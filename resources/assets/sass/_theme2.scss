@@ -1,0 +1,123 @@
+@mixin theme2-variant($header-bg, $text-color, $page-bg) {
+	$base-color : $header-bg;
+	$background-darken-percentage2 : 10%;
+	$background-darken-percentage3 : 5%;
+	$border-darken-percentage : 25%;
+	$text-lighten-percentage : 28%;
+	
+	$page-bg-color : lighten( $base-color, 38% );
+	
+	
+	$bg-color : $header-bg;
+	$bg-color-open : darken($header-bg,$background-darken-percentage2);
+	$bg-color-active : darken($header-bg,$background-darken-percentage3);
+	$link-color : $text-color;
+	$link-color-highlight : lighten($link-color,10%);
+	$link-color-active : white;
+	
+	background-color : $page-bg !important;
+	
+	#page-wrapper {
+		background-color: $page-bg !important;
+	}
+	
+	.navbar-static-top {
+		background:$header-bg;
+		
+		.navbar-toggle {
+			color: $link-color !important;
+			background: none;
+			
+			&:hover {
+				background:$bg-color-active;
+			}
+			
+			&:focus {
+				background:$bg-color-active;
+			}
+			
+			&.active {
+				background:$link-color-active; //lighten($success,10%);
+				color: $bg-color !important;
+				//margin-left:259px;
+			}
+		}
+		
+		.navbar-header, 
+		.dropdown{
+			& > a {
+				color: $link-color !important; 
+			}
+		
+			& > a:hover,
+			& > a:active,
+			& > a:focus,
+			& > a.active {
+				background: lighten($bg-color,5%) !important;
+			}
+		}
+		
+		.nav .open > a, 
+		.nav .open > a:hover, 
+		.nav .open > a:focus {
+			background: lighten($bg-color,5%) !important;
+		}
+	}
+	
+	.sidebar {
+		background: $bg-color;
+		text-transform:uppercase;
+		
+		ul li {
+			//border-bottom:1px inset darken($base-color,$border-darken-percentage) !important;
+		}
+		
+		ul li a {
+			font-size:16px;
+			color: $link-color;
+			position: relative;
+			
+			&:before {
+				content: "";
+				position:absolute;
+				width:100%;
+				height:3px;
+				bottom:0;
+				left:0;
+				border-bottom:1px solid $link-color;
+				//background-color: lighten($base-color,$text-lighten-percentage);
+				visibility:hidden;
+				-webkit-transform: scaleX(0);
+				transform: scaleX(0);
+				-webkit-transition: all 0.2s ease-in-out 0s;
+				transition: all 0.2s ease-in-out 0s; 
+			}
+			
+			&:hover:before {
+				visibility: visible;
+				-webkit-transform: scaleX(1);
+				transform: scaleX(1);
+			}
+			
+			transition: all 0.2s ease-in-out;
+		}
+		
+		ul li a:hover,
+		ul li a:focus {
+			color: $link-color-highlight !important;
+			//transform: translateY(-3px);
+		}
+		
+		ul li a.active {
+			font-weight:bold !important;
+			border-left:2px solid $link-color-active !important;
+			color:$link-color-active !important;
+			background:$bg-color-active !important;
+		}
+		
+		ul li ul li {
+			background: $bg-color-open !important;
+		}
+	}
+
+}

@@ -1,0 +1,59 @@
+// Panels
+
+@mixin panel-variant($border, $heading-text-color, $heading-bg-color, $heading-border) {
+  border-color: $border;
+
+  & > .panel-heading {
+    color: $heading-text-color;
+    background-color: $heading-bg-color;
+    border-color: $heading-border;
+
+    + .panel-collapse > .panel-body {
+      border-top-color: $border;
+    }
+    .badge {
+      color: $heading-bg-color;
+      background-color: $heading-text-color;
+    }
+  }
+  & > .panel-footer {
+    + .panel-collapse > .panel-body {
+      border-bottom-color: $border;
+    }
+  }
+}
+
+@mixin panel-jeremy($color) {
+	border-color: $color;
+	box-shadow:none !important;
+	margin-bottom:0 !important;
+
+	& .panel-heading {
+		color: $white;
+		background-color: $color;
+		border-color: $color;
+	}
+	
+	& .panel-heading:last-child {
+		color: $color;
+		background-color: lighten($color,40%);
+		border-top: 1px solid $very_light_gray2;
+		//border-color: $color;
+	}
+	
+    a {
+		color: darken($color,30%);
+	}
+	
+	a:hover {
+		color: darken($color,50%);
+	}
+	
+	.multiselect-container {
+	
+		li.active a label {
+			color: lighten($moderate_blue,30%);
+		}
+	}
+	
+}

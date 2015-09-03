@@ -1,0 +1,68 @@
+@import 'colors';
+* {
+	font-family: 'Ubuntu', sans-serif;
+}
+
+.badge-error {
+  background-color: $danger;
+}
+.badge-error:hover {
+  background-color: $danger_highlight;
+}
+.badge-warning {
+  background-color: $warning;
+}
+.badge-warning:hover {
+  background-color: $warning_highlight;
+}
+.badge-success {
+  background-color: $success;
+}
+.badge-success:hover {
+  background-color: $success_highlight;
+}
+.badge-info {
+  background-color: $primary;
+}
+.badge-info:hover {
+  background-color: $primary_highlight;
+}
+.badge-inverse {
+  background-color: $inverse;
+}
+.badge-inverse:hover {
+  background-color: $inverse_highlight;
+}
+.badge-red {
+	background-color:$red;	
+}
+.badge-red:hover {
+	background-color:$red_highlight;	
+}
+
+.badge-small {
+	font-size:11px;
+	padding:3px 7px;
+	// position:absolute;
+	// right:36px;
+	// bottom:7px;
+}
+
+.dropdown-menu {
+	transition: all 0.5s ease !important;
+}
+
+.dropdown-menu.dropdown-messages.expand {
+	width:600px;
+	height:400px;
+	top:200px;
+	right:400px;
+}
+ul.dropdown-menu, ul.dropdown-menu * {
+	z-index:10001 !important;
+}
+
+.cursor-move {
+	cursor:move;
+}
+
