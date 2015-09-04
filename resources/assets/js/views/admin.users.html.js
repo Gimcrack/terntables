@@ -66,25 +66,7 @@ _.extend( jApp.views.admin, {
 				rowsPerPage : 10,			// rows per page to display on grid
 				pageNum	: 1,				// current page number to display	
 				html : {
-					
-					// Edit Form Template
-					resetPassword : function() {/*
-						<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper">
-							<div class="frm_wrapper">
-							<div class="panel panel-yellow">
-								<div class="panel-heading">
-									<button type="button" class="close" aria-hidden="true">×</button>
-									<i class="fa fa-refresh fa-fw"></i> Reset Password
-								</div>
-								<div class="panel-overlay" style="display:none"></div>
-								<div class="panel-body">
-									<div class="row side-by-side formContainer"></div>
-								</div>	
-							</div>													
-							</div>
-						</div>		
-					*/},
-					
+					resetPassword : '<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper"> <div class="frm_wrapper"> <div class="panel panel-yellow"> <div class="panel-heading"> <button type="button" class="close" aria-hidden="true">×</button> <i class="fa fa-refresh fa-fw"></i> Reset Password </div> <div class="panel-overlay" style="display:none"></div> <div class="panel-body"> <div class="row side-by-side formContainer"></div> </div> </div> </div> </div>'
 				},
 				formDefs : {
 					resetPassword : {

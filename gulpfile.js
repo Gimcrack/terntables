@@ -1,4 +1,8 @@
 var elixir = require('laravel-elixir');
+var config = elixir.config;
+
+// keep no comments
+
 
 /*
  |--------------------------------------------------------------------------
@@ -50,15 +54,15 @@ elixir(function(mix) {
       jqueryBootpag : paths.jqueryBootpag + '/lib', // done
       jqueryMd5 : paths.jqueryMd5, // done
       jqueryValidator : paths.jqueryValidator, // done
-      perfectScrollbar : paths.perfectScrollbar + '/dist/js',
-      bootstrapSlider : paths.bootstrapSlider + '/js',
-      noty : paths.noty + '/js/noty/packaged',
-      metismenu : paths.metismenu + '/dist',
-      moment : paths.moment,
-      historyjs : paths.historyjs + '/scripts/bundled-uncompressed/html5',
+      perfectScrollbar : paths.perfectScrollbar + '/dist/js', // done
+      bootstrapSlider : paths.bootstrapSlider + '/js', // done
+      noty : paths.noty + '/js/noty/packaged', // done
+      metismenu : paths.metismenu + '/dist', // done
+      moment : paths.moment, // done
+      historyjs : paths.historyjs + '/scripts/bundled-uncompressed/html5', // done
     }
 
-    mix.scripts([
+    var jsScripts = [
       jsPaths.jquery + '/jquery.js',
       jsPaths.jquery + '/jquery-migrate.js',
       jsPaths.bootstrap + '/bootstrap.js',
@@ -84,7 +88,11 @@ elixir(function(mix) {
       jsPaths.metismenu + '/metisMenu.js',
       jsPaths.moment + '/moment.js',
       jsPaths.historyjs + '/jquery.history.js',
-    ], 'public/js/all.js');
+      '*.js',
+      'views/*.js'
+    ]
+
+    mix.scripts(jsScripts, 'public/js/all.js')
 
     var cssPaths = {
       bootstrap : paths.bootstrap + '/stylesheets',
