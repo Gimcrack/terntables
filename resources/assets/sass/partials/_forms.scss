@@ -1,0 +1,148 @@
+fieldset[disabled] {
+	display:none;
+}
+
+.form_element {
+	margin-bottom:4px !important;
+}
+
+.div-btn-edit, .div-btn-reset, .div-btn-delete, .div-btn-new, .div-btn-other {
+	height:64px;
+	width:33.33%;
+	background:#FFF;
+	border:1px solid $primary;
+	position:absolute;
+	top:0;
+	left:0;
+	border-radius:5px;
+
+	opacity:0;
+	transition: all 0.3s;
+
+	fieldset {
+		border:none;
+	}
+
+	button.multiselect.dropdown-toggle,
+  textarea,
+  input:not([type='checkbox']):not([type='radio']):not([type='select']):not([type='button']):not([type='reset']):not([type='submit']) {
+		width:100% !important;
+	}
+	.panel {
+		border: none !important;
+	}
+
+	&.max {
+		position:fixed;
+		max-height:80%;
+		height:auto;
+		width:70%;
+		opacity:1;
+		z-index:9990;
+		top:10%;
+		left:15%;
+		//padding-bottom:40px;
+		overflow:hidden;
+
+		//box-shadow: 5px 5px 5px #666666;
+		transition:height 0.3s linear, width 0.3s linear, opacity 0.3s linear;
+
+
+		.frm_wrapper {
+			visibility:visible;
+
+		//	transition:opacity 0.3s ease 0.4s;
+			opacity:1;
+
+			.row.side-by-side {
+				height:auto;
+				min-height:300px;
+				max-height:60%;
+				overflow:auto;
+			}
+
+			.form-control input[type=checkbox],
+			.form-control input[type=radio]			{
+				float:left;
+				margin-top:-6px;
+				margin-right:10px;
+				outline:none !important;
+			}
+
+			.form-control input[validtype=color] {
+				 text-decoration: underline;
+				-moz-text-decoration-color: black; /* Code for Firefox */
+				text-decoration-color: black;
+			}
+
+			fieldset {
+				padding-bottom:40px;
+			}
+
+			form .panel-heading:last-child {
+				position:absolute;
+				bottom:-7px;
+				background:none !important;
+				border: none !important;
+			}
+
+		}
+
+	}
+
+	.frm_wrapper {
+		visibility:hidden;
+		//transition:all 0.1s;
+		opacity:0;
+	}
+}
+
+.side-by-side {
+
+
+	.form-control {
+		display:inline-block ;
+		width:auto;
+	}
+
+	label:not(.bootstrap-switch-label) {
+		font-weight:bold;
+		color:$primary;
+	}
+
+
+	.div_radios {
+		float:right;
+
+		label, input {
+			float:none;
+		}
+	}
+
+	legend {
+		width: inherit;
+		padding:0 5px;
+		margin-bottom:10px;
+	}
+
+	fieldset {
+		border-radius:3px;
+	}
+
+
+}
+
+::-webkit-input-placeholder { /* WebKit browsers */
+    color:    $placeholder !important;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    $placeholder !important;
+   opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    $placeholder !important;
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+   color:    $placeholder !important;
+}

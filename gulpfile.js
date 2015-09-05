@@ -88,37 +88,23 @@ elixir(function(mix) {
     'views/*.js'
   ];
 
-   var cssPaths = {
-     bootstrap : paths.bootstrap + '/stylesheets',
-     fontAwesome : paths.fontAwesome + '/scss',
-     bootstrapDatetimepicker : paths.bootstrapDatetimepicker + '/css',
-     bootstrapMultiselect : paths.bootstrapMultiselect + '/dist/css',
-     perfectScrollbar : paths.perfectScrollbar + '/dist/css',
-     bootstrapSlider : paths.bootstrapSlider + '/css',
-     metismenu : paths.metismenu + '/dist',
-   }
-
-   var scssFiles = [
-     cssPaths.bootstrap + '/_bootstrap.scss',
-     cssPaths.fontAwesome + '/font-awesome.scss',
-     'app.scss'
-   ];
-
-   var cssFiles = [
-     'app.css',
-     cssPaths.bootstrapDatetimepicker + '/bootstrap-datetimepicker.css',
-     cssPaths.bootstrapMultiselect + '/bootstrap-multiselect.css',
-     cssPaths.perfectScrollbar + '/perfect-scrollbar.css',
-     cssPaths.bootstrapSlider + '/bootstrap-slider.css',
-     cssPaths.metismenu + '/metisMenu.css',
-
+   var cssPaths = [
+     paths.bootstrap + '/stylesheets',
+     paths.fontAwesome + '/scss',
+     paths.bootstrapDatetimepicker + '/css',
+     paths.bootstrapMultiselect + '/dist/css',
+     paths.perfectScrollbar + '/dist/css',
+     paths.bootstrapSlider + '/css',
+    paths.metismenu + '/dist',
    ];
 
     //scripts
     mix.scripts(jsScripts, 'public/js/all.js');
 
     //styles
-    mix.sass(scssFiles, 'resources/assets/css/app.css')
-       .styles(cssFiles, 'public/css/all.css');
+    mix.sass('app.scss',
+      'public/css/all.css', {
+        includePaths : cssPaths
+    });
 
 });

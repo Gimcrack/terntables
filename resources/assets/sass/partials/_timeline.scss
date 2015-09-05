@@ -1,3 +1,26 @@
+
+.timeline-body {
+	ul {
+		list-style:none;
+	}
+	li {
+		list-style:none;
+
+		&:before {
+			font-family:"FontAwesome";
+			content: '\f096';
+			padding-right:5px;
+		}
+
+		&.complete:before {
+			font-family:"FontAwesome";
+			content: '\f046';
+			padding-right:5px;
+		}
+	}
+}
+
+
 .timeline {
     position: relative;
     padding: 20px 0 20px;

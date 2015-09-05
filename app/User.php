@@ -28,7 +28,7 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = ['name', 'username', 'email', 'password'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -36,4 +36,51 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     protected $hidden = ['password', 'remember_token'];
+
+
+    /**
+     * A User may belong to many groups
+     *
+     * @return \belongsToMany
+     */
+    public function groups()
+    {
+      return $this->belongsToMany('App\Group')->withTimestamps();
+    }
+
+    /**
+     * Is user an admin
+     *
+     * @return boolean
+     */
+    public function isAdmin()
+    {
+      return (Boolean)  ( $this->groups()->where('name','Administrators')->count() ) or
+              ( $this->groups()->where('name','Super Administrators')->count() );
+    }
+
+    /**
+     * Is user a super admin
+     *
+     * @return boolean [description]
+     */
+    public function isSuperAdmin()
+    {
+      return (Boolean) ( $this->groups()->where('name','Super Administrators')->count() );
+    }
+
+
+    /**
+     * Is user an AD user
+     *
+     * @return boolean [description]
+     */
+    public function isADUser()
+    {
+      return (Boolean) ( $this->groups()->where('name','AD Users')->count() );
+    }
+
+    public static function aduser() {
+      return explode("\\",$_SERVER['PHP_AUTH_USER'])[1];
+    }
 }

@@ -1,0 +1,15 @@
+
+.quick-add-container {
+	background:lighten($info,31%) !important;
+	position:fixed;
+	bottom:6px;
+	right:0;
+	z-index:999;
+	border-top:2px double lighten($info,10%) !important;
+	padding:6px 6px 0;
+	width:300px;
+
+	transition:all 0.3s linear;
+
+	.qa-preview { margin: 0 0 10px; }
+}

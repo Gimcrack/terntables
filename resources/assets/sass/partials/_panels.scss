@@ -33,27 +33,53 @@
 		background-color: $color;
 		border-color: $color;
 	}
-	
+
 	& .panel-heading:last-child {
 		color: $color;
 		background-color: lighten($color,40%);
 		border-top: 1px solid $very_light_gray2;
 		//border-color: $color;
 	}
-	
+
     a {
 		color: darken($color,30%);
 	}
-	
+
 	a:hover {
 		color: darken($color,50%);
 	}
-	
+
 	.multiselect-container {
-	
+
 		li.active a label {
 			color: lighten($moderate_blue,30%);
 		}
 	}
-	
+
+}
+
+
+/* PANELS */
+.panel-body {
+	padding:15px 15px 0 !important;
+}
+
+.panel-info>.panel-collapse { background: rgba($info, 0.09) }
+.panel-info>.panel-success { background: rgba($success, 0.09) }
+.panel-primary>.panel-body { background: rgba($primary, 0.09) }
+
+.panel-blue		{ @include panel-jeremy($primary) }
+.panel-lblue	{ @include panel-jeremy($info) }
+.panel-green 	{ @include panel-jeremy($green) }
+.panel-red		{ @include panel-jeremy($red) }
+.panel-yellow	{ @include panel-jeremy($yellow)  }
+
+.panel-overlay {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	z-index: 1000;
+	background: url('../../images/tbody-preload.gif') no-repeat center center rgba(0, 0, 50, 0.1);
 }

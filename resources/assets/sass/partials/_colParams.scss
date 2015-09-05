@@ -1,0 +1,78 @@
+
+.tbl-list {
+	position:relative;
+	height:585px;
+	overflow:hidden;
+	padding:15px 0 !important;
+	background: lighten($info,25%);
+
+	h3 {
+		margin:0 6px 10px;
+		font-size:21px;
+	}
+
+	.list-group-item {
+		border:none;
+		margin:0 !important;
+	//	border-right : 1px solid #ddd;
+		border-top: 1px solid transparent;
+		border-bottom: 1px solid transparent;
+		background:transparent;
+
+		&.chosen {
+			//border-right: 1px solid transparent;
+			border-top: 1px solid #ddd !important;
+			border-bottom: 1px solid #ddd !important;
+			font-weight:bold;
+			background: lighten($info,30%);
+		}
+
+		a {
+			outline:none !important;
+		}
+	}
+}
+
+.col-list {
+	position:relative;
+	height:585px;
+	overflow:hidden;
+	padding:15px 0 !important;
+	background: lighten($info,30%);
+
+	h3 {
+		margin:0 6px 10px;
+		font-size:21px;
+
+	}
+
+	.list-group-item {
+		border:none;
+		margin:0 !important;
+		//border-right : 1px solid #ddd;
+		border-top: 1px solid transparent;
+		border-bottom: 1px solid transparent;
+		background:transparent;
+
+
+		&.chosen {
+			//border-right: 1px solid transparent;
+			border-top: 1px solid #ddd !important;
+			border-bottom: 1px solid #ddd !important;
+			font-weight:bold;
+			background: lighten($info,35%);
+		}
+
+		a {
+			outline:none !important;
+		}
+	}
+}
+
+.param-list {
+	height:585px;
+	overflow:hidden;
+	position:relative;
+	padding:15px 0 !important;
+	background: lighten($info,35%);
+}

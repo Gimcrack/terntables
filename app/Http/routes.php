@@ -11,6 +11,19 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'PagesController@home');
+Route::get('/home', 'PagesController@home');
+
+
+
+/**
+ * Authentication
+ */
+
+ // AD LOGIN
+ Route::get('/auth/adlogin/{_token}', 'Auth\AuthController@adlogin');
+
+Route::controllers([
+  'auth' => 'Auth\AuthController',
+  'password' => 'Auth\PasswordController'
+  ]);

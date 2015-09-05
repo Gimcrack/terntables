@@ -576,12 +576,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "b70f279ce3d644e8d4aba10f544f52452a2832bf"
+                "reference": "6f86f509939f14423ddfb39da72b5cd73b6836c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/b70f279ce3d644e8d4aba10f544f52452a2832bf",
-                "reference": "b70f279ce3d644e8d4aba10f544f52452a2832bf",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/6f86f509939f14423ddfb39da72b5cd73b6836c9",
+                "reference": "6f86f509939f14423ddfb39da72b5cd73b6836c9",
                 "shasum": ""
             },
             "require": {
@@ -602,7 +602,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2015-09-04 00:45:21"
+            "time": "2015-09-05 00:56:20"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -1049,16 +1049,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.1.15",
+            "version": "v5.1.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "231b5ee6d8439edb5f7d45da00fd31d915bdf6f0"
+                "reference": "e34dcc0c57e0f560248aec5128161256ff8bf4e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/231b5ee6d8439edb5f7d45da00fd31d915bdf6f0",
-                "reference": "231b5ee6d8439edb5f7d45da00fd31d915bdf6f0",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/e34dcc0c57e0f560248aec5128161256ff8bf4e1",
+                "reference": "e34dcc0c57e0f560248aec5128161256ff8bf4e1",
                 "shasum": ""
             },
             "require": {
@@ -1173,7 +1173,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2015-09-03 16:00:33"
+            "time": "2015-09-04 12:46:14"
         },
         {
             "name": "league/flysystem",

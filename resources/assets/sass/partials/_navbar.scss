@@ -1,0 +1,89 @@
+.navbar-static-top {
+	position:fixed;
+	right:0;
+	left:0;
+	top:0;
+}
+
+.navbar-top-links {
+	li {
+		display: inline-block;
+
+		&:last-child {
+			margin-right: 15px;
+		}
+
+		a {
+				padding: 15px;
+				min-height: 50px;
+		}
+	}
+
+	.dropdown-menu {
+		li {
+			display: block;
+
+			&:last-child {
+				margin-right: 0;
+			}
+
+			a {
+				padding: 3px 20px;
+				min-height: 0;
+
+				div {
+					white-space: normal;
+				}
+			}
+		}
+	}
+}
+
+.navbar-top-links .dropdown-messages,
+.navbar-top-links .dropdown-tasks,
+.navbar-top-links .dropdown-alerts,
+.navbar-top-links .dropdown-notifications {
+    width: 310px;
+    min-width: 0;
+}
+
+.navbar-top-links .dropdown-notifications {
+	div {
+		padding: 5px 15px;
+	}
+}
+
+.navbar-top-links .dropdown-messages {
+    margin-left: 5px;
+}
+
+.navbar-top-links .dropdown-tasks {
+    margin-left: -59px;
+}
+
+.navbar-top-links .dropdown-alerts {
+    margin-left: -123px;
+}
+
+.navbar-top-links .dropdown-user {
+    right: 0;
+    left: auto;
+}
+.navbar-default {
+	transition:margin 0.4s ease-in !important;
+}
+
+.navbar-default.slide {
+	margin-left:250px;
+}
+
+.navbar-default .navbar-toggle {
+	border: none !important;
+	margin: 12px 5px 0;
+	padding:5px 5px;
+	transition:margin 0.4s ease-in;
+
+	.icon-bar {
+		background: white !important;
+	}
+}

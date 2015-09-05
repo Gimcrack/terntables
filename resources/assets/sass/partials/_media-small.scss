@@ -1,0 +1,12 @@
+@media(min-width:768px) {
+    .sidebar {
+
+    }
+
+    .navbar-top-links .dropdown-messages,
+    .navbar-top-links .dropdown-tasks,
+    .navbar-top-links .dropdown-alerts,
+	  .navbar-top-links .dropdown-notifications {
+        margin-left: auto;
+    }
+}
