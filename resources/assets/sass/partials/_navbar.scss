@@ -71,6 +71,12 @@
 }
 .navbar-default {
 	transition:margin 0.4s ease-in !important;
+
+	li.menu-section-heading {
+    font-weight: bold;
+    text-align: center;
+    color: $brand-primary;
+  }
 }
 
 .navbar-default.slide {

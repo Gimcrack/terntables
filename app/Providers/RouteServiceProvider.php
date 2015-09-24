@@ -27,6 +27,8 @@ class RouteServiceProvider extends ServiceProvider
         //
 
         parent::boot($router);
+
+        //$router->model('colparams',function($id) { return \App\ColParam::where('colparam_id',$id)->firstOrFail();  });
     }
 
     /**

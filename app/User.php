@@ -81,6 +81,10 @@ class User extends Model implements AuthenticatableContract,
     }
 
     public static function aduser() {
-      return explode("\\",$_SERVER['PHP_AUTH_USER'])[1];
+      if (!empty($_SERVER['PHP_AUTH_USER'])) {
+        return explode("\\",$_SERVER['PHP_AUTH_USER'])[1];
+      } else {
+        return false;
+      }
     }
 }

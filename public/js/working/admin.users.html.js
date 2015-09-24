@@ -1,31 +1,22 @@
 // extend the application views
-_.extend( jApp.views, {
+_.extend( jApp.views.admin, {
 
-	profile : function() {
+	users : function() {
 
-		_.extend( jApp.oG, {
+		_.extend( jApp.oG.admin, {
 
-			profile : new jGrid({
-
-				table : 'contact',
-				dbView : 'vw_Contact',		// db table
-				pkey : 'ContactID',			// Primary Key Of Table
-				tableFriendly : 'User',
-				columnFriendly : 'FullName',
-				filter : 'ContactID = [[CONTACTID]]',
+			users : new jGrid({
+				url : '/admin/users/json',
+				columnFriendly : 'name',
 				gridHeader : {
 					icon : 'fa-user',
-					headerTitle : 'My Profile',
-					helpText : 'Note: Resetting your password here will affect all Logins assigned to you.'
+					headerTitle : 'Manage Users',
+					helpText : "<strong>Note:</strong> Manage Users Here"
 				},
-				toggles : {
-					new : false,
-					del : false,
-					sort : false,
-					autoUpdate : false,
-					paginate : false,
-					withSelected : false,
-					//headerFilters : false,
+				tableBtns : {
+					new : {
+						label : 'New User',
+					},
 				},
 				rowBtns : {
 					custom : {
@@ -33,38 +24,45 @@ _.extend( jApp.views, {
 					}
 				},
 				columns : [ 				// columns to query
-					"ContactID",
-					"EmailLink",
-					"UserNames",
-					"ManagerName",
-					"GroupNames",
-					"UserIDs",
-					"GroupIDs",
-					"ManagerID",
+					"id",
+					"name",
+					"email",
+					"username",
+					"groups",
+					"created_at",
+					"updated_at",
+
 				],
 				hidCols : [					// columns to hide
-					"UserIDs",
-					"GroupIDs",
-					"ManagerID"
+
 				],
 				headers : [ 				// headers for table
 					"ID",
 					"Name",
-					"Login(s)",
-					"Reports To",
+					"Email",
+					"Username",
 					"Groups",
+					"Created Date",
+					"Changed Date",
 				],
 				templates : { 				// html template functions
 
-					"ContactID" : function(value) {
+					"id" : function(value) {
 						var temp = '0000' + value;
 						return temp.slice(-4);
 					},
 
+					"email" : function(value) {
+						return '<a href="mailto:' + value + '" >' + value + '</a>';
+					},
+
+					"groups" : function(arr) {
+						return _.pluck(arr, 'name').join(', ');
+					}
+
 				},
 				linkTables : [
-					{ tables : { parent : 'Contact', child : 'Group' }, childFriendlyName : 'GroupName' },
-					{ tables : { parent : 'Contact', child : 'User' }, childFriendlyName : 'UserName' },
+
 				],
 				sortBy : 'EmailLink',			// column to sort by
 				rowsPerPage : 10,			// rows per page to display on grid
@@ -87,23 +85,22 @@ _.extend( jApp.views, {
 						loadExternal : false,
 						colParams : [
 							{ type : 'hidden', readonly : 'readonly', name : 'ContactID' },
-							{ type : 'password', name : 'Password1', id : 'Password1', required : 'required', 'data-validType' : 'min>=6', _label : 'New Password', placeholder : '******' },
-							{ type : 'password', name : 'Password2', id : 'Password2', required : 'required', 'data-validType' : 'field==#Password1', _label : 'Confirm Password', placeholder : '******' },
+							{ type : 'password', name : 'Password1', id : 'Password1', required : 'required', validType : 'min>=6', _label : 'New Password', placeholder : '******' },
+							{ type : 'password', name : 'Password2', id : 'Password2', required : 'required', validType : 'field==#Password1', _label : 'Confirm Password', placeholder : '******' },
 						],
 					}
 				},
 				fn : {
 					resetPassword : function() {
-						jApp.oG.profile.action = 'resetPassword';
+						jApp.oG.admin.users.action = 'resetPassword';
 						// modal overlay
-						jApp.oG.profile.fn.overlay(2,'on');
+						jApp.oG.admin.users.fn.overlay(2,'on');
 
 						//setup target div
-						var $target = jApp.oG.profile.$().find('#div_resetFrm');
-						jApp.oG.profile.fn.setupTargetDiv($target);
+						var $target = jApp.oG.admin.users.$().find('#div_resetFrm');
+						jApp.oG.admin.users.fn.setupTargetDiv($target);
 					}, //end fn
 				}
-
 			})
 		})
 	}

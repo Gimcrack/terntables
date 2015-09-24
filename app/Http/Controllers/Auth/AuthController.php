@@ -40,7 +40,10 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('guest', ['except' => 'getLogout']);
-        $this->aduser = explode("\\",$_SERVER['PHP_AUTH_USER'])[1];
+
+        $this->aduser = (!empty($_SERVER['PHP_AUTH_USER'])) ?
+          explode("\\",$_SERVER['PHP_AUTH_USER'])[1] :
+          '';
     }
 
     /**
@@ -110,8 +113,8 @@ class AuthController extends Controller
     private function isValidADUser()
     {
         try {
-          return (Boolean) User::where('username',$this->aduser)
-                            ->firstOrFail()
+          return (Boolean) User::where('username', 'like', $this->aduser)
+                            ->first()
                             ->groups()
                             ->where('name','AD Users')
                             ->count();
@@ -124,8 +127,8 @@ class AuthController extends Controller
     private function getUserByADLogin()
     {
       try {
-        return User::where('username',$this->aduser)
-                          ->firstOrFail();
+        return User::where('username', 'like', $this->aduser)
+                          ->first();
       } catch(Exception $e ) {
         return false;
       }

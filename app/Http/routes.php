@@ -14,6 +14,23 @@
 Route::get('/', 'PagesController@home');
 Route::get('/home', 'PagesController@home');
 
+/**
+ * Admin Routes
+ */
+ Route::get('admin/users/json',      'Admin\UserController@indexjson');
+ Route::get('admin/users/{id}/json', 'Admin\UserController@showjson');
+ Route::resource('admin/users',      'Admin\UserController');
+
+
+
+ Route::get('admin/colparams/json/{table}/{column}',  'Admin\ColParamController@columnjson');
+ Route::get('admin/colparams/json/{table}',           'Admin\ColParamController@tablejson');
+ Route::get('admin/colparams/json',                   'Admin\ColParamController@indexjson');
+ Route::get('admin/colparams/tablelist',              'Admin\ColParamController@tablelist');
+ Route::resource('admin/colparams',                   'Admin\ColParamController');
+
+ //Route::resource('admin/groups',     'Admin\GroupController');
+
 
 
 /**
