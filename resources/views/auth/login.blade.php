@@ -59,8 +59,7 @@
 			<div class="panel panel-info">
 				<div class="panel-heading">AD Login</div>
 				<div class="panel-body">
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/auth/adlogin') }}">
-						<input type="hidden" name="_token" value="{{ csrf_token() }}">
+					<form class="form-horizontal" role="form" method="GET" action="{{ url('/auth/adlogin') }}/{{ csrf_token() }}">
 
 						<div class="form-group">
 							<div class="col-md-6 col-md-offset-4">

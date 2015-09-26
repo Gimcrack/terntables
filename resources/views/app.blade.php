@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu:400,300,700" media="screen" title="no title" charset="utf-8">
 
-    <script type="text/javascript" src="/js/async-grid/jApp.class.js"> </script>
+    <script type="text/javascript" src="/js/async-grid/js/jApp.class.js"> </script>
     <script type="text/javascript" src="/js/all.js"> </script>
 
-    <script type="text/javascript" src="/js/async-grid/jForm.class.js"> </script>
-    <script type="text/javascript" src="/js/async-grid/jInput.class.js"> </script>
-    <script type="text/javascript" src="/js/async-grid/jLinkTable.class.js"> </script>
+    <script type="text/javascript" src="/js/async-grid/js/jForm.class.js"> </script>
+    <script type="text/javascript" src="/js/async-grid/js/jInput.class.js"> </script>
+    <script type="text/javascript" src="/js/async-grid/js/jLinkTable.class.js"> </script>
 
-    <script type="text/javascript" src="/js/async-grid/jGrid.class.js"> </script>
+    <script type="text/javascript" src="/js/async-grid/js/jGrid.class.js"> </script>
     <script type="text/javascript" src="/js/working/admin.users.html.js"> </script>
   </head>
   <body class="{{ env('CSS_CLASS') }}">

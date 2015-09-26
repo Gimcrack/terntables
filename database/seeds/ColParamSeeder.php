@@ -571,8 +571,8 @@ class ColParamSeeder extends Seeder
 
         ColParam::create([	'tableName' => 'users'
         ,	'name' => 'email'
-        ,	'placeholder' => 'e.g. John Smith'
-        ,	'_label' => 'Name'
+        ,	'placeholder' => 'email@domain.com'
+        ,	'_label' => 'Email Address'
         ,	'_enabled' => 'yes'
         ,	'data-ordering' => '3'
         ,	'data-fieldset' => '1'

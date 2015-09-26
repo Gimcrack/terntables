@@ -112,25 +112,18 @@ class AuthController extends Controller
 
     private function isValidADUser()
     {
-        try {
-          return (Boolean) User::where('username', 'like', $this->aduser)
-                            ->first()
-                            ->groups()
-                            ->where('name','AD Users')
-                            ->count();
-        } catch(Exception $e ) {
-          return false;
-        }
+        $user = $this->getUserByADLogin();
 
+        if ($user === false) { return false; }
+
+        return (Boolean) $user->groups()
+          ->where('name','AD Users')
+          ->count();
     }
 
     private function getUserByADLogin()
     {
-      try {
-        return User::where('username', 'like', $this->aduser)
-                          ->first();
-      } catch(Exception $e ) {
-        return false;
-      }
+      $user = User::where('username', 'like', $this->aduser)->first();
+      return ( !empty($user) ) ? $user : false;
     }
 }

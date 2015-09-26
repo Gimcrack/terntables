@@ -16191,9 +16191,9 @@ window.Modernizr = (function( window, document, undefined ) {
 
 })(this, this.document);
 
-//     Underscore.js 1.7.0
+//     Underscore.js 1.8.3
 //     http://underscorejs.org
-//     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
 
 (function() {
@@ -16201,29 +16201,35 @@ window.Modernizr = (function( window, document, undefined ) {
   // Baseline setup
   // --------------
 
-  // Establish the root object, `window` in the browser, or `exports` on the server.
-  var root = this;
+  // Establish the root object, `window` (`self`) in the browser, `global`
+  // on the server, or `this` in some virtual machines. We use `self`
+  // instead of `window` for `WebWorker` support.
+  var root = typeof self == 'object' && self.self === self && self ||
+            typeof global == 'object' && global.global === global && global ||
+            this;
 
   // Save the previous value of the `_` variable.
   var previousUnderscore = root._;
 
   // Save bytes in the minified (but not gzipped) version:
-  var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
+  var ArrayProto = Array.prototype, ObjProto = Object.prototype;
 
   // Create quick reference variables for speed access to core prototypes.
   var
-    push             = ArrayProto.push,
-    slice            = ArrayProto.slice,
-    concat           = ArrayProto.concat,
-    toString         = ObjProto.toString,
-    hasOwnProperty   = ObjProto.hasOwnProperty;
+    push = ArrayProto.push,
+    slice = ArrayProto.slice,
+    toString = ObjProto.toString,
+    hasOwnProperty = ObjProto.hasOwnProperty;
 
   // All **ECMAScript 5** native function implementations that we hope to use
   // are declared here.
   var
-    nativeIsArray      = Array.isArray,
-    nativeKeys         = Object.keys,
-    nativeBind         = FuncProto.bind;
+    nativeIsArray = Array.isArray,
+    nativeKeys = Object.keys,
+    nativeCreate = Object.create;
+
+  // Naked function reference for surrogate-prototype-swapping.
+  var Ctor = function(){};
 
   // Create a safe reference to the Underscore object for use below.
   var _ = function(obj) {
@@ -16233,10 +16239,10 @@ window.Modernizr = (function( window, document, undefined ) {
   };
 
   // Export the Underscore object for **Node.js**, with
-  // backwards-compatibility for the old `require()` API. If we're in
+  // backwards-compatibility for their old module API. If we're in
   // the browser, add `_` as a global object.
-  if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
+  if (typeof exports != 'undefined') {
+    if (typeof module != 'undefined' && module.exports) {
       exports = module.exports = _;
     }
     exports._ = _;
@@ -16245,20 +16251,19 @@ window.Modernizr = (function( window, document, undefined ) {
   }
 
   // Current version.
-  _.VERSION = '1.7.0';
+  _.VERSION = '1.8.3';
 
   // Internal function that returns an efficient (for current engines) version
   // of the passed-in callback, to be repeatedly applied in other Underscore
   // functions.
-  var createCallback = function(func, context, argCount) {
+  var optimizeCb = function(func, context, argCount) {
     if (context === void 0) return func;
     switch (argCount == null ? 3 : argCount) {
       case 1: return function(value) {
         return func.call(context, value);
       };
-      case 2: return function(value, other) {
-        return func.call(context, value, other);
-      };
+      // The 2-parameter case has been omitted only because no current consumers
+      // made use of it.
       case 3: return function(value, index, collection) {
         return func.call(context, value, index, collection);
       };
@@ -16273,12 +16278,67 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // A mostly-internal function to generate callbacks that can be applied
   // to each element in a collection, returning the desired result — either
-  // identity, an arbitrary callback, a property matcher, or a property accessor.
-  _.iteratee = function(value, context, argCount) {
+  // `identity`, an arbitrary callback, a property matcher, or a property accessor.
+  var cb = function(value, context, argCount) {
     if (value == null) return _.identity;
-    if (_.isFunction(value)) return createCallback(value, context, argCount);
-    if (_.isObject(value)) return _.matches(value);
+    if (_.isFunction(value)) return optimizeCb(value, context, argCount);
+    if (_.isObject(value)) return _.matcher(value);
     return _.property(value);
+  };
+
+  _.iteratee = function(value, context) {
+    return cb(value, context, Infinity);
+  };
+
+  // Similar to ES6's rest param (http://ariya.ofilabs.com/2013/03/es6-and-rest-parameter.html)
+  // This accumulates the arguments passed into an array, after a given index.
+  var restArgs = function(func, startIndex) {
+    startIndex = startIndex == null ? func.length - 1 : +startIndex;
+    return function() {
+      var length = Math.max(arguments.length - startIndex, 0);
+      var rest = Array(length);
+      for (var index = 0; index < length; index++) {
+        rest[index] = arguments[index + startIndex];
+      }
+      switch (startIndex) {
+        case 0: return func.call(this, rest);
+        case 1: return func.call(this, arguments[0], rest);
+        case 2: return func.call(this, arguments[0], arguments[1], rest);
+      }
+      var args = Array(startIndex + 1);
+      for (index = 0; index < startIndex; index++) {
+        args[index] = arguments[index];
+      }
+      args[startIndex] = rest;
+      return func.apply(this, args);
+    };
+  };
+
+  // An internal function for creating a new object that inherits from another.
+  var baseCreate = function(prototype) {
+    if (!_.isObject(prototype)) return {};
+    if (nativeCreate) return nativeCreate(prototype);
+    Ctor.prototype = prototype;
+    var result = new Ctor;
+    Ctor.prototype = null;
+    return result;
+  };
+
+  var property = function(key) {
+    return function(obj) {
+      return obj == null ? void 0 : obj[key];
+    };
+  };
+
+  // Helper for collection methods to determine whether a collection
+  // should be iterated as an array or as an object.
+  // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
+  // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
+  var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
+  var getLength = property('length');
+  var isArrayLike = function(collection) {
+    var length = getLength(collection);
+    return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
   };
 
   // Collection Functions
@@ -16288,11 +16348,10 @@ window.Modernizr = (function( window, document, undefined ) {
   // Handles raw objects in addition to array-likes. Treats all
   // sparse array-likes as if they were dense.
   _.each = _.forEach = function(obj, iteratee, context) {
-    if (obj == null) return obj;
-    iteratee = createCallback(iteratee, context);
-    var i, length = obj.length;
-    if (length === +length) {
-      for (i = 0; i < length; i++) {
+    iteratee = optimizeCb(iteratee, context);
+    var i, length;
+    if (isArrayLike(obj)) {
+      for (i = 0, length = obj.length; i < length; i++) {
         iteratee(obj[i], i, obj);
       }
     } else {
@@ -16306,77 +16365,65 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // Return the results of applying the iteratee to each element.
   _.map = _.collect = function(obj, iteratee, context) {
-    if (obj == null) return [];
-    iteratee = _.iteratee(iteratee, context);
-    var keys = obj.length !== +obj.length && _.keys(obj),
+    iteratee = cb(iteratee, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
         length = (keys || obj).length,
-        results = Array(length),
-        currentKey;
+        results = Array(length);
     for (var index = 0; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
+      var currentKey = keys ? keys[index] : index;
       results[index] = iteratee(obj[currentKey], currentKey, obj);
     }
     return results;
   };
 
-  var reduceError = 'Reduce of empty array with no initial value';
+  // Create a reducing function iterating left or right.
+  var createReduce = function(dir) {
+    // Optimized iterator function as using arguments.length
+    // in the main function will deoptimize the, see #1991.
+    var reducer = function(obj, iteratee, memo, initial) {
+      var keys = !isArrayLike(obj) && _.keys(obj),
+          length = (keys || obj).length,
+          index = dir > 0 ? 0 : length - 1;
+      if (!initial) {
+        memo = obj[keys ? keys[index] : index];
+        index += dir;
+      }
+      for (; index >= 0 && index < length; index += dir) {
+        var currentKey = keys ? keys[index] : index;
+        memo = iteratee(memo, obj[currentKey], currentKey, obj);
+      }
+      return memo;
+    };
+
+    return function(obj, iteratee, memo, context) {
+      var initial = arguments.length >= 3;
+      return reducer(obj, optimizeCb(iteratee, context, 4), memo, initial);
+    };
+  };
 
   // **Reduce** builds up a single result from a list of values, aka `inject`,
   // or `foldl`.
-  _.reduce = _.foldl = _.inject = function(obj, iteratee, memo, context) {
-    if (obj == null) obj = [];
-    iteratee = createCallback(iteratee, context, 4);
-    var keys = obj.length !== +obj.length && _.keys(obj),
-        length = (keys || obj).length,
-        index = 0, currentKey;
-    if (arguments.length < 3) {
-      if (!length) throw new TypeError(reduceError);
-      memo = obj[keys ? keys[index++] : index++];
-    }
-    for (; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
-      memo = iteratee(memo, obj[currentKey], currentKey, obj);
-    }
-    return memo;
-  };
+  _.reduce = _.foldl = _.inject = createReduce(1);
 
   // The right-associative version of reduce, also known as `foldr`.
-  _.reduceRight = _.foldr = function(obj, iteratee, memo, context) {
-    if (obj == null) obj = [];
-    iteratee = createCallback(iteratee, context, 4);
-    var keys = obj.length !== + obj.length && _.keys(obj),
-        index = (keys || obj).length,
-        currentKey;
-    if (arguments.length < 3) {
-      if (!index) throw new TypeError(reduceError);
-      memo = obj[keys ? keys[--index] : --index];
-    }
-    while (index--) {
-      currentKey = keys ? keys[index] : index;
-      memo = iteratee(memo, obj[currentKey], currentKey, obj);
-    }
-    return memo;
-  };
+  _.reduceRight = _.foldr = createReduce(-1);
 
   // Return the first value which passes a truth test. Aliased as `detect`.
   _.find = _.detect = function(obj, predicate, context) {
-    var result;
-    predicate = _.iteratee(predicate, context);
-    _.some(obj, function(value, index, list) {
-      if (predicate(value, index, list)) {
-        result = value;
-        return true;
-      }
-    });
-    return result;
+    var key;
+    if (isArrayLike(obj)) {
+      key = _.findIndex(obj, predicate, context);
+    } else {
+      key = _.findKey(obj, predicate, context);
+    }
+    if (key !== void 0 && key !== -1) return obj[key];
   };
 
   // Return all the elements that pass a truth test.
   // Aliased as `select`.
   _.filter = _.select = function(obj, predicate, context) {
     var results = [];
-    if (obj == null) return results;
-    predicate = _.iteratee(predicate, context);
+    predicate = cb(predicate, context);
     _.each(obj, function(value, index, list) {
       if (predicate(value, index, list)) results.push(value);
     });
@@ -16385,19 +16432,17 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // Return all the elements for which a truth test fails.
   _.reject = function(obj, predicate, context) {
-    return _.filter(obj, _.negate(_.iteratee(predicate)), context);
+    return _.filter(obj, _.negate(cb(predicate)), context);
   };
 
   // Determine whether all of the elements match a truth test.
   // Aliased as `all`.
   _.every = _.all = function(obj, predicate, context) {
-    if (obj == null) return true;
-    predicate = _.iteratee(predicate, context);
-    var keys = obj.length !== +obj.length && _.keys(obj),
-        length = (keys || obj).length,
-        index, currentKey;
-    for (index = 0; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
+    predicate = cb(predicate, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length;
+    for (var index = 0; index < length; index++) {
+      var currentKey = keys ? keys[index] : index;
       if (!predicate(obj[currentKey], currentKey, obj)) return false;
     }
     return true;
@@ -16406,34 +16451,32 @@ window.Modernizr = (function( window, document, undefined ) {
   // Determine if at least one element in the object matches a truth test.
   // Aliased as `any`.
   _.some = _.any = function(obj, predicate, context) {
-    if (obj == null) return false;
-    predicate = _.iteratee(predicate, context);
-    var keys = obj.length !== +obj.length && _.keys(obj),
-        length = (keys || obj).length,
-        index, currentKey;
-    for (index = 0; index < length; index++) {
-      currentKey = keys ? keys[index] : index;
+    predicate = cb(predicate, context);
+    var keys = !isArrayLike(obj) && _.keys(obj),
+        length = (keys || obj).length;
+    for (var index = 0; index < length; index++) {
+      var currentKey = keys ? keys[index] : index;
       if (predicate(obj[currentKey], currentKey, obj)) return true;
     }
     return false;
   };
 
-  // Determine if the array or object contains a given value (using `===`).
-  // Aliased as `include`.
-  _.contains = _.include = function(obj, target) {
-    if (obj == null) return false;
-    if (obj.length !== +obj.length) obj = _.values(obj);
-    return _.indexOf(obj, target) >= 0;
+  // Determine if the array or object contains a given item (using `===`).
+  // Aliased as `includes` and `include`.
+  _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
+    if (!isArrayLike(obj)) obj = _.values(obj);
+    if (typeof fromIndex != 'number' || guard) fromIndex = 0;
+    return _.indexOf(obj, item, fromIndex) >= 0;
   };
 
   // Invoke a method (with arguments) on every item in a collection.
-  _.invoke = function(obj, method) {
-    var args = slice.call(arguments, 2);
+  _.invoke = restArgs(function(obj, method, args) {
     var isFunc = _.isFunction(method);
     return _.map(obj, function(value) {
-      return (isFunc ? method : value[method]).apply(value, args);
+      var func = isFunc ? method : value[method];
+      return func == null ? func : func.apply(value, args);
     });
-  };
+  });
 
   // Convenience version of a common use case of `map`: fetching a property.
   _.pluck = function(obj, key) {
@@ -16443,21 +16486,21 @@ window.Modernizr = (function( window, document, undefined ) {
   // Convenience version of a common use case of `filter`: selecting only objects
   // containing specific `key:value` pairs.
   _.where = function(obj, attrs) {
-    return _.filter(obj, _.matches(attrs));
+    return _.filter(obj, _.matcher(attrs));
   };
 
   // Convenience version of a common use case of `find`: getting the first object
   // containing specific `key:value` pairs.
   _.findWhere = function(obj, attrs) {
-    return _.find(obj, _.matches(attrs));
+    return _.find(obj, _.matcher(attrs));
   };
 
   // Return the maximum element (or element-based computation).
   _.max = function(obj, iteratee, context) {
     var result = -Infinity, lastComputed = -Infinity,
         value, computed;
-    if (iteratee == null && obj != null) {
-      obj = obj.length === +obj.length ? obj : _.values(obj);
+    if (iteratee == null || (typeof iteratee == 'number' && typeof obj[0] != 'object') && obj != null) {
+      obj = isArrayLike(obj) ? obj : _.values(obj);
       for (var i = 0, length = obj.length; i < length; i++) {
         value = obj[i];
         if (value > result) {
@@ -16465,11 +16508,11 @@ window.Modernizr = (function( window, document, undefined ) {
         }
       }
     } else {
-      iteratee = _.iteratee(iteratee, context);
-      _.each(obj, function(value, index, list) {
-        computed = iteratee(value, index, list);
+      iteratee = cb(iteratee, context);
+      _.each(obj, function(v, index, list) {
+        computed = iteratee(v, index, list);
         if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
-          result = value;
+          result = v;
           lastComputed = computed;
         }
       });
@@ -16481,8 +16524,8 @@ window.Modernizr = (function( window, document, undefined ) {
   _.min = function(obj, iteratee, context) {
     var result = Infinity, lastComputed = Infinity,
         value, computed;
-    if (iteratee == null && obj != null) {
-      obj = obj.length === +obj.length ? obj : _.values(obj);
+    if (iteratee == null || (typeof iteratee == 'number' && typeof obj[0] != 'object') && obj != null) {
+      obj = isArrayLike(obj) ? obj : _.values(obj);
       for (var i = 0, length = obj.length; i < length; i++) {
         value = obj[i];
         if (value < result) {
@@ -16490,11 +16533,11 @@ window.Modernizr = (function( window, document, undefined ) {
         }
       }
     } else {
-      iteratee = _.iteratee(iteratee, context);
-      _.each(obj, function(value, index, list) {
-        computed = iteratee(value, index, list);
+      iteratee = cb(iteratee, context);
+      _.each(obj, function(v, index, list) {
+        computed = iteratee(v, index, list);
         if (computed < lastComputed || computed === Infinity && result === Infinity) {
-          result = value;
+          result = v;
           lastComputed = computed;
         }
       });
@@ -16502,39 +16545,42 @@ window.Modernizr = (function( window, document, undefined ) {
     return result;
   };
 
-  // Shuffle a collection, using the modern version of the
-  // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
+  // Shuffle a collection.
   _.shuffle = function(obj) {
-    var set = obj && obj.length === +obj.length ? obj : _.values(obj);
-    var length = set.length;
-    var shuffled = Array(length);
-    for (var index = 0, rand; index < length; index++) {
-      rand = _.random(0, index);
-      if (rand !== index) shuffled[index] = shuffled[rand];
-      shuffled[rand] = set[index];
-    }
-    return shuffled;
+    return _.sample(obj, Infinity);
   };
 
-  // Sample **n** random values from a collection.
+  // Sample **n** random values from a collection using the modern version of the
+  // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
   // If **n** is not specified, returns a single random element.
   // The internal `guard` argument allows it to work with `map`.
   _.sample = function(obj, n, guard) {
     if (n == null || guard) {
-      if (obj.length !== +obj.length) obj = _.values(obj);
+      if (!isArrayLike(obj)) obj = _.values(obj);
       return obj[_.random(obj.length - 1)];
     }
-    return _.shuffle(obj).slice(0, Math.max(0, n));
+    var sample = isArrayLike(obj) ? _.clone(obj) : _.values(obj);
+    var length = getLength(sample);
+    n = Math.max(Math.min(n, length), 0);
+    var last = length - 1;
+    for (var index = 0; index < n; index++) {
+      var rand = _.random(index, last);
+      var temp = sample[index];
+      sample[index] = sample[rand];
+      sample[rand] = temp;
+    }
+    return sample.slice(0, n);
   };
 
   // Sort the object's values by a criterion produced by an iteratee.
   _.sortBy = function(obj, iteratee, context) {
-    iteratee = _.iteratee(iteratee, context);
-    return _.pluck(_.map(obj, function(value, index, list) {
+    var index = 0;
+    iteratee = cb(iteratee, context);
+    return _.pluck(_.map(obj, function(value, key, list) {
       return {
         value: value,
-        index: index,
-        criteria: iteratee(value, index, list)
+        index: index++,
+        criteria: iteratee(value, key, list)
       };
     }).sort(function(left, right) {
       var a = left.criteria;
@@ -16548,10 +16594,10 @@ window.Modernizr = (function( window, document, undefined ) {
   };
 
   // An internal function used for aggregate "group by" operations.
-  var group = function(behavior) {
+  var group = function(behavior, partition) {
     return function(obj, iteratee, context) {
-      var result = {};
-      iteratee = _.iteratee(iteratee, context);
+      var result = partition ? [[], []] : {};
+      iteratee = cb(iteratee, context);
       _.each(obj, function(value, index) {
         var key = iteratee(value, index, obj);
         behavior(result, value, key);
@@ -16579,43 +16625,30 @@ window.Modernizr = (function( window, document, undefined ) {
     if (_.has(result, key)) result[key]++; else result[key] = 1;
   });
 
-  // Use a comparator function to figure out the smallest index at which
-  // an object should be inserted so as to maintain order. Uses binary search.
-  _.sortedIndex = function(array, obj, iteratee, context) {
-    iteratee = _.iteratee(iteratee, context, 1);
-    var value = iteratee(obj);
-    var low = 0, high = array.length;
-    while (low < high) {
-      var mid = low + high >>> 1;
-      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
-    }
-    return low;
-  };
-
+  var reStrSymbol = /[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff]|[\ud800-\udfff]/g;
   // Safely create a real, live array from anything iterable.
   _.toArray = function(obj) {
     if (!obj) return [];
     if (_.isArray(obj)) return slice.call(obj);
-    if (obj.length === +obj.length) return _.map(obj, _.identity);
+    if (_.isString(obj)) {
+      // Keep surrogate pair characters together
+      return obj ? obj.match(reStrSymbol) : [];
+    }
+    if (isArrayLike(obj)) return _.map(obj, _.identity);
     return _.values(obj);
   };
 
   // Return the number of elements in an object.
   _.size = function(obj) {
     if (obj == null) return 0;
-    return obj.length === +obj.length ? obj.length : _.keys(obj).length;
+    return isArrayLike(obj) ? obj.length : _.keys(obj).length;
   };
 
   // Split a collection into two arrays: one whose elements all satisfy the given
   // predicate, and one whose elements all do not satisfy the predicate.
-  _.partition = function(obj, predicate, context) {
-    predicate = _.iteratee(predicate, context);
-    var pass = [], fail = [];
-    _.each(obj, function(value, key, obj) {
-      (predicate(value, key, obj) ? pass : fail).push(value);
-    });
-    return [pass, fail];
-  };
+  _.partition = group(function(result, value, pass) {
+    result[pass ? 0 : 1].push(value);
+  }, true);
 
   // Array Functions
   // ---------------
@@ -16626,30 +16659,27 @@ window.Modernizr = (function( window, document, undefined ) {
   _.first = _.head = _.take = function(array, n, guard) {
     if (array == null) return void 0;
     if (n == null || guard) return array[0];
-    if (n < 0) return [];
-    return slice.call(array, 0, n);
+    return _.initial(array, array.length - n);
   };
 
   // Returns everything but the last entry of the array. Especially useful on
   // the arguments object. Passing **n** will return all the values in
-  // the array, excluding the last N. The **guard** check allows it to work with
-  // `_.map`.
+  // the array, excluding the last N.
   _.initial = function(array, n, guard) {
     return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
   };
 
   // Get the last element of an array. Passing **n** will return the last N
-  // values in the array. The **guard** check allows it to work with `_.map`.
+  // values in the array.
   _.last = function(array, n, guard) {
     if (array == null) return void 0;
     if (n == null || guard) return array[array.length - 1];
-    return slice.call(array, Math.max(array.length - n, 0));
+    return _.rest(array, Math.max(0, array.length - n));
   };
 
   // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
   // Especially useful on the arguments object. Passing an **n** will return
-  // the rest N values in the array. The **guard**
-  // check allows it to work with `_.map`.
+  // the rest N values in the array.
   _.rest = _.tail = _.drop = function(array, n, guard) {
     return slice.call(array, n == null || guard ? 1 : n);
   };
@@ -16661,17 +16691,21 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // Internal implementation of a recursive `flatten` function.
   var flatten = function(input, shallow, strict, output) {
-    if (shallow && _.every(input, _.isArray)) {
-      return concat.apply(output, input);
-    }
-    for (var i = 0, length = input.length; i < length; i++) {
+    output = output || [];
+    var idx = output.length;
+    for (var i = 0, length = getLength(input); i < length; i++) {
       var value = input[i];
-      if (!_.isArray(value) && !_.isArguments(value)) {
-        if (!strict) output.push(value);
-      } else if (shallow) {
-        push.apply(output, value);
-      } else {
-        flatten(value, shallow, strict, output);
+      if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
+        //flatten current level of array or arguments object
+        if (shallow) {
+          var j = 0, len = value.length;
+          while (j < len) output[idx++] = value[j++];
+        } else {
+          flatten(value, shallow, strict, output);
+          idx = output.length;
+        }
+      } else if (!strict) {
+        output[idx++] = value;
       }
     }
     return output;
@@ -16679,39 +16713,38 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // Flatten out an array, either recursively (by default), or just one level.
   _.flatten = function(array, shallow) {
-    return flatten(array, shallow, false, []);
+    return flatten(array, shallow, false);
   };
 
   // Return a version of the array that does not contain the specified value(s).
-  _.without = function(array) {
-    return _.difference(array, slice.call(arguments, 1));
-  };
+  _.without = restArgs(function(array, otherArrays) {
+    return _.difference(array, otherArrays);
+  });
 
   // Produce a duplicate-free version of the array. If the array has already
   // been sorted, you have the option of using a faster algorithm.
   // Aliased as `unique`.
   _.uniq = _.unique = function(array, isSorted, iteratee, context) {
-    if (array == null) return [];
     if (!_.isBoolean(isSorted)) {
       context = iteratee;
       iteratee = isSorted;
       isSorted = false;
     }
-    if (iteratee != null) iteratee = _.iteratee(iteratee, context);
+    if (iteratee != null) iteratee = cb(iteratee, context);
     var result = [];
     var seen = [];
-    for (var i = 0, length = array.length; i < length; i++) {
-      var value = array[i];
+    for (var i = 0, length = getLength(array); i < length; i++) {
+      var value = array[i],
+          computed = iteratee ? iteratee(value, i, array) : value;
       if (isSorted) {
-        if (!i || seen !== value) result.push(value);
-        seen = value;
+        if (!i || seen !== computed) result.push(value);
+        seen = computed;
       } else if (iteratee) {
-        var computed = iteratee(value, i, array);
-        if (_.indexOf(seen, computed) < 0) {
+        if (!_.contains(seen, computed)) {
           seen.push(computed);
           result.push(value);
         }
-      } else if (_.indexOf(result, value) < 0) {
+      } else if (!_.contains(result, value)) {
         result.push(value);
       }
     }
@@ -16720,20 +16753,20 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // Produce an array that contains the union: each distinct element from all of
   // the passed-in arrays.
-  _.union = function() {
-    return _.uniq(flatten(arguments, true, true, []));
-  };
+  _.union = restArgs(function(arrays) {
+    return _.uniq(flatten(arrays, true, true));
+  });
 
   // Produce an array that contains every item shared between all the
   // passed-in arrays.
   _.intersection = function(array) {
-    if (array == null) return [];
     var result = [];
     var argsLength = arguments.length;
-    for (var i = 0, length = array.length; i < length; i++) {
+    for (var i = 0, length = getLength(array); i < length; i++) {
       var item = array[i];
       if (_.contains(result, item)) continue;
-      for (var j = 1; j < argsLength; j++) {
+      var j;
+      for (j = 1; j < argsLength; j++) {
         if (!_.contains(arguments[j], item)) break;
       }
       if (j === argsLength) result.push(item);
@@ -16743,32 +16776,35 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
-  _.difference = function(array) {
-    var rest = flatten(slice.call(arguments, 1), true, true, []);
+  _.difference = restArgs(function(array, rest) {
+    rest = flatten(rest, true, true);
     return _.filter(array, function(value){
       return !_.contains(rest, value);
     });
+  });
+
+  // Complement of _.zip. Unzip accepts an array of arrays and groups
+  // each array's elements on shared indices
+  _.unzip = function(array) {
+    var length = array && _.max(array, getLength).length || 0;
+    var result = Array(length);
+
+    for (var index = 0; index < length; index++) {
+      result[index] = _.pluck(array, index);
+    }
+    return result;
   };
 
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
-  _.zip = function(array) {
-    if (array == null) return [];
-    var length = _.max(arguments, 'length').length;
-    var results = Array(length);
-    for (var i = 0; i < length; i++) {
-      results[i] = _.pluck(arguments, i);
-    }
-    return results;
-  };
+  _.zip = restArgs(_.unzip);
 
   // Converts lists into objects. Pass either a single array of `[key, value]`
   // pairs, or two parallel arrays of the same length -- one of keys, and one of
   // the corresponding values.
   _.object = function(list, values) {
-    if (list == null) return {};
     var result = {};
-    for (var i = 0, length = list.length; i < length; i++) {
+    for (var i = 0, length = getLength(list); i < length; i++) {
       if (values) {
         result[list[i]] = values[i];
       } else {
@@ -16778,40 +16814,73 @@ window.Modernizr = (function( window, document, undefined ) {
     return result;
   };
 
+  // Generator function to create the findIndex and findLastIndex functions
+  var createPredicateIndexFinder = function(dir) {
+    return function(array, predicate, context) {
+      predicate = cb(predicate, context);
+      var length = getLength(array);
+      var index = dir > 0 ? 0 : length - 1;
+      for (; index >= 0 && index < length; index += dir) {
+        if (predicate(array[index], index, array)) return index;
+      }
+      return -1;
+    };
+  };
+
+  // Returns the first index on an array-like that passes a predicate test
+  _.findIndex = createPredicateIndexFinder(1);
+  _.findLastIndex = createPredicateIndexFinder(-1);
+
+  // Use a comparator function to figure out the smallest index at which
+  // an object should be inserted so as to maintain order. Uses binary search.
+  _.sortedIndex = function(array, obj, iteratee, context) {
+    iteratee = cb(iteratee, context, 1);
+    var value = iteratee(obj);
+    var low = 0, high = getLength(array);
+    while (low < high) {
+      var mid = Math.floor((low + high) / 2);
+      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
+    }
+    return low;
+  };
+
+  // Generator function to create the indexOf and lastIndexOf functions
+  var createIndexFinder = function(dir, predicateFind, sortedIndex) {
+    return function(array, item, idx) {
+      var i = 0, length = getLength(array);
+      if (typeof idx == 'number') {
+        if (dir > 0) {
+          i = idx >= 0 ? idx : Math.max(idx + length, i);
+        } else {
+          length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
+        }
+      } else if (sortedIndex && idx && length) {
+        idx = sortedIndex(array, item);
+        return array[idx] === item ? idx : -1;
+      }
+      if (item !== item) {
+        idx = predicateFind(slice.call(array, i, length), _.isNaN);
+        return idx >= 0 ? idx + i : -1;
+      }
+      for (idx = dir > 0 ? i : length - 1; idx >= 0 && idx < length; idx += dir) {
+        if (array[idx] === item) return idx;
+      }
+      return -1;
+    };
+  };
+
   // Return the position of the first occurrence of an item in an array,
   // or -1 if the item is not included in the array.
   // If the array is large and already in sort order, pass `true`
   // for **isSorted** to use binary search.
-  _.indexOf = function(array, item, isSorted) {
-    if (array == null) return -1;
-    var i = 0, length = array.length;
-    if (isSorted) {
-      if (typeof isSorted == 'number') {
-        i = isSorted < 0 ? Math.max(0, length + isSorted) : isSorted;
-      } else {
-        i = _.sortedIndex(array, item);
-        return array[i] === item ? i : -1;
-      }
-    }
-    for (; i < length; i++) if (array[i] === item) return i;
-    return -1;
-  };
-
-  _.lastIndexOf = function(array, item, from) {
-    if (array == null) return -1;
-    var idx = array.length;
-    if (typeof from == 'number') {
-      idx = from < 0 ? idx + from + 1 : Math.min(idx, from + 1);
-    }
-    while (--idx >= 0) if (array[idx] === item) return idx;
-    return -1;
-  };
+  _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
+  _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
 
   // Generate an integer Array containing an arithmetic progression. A port of
   // the native Python `range()` function. See
   // [the Python documentation](http://docs.python.org/library/functions.html#range).
   _.range = function(start, stop, step) {
-    if (arguments.length <= 1) {
+    if (stop == null) {
       stop = start || 0;
       start = 0;
     }
@@ -16827,66 +16896,81 @@ window.Modernizr = (function( window, document, undefined ) {
     return range;
   };
 
+  // Split an **array** into several arrays containing **count** or less elements
+  // of initial array
+  _.chunk = function(array, count) {
+    if (count == null || count < 1) return [];
+
+    var result = [];
+    var i = 0, length = array.length;
+    while (i < length) {
+      result.push(slice.call(array, i, i += count));
+    }
+    return result;
+  };
+
   // Function (ahem) Functions
   // ------------------
 
-  // Reusable constructor function for prototype setting.
-  var Ctor = function(){};
+  // Determines whether to execute a function as a constructor
+  // or a normal function with the provided arguments
+  var executeBound = function(sourceFunc, boundFunc, context, callingContext, args) {
+    if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args);
+    var self = baseCreate(sourceFunc.prototype);
+    var result = sourceFunc.apply(self, args);
+    if (_.isObject(result)) return result;
+    return self;
+  };
 
   // Create a function bound to a given object (assigning `this`, and arguments,
   // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
   // available.
-  _.bind = function(func, context) {
-    var args, bound;
-    if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
+  _.bind = restArgs(function(func, context, args) {
     if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
-    args = slice.call(arguments, 2);
-    bound = function() {
-      if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
-      Ctor.prototype = func.prototype;
-      var self = new Ctor;
-      Ctor.prototype = null;
-      var result = func.apply(self, args.concat(slice.call(arguments)));
-      if (_.isObject(result)) return result;
-      return self;
-    };
+    var bound = restArgs(function(callArgs) {
+      return executeBound(func, bound, context, this, args.concat(callArgs));
+    });
     return bound;
-  };
+  });
 
   // Partially apply a function by creating a version that has had some of its
   // arguments pre-filled, without changing its dynamic `this` context. _ acts
-  // as a placeholder, allowing any combination of arguments to be pre-filled.
-  _.partial = function(func) {
-    var boundArgs = slice.call(arguments, 1);
-    return function() {
-      var position = 0;
-      var args = boundArgs.slice();
-      for (var i = 0, length = args.length; i < length; i++) {
-        if (args[i] === _) args[i] = arguments[position++];
+  // as a placeholder by default, allowing any combination of arguments to be
+  // pre-filled. Set `_.partial.placeholder` for a custom placeholder argument.
+  _.partial = restArgs(function(func, boundArgs) {
+    var placeholder = _.partial.placeholder;
+    var bound = function() {
+      var position = 0, length = boundArgs.length;
+      var args = Array(length);
+      for (var i = 0; i < length; i++) {
+        args[i] = boundArgs[i] === placeholder ? arguments[position++] : boundArgs[i];
       }
       while (position < arguments.length) args.push(arguments[position++]);
-      return func.apply(this, args);
+      return executeBound(func, bound, this, this, args);
     };
-  };
+    return bound;
+  });
+
+  _.partial.placeholder = _;
 
   // Bind a number of an object's methods to that object. Remaining arguments
   // are the method names to be bound. Useful for ensuring that all callbacks
   // defined on an object belong to it.
-  _.bindAll = function(obj) {
-    var i, length = arguments.length, key;
-    if (length <= 1) throw new Error('bindAll must be passed function names');
-    for (i = 1; i < length; i++) {
-      key = arguments[i];
+  _.bindAll = restArgs(function(obj, keys) {
+    keys = flatten(keys, false, false);
+    var index = keys.length;
+    if (index < 1) throw new Error('bindAll must be passed function names');
+    while (index--) {
+      var key = keys[index];
       obj[key] = _.bind(obj[key], obj);
     }
-    return obj;
-  };
+  });
 
   // Memoize an expensive function by storing its results.
   _.memoize = function(func, hasher) {
     var memoize = function(key) {
       var cache = memoize.cache;
-      var address = hasher ? hasher.apply(this, arguments) : key;
+      var address = '' + (hasher ? hasher.apply(this, arguments) : key);
       if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
       return cache[address];
     };
@@ -16896,18 +16980,15 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
-  _.delay = function(func, wait) {
-    var args = slice.call(arguments, 2);
+  _.delay = restArgs(function(func, wait, args) {
     return setTimeout(function(){
       return func.apply(null, args);
     }, wait);
-  };
+  });
 
   // Defers a function, scheduling it to run after the current call stack has
   // cleared.
-  _.defer = function(func) {
-    return _.delay.apply(_, [func, 1].concat(slice.call(arguments, 1)));
-  };
+  _.defer = _.partial(_.delay, _, 1);
 
   // Returns a function, that, when invoked, will only be triggered at most once
   // during a given window of time. Normally, the throttled function will run
@@ -16932,8 +17013,10 @@ window.Modernizr = (function( window, document, undefined ) {
       context = this;
       args = arguments;
       if (remaining <= 0 || remaining > wait) {
-        clearTimeout(timeout);
-        timeout = null;
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
         previous = now;
         result = func.apply(context, args);
         if (!timeout) context = args = null;
@@ -16954,7 +17037,7 @@ window.Modernizr = (function( window, document, undefined ) {
     var later = function() {
       var last = _.now() - timestamp;
 
-      if (last < wait && last > 0) {
+      if (last < wait && last >= 0) {
         timeout = setTimeout(later, wait - last);
       } else {
         timeout = null;
@@ -17007,7 +17090,7 @@ window.Modernizr = (function( window, document, undefined ) {
     };
   };
 
-  // Returns a function that will only be executed after being called N times.
+  // Returns a function that will only be executed on and after the Nth call.
   _.after = function(times, func) {
     return function() {
       if (--times < 1) {
@@ -17016,15 +17099,14 @@ window.Modernizr = (function( window, document, undefined ) {
     };
   };
 
-  // Returns a function that will only be executed before being called N times.
+  // Returns a function that will only be executed up to (but not including) the Nth call.
   _.before = function(times, func) {
     var memo;
     return function() {
       if (--times > 0) {
         memo = func.apply(this, arguments);
-      } else {
-        func = null;
       }
+      if (times <= 1) func = null;
       return memo;
     };
   };
@@ -17033,16 +17115,52 @@ window.Modernizr = (function( window, document, undefined ) {
   // often you call it. Useful for lazy initialization.
   _.once = _.partial(_.before, 2);
 
+  _.restArgs = restArgs;
+
   // Object Functions
   // ----------------
 
-  // Retrieve the names of an object's properties.
+  // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
+  var hasEnumBug = !{toString: null}.propertyIsEnumerable('toString');
+  var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
+                      'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
+
+  var collectNonEnumProps = function(obj, keys) {
+    var nonEnumIdx = nonEnumerableProps.length;
+    var constructor = obj.constructor;
+    var proto = _.isFunction(constructor) && constructor.prototype || ObjProto;
+
+    // Constructor is a special case.
+    var prop = 'constructor';
+    if (_.has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
+
+    while (nonEnumIdx--) {
+      prop = nonEnumerableProps[nonEnumIdx];
+      if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) {
+        keys.push(prop);
+      }
+    }
+  };
+
+  // Retrieve the names of an object's own properties.
   // Delegates to **ECMAScript 5**'s native `Object.keys`
   _.keys = function(obj) {
     if (!_.isObject(obj)) return [];
     if (nativeKeys) return nativeKeys(obj);
     var keys = [];
     for (var key in obj) if (_.has(obj, key)) keys.push(key);
+    // Ahem, IE < 9.
+    if (hasEnumBug) collectNonEnumProps(obj, keys);
+    return keys;
+  };
+
+  // Retrieve all the property names of an object.
+  _.allKeys = function(obj) {
+    if (!_.isObject(obj)) return [];
+    var keys = [];
+    for (var key in obj) keys.push(key);
+    // Ahem, IE < 9.
+    if (hasEnumBug) collectNonEnumProps(obj, keys);
     return keys;
   };
 
@@ -17055,6 +17173,20 @@ window.Modernizr = (function( window, document, undefined ) {
       values[i] = obj[keys[i]];
     }
     return values;
+  };
+
+  // Returns the results of applying the iteratee to each element of the object
+  // In contrast to _.map it returns an object
+  _.mapObject = function(obj, iteratee, context) {
+    iteratee = cb(iteratee, context);
+    var keys = _.keys(obj),
+      length = keys.length,
+      results = {};
+    for (var index = 0; index < length; index++) {
+      var currentKey = keys[index];
+      results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
+    }
+    return results;
   };
 
   // Convert an object into a list of `[key, value]` pairs.
@@ -17088,65 +17220,92 @@ window.Modernizr = (function( window, document, undefined ) {
     return names.sort();
   };
 
-  // Extend a given object with all the properties in passed-in object(s).
-  _.extend = function(obj) {
-    if (!_.isObject(obj)) return obj;
-    var source, prop;
-    for (var i = 1, length = arguments.length; i < length; i++) {
-      source = arguments[i];
-      for (prop in source) {
-        if (hasOwnProperty.call(source, prop)) {
-            obj[prop] = source[prop];
+  // An internal function for creating assigner functions.
+  var createAssigner = function(keysFunc, defaults) {
+    return function(obj) {
+      var length = arguments.length;
+      if (defaults) obj = Object(obj);
+      if (length < 2 || obj == null) return obj;
+      for (var index = 1; index < length; index++) {
+        var source = arguments[index],
+            keys = keysFunc(source),
+            l = keys.length;
+        for (var i = 0; i < l; i++) {
+          var key = keys[i];
+          if (!defaults || obj[key] === void 0) obj[key] = source[key];
         }
       }
+      return obj;
+    };
+  };
+
+  // Extend a given object with all the properties in passed-in object(s).
+  _.extend = createAssigner(_.allKeys);
+
+  // Assigns a given object with all the own properties in the passed-in object(s)
+  // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
+  _.extendOwn = _.assign = createAssigner(_.keys);
+
+  // Returns the first key on an object that passes a predicate test
+  _.findKey = function(obj, predicate, context) {
+    predicate = cb(predicate, context);
+    var keys = _.keys(obj), key;
+    for (var i = 0, length = keys.length; i < length; i++) {
+      key = keys[i];
+      if (predicate(obj[key], key, obj)) return key;
     }
-    return obj;
+  };
+
+  // Internal pick helper function to determine if `obj` has key `key`.
+  var keyInObj = function(value, key, obj) {
+    return key in obj;
   };
 
   // Return a copy of the object only containing the whitelisted properties.
-  _.pick = function(obj, iteratee, context) {
-    var result = {}, key;
+  _.pick = restArgs(function(obj, keys) {
+    var result = {}, iteratee = keys[0];
     if (obj == null) return result;
     if (_.isFunction(iteratee)) {
-      iteratee = createCallback(iteratee, context);
-      for (key in obj) {
-        var value = obj[key];
-        if (iteratee(value, key, obj)) result[key] = value;
-      }
+      if (keys.length > 1) iteratee = optimizeCb(iteratee, keys[1]);
+      keys = _.allKeys(obj);
     } else {
-      var keys = concat.apply([], slice.call(arguments, 1));
-      obj = new Object(obj);
-      for (var i = 0, length = keys.length; i < length; i++) {
-        key = keys[i];
-        if (key in obj) result[key] = obj[key];
-      }
+      iteratee = keyInObj;
+      keys = flatten(keys, false, false);
+      obj = Object(obj);
+    }
+    for (var i = 0, length = keys.length; i < length; i++) {
+      var key = keys[i];
+      var value = obj[key];
+      if (iteratee(value, key, obj)) result[key] = value;
     }
     return result;
-  };
+  });
 
    // Return a copy of the object without the blacklisted properties.
-  _.omit = function(obj, iteratee, context) {
+  _.omit = restArgs(function(obj, keys) {
+    var iteratee = keys[0], context;
     if (_.isFunction(iteratee)) {
       iteratee = _.negate(iteratee);
+      if (keys.length > 1) context = keys[1];
     } else {
-      var keys = _.map(concat.apply([], slice.call(arguments, 1)), String);
+      keys = _.map(flatten(keys, false, false), String);
       iteratee = function(value, key) {
         return !_.contains(keys, key);
       };
     }
     return _.pick(obj, iteratee, context);
-  };
+  });
 
   // Fill in a given object with default properties.
-  _.defaults = function(obj) {
-    if (!_.isObject(obj)) return obj;
-    for (var i = 1, length = arguments.length; i < length; i++) {
-      var source = arguments[i];
-      for (var prop in source) {
-        if (obj[prop] === void 0) obj[prop] = source[prop];
-      }
-    }
-    return obj;
+  _.defaults = createAssigner(_.allKeys, true);
+
+  // Creates an object that inherits from the given prototype object.
+  // If additional properties are provided then they will be added to the
+  // created object.
+  _.create = function(prototype, props) {
+    var result = baseCreate(prototype);
+    if (props) _.extendOwn(result, props);
+    return result;
   };
 
   // Create a (shallow-cloned) duplicate of an object.
@@ -17163,13 +17322,37 @@ window.Modernizr = (function( window, document, undefined ) {
     return obj;
   };
 
+  // Returns whether an object has a given set of `key:value` pairs.
+  _.isMatch = function(object, attrs) {
+    var keys = _.keys(attrs), length = keys.length;
+    if (object == null) return !length;
+    var obj = Object(object);
+    for (var i = 0; i < length; i++) {
+      var key = keys[i];
+      if (attrs[key] !== obj[key] || !(key in obj)) return false;
+    }
+    return true;
+  };
+
+
   // Internal recursive comparison function for `isEqual`.
-  var eq = function(a, b, aStack, bStack) {
+  var eq, deepEq;
+  eq = function(a, b, aStack, bStack) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
     // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
     if (a === b) return a !== 0 || 1 / a === 1 / b;
     // A strict comparison is necessary because `null == undefined`.
     if (a == null || b == null) return a === b;
+    // `NaN`s are equivalent, but non-reflexive.
+    if (a !== a) return b !== b;
+    // Exhaust primitive checks
+    var type = typeof a;
+    if (type !== 'function' && type !== 'object' && typeof b != 'object') return false;
+    return deepEq(a, b, aStack, bStack);
+  };
+
+  // Internal recursive comparison function for `isEqual`.
+  deepEq = function(a, b, aStack, bStack) {
     // Unwrap any wrapped objects.
     if (a instanceof _) a = a._wrapped;
     if (b instanceof _) b = b._wrapped;
@@ -17197,74 +17380,76 @@ window.Modernizr = (function( window, document, undefined ) {
         // of `NaN` are not equivalent.
         return +a === +b;
     }
-    if (typeof a != 'object' || typeof b != 'object') return false;
+
+    var areArrays = className === '[object Array]';
+    if (!areArrays) {
+      if (typeof a != 'object' || typeof b != 'object') return false;
+
+      // Objects with different constructors are not equivalent, but `Object`s or `Array`s
+      // from different frames are.
+      var aCtor = a.constructor, bCtor = b.constructor;
+      if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
+                               _.isFunction(bCtor) && bCtor instanceof bCtor)
+                          && ('constructor' in a && 'constructor' in b)) {
+        return false;
+      }
+    }
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
     // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+
+    // Initializing stack of traversed objects.
+    // It's done here since we only need them for objects and arrays comparison.
+    aStack = aStack || [];
+    bStack = bStack || [];
     var length = aStack.length;
     while (length--) {
       // Linear search. Performance is inversely proportional to the number of
       // unique nested structures.
       if (aStack[length] === a) return bStack[length] === b;
     }
-    // Objects with different constructors are not equivalent, but `Object`s
-    // from different frames are.
-    var aCtor = a.constructor, bCtor = b.constructor;
-    if (
-      aCtor !== bCtor &&
-      // Handle Object.create(x) cases
-      'constructor' in a && 'constructor' in b &&
-      !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
-        _.isFunction(bCtor) && bCtor instanceof bCtor)
-    ) {
-      return false;
-    }
+
     // Add the first object to the stack of traversed objects.
     aStack.push(a);
     bStack.push(b);
-    var size, result;
+
     // Recursively compare objects and arrays.
-    if (className === '[object Array]') {
+    if (areArrays) {
       // Compare array lengths to determine if a deep comparison is necessary.
-      size = a.length;
-      result = size === b.length;
-      if (result) {
-        // Deep compare the contents, ignoring non-numeric properties.
-        while (size--) {
-          if (!(result = eq(a[size], b[size], aStack, bStack))) break;
-        }
+      length = a.length;
+      if (length !== b.length) return false;
+      // Deep compare the contents, ignoring non-numeric properties.
+      while (length--) {
+        if (!eq(a[length], b[length], aStack, bStack)) return false;
       }
     } else {
       // Deep compare objects.
       var keys = _.keys(a), key;
-      size = keys.length;
+      length = keys.length;
       // Ensure that both objects contain the same number of properties before comparing deep equality.
-      result = _.keys(b).length === size;
-      if (result) {
-        while (size--) {
-          // Deep compare each member
-          key = keys[size];
-          if (!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
-        }
+      if (_.keys(b).length !== length) return false;
+      while (length--) {
+        // Deep compare each member
+        key = keys[length];
+        if (!(_.has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
       }
     }
     // Remove the first object from the stack of traversed objects.
     aStack.pop();
     bStack.pop();
-    return result;
+    return true;
   };
 
   // Perform a deep comparison to check if two objects are equal.
   _.isEqual = function(a, b) {
-    return eq(a, b, [], []);
+    return eq(a, b);
   };
 
   // Is a given array, string, or object empty?
   // An "empty" object has no enumerable own-properties.
   _.isEmpty = function(obj) {
     if (obj == null) return true;
-    if (_.isArray(obj) || _.isString(obj) || _.isArguments(obj)) return obj.length === 0;
-    for (var key in obj) if (_.has(obj, key)) return false;
-    return true;
+    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
+    return _.keys(obj).length === 0;
   };
 
   // Is a given value a DOM element?
@@ -17284,14 +17469,14 @@ window.Modernizr = (function( window, document, undefined ) {
     return type === 'function' || type === 'object' && !!obj;
   };
 
-  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
-  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
+  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
+  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function(name) {
     _['is' + name] = function(obj) {
       return toString.call(obj) === '[object ' + name + ']';
     };
   });
 
-  // Define a fallback version of the method in browsers (ahem, IE), where
+  // Define a fallback version of the method in browsers (ahem, IE < 9), where
   // there isn't any inspectable "Arguments" type.
   if (!_.isArguments(arguments)) {
     _.isArguments = function(obj) {
@@ -17299,8 +17484,10 @@ window.Modernizr = (function( window, document, undefined ) {
     };
   }
 
-  // Optimize `isFunction` if appropriate. Work around an IE 11 bug.
-  if (typeof /./ !== 'function') {
+  // Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
+  // IE 11 (#1621), Safari 8 (#1929), and PhantomJS (#2236).
+  var nodelist = root.document && root.document.childNodes;
+  if (typeof /./ != 'function' && typeof Int8Array != 'object' && typeof nodelist != 'function') {
     _.isFunction = function(obj) {
       return typeof obj == 'function' || false;
     };
@@ -17311,9 +17498,9 @@ window.Modernizr = (function( window, document, undefined ) {
     return isFinite(obj) && !isNaN(parseFloat(obj));
   };
 
-  // Is the given value `NaN`? (NaN is the only number which does not equal itself).
+  // Is the given value `NaN`?
   _.isNaN = function(obj) {
-    return _.isNumber(obj) && obj !== +obj;
+    return _.isNumber(obj) && isNaN(obj);
   };
 
   // Is a given value a boolean?
@@ -17352,6 +17539,7 @@ window.Modernizr = (function( window, document, undefined ) {
     return value;
   };
 
+  // Predicate-generating functions. Often useful outside of Underscore.
   _.constant = function(value) {
     return function() {
       return value;
@@ -17360,30 +17548,28 @@ window.Modernizr = (function( window, document, undefined ) {
 
   _.noop = function(){};
 
-  _.property = function(key) {
-    return function(obj) {
+  _.property = property;
+
+  // Generates a function for a given object that returns a given property.
+  _.propertyOf = function(obj) {
+    return obj == null ? function(){} : function(key) {
       return obj[key];
     };
   };
 
-  // Returns a predicate for checking whether an object has a given set of `key:value` pairs.
-  _.matches = function(attrs) {
-    var pairs = _.pairs(attrs), length = pairs.length;
+  // Returns a predicate for checking whether an object has a given set of
+  // `key:value` pairs.
+  _.matcher = _.matches = function(attrs) {
+    attrs = _.extendOwn({}, attrs);
     return function(obj) {
-      if (obj == null) return !length;
-      obj = new Object(obj);
-      for (var i = 0; i < length; i++) {
-        var pair = pairs[i], key = pair[0];
-        if (pair[1] !== obj[key] || !(key in obj)) return false;
-      }
-      return true;
+      return _.isMatch(obj, attrs);
     };
   };
 
   // Run a function **n** times.
   _.times = function(n, iteratee, context) {
     var accum = Array(Math.max(0, n));
-    iteratee = createCallback(iteratee, context, 1);
+    iteratee = optimizeCb(iteratee, context, 1);
     for (var i = 0; i < n; i++) accum[i] = iteratee(i);
     return accum;
   };
@@ -17432,10 +17618,12 @@ window.Modernizr = (function( window, document, undefined ) {
 
   // If the value of the named `property` is a function then invoke it with the
   // `object` as context; otherwise, return it.
-  _.result = function(object, property) {
-    if (object == null) return void 0;
-    var value = object[property];
-    return _.isFunction(value) ? object[property]() : value;
+  _.result = function(object, prop, fallback) {
+    var value = object == null ? void 0 : object[prop];
+    if (value === void 0) {
+      value = fallback;
+    }
+    return _.isFunction(value) ? value.call(object) : value;
   };
 
   // Generate a unique integer id (unique within the entire client session).
@@ -17449,9 +17637,9 @@ window.Modernizr = (function( window, document, undefined ) {
   // By default, Underscore uses ERB-style template delimiters, change the
   // following template settings to use alternative delimiters.
   _.templateSettings = {
-    evaluate    : /<%([\s\S]+?)%>/g,
-    interpolate : /<%=([\s\S]+?)%>/g,
-    escape      : /<%-([\s\S]+?)%>/g
+    evaluate: /<%([\s\S]+?)%>/g,
+    interpolate: /<%=([\s\S]+?)%>/g,
+    escape: /<%-([\s\S]+?)%>/g
   };
 
   // When customizing `templateSettings`, if you don't want to define an
@@ -17462,15 +17650,15 @@ window.Modernizr = (function( window, document, undefined ) {
   // Certain characters need to be escaped so that they can be put into a
   // string literal.
   var escapes = {
-    "'":      "'",
-    '\\':     '\\',
-    '\r':     'r',
-    '\n':     'n',
+    "'": "'",
+    '\\': '\\',
+    '\r': 'r',
+    '\n': 'n',
     '\u2028': 'u2028',
     '\u2029': 'u2029'
   };
 
-  var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
+  var escapeRegExp = /\\|'|\r|\n|\u2028|\u2029/g;
 
   var escapeChar = function(match) {
     return '\\' + escapes[match];
@@ -17495,7 +17683,7 @@ window.Modernizr = (function( window, document, undefined ) {
     var index = 0;
     var source = "__p+='";
     text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
-      source += text.slice(index, offset).replace(escaper, escapeChar);
+      source += text.slice(index, offset).replace(escapeRegExp, escapeChar);
       index = offset + match.length;
 
       if (escape) {
@@ -17506,7 +17694,7 @@ window.Modernizr = (function( window, document, undefined ) {
         source += "';\n" + evaluate + "\n__p+='";
       }
 
-      // Adobe VMs need the match returned to produce the correct offest.
+      // Adobe VMs need the match returned to produce the correct offset.
       return match;
     });
     source += "';\n";
@@ -17518,8 +17706,9 @@ window.Modernizr = (function( window, document, undefined ) {
       "print=function(){__p+=__j.call(arguments,'');};\n" +
       source + 'return __p;\n';
 
+    var render;
     try {
-      var render = new Function(settings.variable || 'obj', '_', source);
+      render = new Function(settings.variable || 'obj', '_', source);
     } catch (e) {
       e.source = source;
       throw e;
@@ -17550,8 +17739,8 @@ window.Modernizr = (function( window, document, undefined ) {
   // underscore functions. Wrapped objects may be chained.
 
   // Helper function to continue chaining intermediate results.
-  var result = function(obj) {
-    return this._chain ? _(obj).chain() : obj;
+  var chainResult = function(instance, obj) {
+    return instance._chain ? _(obj).chain() : obj;
   };
 
   // Add your own custom functions to the Underscore object.
@@ -17561,7 +17750,7 @@ window.Modernizr = (function( window, document, undefined ) {
       _.prototype[name] = function() {
         var args = [this._wrapped];
         push.apply(args, arguments);
-        return result.call(this, func.apply(_, args));
+        return chainResult(this, func.apply(_, args));
       };
     });
   };
@@ -17576,7 +17765,7 @@ window.Modernizr = (function( window, document, undefined ) {
       var obj = this._wrapped;
       method.apply(obj, arguments);
       if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
-      return result.call(this, obj);
+      return chainResult(this, obj);
     };
   });
 
@@ -17584,13 +17773,21 @@ window.Modernizr = (function( window, document, undefined ) {
   _.each(['concat', 'join', 'slice'], function(name) {
     var method = ArrayProto[name];
     _.prototype[name] = function() {
-      return result.call(this, method.apply(this._wrapped, arguments));
+      return chainResult(this, method.apply(this._wrapped, arguments));
     };
   });
 
   // Extracts the result from a wrapped and chained object.
   _.prototype.value = function() {
     return this._wrapped;
+  };
+
+  // Provide unwrapping proxy for some methods used in engine operations
+  // such as arithmetic and JSON stringification.
+  _.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
+
+  _.prototype.toString = function() {
+    return '' + this._wrapped;
   };
 
   // AMD registration happens at the end for compatibility with AMD loaders
@@ -17600,12 +17797,12 @@ window.Modernizr = (function( window, document, undefined ) {
   // popular enough to be bundled in a third party lib, but not be part of
   // an AMD load request. Those cases could generate an error when an
   // anonymous define() is called outside of a loader request.
-  if (typeof define === 'function' && define.amd) {
+  if (typeof define == 'function' && define.amd) {
     define('underscore', [], function() {
       return _;
     });
   }
-}.call(this));
+}());
 
 /*
  * ----------------------------- JSTORAGE -------------------------------------
@@ -24213,7 +24410,7 @@ module.exports = function (element) {
 
 /*!
  @package noty - jQuery Notification Plugin
- @version version: 2.3.6
+ @version version: 2.3.7
  @contributors https://github.com/needim/noty/graphs/contributors
 
  @documentation Examples and Documentation - http://needim.github.com/noty/
@@ -24353,10 +24550,19 @@ module.exports = function (element) {
 
             if (typeof self.options.animation.open == 'string') {
                 self.$bar.css('height', self.$bar.innerHeight());
+                self.$bar.on('click',function(e){
+                    self.wasClicked = true;
+                });
                 self.$bar.show().addClass(self.options.animation.open).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
                     if(self.options.callback.afterShow) self.options.callback.afterShow.apply(self);
                     self.showing = false;
                     self.shown = true;
+                    if(self.hasOwnProperty('wasClicked')){
+                        self.$bar.off('click',function(e){
+                            self.wasClicked = true;
+                        });
+                        self.close();
+                    }
                 });
 
             } else {
@@ -24619,7 +24825,7 @@ module.exports = function (element) {
             if(notification.options.theme.modal && notification.options.theme.modal.css)
                 modal.css(notification.options.theme.modal.css);
 
-            modal.prependTo($('body')).fadeIn(self.options.animation.fadeSpeed);
+            modal.prependTo($('body')).fadeIn(notification.options.animation.fadeSpeed);
 
             if($.inArray('backdrop', notification.options.closeWith) > -1)
                 modal.on('click', function(e) {
@@ -29108,2128 +29314,7 @@ return window.noty;
     return _moment;
 
 }));
-/**
- * History.js jQuery Adapter
- * @author Benjamin Arthur Lupton <contact@balupton.com>
- * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
- * @license New BSD License <http://creativecommons.org/licenses/BSD/>
- */
-
-// Closure
-(function(window,undefined){
-	"use strict";
-
-	// Localise Globals
-	var
-		History = window.History = window.History||{},
-		jQuery = window.jQuery;
-
-	// Check Existence
-	if ( typeof History.Adapter !== 'undefined' ) {
-		throw new Error('History.js Adapter has already been loaded...');
-	}
-
-	// Add the Adapter
-	History.Adapter = {
-		/**
-		 * History.Adapter.bind(el,event,callback)
-		 * @param {Element|string} el
-		 * @param {string} event - custom and standard events
-		 * @param {function} callback
-		 * @return {void}
-		 */
-		bind: function(el,event,callback){
-			jQuery(el).bind(event,callback);
-		},
-
-		/**
-		 * History.Adapter.trigger(el,event)
-		 * @param {Element|string} el
-		 * @param {string} event - custom and standard events
-		 * @param {Object=} extra - a object of extra event data (optional)
-		 * @return {void}
-		 */
-		trigger: function(el,event,extra){
-			jQuery(el).trigger(event,extra);
-		},
-
-		/**
-		 * History.Adapter.extractEventData(key,event,extra)
-		 * @param {string} key - key for the event data to extract
-		 * @param {string} event - custom and standard events
-		 * @param {Object=} extra - a object of extra event data (optional)
-		 * @return {mixed}
-		 */
-		extractEventData: function(key,event,extra){
-			// jQuery Native then jQuery Custom
-			var result = (event && event.originalEvent && event.originalEvent[key]) || (extra && extra[key]) || undefined;
-
-			// Return
-			return result;
-		},
-
-		/**
-		 * History.Adapter.onDomLoad(callback)
-		 * @param {function} callback
-		 * @return {void}
-		 */
-		onDomLoad: function(callback) {
-			jQuery(callback);
-		}
-	};
-
-	// Try and Initialise History
-	if ( typeof History.init !== 'undefined' ) {
-		History.init();
-	}
-
-})(window);
-
-/**
- * History.js Core
- * @author Benjamin Arthur Lupton <contact@balupton.com>
- * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
- * @license New BSD License <http://creativecommons.org/licenses/BSD/>
- */
-
-(function(window,undefined){
-	"use strict";
-
-	// ========================================================================
-	// Initialise
-
-	// Localise Globals
-	var
-		console = window.console||undefined, // Prevent a JSLint complain
-		document = window.document, // Make sure we are using the correct document
-		navigator = window.navigator, // Make sure we are using the correct navigator
-		sessionStorage = window.sessionStorage||false, // sessionStorage
-		setTimeout = window.setTimeout,
-		clearTimeout = window.clearTimeout,
-		setInterval = window.setInterval,
-		clearInterval = window.clearInterval,
-		JSON = window.JSON,
-		alert = window.alert,
-		History = window.History = window.History||{}, // Public History Object
-		history = window.history; // Old History Object
-
-	try {
-		sessionStorage.setItem('TEST', '1');
-		sessionStorage.removeItem('TEST');
-	} catch(e) {
-		sessionStorage = false;
-	}
-
-	// MooTools Compatibility
-	JSON.stringify = JSON.stringify||JSON.encode;
-	JSON.parse = JSON.parse||JSON.decode;
-
-	// Check Existence
-	if ( typeof History.init !== 'undefined' ) {
-		throw new Error('History.js Core has already been loaded...');
-	}
-
-	// Initialise History
-	History.init = function(options){
-		// Check Load Status of Adapter
-		if ( typeof History.Adapter === 'undefined' ) {
-			return false;
-		}
-
-		// Check Load Status of Core
-		if ( typeof History.initCore !== 'undefined' ) {
-			History.initCore();
-		}
-
-		// Check Load Status of HTML4 Support
-		if ( typeof History.initHtml4 !== 'undefined' ) {
-			History.initHtml4();
-		}
-
-		// Return true
-		return true;
-	};
-
-
-	// ========================================================================
-	// Initialise Core
-
-	// Initialise Core
-	History.initCore = function(options){
-		// Initialise
-		if ( typeof History.initCore.initialized !== 'undefined' ) {
-			// Already Loaded
-			return false;
-		}
-		else {
-			History.initCore.initialized = true;
-		}
-
-
-		// ====================================================================
-		// Options
-
-		/**
-		 * History.options
-		 * Configurable options
-		 */
-		History.options = History.options||{};
-
-		/**
-		 * History.options.hashChangeInterval
-		 * How long should the interval be before hashchange checks
-		 */
-		History.options.hashChangeInterval = History.options.hashChangeInterval || 100;
-
-		/**
-		 * History.options.safariPollInterval
-		 * How long should the interval be before safari poll checks
-		 */
-		History.options.safariPollInterval = History.options.safariPollInterval || 500;
-
-		/**
-		 * History.options.doubleCheckInterval
-		 * How long should the interval be before we perform a double check
-		 */
-		History.options.doubleCheckInterval = History.options.doubleCheckInterval || 500;
-
-		/**
-		 * History.options.disableSuid
-		 * Force History not to append suid
-		 */
-		History.options.disableSuid = History.options.disableSuid || false;
-
-		/**
-		 * History.options.storeInterval
-		 * How long should we wait between store calls
-		 */
-		History.options.storeInterval = History.options.storeInterval || 1000;
-
-		/**
-		 * History.options.busyDelay
-		 * How long should we wait between busy events
-		 */
-		History.options.busyDelay = History.options.busyDelay || 250;
-
-		/**
-		 * History.options.debug
-		 * If true will enable debug messages to be logged
-		 */
-		History.options.debug = History.options.debug || false;
-
-		/**
-		 * History.options.initialTitle
-		 * What is the title of the initial state
-		 */
-		History.options.initialTitle = History.options.initialTitle || document.title;
-
-		/**
-		 * History.options.html4Mode
-		 * If true, will force HTMl4 mode (hashtags)
-		 */
-		History.options.html4Mode = History.options.html4Mode || false;
-
-		/**
-		 * History.options.delayInit
-		 * Want to override default options and call init manually.
-		 */
-		History.options.delayInit = History.options.delayInit || false;
-
-
-		// ====================================================================
-		// Interval record
-
-		/**
-		 * History.intervalList
-		 * List of intervals set, to be cleared when document is unloaded.
-		 */
-		History.intervalList = [];
-
-		/**
-		 * History.clearAllIntervals
-		 * Clears all setInterval instances.
-		 */
-		History.clearAllIntervals = function(){
-			var i, il = History.intervalList;
-			if (typeof il !== "undefined" && il !== null) {
-				for (i = 0; i < il.length; i++) {
-					clearInterval(il[i]);
-				}
-				History.intervalList = null;
-			}
-		};
-
-
-		// ====================================================================
-		// Debug
-
-		/**
-		 * History.debug(message,...)
-		 * Logs the passed arguments if debug enabled
-		 */
-		History.debug = function(){
-			if ( (History.options.debug||false) ) {
-				History.log.apply(History,arguments);
-			}
-		};
-
-		/**
-		 * History.log(message,...)
-		 * Logs the passed arguments
-		 */
-		History.log = function(){
-			// Prepare
-			var
-				consoleExists = !(typeof console === 'undefined' || typeof console.log === 'undefined' || typeof console.log.apply === 'undefined'),
-				textarea = document.getElementById('log'),
-				message,
-				i,n,
-				args,arg
-				;
-
-			// Write to Console
-			if ( consoleExists ) {
-				args = Array.prototype.slice.call(arguments);
-				message = args.shift();
-				if ( typeof console.debug !== 'undefined' ) {
-					console.debug.apply(console,[message,args]);
-				}
-				else {
-					console.log.apply(console,[message,args]);
-				}
-			}
-			else {
-				message = ("\n"+arguments[0]+"\n");
-			}
-
-			// Write to log
-			for ( i=1,n=arguments.length; i<n; ++i ) {
-				arg = arguments[i];
-				if ( typeof arg === 'object' && typeof JSON !== 'undefined' ) {
-					try {
-						arg = JSON.stringify(arg);
-					}
-					catch ( Exception ) {
-						// Recursive Object
-					}
-				}
-				message += "\n"+arg+"\n";
-			}
-
-			// Textarea
-			if ( textarea ) {
-				textarea.value += message+"\n-----\n";
-				textarea.scrollTop = textarea.scrollHeight - textarea.clientHeight;
-			}
-			// No Textarea, No Console
-			else if ( !consoleExists ) {
-				alert(message);
-			}
-
-			// Return true
-			return true;
-		};
-
-
-		// ====================================================================
-		// Emulated Status
-
-		/**
-		 * History.getInternetExplorerMajorVersion()
-		 * Get's the major version of Internet Explorer
-		 * @return {integer}
-		 * @license Public Domain
-		 * @author Benjamin Arthur Lupton <contact@balupton.com>
-		 * @author James Padolsey <https://gist.github.com/527683>
-		 */
-		History.getInternetExplorerMajorVersion = function(){
-			var result = History.getInternetExplorerMajorVersion.cached =
-					(typeof History.getInternetExplorerMajorVersion.cached !== 'undefined')
-				?	History.getInternetExplorerMajorVersion.cached
-				:	(function(){
-						var v = 3,
-								div = document.createElement('div'),
-								all = div.getElementsByTagName('i');
-						while ( (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->') && all[0] ) {}
-						return (v > 4) ? v : false;
-					})()
-				;
-			return result;
-		};
-
-		/**
-		 * History.isInternetExplorer()
-		 * Are we using Internet Explorer?
-		 * @return {boolean}
-		 * @license Public Domain
-		 * @author Benjamin Arthur Lupton <contact@balupton.com>
-		 */
-		History.isInternetExplorer = function(){
-			var result =
-				History.isInternetExplorer.cached =
-				(typeof History.isInternetExplorer.cached !== 'undefined')
-					?	History.isInternetExplorer.cached
-					:	Boolean(History.getInternetExplorerMajorVersion())
-				;
-			return result;
-		};
-
-		/**
-		 * History.emulated
-		 * Which features require emulating?
-		 */
-
-		if (History.options.html4Mode) {
-			History.emulated = {
-				pushState : true,
-				hashChange: true
-			};
-		}
-
-		else {
-
-			History.emulated = {
-				pushState: !Boolean(
-					window.history && window.history.pushState && window.history.replaceState
-					&& !(
-						(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
-						|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
-					)
-				),
-				hashChange: Boolean(
-					!(('onhashchange' in window) || ('onhashchange' in document))
-					||
-					(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8)
-				)
-			};
-		}
-
-		/**
-		 * History.enabled
-		 * Is History enabled?
-		 */
-		History.enabled = !History.emulated.pushState;
-
-		/**
-		 * History.bugs
-		 * Which bugs are present
-		 */
-		History.bugs = {
-			/**
-			 * Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call
-			 * https://bugs.webkit.org/show_bug.cgi?id=56249
-			 */
-			setHash: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent)),
-
-			/**
-			 * Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions
-			 * https://bugs.webkit.org/show_bug.cgi?id=42940
-			 */
-			safariPoll: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent)),
-
-			/**
-			 * MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
-			 */
-			ieDoubleCheck: Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8),
-
-			/**
-			 * MSIE 6 requires the entire hash to be encoded for the hashes to trigger the onHashChange event
-			 */
-			hashEscape: Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 7)
-		};
-
-		/**
-		 * History.isEmptyObject(obj)
-		 * Checks to see if the Object is Empty
-		 * @param {Object} obj
-		 * @return {boolean}
-		 */
-		History.isEmptyObject = function(obj) {
-			for ( var name in obj ) {
-				if ( obj.hasOwnProperty(name) ) {
-					return false;
-				}
-			}
-			return true;
-		};
-
-		/**
-		 * History.cloneObject(obj)
-		 * Clones a object and eliminate all references to the original contexts
-		 * @param {Object} obj
-		 * @return {Object}
-		 */
-		History.cloneObject = function(obj) {
-			var hash,newObj;
-			if ( obj ) {
-				hash = JSON.stringify(obj);
-				newObj = JSON.parse(hash);
-			}
-			else {
-				newObj = {};
-			}
-			return newObj;
-		};
-
-
-		// ====================================================================
-		// URL Helpers
-
-		/**
-		 * History.getRootUrl()
-		 * Turns "http://mysite.com/dir/page.html?asd" into "http://mysite.com"
-		 * @return {String} rootUrl
-		 */
-		History.getRootUrl = function(){
-			// Create
-			var rootUrl = document.location.protocol+'//'+(document.location.hostname||document.location.host);
-			if ( document.location.port||false ) {
-				rootUrl += ':'+document.location.port;
-			}
-			rootUrl += '/';
-
-			// Return
-			return rootUrl;
-		};
-
-		/**
-		 * History.getBaseHref()
-		 * Fetches the `href` attribute of the `<base href="...">` element if it exists
-		 * @return {String} baseHref
-		 */
-		History.getBaseHref = function(){
-			// Create
-			var
-				baseElements = document.getElementsByTagName('base'),
-				baseElement = null,
-				baseHref = '';
-
-			// Test for Base Element
-			if ( baseElements.length === 1 ) {
-				// Prepare for Base Element
-				baseElement = baseElements[0];
-				baseHref = baseElement.href.replace(/[^\/]+$/,'');
-			}
-
-			// Adjust trailing slash
-			baseHref = baseHref.replace(/\/+$/,'');
-			if ( baseHref ) baseHref += '/';
-
-			// Return
-			return baseHref;
-		};
-
-		/**
-		 * History.getBaseUrl()
-		 * Fetches the baseHref or basePageUrl or rootUrl (whichever one exists first)
-		 * @return {String} baseUrl
-		 */
-		History.getBaseUrl = function(){
-			// Create
-			var baseUrl = History.getBaseHref()||History.getBasePageUrl()||History.getRootUrl();
-
-			// Return
-			return baseUrl;
-		};
-
-		/**
-		 * History.getPageUrl()
-		 * Fetches the URL of the current page
-		 * @return {String} pageUrl
-		 */
-		History.getPageUrl = function(){
-			// Fetch
-			var
-				State = History.getState(false,false),
-				stateUrl = (State||{}).url||History.getLocationHref(),
-				pageUrl;
-
-			// Create
-			pageUrl = stateUrl.replace(/\/+$/,'').replace(/[^\/]+$/,function(part,index,string){
-				return (/\./).test(part) ? part : part+'/';
-			});
-
-			// Return
-			return pageUrl;
-		};
-
-		/**
-		 * History.getBasePageUrl()
-		 * Fetches the Url of the directory of the current page
-		 * @return {String} basePageUrl
-		 */
-		History.getBasePageUrl = function(){
-			// Create
-			var basePageUrl = (History.getLocationHref()).replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
-				return (/[^\/]$/).test(part) ? '' : part;
-			}).replace(/\/+$/,'')+'/';
-
-			// Return
-			return basePageUrl;
-		};
-
-		/**
-		 * History.getFullUrl(url)
-		 * Ensures that we have an absolute URL and not a relative URL
-		 * @param {string} url
-		 * @param {Boolean} allowBaseHref
-		 * @return {string} fullUrl
-		 */
-		History.getFullUrl = function(url,allowBaseHref){
-			// Prepare
-			var fullUrl = url, firstChar = url.substring(0,1);
-			allowBaseHref = (typeof allowBaseHref === 'undefined') ? true : allowBaseHref;
-
-			// Check
-			if ( /[a-z]+\:\/\//.test(url) ) {
-				// Full URL
-			}
-			else if ( firstChar === '/' ) {
-				// Root URL
-				fullUrl = History.getRootUrl()+url.replace(/^\/+/,'');
-			}
-			else if ( firstChar === '#' ) {
-				// Anchor URL
-				fullUrl = History.getPageUrl().replace(/#.*/,'')+url;
-			}
-			else if ( firstChar === '?' ) {
-				// Query URL
-				fullUrl = History.getPageUrl().replace(/[\?#].*/,'')+url;
-			}
-			else {
-				// Relative URL
-				if ( allowBaseHref ) {
-					fullUrl = History.getBaseUrl()+url.replace(/^(\.\/)+/,'');
-				} else {
-					fullUrl = History.getBasePageUrl()+url.replace(/^(\.\/)+/,'');
-				}
-				// We have an if condition above as we do not want hashes
-				// which are relative to the baseHref in our URLs
-				// as if the baseHref changes, then all our bookmarks
-				// would now point to different locations
-				// whereas the basePageUrl will always stay the same
-			}
-
-			// Return
-			return fullUrl.replace(/\#$/,'');
-		};
-
-		/**
-		 * History.getShortUrl(url)
-		 * Ensures that we have a relative URL and not a absolute URL
-		 * @param {string} url
-		 * @return {string} url
-		 */
-		History.getShortUrl = function(url){
-			// Prepare
-			var shortUrl = url, baseUrl = History.getBaseUrl(), rootUrl = History.getRootUrl();
-
-			// Trim baseUrl
-			if ( History.emulated.pushState ) {
-				// We are in a if statement as when pushState is not emulated
-				// The actual url these short urls are relative to can change
-				// So within the same session, we the url may end up somewhere different
-				shortUrl = shortUrl.replace(baseUrl,'');
-			}
-
-			// Trim rootUrl
-			shortUrl = shortUrl.replace(rootUrl,'/');
-
-			// Ensure we can still detect it as a state
-			if ( History.isTraditionalAnchor(shortUrl) ) {
-				shortUrl = './'+shortUrl;
-			}
-
-			// Clean It
-			shortUrl = shortUrl.replace(/^(\.\/)+/g,'./').replace(/\#$/,'');
-
-			// Return
-			return shortUrl;
-		};
-
-		/**
-		 * History.getLocationHref(document)
-		 * Returns a normalized version of document.location.href
-		 * accounting for browser inconsistencies, etc.
-		 *
-		 * This URL will be URI-encoded and will include the hash
-		 *
-		 * @param {object} document
-		 * @return {string} url
-		 */
-		History.getLocationHref = function(doc) {
-			doc = doc || document;
-
-			// most of the time, this will be true
-			if (doc.URL === doc.location.href)
-				return doc.location.href;
-
-			// some versions of webkit URI-decode document.location.href
-			// but they leave document.URL in an encoded state
-			if (doc.location.href === decodeURIComponent(doc.URL))
-				return doc.URL;
-
-			// FF 3.6 only updates document.URL when a page is reloaded
-			// document.location.href is updated correctly
-			if (doc.location.hash && decodeURIComponent(doc.location.href.replace(/^[^#]+/, "")) === doc.location.hash)
-				return doc.location.href;
-
-			if (doc.URL.indexOf('#') == -1 && doc.location.href.indexOf('#') != -1)
-				return doc.location.href;
-			
-			return doc.URL || doc.location.href;
-		};
-
-
-		// ====================================================================
-		// State Storage
-
-		/**
-		 * History.store
-		 * The store for all session specific data
-		 */
-		History.store = {};
-
-		/**
-		 * History.idToState
-		 * 1-1: State ID to State Object
-		 */
-		History.idToState = History.idToState||{};
-
-		/**
-		 * History.stateToId
-		 * 1-1: State String to State ID
-		 */
-		History.stateToId = History.stateToId||{};
-
-		/**
-		 * History.urlToId
-		 * 1-1: State URL to State ID
-		 */
-		History.urlToId = History.urlToId||{};
-
-		/**
-		 * History.storedStates
-		 * Store the states in an array
-		 */
-		History.storedStates = History.storedStates||[];
-
-		/**
-		 * History.savedStates
-		 * Saved the states in an array
-		 */
-		History.savedStates = History.savedStates||[];
-
-		/**
-		 * History.noramlizeStore()
-		 * Noramlize the store by adding necessary values
-		 */
-		History.normalizeStore = function(){
-			History.store.idToState = History.store.idToState||{};
-			History.store.urlToId = History.store.urlToId||{};
-			History.store.stateToId = History.store.stateToId||{};
-		};
-
-		/**
-		 * History.getState()
-		 * Get an object containing the data, title and url of the current state
-		 * @param {Boolean} friendly
-		 * @param {Boolean} create
-		 * @return {Object} State
-		 */
-		History.getState = function(friendly,create){
-			// Prepare
-			if ( typeof friendly === 'undefined' ) { friendly = true; }
-			if ( typeof create === 'undefined' ) { create = true; }
-
-			// Fetch
-			var State = History.getLastSavedState();
-
-			// Create
-			if ( !State && create ) {
-				State = History.createStateObject();
-			}
-
-			// Adjust
-			if ( friendly ) {
-				State = History.cloneObject(State);
-				State.url = State.cleanUrl||State.url;
-			}
-
-			// Return
-			return State;
-		};
-
-		/**
-		 * History.getIdByState(State)
-		 * Gets a ID for a State
-		 * @param {State} newState
-		 * @return {String} id
-		 */
-		History.getIdByState = function(newState){
-
-			// Fetch ID
-			var id = History.extractId(newState.url),
-				str;
-
-			if ( !id ) {
-				// Find ID via State String
-				str = History.getStateString(newState);
-				if ( typeof History.stateToId[str] !== 'undefined' ) {
-					id = History.stateToId[str];
-				}
-				else if ( typeof History.store.stateToId[str] !== 'undefined' ) {
-					id = History.store.stateToId[str];
-				}
-				else {
-					// Generate a new ID
-					while ( true ) {
-						id = (new Date()).getTime() + String(Math.random()).replace(/\D/g,'');
-						if ( typeof History.idToState[id] === 'undefined' && typeof History.store.idToState[id] === 'undefined' ) {
-							break;
-						}
-					}
-
-					// Apply the new State to the ID
-					History.stateToId[str] = id;
-					History.idToState[id] = newState;
-				}
-			}
-
-			// Return ID
-			return id;
-		};
-
-		/**
-		 * History.normalizeState(State)
-		 * Expands a State Object
-		 * @param {object} State
-		 * @return {object}
-		 */
-		History.normalizeState = function(oldState){
-			// Variables
-			var newState, dataNotEmpty;
-
-			// Prepare
-			if ( !oldState || (typeof oldState !== 'object') ) {
-				oldState = {};
-			}
-
-			// Check
-			if ( typeof oldState.normalized !== 'undefined' ) {
-				return oldState;
-			}
-
-			// Adjust
-			if ( !oldState.data || (typeof oldState.data !== 'object') ) {
-				oldState.data = {};
-			}
-
-			// ----------------------------------------------------------------
-
-			// Create
-			newState = {};
-			newState.normalized = true;
-			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(oldState.url?oldState.url:(History.getLocationHref()));
-			newState.hash = History.getShortUrl(newState.url);
-			newState.data = History.cloneObject(oldState.data);
-
-			// Fetch ID
-			newState.id = History.getIdByState(newState);
-
-			// ----------------------------------------------------------------
-
-			// Clean the URL
-			newState.cleanUrl = newState.url.replace(/\??\&_suid.*/,'');
-			newState.url = newState.cleanUrl;
-
-			// Check to see if we have more than just a url
-			dataNotEmpty = !History.isEmptyObject(newState.data);
-
-			// Apply
-			if ( (newState.title || dataNotEmpty) && History.options.disableSuid !== true ) {
-				// Add ID to Hash
-				newState.hash = History.getShortUrl(newState.url).replace(/\??\&_suid.*/,'');
-				if ( !/\?/.test(newState.hash) ) {
-					newState.hash += '?';
-				}
-				newState.hash += '&_suid='+newState.id;
-			}
-
-			// Create the Hashed URL
-			newState.hashedUrl = History.getFullUrl(newState.hash);
-
-			// ----------------------------------------------------------------
-
-			// Update the URL if we have a duplicate
-			if ( (History.emulated.pushState || History.bugs.safariPoll) && History.hasUrlDuplicate(newState) ) {
-				newState.url = newState.hashedUrl;
-			}
-
-			// ----------------------------------------------------------------
-
-			// Return
-			return newState;
-		};
-
-		/**
-		 * History.createStateObject(data,title,url)
-		 * Creates a object based on the data, title and url state params
-		 * @param {object} data
-		 * @param {string} title
-		 * @param {string} url
-		 * @return {object}
-		 */
-		History.createStateObject = function(data,title,url){
-			// Hashify
-			var State = {
-				'data': data,
-				'title': title,
-				'url': url
-			};
-
-			// Expand the State
-			State = History.normalizeState(State);
-
-			// Return object
-			return State;
-		};
-
-		/**
-		 * History.getStateById(id)
-		 * Get a state by it's UID
-		 * @param {String} id
-		 */
-		History.getStateById = function(id){
-			// Prepare
-			id = String(id);
-
-			// Retrieve
-			var State = History.idToState[id] || History.store.idToState[id] || undefined;
-
-			// Return State
-			return State;
-		};
-
-		/**
-		 * Get a State's String
-		 * @param {State} passedState
-		 */
-		History.getStateString = function(passedState){
-			// Prepare
-			var State, cleanedState, str;
-
-			// Fetch
-			State = History.normalizeState(passedState);
-
-			// Clean
-			cleanedState = {
-				data: State.data,
-				title: passedState.title,
-				url: passedState.url
-			};
-
-			// Fetch
-			str = JSON.stringify(cleanedState);
-
-			// Return
-			return str;
-		};
-
-		/**
-		 * Get a State's ID
-		 * @param {State} passedState
-		 * @return {String} id
-		 */
-		History.getStateId = function(passedState){
-			// Prepare
-			var State, id;
-
-			// Fetch
-			State = History.normalizeState(passedState);
-
-			// Fetch
-			id = State.id;
-
-			// Return
-			return id;
-		};
-
-		/**
-		 * History.getHashByState(State)
-		 * Creates a Hash for the State Object
-		 * @param {State} passedState
-		 * @return {String} hash
-		 */
-		History.getHashByState = function(passedState){
-			// Prepare
-			var State, hash;
-
-			// Fetch
-			State = History.normalizeState(passedState);
-
-			// Hash
-			hash = State.hash;
-
-			// Return
-			return hash;
-		};
-
-		/**
-		 * History.extractId(url_or_hash)
-		 * Get a State ID by it's URL or Hash
-		 * @param {string} url_or_hash
-		 * @return {string} id
-		 */
-		History.extractId = function ( url_or_hash ) {
-			// Prepare
-			var id,parts,url, tmp;
-
-			// Extract
-			
-			// If the URL has a #, use the id from before the #
-			if (url_or_hash.indexOf('#') != -1)
-			{
-				tmp = url_or_hash.split("#")[0];
-			}
-			else
-			{
-				tmp = url_or_hash;
-			}
-			
-			parts = /(.*)\&_suid=([0-9]+)$/.exec(tmp);
-			url = parts ? (parts[1]||url_or_hash) : url_or_hash;
-			id = parts ? String(parts[2]||'') : '';
-
-			// Return
-			return id||false;
-		};
-
-		/**
-		 * History.isTraditionalAnchor
-		 * Checks to see if the url is a traditional anchor or not
-		 * @param {String} url_or_hash
-		 * @return {Boolean}
-		 */
-		History.isTraditionalAnchor = function(url_or_hash){
-			// Check
-			var isTraditional = !(/[\/\?\.]/.test(url_or_hash));
-
-			// Return
-			return isTraditional;
-		};
-
-		/**
-		 * History.extractState
-		 * Get a State by it's URL or Hash
-		 * @param {String} url_or_hash
-		 * @return {State|null}
-		 */
-		History.extractState = function(url_or_hash,create){
-			// Prepare
-			var State = null, id, url;
-			create = create||false;
-
-			// Fetch SUID
-			id = History.extractId(url_or_hash);
-			if ( id ) {
-				State = History.getStateById(id);
-			}
-
-			// Fetch SUID returned no State
-			if ( !State ) {
-				// Fetch URL
-				url = History.getFullUrl(url_or_hash);
-
-				// Check URL
-				id = History.getIdByUrl(url)||false;
-				if ( id ) {
-					State = History.getStateById(id);
-				}
-
-				// Create State
-				if ( !State && create && !History.isTraditionalAnchor(url_or_hash) ) {
-					State = History.createStateObject(null,null,url);
-				}
-			}
-
-			// Return
-			return State;
-		};
-
-		/**
-		 * History.getIdByUrl()
-		 * Get a State ID by a State URL
-		 */
-		History.getIdByUrl = function(url){
-			// Fetch
-			var id = History.urlToId[url] || History.store.urlToId[url] || undefined;
-
-			// Return
-			return id;
-		};
-
-		/**
-		 * History.getLastSavedState()
-		 * Get an object containing the data, title and url of the current state
-		 * @return {Object} State
-		 */
-		History.getLastSavedState = function(){
-			return History.savedStates[History.savedStates.length-1]||undefined;
-		};
-
-		/**
-		 * History.getLastStoredState()
-		 * Get an object containing the data, title and url of the current state
-		 * @return {Object} State
-		 */
-		History.getLastStoredState = function(){
-			return History.storedStates[History.storedStates.length-1]||undefined;
-		};
-
-		/**
-		 * History.hasUrlDuplicate
-		 * Checks if a Url will have a url conflict
-		 * @param {Object} newState
-		 * @return {Boolean} hasDuplicate
-		 */
-		History.hasUrlDuplicate = function(newState) {
-			// Prepare
-			var hasDuplicate = false,
-				oldState;
-
-			// Fetch
-			oldState = History.extractState(newState.url);
-
-			// Check
-			hasDuplicate = oldState && oldState.id !== newState.id;
-
-			// Return
-			return hasDuplicate;
-		};
-
-		/**
-		 * History.storeState
-		 * Store a State
-		 * @param {Object} newState
-		 * @return {Object} newState
-		 */
-		History.storeState = function(newState){
-			// Store the State
-			History.urlToId[newState.url] = newState.id;
-
-			// Push the State
-			History.storedStates.push(History.cloneObject(newState));
-
-			// Return newState
-			return newState;
-		};
-
-		/**
-		 * History.isLastSavedState(newState)
-		 * Tests to see if the state is the last state
-		 * @param {Object} newState
-		 * @return {boolean} isLast
-		 */
-		History.isLastSavedState = function(newState){
-			// Prepare
-			var isLast = false,
-				newId, oldState, oldId;
-
-			// Check
-			if ( History.savedStates.length ) {
-				newId = newState.id;
-				oldState = History.getLastSavedState();
-				oldId = oldState.id;
-
-				// Check
-				isLast = (newId === oldId);
-			}
-
-			// Return
-			return isLast;
-		};
-
-		/**
-		 * History.saveState
-		 * Push a State
-		 * @param {Object} newState
-		 * @return {boolean} changed
-		 */
-		History.saveState = function(newState){
-			// Check Hash
-			if ( History.isLastSavedState(newState) ) {
-				return false;
-			}
-
-			// Push the State
-			History.savedStates.push(History.cloneObject(newState));
-
-			// Return true
-			return true;
-		};
-
-		/**
-		 * History.getStateByIndex()
-		 * Gets a state by the index
-		 * @param {integer} index
-		 * @return {Object}
-		 */
-		History.getStateByIndex = function(index){
-			// Prepare
-			var State = null;
-
-			// Handle
-			if ( typeof index === 'undefined' ) {
-				// Get the last inserted
-				State = History.savedStates[History.savedStates.length-1];
-			}
-			else if ( index < 0 ) {
-				// Get from the end
-				State = History.savedStates[History.savedStates.length+index];
-			}
-			else {
-				// Get from the beginning
-				State = History.savedStates[index];
-			}
-
-			// Return State
-			return State;
-		};
-		
-		/**
-		 * History.getCurrentIndex()
-		 * Gets the current index
-		 * @return (integer)
-		*/
-		History.getCurrentIndex = function(){
-			// Prepare
-			var index = null;
-			
-			// No states saved
-			if(History.savedStates.length < 1) {
-				index = 0;
-			}
-			else {
-				index = History.savedStates.length-1;
-			}
-			return index;
-		};
-
-		// ====================================================================
-		// Hash Helpers
-
-		/**
-		 * History.getHash()
-		 * @param {Location=} location
-		 * Gets the current document hash
-		 * Note: unlike location.hash, this is guaranteed to return the escaped hash in all browsers
-		 * @return {string}
-		 */
-		History.getHash = function(doc){
-			var url = History.getLocationHref(doc),
-				hash;
-			hash = History.getHashByUrl(url);
-			return hash;
-		};
-
-		/**
-		 * History.unescapeHash()
-		 * normalize and Unescape a Hash
-		 * @param {String} hash
-		 * @return {string}
-		 */
-		History.unescapeHash = function(hash){
-			// Prepare
-			var result = History.normalizeHash(hash);
-
-			// Unescape hash
-			result = decodeURIComponent(result);
-
-			// Return result
-			return result;
-		};
-
-		/**
-		 * History.normalizeHash()
-		 * normalize a hash across browsers
-		 * @return {string}
-		 */
-		History.normalizeHash = function(hash){
-			// Prepare
-			var result = hash.replace(/[^#]*#/,'').replace(/#.*/, '');
-
-			// Return result
-			return result;
-		};
-
-		/**
-		 * History.setHash(hash)
-		 * Sets the document hash
-		 * @param {string} hash
-		 * @return {History}
-		 */
-		History.setHash = function(hash,queue){
-			// Prepare
-			var State, pageUrl;
-
-			// Handle Queueing
-			if ( queue !== false && History.busy() ) {
-				// Wait + Push to Queue
-				//History.debug('History.setHash: we must wait', arguments);
-				History.pushQueue({
-					scope: History,
-					callback: History.setHash,
-					args: arguments,
-					queue: queue
-				});
-				return false;
-			}
-
-			// Log
-			//History.debug('History.setHash: called',hash);
-
-			// Make Busy + Continue
-			History.busy(true);
-
-			// Check if hash is a state
-			State = History.extractState(hash,true);
-			if ( State && !History.emulated.pushState ) {
-				// Hash is a state so skip the setHash
-				//History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',arguments);
-
-				// PushState
-				History.pushState(State.data,State.title,State.url,false);
-			}
-			else if ( History.getHash() !== hash ) {
-				// Hash is a proper hash, so apply it
-
-				// Handle browser bugs
-				if ( History.bugs.setHash ) {
-					// Fix Safari Bug https://bugs.webkit.org/show_bug.cgi?id=56249
-
-					// Fetch the base page
-					pageUrl = History.getPageUrl();
-
-					// Safari hash apply
-					History.pushState(null,null,pageUrl+'#'+hash,false);
-				}
-				else {
-					// Normal hash apply
-					document.location.hash = hash;
-				}
-			}
-
-			// Chain
-			return History;
-		};
-
-		/**
-		 * History.escape()
-		 * normalize and Escape a Hash
-		 * @return {string}
-		 */
-		History.escapeHash = function(hash){
-			// Prepare
-			var result = History.normalizeHash(hash);
-
-			// Escape hash
-			result = window.encodeURIComponent(result);
-
-			// IE6 Escape Bug
-			if ( !History.bugs.hashEscape ) {
-				// Restore common parts
-				result = result
-					.replace(/\%21/g,'!')
-					.replace(/\%26/g,'&')
-					.replace(/\%3D/g,'=')
-					.replace(/\%3F/g,'?');
-			}
-
-			// Return result
-			return result;
-		};
-
-		/**
-		 * History.getHashByUrl(url)
-		 * Extracts the Hash from a URL
-		 * @param {string} url
-		 * @return {string} url
-		 */
-		History.getHashByUrl = function(url){
-			// Extract the hash
-			var hash = String(url)
-				.replace(/([^#]*)#?([^#]*)#?(.*)/, '$2')
-				;
-
-			// Unescape hash
-			hash = History.unescapeHash(hash);
-
-			// Return hash
-			return hash;
-		};
-
-		/**
-		 * History.setTitle(title)
-		 * Applies the title to the document
-		 * @param {State} newState
-		 * @return {Boolean}
-		 */
-		History.setTitle = function(newState){
-			// Prepare
-			var title = newState.title,
-				firstState;
-
-			// Initial
-			if ( !title ) {
-				firstState = History.getStateByIndex(0);
-				if ( firstState && firstState.url === newState.url ) {
-					title = firstState.title||History.options.initialTitle;
-				}
-			}
-
-			// Apply
-			try {
-				document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
-			}
-			catch ( Exception ) { }
-			document.title = title;
-
-			// Chain
-			return History;
-		};
-
-
-		// ====================================================================
-		// Queueing
-
-		/**
-		 * History.queues
-		 * The list of queues to use
-		 * First In, First Out
-		 */
-		History.queues = [];
-
-		/**
-		 * History.busy(value)
-		 * @param {boolean} value [optional]
-		 * @return {boolean} busy
-		 */
-		History.busy = function(value){
-			// Apply
-			if ( typeof value !== 'undefined' ) {
-				//History.debug('History.busy: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues.length);
-				History.busy.flag = value;
-			}
-			// Default
-			else if ( typeof History.busy.flag === 'undefined' ) {
-				History.busy.flag = false;
-			}
-
-			// Queue
-			if ( !History.busy.flag ) {
-				// Execute the next item in the queue
-				clearTimeout(History.busy.timeout);
-				var fireNext = function(){
-					var i, queue, item;
-					if ( History.busy.flag ) return;
-					for ( i=History.queues.length-1; i >= 0; --i ) {
-						queue = History.queues[i];
-						if ( queue.length === 0 ) continue;
-						item = queue.shift();
-						History.fireQueueItem(item);
-						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
-					}
-				};
-				History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
-			}
-
-			// Return
-			return History.busy.flag;
-		};
-
-		/**
-		 * History.busy.flag
-		 */
-		History.busy.flag = false;
-
-		/**
-		 * History.fireQueueItem(item)
-		 * Fire a Queue Item
-		 * @param {Object} item
-		 * @return {Mixed} result
-		 */
-		History.fireQueueItem = function(item){
-			return item.callback.apply(item.scope||History,item.args||[]);
-		};
-
-		/**
-		 * History.pushQueue(callback,args)
-		 * Add an item to the queue
-		 * @param {Object} item [scope,callback,args,queue]
-		 */
-		History.pushQueue = function(item){
-			// Prepare the queue
-			History.queues[item.queue||0] = History.queues[item.queue||0]||[];
-
-			// Add to the queue
-			History.queues[item.queue||0].push(item);
-
-			// Chain
-			return History;
-		};
-
-		/**
-		 * History.queue (item,queue), (func,queue), (func), (item)
-		 * Either firs the item now if not busy, or adds it to the queue
-		 */
-		History.queue = function(item,queue){
-			// Prepare
-			if ( typeof item === 'function' ) {
-				item = {
-					callback: item
-				};
-			}
-			if ( typeof queue !== 'undefined' ) {
-				item.queue = queue;
-			}
-
-			// Handle
-			if ( History.busy() ) {
-				History.pushQueue(item);
-			} else {
-				History.fireQueueItem(item);
-			}
-
-			// Chain
-			return History;
-		};
-
-		/**
-		 * History.clearQueue()
-		 * Clears the Queue
-		 */
-		History.clearQueue = function(){
-			History.busy.flag = false;
-			History.queues = [];
-			return History;
-		};
-
-
-		// ====================================================================
-		// IE Bug Fix
-
-		/**
-		 * History.stateChanged
-		 * States whether or not the state has changed since the last double check was initialised
-		 */
-		History.stateChanged = false;
-
-		/**
-		 * History.doubleChecker
-		 * Contains the timeout used for the double checks
-		 */
-		History.doubleChecker = false;
-
-		/**
-		 * History.doubleCheckComplete()
-		 * Complete a double check
-		 * @return {History}
-		 */
-		History.doubleCheckComplete = function(){
-			// Update
-			History.stateChanged = true;
-
-			// Clear
-			History.doubleCheckClear();
-
-			// Chain
-			return History;
-		};
-
-		/**
-		 * History.doubleCheckClear()
-		 * Clear a double check
-		 * @return {History}
-		 */
-		History.doubleCheckClear = function(){
-			// Clear
-			if ( History.doubleChecker ) {
-				clearTimeout(History.doubleChecker);
-				History.doubleChecker = false;
-			}
-
-			// Chain
-			return History;
-		};
-
-		/**
-		 * History.doubleCheck()
-		 * Create a double check
-		 * @return {History}
-		 */
-		History.doubleCheck = function(tryAgain){
-			// Reset
-			History.stateChanged = false;
-			History.doubleCheckClear();
-
-			// Fix IE6,IE7 bug where calling history.back or history.forward does not actually change the hash (whereas doing it manually does)
-			// Fix Safari 5 bug where sometimes the state does not change: https://bugs.webkit.org/show_bug.cgi?id=42940
-			if ( History.bugs.ieDoubleCheck ) {
-				// Apply Check
-				History.doubleChecker = setTimeout(
-					function(){
-						History.doubleCheckClear();
-						if ( !History.stateChanged ) {
-							//History.debug('History.doubleCheck: State has not yet changed, trying again', arguments);
-							// Re-Attempt
-							tryAgain();
-						}
-						return true;
-					},
-					History.options.doubleCheckInterval
-				);
-			}
-
-			// Chain
-			return History;
-		};
-
-
-		// ====================================================================
-		// Safari Bug Fix
-
-		/**
-		 * History.safariStatePoll()
-		 * Poll the current state
-		 * @return {History}
-		 */
-		History.safariStatePoll = function(){
-			// Poll the URL
-
-			// Get the Last State which has the new URL
-			var
-				urlState = History.extractState(History.getLocationHref()),
-				newState;
-
-			// Check for a difference
-			if ( !History.isLastSavedState(urlState) ) {
-				newState = urlState;
-			}
-			else {
-				return;
-			}
-
-			// Check if we have a state with that url
-			// If not create it
-			if ( !newState ) {
-				//History.debug('History.safariStatePoll: new');
-				newState = History.createStateObject();
-			}
-
-			// Apply the New State
-			//History.debug('History.safariStatePoll: trigger');
-			History.Adapter.trigger(window,'popstate');
-
-			// Chain
-			return History;
-		};
-
-
-		// ====================================================================
-		// State Aliases
-
-		/**
-		 * History.back(queue)
-		 * Send the browser history back one item
-		 * @param {Integer} queue [optional]
-		 */
-		History.back = function(queue){
-			//History.debug('History.back: called', arguments);
-
-			// Handle Queueing
-			if ( queue !== false && History.busy() ) {
-				// Wait + Push to Queue
-				//History.debug('History.back: we must wait', arguments);
-				History.pushQueue({
-					scope: History,
-					callback: History.back,
-					args: arguments,
-					queue: queue
-				});
-				return false;
-			}
-
-			// Make Busy + Continue
-			History.busy(true);
-
-			// Fix certain browser bugs that prevent the state from changing
-			History.doubleCheck(function(){
-				History.back(false);
-			});
-
-			// Go back
-			history.go(-1);
-
-			// End back closure
-			return true;
-		};
-
-		/**
-		 * History.forward(queue)
-		 * Send the browser history forward one item
-		 * @param {Integer} queue [optional]
-		 */
-		History.forward = function(queue){
-			//History.debug('History.forward: called', arguments);
-
-			// Handle Queueing
-			if ( queue !== false && History.busy() ) {
-				// Wait + Push to Queue
-				//History.debug('History.forward: we must wait', arguments);
-				History.pushQueue({
-					scope: History,
-					callback: History.forward,
-					args: arguments,
-					queue: queue
-				});
-				return false;
-			}
-
-			// Make Busy + Continue
-			History.busy(true);
-
-			// Fix certain browser bugs that prevent the state from changing
-			History.doubleCheck(function(){
-				History.forward(false);
-			});
-
-			// Go forward
-			history.go(1);
-
-			// End forward closure
-			return true;
-		};
-
-		/**
-		 * History.go(index,queue)
-		 * Send the browser history back or forward index times
-		 * @param {Integer} queue [optional]
-		 */
-		History.go = function(index,queue){
-			//History.debug('History.go: called', arguments);
-
-			// Prepare
-			var i;
-
-			// Handle
-			if ( index > 0 ) {
-				// Forward
-				for ( i=1; i<=index; ++i ) {
-					History.forward(queue);
-				}
-			}
-			else if ( index < 0 ) {
-				// Backward
-				for ( i=-1; i>=index; --i ) {
-					History.back(queue);
-				}
-			}
-			else {
-				throw new Error('History.go: History.go requires a positive or negative integer passed.');
-			}
-
-			// Chain
-			return History;
-		};
-
-
-		// ====================================================================
-		// HTML5 State Support
-
-		// Non-Native pushState Implementation
-		if ( History.emulated.pushState ) {
-			/*
-			 * Provide Skeleton for HTML4 Browsers
-			 */
-
-			// Prepare
-			var emptyFunction = function(){};
-			History.pushState = History.pushState||emptyFunction;
-			History.replaceState = History.replaceState||emptyFunction;
-		} // History.emulated.pushState
-
-		// Native pushState Implementation
-		else {
-			/*
-			 * Use native HTML5 History API Implementation
-			 */
-
-			/**
-			 * History.onPopState(event,extra)
-			 * Refresh the Current State
-			 */
-			History.onPopState = function(event,extra){
-				// Prepare
-				var stateId = false, newState = false, currentHash, currentState;
-
-				// Reset the double check
-				History.doubleCheckComplete();
-
-				// Check for a Hash, and handle apporiatly
-				currentHash = History.getHash();
-				if ( currentHash ) {
-					// Expand Hash
-					currentState = History.extractState(currentHash||History.getLocationHref(),true);
-					if ( currentState ) {
-						// We were able to parse it, it must be a State!
-						// Let's forward to replaceState
-						//History.debug('History.onPopState: state anchor', currentHash, currentState);
-						History.replaceState(currentState.data, currentState.title, currentState.url, false);
-					}
-					else {
-						// Traditional Anchor
-						//History.debug('History.onPopState: traditional anchor', currentHash);
-						History.Adapter.trigger(window,'anchorchange');
-						History.busy(false);
-					}
-
-					// We don't care for hashes
-					History.expectedStateId = false;
-					return false;
-				}
-
-				// Ensure
-				stateId = History.Adapter.extractEventData('state',event,extra) || false;
-
-				// Fetch State
-				if ( stateId ) {
-					// Vanilla: Back/forward button was used
-					newState = History.getStateById(stateId);
-				}
-				else if ( History.expectedStateId ) {
-					// Vanilla: A new state was pushed, and popstate was called manually
-					newState = History.getStateById(History.expectedStateId);
-				}
-				else {
-					// Initial State
-					newState = History.extractState(History.getLocationHref());
-				}
-
-				// The State did not exist in our store
-				if ( !newState ) {
-					// Regenerate the State
-					newState = History.createStateObject(null,null,History.getLocationHref());
-				}
-
-				// Clean
-				History.expectedStateId = false;
-
-				// Check if we are the same state
-				if ( History.isLastSavedState(newState) ) {
-					// There has been no change (just the page's hash has finally propagated)
-					//History.debug('History.onPopState: no change', newState, History.savedStates);
-					History.busy(false);
-					return false;
-				}
-
-				// Store the State
-				History.storeState(newState);
-				History.saveState(newState);
-
-				// Force update of the title
-				History.setTitle(newState);
-
-				// Fire Our Event
-				History.Adapter.trigger(window,'statechange');
-				History.busy(false);
-
-				// Return true
-				return true;
-			};
-			History.Adapter.bind(window,'popstate',History.onPopState);
-
-			/**
-			 * History.pushState(data,title,url)
-			 * Add a new State to the history object, become it, and trigger onpopstate
-			 * We have to trigger for HTML4 compatibility
-			 * @param {object} data
-			 * @param {string} title
-			 * @param {string} url
-			 * @return {true}
-			 */
-			History.pushState = function(data,title,url,queue){
-				//History.debug('History.pushState: called', arguments);
-
-				// Check the State
-				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
-				}
-
-				// Handle Queueing
-				if ( queue !== false && History.busy() ) {
-					// Wait + Push to Queue
-					//History.debug('History.pushState: we must wait', arguments);
-					History.pushQueue({
-						scope: History,
-						callback: History.pushState,
-						args: arguments,
-						queue: queue
-					});
-					return false;
-				}
-
-				// Make Busy + Continue
-				History.busy(true);
-
-				// Create the newState
-				var newState = History.createStateObject(data,title,url);
-
-				// Check it
-				if ( History.isLastSavedState(newState) ) {
-					// Won't be a change
-					History.busy(false);
-				}
-				else {
-					// Store the newState
-					History.storeState(newState);
-					History.expectedStateId = newState.id;
-
-					// Push the newState
-					history.pushState(newState.id,newState.title,newState.url);
-
-					// Fire HTML5 Event
-					History.Adapter.trigger(window,'popstate');
-				}
-
-				// End pushState closure
-				return true;
-			};
-
-			/**
-			 * History.replaceState(data,title,url)
-			 * Replace the State and trigger onpopstate
-			 * We have to trigger for HTML4 compatibility
-			 * @param {object} data
-			 * @param {string} title
-			 * @param {string} url
-			 * @return {true}
-			 */
-			History.replaceState = function(data,title,url,queue){
-				//History.debug('History.replaceState: called', arguments);
-
-				// Check the State
-				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
-				}
-
-				// Handle Queueing
-				if ( queue !== false && History.busy() ) {
-					// Wait + Push to Queue
-					//History.debug('History.replaceState: we must wait', arguments);
-					History.pushQueue({
-						scope: History,
-						callback: History.replaceState,
-						args: arguments,
-						queue: queue
-					});
-					return false;
-				}
-
-				// Make Busy + Continue
-				History.busy(true);
-
-				// Create the newState
-				var newState = History.createStateObject(data,title,url);
-
-				// Check it
-				if ( History.isLastSavedState(newState) ) {
-					// Won't be a change
-					History.busy(false);
-				}
-				else {
-					// Store the newState
-					History.storeState(newState);
-					History.expectedStateId = newState.id;
-
-					// Push the newState
-					history.replaceState(newState.id,newState.title,newState.url);
-
-					// Fire HTML5 Event
-					History.Adapter.trigger(window,'popstate');
-				}
-
-				// End replaceState closure
-				return true;
-			};
-
-		} // !History.emulated.pushState
-
-
-		// ====================================================================
-		// Initialise
-
-		/**
-		 * Load the Store
-		 */
-		if ( sessionStorage ) {
-			// Fetch
-			try {
-				History.store = JSON.parse(sessionStorage.getItem('History.store'))||{};
-			}
-			catch ( err ) {
-				History.store = {};
-			}
-
-			// Normalize
-			History.normalizeStore();
-		}
-		else {
-			// Default Load
-			History.store = {};
-			History.normalizeStore();
-		}
-
-		/**
-		 * Clear Intervals on exit to prevent memory leaks
-		 */
-		History.Adapter.bind(window,"unload",History.clearAllIntervals);
-
-		/**
-		 * Create the initial State
-		 */
-		History.saveState(History.storeState(History.extractState(History.getLocationHref(),true)));
-
-		/**
-		 * Bind for Saving Store
-		 */
-		if ( sessionStorage ) {
-			// When the page is closed
-			History.onUnload = function(){
-				// Prepare
-				var	currentStore, item, currentStoreString;
-
-				// Fetch
-				try {
-					currentStore = JSON.parse(sessionStorage.getItem('History.store'))||{};
-				}
-				catch ( err ) {
-					currentStore = {};
-				}
-
-				// Ensure
-				currentStore.idToState = currentStore.idToState || {};
-				currentStore.urlToId = currentStore.urlToId || {};
-				currentStore.stateToId = currentStore.stateToId || {};
-
-				// Sync
-				for ( item in History.idToState ) {
-					if ( !History.idToState.hasOwnProperty(item) ) {
-						continue;
-					}
-					currentStore.idToState[item] = History.idToState[item];
-				}
-				for ( item in History.urlToId ) {
-					if ( !History.urlToId.hasOwnProperty(item) ) {
-						continue;
-					}
-					currentStore.urlToId[item] = History.urlToId[item];
-				}
-				for ( item in History.stateToId ) {
-					if ( !History.stateToId.hasOwnProperty(item) ) {
-						continue;
-					}
-					currentStore.stateToId[item] = History.stateToId[item];
-				}
-
-				// Update
-				History.store = currentStore;
-				History.normalizeStore();
-
-				// In Safari, going into Private Browsing mode causes the
-				// Session Storage object to still exist but if you try and use
-				// or set any property/function of it it throws the exception
-				// "QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to
-				// add something to storage that exceeded the quota." infinitely
-				// every second.
-				currentStoreString = JSON.stringify(currentStore);
-				try {
-					// Store
-					sessionStorage.setItem('History.store', currentStoreString);
-				}
-				catch (e) {
-					if (e.code === DOMException.QUOTA_EXCEEDED_ERR) {
-						if (sessionStorage.length) {
-							// Workaround for a bug seen on iPads. Sometimes the quota exceeded error comes up and simply
-							// removing/resetting the storage can work.
-							sessionStorage.removeItem('History.store');
-							sessionStorage.setItem('History.store', currentStoreString);
-						} else {
-							// Otherwise, we're probably private browsing in Safari, so we'll ignore the exception.
-						}
-					} else {
-						throw e;
-					}
-				}
-			};
-
-			// For Internet Explorer
-			History.intervalList.push(setInterval(History.onUnload,History.options.storeInterval));
-
-			// For Other Browsers
-			History.Adapter.bind(window,'beforeunload',History.onUnload);
-			History.Adapter.bind(window,'unload',History.onUnload);
-
-			// Both are enabled for consistency
-		}
-
-		// Non-Native pushState Implementation
-		if ( !History.emulated.pushState ) {
-			// Be aware, the following is only for native pushState implementations
-			// If you are wanting to include something for all browsers
-			// Then include it above this if block
-
-			/**
-			 * Setup Safari Fix
-			 */
-			if ( History.bugs.safariPoll ) {
-				History.intervalList.push(setInterval(History.safariStatePoll, History.options.safariPollInterval));
-			}
-
-			/**
-			 * Ensure Cross Browser Compatibility
-			 */
-			if ( navigator.vendor === 'Apple Computer, Inc.' || (navigator.appCodeName||'') === 'Mozilla' ) {
-				/**
-				 * Fix Safari HashChange Issue
-				 */
-
-				// Setup Alias
-				History.Adapter.bind(window,'hashchange',function(){
-					History.Adapter.trigger(window,'popstate');
-				});
-
-				// Initialise Alias
-				if ( History.getHash() ) {
-					History.Adapter.onDomLoad(function(){
-						History.Adapter.trigger(window,'hashchange');
-					});
-				}
-			}
-
-		} // !History.emulated.pushState
-
-
-	}; // History.initCore
-
-	// Try to Initialise History
-	if (!History.options || !History.options.delayInit) {
-		History.init();
-	}
-
-})(window);
-
+typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<10?"0"+e:e}function quote(e){return escapable.lastIndex=0,escapable.test(e)?'"'+e.replace(escapable,function(e){var t=meta[e];return typeof t=="string"?t:"\\u"+("0000"+e.charCodeAt(0).toString(16)).slice(-4)})+'"':'"'+e+'"'}function str(e,t){var n,r,i,s,o=gap,u,a=t[e];a&&typeof a=="object"&&typeof a.toJSON=="function"&&(a=a.toJSON(e)),typeof rep=="function"&&(a=rep.call(t,e,a));switch(typeof a){case"string":return quote(a);case"number":return isFinite(a)?String(a):"null";case"boolean":case"null":return String(a);case"object":if(!a)return"null";gap+=indent,u=[];if(Object.prototype.toString.apply(a)==="[object Array]"){s=a.length;for(n=0;n<s;n+=1)u[n]=str(n,a)||"null";return i=u.length===0?"[]":gap?"[\n"+gap+u.join(",\n"+gap)+"\n"+o+"]":"["+u.join(",")+"]",gap=o,i}if(rep&&typeof rep=="object"){s=rep.length;for(n=0;n<s;n+=1)typeof rep[n]=="string"&&(r=rep[n],i=str(r,a),i&&u.push(quote(r)+(gap?": ":":")+i))}else for(r in a)Object.prototype.hasOwnProperty.call(a,r)&&(i=str(r,a),i&&u.push(quote(r)+(gap?": ":":")+i));return i=u.length===0?"{}":gap?"{\n"+gap+u.join(",\n"+gap)+"\n"+o+"}":"{"+u.join(",")+"}",gap=o,i}}typeof Date.prototype.toJSON!="function"&&(Date.prototype.toJSON=function(e){return isFinite(this.valueOf())?this.getUTCFullYear()+"-"+f(this.getUTCMonth()+1)+"-"+f(this.getUTCDate())+"T"+f(this.getUTCHours())+":"+f(this.getUTCMinutes())+":"+f(this.getUTCSeconds())+"Z":null},String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(e){return this.valueOf()});var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,gap,indent,meta={"\b":"\\b","	":"\\t","\n":"\\n","\f":"\\f","\r":"\\r",'"':'\\"',"\\":"\\\\"},rep;typeof JSON.stringify!="function"&&(JSON.stringify=function(e,t,n){var r;gap="",indent="";if(typeof n=="number")for(r=0;r<n;r+=1)indent+=" ";else typeof n=="string"&&(indent=n);rep=t;if(!t||typeof t=="function"||typeof t=="object"&&typeof t.length=="number")return str("",{"":e});throw new Error("JSON.stringify")}),typeof JSON.parse!="function"&&(JSON.parse=function(text,reviver){function walk(e,t){var n,r,i=e[t];if(i&&typeof i=="object")for(n in i)Object.prototype.hasOwnProperty.call(i,n)&&(r=walk(i,n),r!==undefined?i[n]=r:delete i[n]);return reviver.call(e,t,i)}var j;text=String(text),cx.lastIndex=0,cx.test(text)&&(text=text.replace(cx,function(e){return"\\u"+("0000"+e.charCodeAt(0).toString(16)).slice(-4)}));if(/^[\],:{}\s]*$/.test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,"@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,"]").replace(/(?:^|:|,)(?:\s*\[)+/g,"")))return j=eval("("+text+")"),typeof reviver=="function"?walk({"":j},""):j;throw new SyntaxError("JSON.parse")})}(),function(e,t){"use strict";var n=e.History=e.History||{},r=e.jQuery;if(typeof n.Adapter!="undefined")throw new Error("History.js Adapter has already been loaded...");n.Adapter={bind:function(e,t,n){r(e).bind(t,n)},trigger:function(e,t,n){r(e).trigger(t,n)},extractEventData:function(e,n,r){var i=n&&n.originalEvent&&n.originalEvent[e]||r&&r[e]||t;return i},onDomLoad:function(e){r(e)}},typeof n.init!="undefined"&&n.init()}(window),function(e,t){"use strict";var n=e.document,r=e.setTimeout||r,i=e.clearTimeout||i,s=e.setInterval||s,o=e.History=e.History||{};if(typeof o.initHtml4!="undefined")throw new Error("History.js HTML4 Support has already been loaded...");o.initHtml4=function(){if(typeof o.initHtml4.initialized!="undefined")return!1;o.initHtml4.initialized=!0,o.enabled=!0,o.savedHashes=[],o.isLastHash=function(e){var t=o.getHashByIndex(),n;return n=e===t,n},o.isHashEqual=function(e,t){return e=encodeURIComponent(e).replace(/%25/g,"%"),t=encodeURIComponent(t).replace(/%25/g,"%"),e===t},o.saveHash=function(e){return o.isLastHash(e)?!1:(o.savedHashes.push(e),!0)},o.getHashByIndex=function(e){var t=null;return typeof e=="undefined"?t=o.savedHashes[o.savedHashes.length-1]:e<0?t=o.savedHashes[o.savedHashes.length+e]:t=o.savedHashes[e],t},o.discardedHashes={},o.discardedStates={},o.discardState=function(e,t,n){var r=o.getHashByState(e),i;return i={discardedState:e,backState:n,forwardState:t},o.discardedStates[r]=i,!0},o.discardHash=function(e,t,n){var r={discardedHash:e,backState:n,forwardState:t};return o.discardedHashes[e]=r,!0},o.discardedState=function(e){var t=o.getHashByState(e),n;return n=o.discardedStates[t]||!1,n},o.discardedHash=function(e){var t=o.discardedHashes[e]||!1;return t},o.recycleState=function(e){var t=o.getHashByState(e);return o.discardedState(e)&&delete o.discardedStates[t],!0},o.emulated.hashChange&&(o.hashChangeInit=function(){o.checkerFunction=null;var t="",r,i,u,a,f=Boolean(o.getHash());return o.isInternetExplorer()?(r="historyjs-iframe",i=n.createElement("iframe"),i.setAttribute("id",r),i.setAttribute("src","#"),i.style.display="none",n.body.appendChild(i),i.contentWindow.document.open(),i.contentWindow.document.close(),u="",a=!1,o.checkerFunction=function(){if(a)return!1;a=!0;var n=o.getHash(),r=o.getHash(i.contentWindow.document);return n!==t?(t=n,r!==n&&(u=r=n,i.contentWindow.document.open(),i.contentWindow.document.close(),i.contentWindow.document.location.hash=o.escapeHash(n)),o.Adapter.trigger(e,"hashchange")):r!==u&&(u=r,f&&r===""?o.back():o.setHash(r,!1)),a=!1,!0}):o.checkerFunction=function(){var n=o.getHash()||"";return n!==t&&(t=n,o.Adapter.trigger(e,"hashchange")),!0},o.intervalList.push(s(o.checkerFunction,o.options.hashChangeInterval)),!0},o.Adapter.onDomLoad(o.hashChangeInit)),o.emulated.pushState&&(o.onHashChange=function(t){var n=t&&t.newURL||o.getLocationHref(),r=o.getHashByUrl(n),i=null,s=null,u=null,a;return o.isLastHash(r)?(o.busy(!1),!1):(o.doubleCheckComplete(),o.saveHash(r),r&&o.isTraditionalAnchor(r)?(o.Adapter.trigger(e,"anchorchange"),o.busy(!1),!1):(i=o.extractState(o.getFullUrl(r||o.getLocationHref()),!0),o.isLastSavedState(i)?(o.busy(!1),!1):(s=o.getHashByState(i),a=o.discardedState(i),a?(o.getHashByIndex(-2)===o.getHashByState(a.forwardState)?o.back(!1):o.forward(!1),!1):(o.pushState(i.data,i.title,encodeURI(i.url),!1),!0))))},o.Adapter.bind(e,"hashchange",o.onHashChange),o.pushState=function(t,n,r,i){r=encodeURI(r).replace(/%25/g,"%");if(o.getHashByUrl(r))throw new Error("History.js does not support states with fragment-identifiers (hashes/anchors).");if(i!==!1&&o.busy())return o.pushQueue({scope:o,callback:o.pushState,args:arguments,queue:i}),!1;o.busy(!0);var s=o.createStateObject(t,n,r),u=o.getHashByState(s),a=o.getState(!1),f=o.getHashByState(a),l=o.getHash(),c=o.expectedStateId==s.id;return o.storeState(s),o.expectedStateId=s.id,o.recycleState(s),o.setTitle(s),u===f?(o.busy(!1),!1):(o.saveState(s),c||o.Adapter.trigger(e,"statechange"),!o.isHashEqual(u,l)&&!o.isHashEqual(u,o.getShortUrl(o.getLocationHref()))&&o.setHash(u,!1),o.busy(!1),!0)},o.replaceState=function(t,n,r,i){r=encodeURI(r).replace(/%25/g,"%");if(o.getHashByUrl(r))throw new Error("History.js does not support states with fragment-identifiers (hashes/anchors).");if(i!==!1&&o.busy())return o.pushQueue({scope:o,callback:o.replaceState,args:arguments,queue:i}),!1;o.busy(!0);var s=o.createStateObject(t,n,r),u=o.getHashByState(s),a=o.getState(!1),f=o.getHashByState(a),l=o.getStateByIndex(-2);return o.discardState(a,s,l),u===f?(o.storeState(s),o.expectedStateId=s.id,o.recycleState(s),o.setTitle(s),o.saveState(s),o.Adapter.trigger(e,"statechange"),o.busy(!1)):o.pushState(s.data,s.title,s.url,!1),!0}),o.emulated.pushState&&o.getHash()&&!o.emulated.hashChange&&o.Adapter.onDomLoad(function(){o.Adapter.trigger(e,"hashchange")})},typeof o.init!="undefined"&&o.init()}(window),function(e,t){"use strict";var n=e.console||t,r=e.document,i=e.navigator,s=!1,o=e.setTimeout,u=e.clearTimeout,a=e.setInterval,f=e.clearInterval,l=e.JSON,c=e.alert,h=e.History=e.History||{},p=e.history;try{s=e.sessionStorage,s.setItem("TEST","1"),s.removeItem("TEST")}catch(d){s=!1}l.stringify=l.stringify||l.encode,l.parse=l.parse||l.decode;if(typeof h.init!="undefined")throw new Error("History.js Core has already been loaded...");h.init=function(e){return typeof h.Adapter=="undefined"?!1:(typeof h.initCore!="undefined"&&h.initCore(),typeof h.initHtml4!="undefined"&&h.initHtml4(),!0)},h.initCore=function(d){if(typeof h.initCore.initialized!="undefined")return!1;h.initCore.initialized=!0,h.options=h.options||{},h.options.hashChangeInterval=h.options.hashChangeInterval||100,h.options.safariPollInterval=h.options.safariPollInterval||500,h.options.doubleCheckInterval=h.options.doubleCheckInterval||500,h.options.disableSuid=h.options.disableSuid||!1,h.options.storeInterval=h.options.storeInterval||1e3,h.options.busyDelay=h.options.busyDelay||250,h.options.debug=h.options.debug||!1,h.options.initialTitle=h.options.initialTitle||r.title,h.options.html4Mode=h.options.html4Mode||!1,h.options.delayInit=h.options.delayInit||!1,h.intervalList=[],h.clearAllIntervals=function(){var e,t=h.intervalList;if(typeof t!="undefined"&&t!==null){for(e=0;e<t.length;e++)f(t[e]);h.intervalList=null}},h.debug=function(){(h.options.debug||!1)&&h.log.apply(h,arguments)},h.log=function(){var e=typeof n!="undefined"&&typeof n.log!="undefined"&&typeof n.log.apply!="undefined",t=r.getElementById("log"),i,s,o,u,a;e?(u=Array.prototype.slice.call(arguments),i=u.shift(),typeof n.debug!="undefined"?n.debug.apply(n,[i,u]):n.log.apply(n,[i,u])):i="\n"+arguments[0]+"\n";for(s=1,o=arguments.length;s<o;++s){a=arguments[s];if(typeof a=="object"&&typeof l!="undefined")try{a=l.stringify(a)}catch(f){}i+="\n"+a+"\n"}return t?(t.value+=i+"\n-----\n",t.scrollTop=t.scrollHeight-t.clientHeight):e||c(i),!0},h.getInternetExplorerMajorVersion=function(){var e=h.getInternetExplorerMajorVersion.cached=typeof h.getInternetExplorerMajorVersion.cached!="undefined"?h.getInternetExplorerMajorVersion.cached:function(){var e=3,t=r.createElement("div"),n=t.getElementsByTagName("i");while((t.innerHTML="<!--[if gt IE "+ ++e+"]><i></i><![endif]-->")&&n[0]);return e>4?e:!1}();return e},h.isInternetExplorer=function(){var e=h.isInternetExplorer.cached=typeof h.isInternetExplorer.cached!="undefined"?h.isInternetExplorer.cached:Boolean(h.getInternetExplorerMajorVersion());return e},h.options.html4Mode?h.emulated={pushState:!0,hashChange:!0}:h.emulated={pushState:!Boolean(e.history&&e.history.pushState&&e.history.replaceState&&!/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i.test(i.userAgent)&&!/AppleWebKit\/5([0-2]|3[0-2])/i.test(i.userAgent)),hashChange:Boolean(!("onhashchange"in e||"onhashchange"in r)||h.isInternetExplorer()&&h.getInternetExplorerMajorVersion()<8)},h.enabled=!h.emulated.pushState,h.bugs={setHash:Boolean(!h.emulated.pushState&&i.vendor==="Apple Computer, Inc."&&/AppleWebKit\/5([0-2]|3[0-3])/.test(i.userAgent)),safariPoll:Boolean(!h.emulated.pushState&&i.vendor==="Apple Computer, Inc."&&/AppleWebKit\/5([0-2]|3[0-3])/.test(i.userAgent)),ieDoubleCheck:Boolean(h.isInternetExplorer()&&h.getInternetExplorerMajorVersion()<8),hashEscape:Boolean(h.isInternetExplorer()&&h.getInternetExplorerMajorVersion()<7)},h.isEmptyObject=function(e){for(var t in e)if(e.hasOwnProperty(t))return!1;return!0},h.cloneObject=function(e){var t,n;return e?(t=l.stringify(e),n=l.parse(t)):n={},n},h.getRootUrl=function(){var e=r.location.protocol+"//"+(r.location.hostname||r.location.host);if(r.location.port||!1)e+=":"+r.location.port;return e+="/",e},h.getBaseHref=function(){var e=r.getElementsByTagName("base"),t=null,n="";return e.length===1&&(t=e[0],n=t.href.replace(/[^\/]+$/,"")),n=n.replace(/\/+$/,""),n&&(n+="/"),n},h.getBaseUrl=function(){var e=h.getBaseHref()||h.getBasePageUrl()||h.getRootUrl();return e},h.getPageUrl=function(){var e=h.getState(!1,!1),t=(e||{}).url||h.getLocationHref(),n;return n=t.replace(/\/+$/,"").replace(/[^\/]+$/,function(e,t,n){return/\./.test(e)?e:e+"/"}),n},h.getBasePageUrl=function(){var e=h.getLocationHref().replace(/[#\?].*/,"").replace(/[^\/]+$/,function(e,t,n){return/[^\/]$/.test(e)?"":e}).replace(/\/+$/,"")+"/";return e},h.getFullUrl=function(e,t){var n=e,r=e.substring(0,1);return t=typeof t=="undefined"?!0:t,/[a-z]+\:\/\//.test(e)||(r==="/"?n=h.getRootUrl()+e.replace(/^\/+/,""):r==="#"?n=h.getPageUrl().replace(/#.*/,"")+e:r==="?"?n=h.getPageUrl().replace(/[\?#].*/,"")+e:t?n=h.getBaseUrl()+e.replace(/^(\.\/)+/,""):n=h.getBasePageUrl()+e.replace(/^(\.\/)+/,"")),n.replace(/\#$/,"")},h.getShortUrl=function(e){var t=e,n=h.getBaseUrl(),r=h.getRootUrl();return h.emulated.pushState&&(t=t.replace(n,"")),t=t.replace(r,"/"),h.isTraditionalAnchor(t)&&(t="./"+t),t=t.replace(/^(\.\/)+/g,"./").replace(/\#$/,""),t},h.getLocationHref=function(e){return e=e||r,e.URL===e.location.href?e.location.href:e.location.href===decodeURIComponent(e.URL)?e.URL:e.location.hash&&decodeURIComponent(e.location.href.replace(/^[^#]+/,""))===e.location.hash?e.location.href:e.URL.indexOf("#")==-1&&e.location.href.indexOf("#")!=-1?e.location.href:e.URL||e.location.href},h.store={},h.idToState=h.idToState||{},h.stateToId=h.stateToId||{},h.urlToId=h.urlToId||{},h.storedStates=h.storedStates||[],h.savedStates=h.savedStates||[],h.normalizeStore=function(){h.store.idToState=h.store.idToState||{},h.store.urlToId=h.store.urlToId||{},h.store.stateToId=h.store.stateToId||{}},h.getState=function(e,t){typeof e=="undefined"&&(e=!0),typeof t=="undefined"&&(t=!0);var n=h.getLastSavedState();return!n&&t&&(n=h.createStateObject()),e&&(n=h.cloneObject(n),n.url=n.cleanUrl||n.url),n},h.getIdByState=function(e){var t=h.extractId(e.url),n;if(!t){n=h.getStateString(e);if(typeof h.stateToId[n]!="undefined")t=h.stateToId[n];else if(typeof h.store.stateToId[n]!="undefined")t=h.store.stateToId[n];else{for(;;){t=(new Date).getTime()+String(Math.random()).replace(/\D/g,"");if(typeof h.idToState[t]=="undefined"&&typeof h.store.idToState[t]=="undefined")break}h.stateToId[n]=t,h.idToState[t]=e}}return t},h.normalizeState=function(e){var t,n;if(!e||typeof e!="object")e={};if(typeof e.normalized!="undefined")return e;if(!e.data||typeof e.data!="object")e.data={};return t={},t.normalized=!0,t.title=e.title||"",t.url=h.getFullUrl(e.url?e.url:h.getLocationHref()),t.hash=h.getShortUrl(t.url),t.data=h.cloneObject(e.data),t.id=h.getIdByState(t),t.cleanUrl=t.url.replace(/\??\&_suid.*/,""),t.url=t.cleanUrl,n=!h.isEmptyObject(t.data),(t.title||n)&&h.options.disableSuid!==!0&&(t.hash=h.getShortUrl(t.url).replace(/\??\&_suid.*/,""),/\?/.test(t.hash)||(t.hash+="?"),t.hash+="&_suid="+t.id),t.hashedUrl=h.getFullUrl(t.hash),(h.emulated.pushState||h.bugs.safariPoll)&&h.hasUrlDuplicate(t)&&(t.url=t.hashedUrl),t},h.createStateObject=function(e,t,n){var r={data:e,title:t,url:n};return r=h.normalizeState(r),r},h.getStateById=function(e){e=String(e);var n=h.idToState[e]||h.store.idToState[e]||t;return n},h.getStateString=function(e){var t,n,r;return t=h.normalizeState(e),n={data:t.data,title:e.title,url:e.url},r=l.stringify(n),r},h.getStateId=function(e){var t,n;return t=h.normalizeState(e),n=t.id,n},h.getHashByState=function(e){var t,n;return t=h.normalizeState(e),n=t.hash,n},h.extractId=function(e){var t,n,r,i;return e.indexOf("#")!=-1?i=e.split("#")[0]:i=e,n=/(.*)\&_suid=([0-9]+)$/.exec(i),r=n?n[1]||e:e,t=n?String(n[2]||""):"",t||!1},h.isTraditionalAnchor=function(e){var t=!/[\/\?\.]/.test(e);return t},h.extractState=function(e,t){var n=null,r,i;return t=t||!1,r=h.extractId(e),r&&(n=h.getStateById(r)),n||(i=h.getFullUrl(e),r=h.getIdByUrl(i)||!1,r&&(n=h.getStateById(r)),!n&&t&&!h.isTraditionalAnchor(e)&&(n=h.createStateObject(null,null,i))),n},h.getIdByUrl=function(e){var n=h.urlToId[e]||h.store.urlToId[e]||t;return n},h.getLastSavedState=function(){return h.savedStates[h.savedStates.length-1]||t},h.getLastStoredState=function(){return h.storedStates[h.storedStates.length-1]||t},h.hasUrlDuplicate=function(e){var t=!1,n;return n=h.extractState(e.url),t=n&&n.id!==e.id,t},h.storeState=function(e){return h.urlToId[e.url]=e.id,h.storedStates.push(h.cloneObject(e)),e},h.isLastSavedState=function(e){var t=!1,n,r,i;return h.savedStates.length&&(n=e.id,r=h.getLastSavedState(),i=r.id,t=n===i),t},h.saveState=function(e){return h.isLastSavedState(e)?!1:(h.savedStates.push(h.cloneObject(e)),!0)},h.getStateByIndex=function(e){var t=null;return typeof e=="undefined"?t=h.savedStates[h.savedStates.length-1]:e<0?t=h.savedStates[h.savedStates.length+e]:t=h.savedStates[e],t},h.getCurrentIndex=function(){var e=null;return h.savedStates.length<1?e=0:e=h.savedStates.length-1,e},h.getHash=function(e){var t=h.getLocationHref(e),n;return n=h.getHashByUrl(t),n},h.unescapeHash=function(e){var t=h.normalizeHash(e);return t=decodeURIComponent(t),t},h.normalizeHash=function(e){var t=e.replace(/[^#]*#/,"").replace(/#.*/,"");return t},h.setHash=function(e,t){var n,i;return t!==!1&&h.busy()?(h.pushQueue({scope:h,callback:h.setHash,args:arguments,queue:t}),!1):(h.busy(!0),n=h.extractState(e,!0),n&&!h.emulated.pushState?h.pushState(n.data,n.title,n.url,!1):h.getHash()!==e&&(h.bugs.setHash?(i=h.getPageUrl(),h.pushState(null,null,i+"#"+e,!1)):r.location.hash=e),h)},h.escapeHash=function(t){var n=h.normalizeHash(t);return n=e.encodeURIComponent(n),h.bugs.hashEscape||(n=n.replace(/\%21/g,"!").replace(/\%26/g,"&").replace(/\%3D/g,"=").replace(/\%3F/g,"?")),n},h.getHashByUrl=function(e){var t=String(e).replace(/([^#]*)#?([^#]*)#?(.*)/,"$2");return t=h.unescapeHash(t),t},h.setTitle=function(e){var t=e.title,n;t||(n=h.getStateByIndex(0),n&&n.url===e.url&&(t=n.title||h.options.initialTitle));try{r.getElementsByTagName("title")[0].innerHTML=t.replace("<","&lt;").replace(">","&gt;").replace(" & "," &amp; ")}catch(i){}return r.title=t,h},h.queues=[],h.busy=function(e){typeof e!="undefined"?h.busy.flag=e:typeof h.busy.flag=="undefined"&&(h.busy.flag=!1);if(!h.busy.flag){u(h.busy.timeout);var t=function(){var e,n,r;if(h.busy.flag)return;for(e=h.queues.length-1;e>=0;--e){n=h.queues[e];if(n.length===0)continue;r=n.shift(),h.fireQueueItem(r),h.busy.timeout=o(t,h.options.busyDelay)}};h.busy.timeout=o(t,h.options.busyDelay)}return h.busy.flag},h.busy.flag=!1,h.fireQueueItem=function(e){return e.callback.apply(e.scope||h,e.args||[])},h.pushQueue=function(e){return h.queues[e.queue||0]=h.queues[e.queue||0]||[],h.queues[e.queue||0].push(e),h},h.queue=function(e,t){return typeof e=="function"&&(e={callback:e}),typeof t!="undefined"&&(e.queue=t),h.busy()?h.pushQueue(e):h.fireQueueItem(e),h},h.clearQueue=function(){return h.busy.flag=!1,h.queues=[],h},h.stateChanged=!1,h.doubleChecker=!1,h.doubleCheckComplete=function(){return h.stateChanged=!0,h.doubleCheckClear(),h},h.doubleCheckClear=function(){return h.doubleChecker&&(u(h.doubleChecker),h.doubleChecker=!1),h},h.doubleCheck=function(e){return h.stateChanged=!1,h.doubleCheckClear(),h.bugs.ieDoubleCheck&&(h.doubleChecker=o(function(){return h.doubleCheckClear(),h.stateChanged||e(),!0},h.options.doubleCheckInterval)),h},h.safariStatePoll=function(){var t=h.extractState(h.getLocationHref()),n;if(!h.isLastSavedState(t))return n=t,n||(n=h.createStateObject()),h.Adapter.trigger(e,"popstate"),h;return},h.back=function(e){return e!==!1&&h.busy()?(h.pushQueue({scope:h,callback:h.back,args:arguments,queue:e}),!1):(h.busy(!0),h.doubleCheck(function(){h.back(!1)}),p.go(-1),!0)},h.forward=function(e){return e!==!1&&h.busy()?(h.pushQueue({scope:h,callback:h.forward,args:arguments,queue:e}),!1):(h.busy(!0),h.doubleCheck(function(){h.forward(!1)}),p.go(1),!0)},h.go=function(e,t){var n;if(e>0)for(n=1;n<=e;++n)h.forward(t);else{if(!(e<0))throw new Error("History.go: History.go requires a positive or negative integer passed.");for(n=-1;n>=e;--n)h.back(t)}return h};if(h.emulated.pushState){var v=function(){};h.pushState=h.pushState||v,h.replaceState=h.replaceState||v}else h.onPopState=function(t,n){var r=!1,i=!1,s,o;return h.doubleCheckComplete(),s=h.getHash(),s?(o=h.extractState(s||h.getLocationHref(),!0),o?h.replaceState(o.data,o.title,o.url,!1):(h.Adapter.trigger(e,"anchorchange"),h.busy(!1)),h.expectedStateId=!1,!1):(r=h.Adapter.extractEventData("state",t,n)||!1,r?i=h.getStateById(r):h.expectedStateId?i=h.getStateById(h.expectedStateId):i=h.extractState(h.getLocationHref()),i||(i=h.createStateObject(null,null,h.getLocationHref())),h.expectedStateId=!1,h.isLastSavedState(i)?(h.busy(!1),!1):(h.storeState(i),h.saveState(i),h.setTitle(i),h.Adapter.trigger(e,"statechange"),h.busy(!1),!0))},h.Adapter.bind(e,"popstate",h.onPopState),h.pushState=function(t,n,r,i){if(h.getHashByUrl(r)&&h.emulated.pushState)throw new Error("History.js does not support states with fragement-identifiers (hashes/anchors).");if(i!==!1&&h.busy())return h.pushQueue({scope:h,callback:h.pushState,args:arguments,queue:i}),!1;h.busy(!0);var s=h.createStateObject(t,n,r);return h.isLastSavedState(s)?h.busy(!1):(h.storeState(s),h.expectedStateId=s.id,p.pushState(s.id,s.title,s.url),h.Adapter.trigger(e,"popstate")),!0},h.replaceState=function(t,n,r,i){if(h.getHashByUrl(r)&&h.emulated.pushState)throw new Error("History.js does not support states with fragement-identifiers (hashes/anchors).");if(i!==!1&&h.busy())return h.pushQueue({scope:h,callback:h.replaceState,args:arguments,queue:i}),!1;h.busy(!0);var s=h.createStateObject(t,n,r);return h.isLastSavedState(s)?h.busy(!1):(h.storeState(s),h.expectedStateId=s.id,p.replaceState(s.id,s.title,s.url),h.Adapter.trigger(e,"popstate")),!0};if(s){try{h.store=l.parse(s.getItem("History.store"))||{}}catch(m){h.store={}}h.normalizeStore()}else h.store={},h.normalizeStore();h.Adapter.bind(e,"unload",h.clearAllIntervals),h.saveState(h.storeState(h.extractState(h.getLocationHref(),!0))),s&&(h.onUnload=function(){var e,t,n;try{e=l.parse(s.getItem("History.store"))||{}}catch(r){e={}}e.idToState=e.idToState||{},e.urlToId=e.urlToId||{},e.stateToId=e.stateToId||{};for(t in h.idToState){if(!h.idToState.hasOwnProperty(t))continue;e.idToState[t]=h.idToState[t]}for(t in h.urlToId){if(!h.urlToId.hasOwnProperty(t))continue;e.urlToId[t]=h.urlToId[t]}for(t in h.stateToId){if(!h.stateToId.hasOwnProperty(t))continue;e.stateToId[t]=h.stateToId[t]}h.store=e,h.normalizeStore(),n=l.stringify(e);try{s.setItem("History.store",n)}catch(i){if(i.code!==DOMException.QUOTA_EXCEEDED_ERR)throw i;s.length&&(s.removeItem("History.store"),s.setItem("History.store",n))}},h.intervalList.push(a(h.onUnload,h.options.storeInterval)),h.Adapter.bind(e,"beforeunload",h.onUnload),h.Adapter.bind(e,"unload",h.onUnload));if(!h.emulated.pushState){h.bugs.safariPoll&&h.intervalList.push(a(h.safariStatePoll,h.options.safariPollInterval));if(i.vendor==="Apple Computer, Inc."||(i.appCodeName||"")==="Mozilla")h.Adapter.bind(e,"hashchange",function(){h.Adapter.trigger(e,"popstate")}),h.getHash()&&h.Adapter.onDomLoad(function(){h.Adapter.trigger(e,"hashchange")})}},(!h.options||!h.options.delayInit)&&h.init()}(window)
 
 // DEBUG MODE
 var DEBUGMODE = true;
@@ -32067,7 +30152,8 @@ $.expr[":"].contains = $.expr.createPseudo(function(arg) {
 
 var bindAjaxLinks = function(){
 	var pieces = window.location.href.split('/'),
-		view = pieces.pop();
+		view = pieces.pop(),
+		History = window.History;
 
 	$('.sidebar').find('li.active').removeClass('active').end()
 	.find('a.ajaxy').removeClass('active').each( function() {
@@ -32075,10 +30161,10 @@ var bindAjaxLinks = function(){
 		if ( $(this).attr('href') === view ) {
 			$(this).addClass('active')
 			$(this).closest('.nav.nav-second-level').addClass('active in').parent().addClass('active')
-			//console.log( $(this).closest('li').parent().closest('li').prop('outerHTML') ) 
+			//console.log( $(this).closest('li').parent().closest('li').prop('outerHTML') )
 		}
 	})
-	
+
 	History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
 		var currentIndex = History.getCurrentIndex();
 		var internal = (History.getState().data._index == (currentIndex - 1));
@@ -32090,7 +30176,7 @@ var bindAjaxLinks = function(){
 
 	$('a.ajaxy').off('click.custom').on('click.custom',function(e) {
 		e.preventDefault();
-		
+
 		//determine if grabbing html or a script
 		var self = $(this),
 			view = self.attr('href').replace(/\.\//gi,'').replace('.html',''),
@@ -32104,20 +30190,20 @@ var bindAjaxLinks = function(){
 		History.log(State.data, State.title, State.url);
 		History.pushState({
 			_index: History.getCurrentIndex()
-		},'MSB IT Dashboard - ' + view.replace('-',' ').ucwords(), './' + view + '.html' );	
-		
-		
+		},'MSB IT Dashboard - ' + view.replace('-',' ').ucwords(), './' + view + '.html' );
+
+
 		// determine if the view is an existing function and execute it
-		
+
 		parts = view.split('/');
 		switch (parts.length) {
-			case 1 : 
+			case 1 :
 				isFn = Boolean (typeof jApp.views[view] === 'function');
 				if (!!isFn) {
 					fnName = jApp.views[view];
 				}
 			break;
-			
+
 			case 2 :
 				isFn = Boolean ( typeof jApp.views[ parts[0] ][ parts[1] ] === 'function' );
 				if (!!isFn) {
@@ -32125,43 +30211,43 @@ var bindAjaxLinks = function(){
 				}
 			break;
 		}
-		
-		
+
+
 		// grab script if it's a script
 		if (!!isFn) {
-			
+
 			console.log('Switching to view ' + view);
 			$('#page-wrapper').empty();
 			$('#modal_overlay').show();
-			
+
 			fnName();
-			
+
 			$('.sidebar a').removeClass('active');
-			$(self).addClass('active');	
+			$(self).addClass('active');
 			$('#modal_overlay').fadeOut(200);
 			if ( $('.sidebar').hasClass('active') ) {
 				$('.sidebar-overlay').click();
 			}
-			
+
 		} else {
-		
-			ajaxVars = (!!script) ? 
+
+			ajaxVars = (!!script) ?
 			{
 				 url : './includes/js/views/src/' + view.replace(/\//g,'.') + '.html.js',
 				dataType : 'script',
 				success : function() {
 					$('.sidebar a').removeClass('active');
-					$(self).addClass('active');	
+					$(self).addClass('active');
 					$('#modal_overlay').fadeOut(200);
 					bindAjaxLinks();
-				} 
+				}
 			} : {
 				url : 'index.php?controller=ajax&view=' + view,
 				dataType : 'html',
 				success : function(response) {
 					$('#page-wrapper').html(response);
 					$('.sidebar a').removeClass('active');
-					$(self).addClass('active');	
+					$(self).addClass('active');
 					$('#modal_overlay').fadeOut(200);
 					if ( $('.sidebar').hasClass('active') ) {
 						$('.sidebar-overlay').click();
@@ -32169,23 +30255,24 @@ var bindAjaxLinks = function(){
 					bindAjaxLinks();
 				}
 			}
-			
+
 			//console.log(e);
 			$('#modal_overlay').show();
 			$('#page-wrapper').empty();
-			$.ajax( ajaxVars ); 
+			$.ajax( ajaxVars );
 		}
 	});
 }
 
 
 $(document).ready(function() {
-   
+
    bindAjaxLinks();
 
 });
 
 (function(d){d.each(["backgroundColor","borderBottomColor","borderLeftColor","borderRightColor","borderTopColor","color","outlineColor"],function(f,e){d.fx.step[e]=function(g){if(!g.colorInit){g.start=c(g.elem,e);g.end=b(g.end);g.colorInit=true}g.elem.style[e]="rgb("+[Math.max(Math.min(parseInt((g.pos*(g.end[0]-g.start[0]))+g.start[0]),255),0),Math.max(Math.min(parseInt((g.pos*(g.end[1]-g.start[1]))+g.start[1]),255),0),Math.max(Math.min(parseInt((g.pos*(g.end[2]-g.start[2]))+g.start[2]),255),0)].join(",")+")"}});function b(f){var e;if(f&&f.constructor==Array&&f.length==3){return f}if(e=/rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)/.exec(f)){return[parseInt(e[1]),parseInt(e[2]),parseInt(e[3])]}if(e=/rgb\(\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*,\s*([0-9]+(?:\.[0-9]+)?)\%\s*\)/.exec(f)){return[parseFloat(e[1])*2.55,parseFloat(e[2])*2.55,parseFloat(e[3])*2.55]}if(e=/#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})/.exec(f)){return[parseInt(e[1],16),parseInt(e[2],16),parseInt(e[3],16)]}if(e=/#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])/.exec(f)){return[parseInt(e[1]+e[1],16),parseInt(e[2]+e[2],16),parseInt(e[3]+e[3],16)]}if(e=/rgba\(0, 0, 0, 0\)/.exec(f)){return a.transparent}return a[d.trim(f).toLowerCase()]}function c(g,e){var f;do{f=d.css(g,e);if(f!=""&&f!="transparent"||d.nodeName(g,"body")){break}e="backgroundColor"}while(g=g.parentNode);return b(f)}var a={aqua:[0,255,255],azure:[240,255,255],beige:[245,245,220],black:[0,0,0],blue:[0,0,255],brown:[165,42,42],cyan:[0,255,255],darkblue:[0,0,139],darkcyan:[0,139,139],darkgrey:[169,169,169],darkgreen:[0,100,0],darkkhaki:[189,183,107],darkmagenta:[139,0,139],darkolivegreen:[85,107,47],darkorange:[255,140,0],darkorchid:[153,50,204],darkred:[139,0,0],darksalmon:[233,150,122],darkviolet:[148,0,211],fuchsia:[255,0,255],gold:[255,215,0],green:[0,128,0],indigo:[75,0,130],khaki:[240,230,140],lightblue:[173,216,230],lightcyan:[224,255,255],lightgreen:[144,238,144],lightgrey:[211,211,211],lightpink:[255,182,193],lightyellow:[255,255,224],lime:[0,255,0],magenta:[255,0,255],maroon:[128,0,0],navy:[0,0,128],olive:[128,128,0],orange:[255,165,0],pink:[255,192,203],purple:[128,0,128],violet:[128,0,128],red:[255,0,0],silver:[192,192,192],white:[255,255,255],yellow:[255,255,0],transparent:[255,255,255]}})(jQuery);
+
 $(function() {
 
     $('#side-menu').metisMenu();

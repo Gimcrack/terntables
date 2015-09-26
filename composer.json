@@ -4,6 +4,8 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "type": "project",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.1.*",
@@ -16,8 +18,8 @@
         "components/bootstrap-datetimepicker": "dev-master",
         "components/bootbox" : "dev-master",
         "components/modernizr" : "dev-master",
-        "components/underscore" : "dev-master",
 
+        "ingenious/underscore" : "dev-master",
         "ingenious/async-grid" : "dev-master",
         "ingenious/bootstrap-multiselect" : "dev-master",
         "ingenious/classie": "dev-master",
@@ -30,7 +32,7 @@
         "needim/noty" : "dev-master",
         "onokumus/metismenu" : "dev-master",
         "moment/moment" : "dev-master",
-        "mouf/javascript.historyjs" : "1.8.x-dev"
+        "ingenious/history.js": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -22,7 +22,7 @@ elixir(function(mix) {
     bootstrapDatetimepicker : vendor_path + '/components/bootstrap-datetimepicker',
     bootbox : vendor_path + '/components/bootbox',
     modernizr : vendor_path + '/components/modernizr',
-    underscore : vendor_path + '/components/underscore',
+    underscore : vendor_path + '/ingenious/underscore',
     asyncGrid : vendor_path + '/ingenious/async-grid',
     bootstrapMultiselect : vendor_path + '/ingenious/bootstrap-multiselect',
     classie : vendor_path + '/ingenious/classie',
@@ -34,7 +34,7 @@ elixir(function(mix) {
     noty : vendor_path + '/needim/noty',
     metismenu : vendor_path + '/onokumus/metismenu',
     moment : vendor_path + '/moment/moment',
-    historyjs : vendor_path + '/mouf/javascript.historyjs',
+    historyjs : vendor_path + '/ingenious/history.js',
   }
 
   var jsPaths = {
@@ -55,7 +55,7 @@ elixir(function(mix) {
     noty : paths.noty + '/js/noty/packaged', // done
     metismenu : paths.metismenu + '/dist', // done
     moment : paths.moment, // done
-    historyjs : paths.historyjs + '/scripts/bundled-uncompressed/html5', // done
+    historyjs : paths.historyjs + '/scripts/bundled/html4+html5', // done
   }
 
   var jsScripts = [

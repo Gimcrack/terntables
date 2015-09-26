@@ -6,7 +6,7 @@ _.extend( jApp.views.admin, {
 		_.extend( jApp.oG.admin, {
 
 			users : new jGrid({
-				url : '/admin/users/json',
+				table : 'users',
 				columnFriendly : 'name',
 				gridHeader : {
 					icon : 'fa-user',
@@ -58,17 +58,34 @@ _.extend( jApp.views.admin, {
 
 					"groups" : function(arr) {
 						return _.pluck(arr, 'name').join(', ');
+					},
+
+					"created_at" : function(value) {
+						return date('Y-m-d', strtotime(value));
+					},
+
+					"updated_at" : function(value) {
+						return date('Y-m-d', strtotime(value));
 					}
 
 				},
 				linkTables : [
-
+					{
+						group_user : {
+							tables : {
+								parent: 'user',
+								child : 'group'
+							}
+						}
+					}
 				],
 				sortBy : 'EmailLink',			// column to sort by
 				rowsPerPage : 10,			// rows per page to display on grid
 				pageNum	: 1,				// current page number to display
 				html : {
-					resetPassword : '<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper"> <div class="frm_wrapper"> <div class="panel panel-yellow"> <div class="panel-heading"> <button type="button" class="close" aria-hidden="true">×</button> <i class="fa fa-refresh fa-fw"></i> Reset Password </div> <div class="panel-overlay" style="display:none"></div> <div class="panel-body"> <div class="row side-by-side formContainer"></div> </div> </div> </div> </div>'
+					forms : {
+						resetPassword : '<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper"> <div class="frm_wrapper"> <div class="panel panel-yellow"> <div class="panel-heading"> <button type="button" class="close" aria-hidden="true">×</button> <i class="fa fa-refresh fa-fw"></i> Reset Password </div> <div class="panel-overlay" style="display:none"></div> <div class="panel-body"> <div class="row side-by-side formContainer"></div> </div> </div> </div> </div>'
+					},
 				},
 				formDefs : {
 					resetPassword : {
@@ -92,13 +109,7 @@ _.extend( jApp.views.admin, {
 				},
 				fn : {
 					resetPassword : function() {
-						jApp.oG.admin.users.action = 'resetPassword';
-						// modal overlay
-						jApp.oG.admin.users.fn.overlay(2,'on');
-
-						//setup target div
-						var $target = jApp.oG.admin.users.$().find('#div_resetFrm');
-						jApp.oG.admin.users.fn.setupTargetDiv($target);
+						jApp.activeGrid.utility.actionHelper('resetPassword');
 					}, //end fn
 				}
 			})

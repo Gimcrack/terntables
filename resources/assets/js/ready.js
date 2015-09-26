@@ -6,7 +6,8 @@ $.expr[":"].contains = $.expr.createPseudo(function(arg) {
 
 var bindAjaxLinks = function(){
 	var pieces = window.location.href.split('/'),
-		view = pieces.pop();
+		view = pieces.pop(),
+		History = window.History;
 
 	$('.sidebar').find('li.active').removeClass('active').end()
 	.find('a.ajaxy').removeClass('active').each( function() {
@@ -14,10 +15,10 @@ var bindAjaxLinks = function(){
 		if ( $(this).attr('href') === view ) {
 			$(this).addClass('active')
 			$(this).closest('.nav.nav-second-level').addClass('active in').parent().addClass('active')
-			//console.log( $(this).closest('li').parent().closest('li').prop('outerHTML') ) 
+			//console.log( $(this).closest('li').parent().closest('li').prop('outerHTML') )
 		}
 	})
-	
+
 	History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
 		var currentIndex = History.getCurrentIndex();
 		var internal = (History.getState().data._index == (currentIndex - 1));
@@ -29,7 +30,7 @@ var bindAjaxLinks = function(){
 
 	$('a.ajaxy').off('click.custom').on('click.custom',function(e) {
 		e.preventDefault();
-		
+
 		//determine if grabbing html or a script
 		var self = $(this),
 			view = self.attr('href').replace(/\.\//gi,'').replace('.html',''),
@@ -43,20 +44,20 @@ var bindAjaxLinks = function(){
 		History.log(State.data, State.title, State.url);
 		History.pushState({
 			_index: History.getCurrentIndex()
-		},'MSB IT Dashboard - ' + view.replace('-',' ').ucwords(), './' + view + '.html' );	
-		
-		
+		},'MSB IT Dashboard - ' + view.replace('-',' ').ucwords(), './' + view + '.html' );
+
+
 		// determine if the view is an existing function and execute it
-		
+
 		parts = view.split('/');
 		switch (parts.length) {
-			case 1 : 
+			case 1 :
 				isFn = Boolean (typeof jApp.views[view] === 'function');
 				if (!!isFn) {
 					fnName = jApp.views[view];
 				}
 			break;
-			
+
 			case 2 :
 				isFn = Boolean ( typeof jApp.views[ parts[0] ][ parts[1] ] === 'function' );
 				if (!!isFn) {
@@ -64,43 +65,43 @@ var bindAjaxLinks = function(){
 				}
 			break;
 		}
-		
-		
+
+
 		// grab script if it's a script
 		if (!!isFn) {
-			
+
 			console.log('Switching to view ' + view);
 			$('#page-wrapper').empty();
 			$('#modal_overlay').show();
-			
+
 			fnName();
-			
+
 			$('.sidebar a').removeClass('active');
-			$(self).addClass('active');	
+			$(self).addClass('active');
 			$('#modal_overlay').fadeOut(200);
 			if ( $('.sidebar').hasClass('active') ) {
 				$('.sidebar-overlay').click();
 			}
-			
+
 		} else {
-		
-			ajaxVars = (!!script) ? 
+
+			ajaxVars = (!!script) ?
 			{
 				 url : './includes/js/views/src/' + view.replace(/\//g,'.') + '.html.js',
 				dataType : 'script',
 				success : function() {
 					$('.sidebar a').removeClass('active');
-					$(self).addClass('active');	
+					$(self).addClass('active');
 					$('#modal_overlay').fadeOut(200);
 					bindAjaxLinks();
-				} 
+				}
 			} : {
 				url : 'index.php?controller=ajax&view=' + view,
 				dataType : 'html',
 				success : function(response) {
 					$('#page-wrapper').html(response);
 					$('.sidebar a').removeClass('active');
-					$(self).addClass('active');	
+					$(self).addClass('active');
 					$('#modal_overlay').fadeOut(200);
 					if ( $('.sidebar').hasClass('active') ) {
 						$('.sidebar-overlay').click();
@@ -108,18 +109,18 @@ var bindAjaxLinks = function(){
 					bindAjaxLinks();
 				}
 			}
-			
+
 			//console.log(e);
 			$('#modal_overlay').show();
 			$('#page-wrapper').empty();
-			$.ajax( ajaxVars ); 
+			$.ajax( ajaxVars );
 		}
 	});
 }
 
 
 $(document).ready(function() {
-   
+
    bindAjaxLinks();
 
 });
