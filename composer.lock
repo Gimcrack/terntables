@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1f5dc7a14fd030b0b6306fdd24f7e91d",
+    "hash": "ee09fab6b44179c4fba6256156195ba8",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -579,12 +579,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "142977f0417fae991f6dfcd804c85fd53965c1c0"
+                "reference": "09971c9aa3ad53a63dcd07d15d4819204dc89c78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/142977f0417fae991f6dfcd804c85fd53965c1c0",
-                "reference": "142977f0417fae991f6dfcd804c85fd53965c1c0",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/09971c9aa3ad53a63dcd07d15d4819204dc89c78",
+                "reference": "09971c9aa3ad53a63dcd07d15d4819204dc89c78",
                 "shasum": ""
             },
             "require": {
@@ -605,7 +605,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2015-09-25 17:39:31"
+            "time": "2015-09-26 00:59:59"
         },
         {
             "name": "ingenious/bootstrap-multiselect",

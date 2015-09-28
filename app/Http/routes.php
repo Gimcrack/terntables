@@ -17,9 +17,14 @@ Route::get('/home', 'PagesController@home');
 /**
  * Admin Routes
  */
+
+ Route::get('selopts/_{model}_{options}_{labels}', 'PagesController@optionsjson');
+
  Route::get('admin/users/json',      'Admin\UserController@indexjson');
  Route::get('admin/users/{id}/json', 'Admin\UserController@showjson');
  Route::resource('admin/users',      'Admin\UserController');
+
+
 
 
 

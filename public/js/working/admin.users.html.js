@@ -70,14 +70,13 @@ _.extend( jApp.views.admin, {
 
 				},
 				linkTables : [
-					{
-						group_user : {
-							tables : {
-								parent: 'user',
-								child : 'group'
-							}
+						{
+							selectName : 'groups',
+							selectLabel : 'User Groups',
+							model : 'Group',
+							valueColumn : 'id',
+							labelColumn : 'name'
 						}
-					}
 				],
 				sortBy : 'EmailLink',			// column to sort by
 				rowsPerPage : 10,			// rows per page to display on grid

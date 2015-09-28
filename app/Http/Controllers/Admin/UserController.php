@@ -40,6 +40,21 @@ class UserController extends Controller
         return User::with(['groups'])->get();
     }
 
+    public function getOptionAttribute()
+    {
+      return $this->attributes['id'];
+    }
+
+    /**
+     * Get list of JSON formatted options
+     *
+     * @return Response
+     */
+    public function optionsjson($options,$labels)
+    {
+        return User::select("{$options} as option","{$labels} as label")->get();
+    }
+
     /**
      * Show the form for creating a new resource.
      *
