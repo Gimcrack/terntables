@@ -77,7 +77,7 @@ elixir(function(mix) {
     jsPaths.jqueryBootpag + '/jquery.bootpag.js',
     jsPaths.jqueryMd5 + '/jquery.md5.js',
     jsPaths.jqueryValidator + '/jquery.psiblings.js',
-    jsPaths.jqueryValidator + '/jquery.validator.js',
+    //jsPaths.jqueryValidator + '/jquery.validator.js',
     jsPaths.perfectScrollbar + '/perfect-scrollbar.jquery.js',
     jsPaths.bootstrapSlider + '/bootstrap-slider.js',
     jsPaths.noty + '/jquery.noty.packaged.js',

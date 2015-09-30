@@ -13,6 +13,7 @@
     <script type="text/javascript" src="/js/async-grid/js/jApp.class.js"> </script>
     <script type="text/javascript" src="/js/all.js"> </script>
 
+    <script type="text/javascript" src="/js/working/jquery.validator.js"></script>
 
     <script type="text/javascript" src="/js/async-grid/js/jForm.class.js"> </script>
     <script type="text/javascript" src="/js/async-grid/js/jInput.class.js"> </script>

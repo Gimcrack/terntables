@@ -22,7 +22,9 @@ Route::get('/home', 'PagesController@home');
 
  Route::get('admin/users/json',      'Admin\UserController@indexjson');
  Route::get('admin/users/{id}/json', 'Admin\UserController@showjson');
+ Route::delete('admin/users',        'Admin\UserController@destroyMany');
  Route::resource('admin/users',      'Admin\UserController');
+
 
 
 

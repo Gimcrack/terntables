@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\User;
+use Input;
 
 class UserController extends Controller
 {
@@ -40,20 +41,6 @@ class UserController extends Controller
         return User::with(['groups'])->get();
     }
 
-    public function getOptionAttribute()
-    {
-      return $this->attributes['id'];
-    }
-
-    /**
-     * Get list of JSON formatted options
-     *
-     * @return Response
-     */
-    public function optionsjson($options,$labels)
-    {
-        return User::select("{$options} as option","{$labels} as label")->get();
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -73,7 +60,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+          $input = Input::all();
+          $input['password'] = bcrypt('P@ssw0rd');
+          $user = User::create($input);
+          $user->groups()->attach($input['groups']);
+          return $this->operationSuccessful();
+        } catch(\Illuminate\Database\QueryException $e) {
+          return $this->operationFailed($e);
+        }
     }
 
     /**
@@ -116,9 +111,17 @@ class UserController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $users)
     {
-        //
+      try {
+        $input = Input::all();
+        $user = User::find($users);
+        $user->update($input);
+        $user->groups()->sync($input['groups']);
+        return $this->operationSuccessful();
+      } catch(\Illuminate\Database\QueryException $e) {
+        return $this->operationFailed($e);
+      }
     }
 
     /**
@@ -127,8 +130,57 @@ class UserController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
+    public function destroy($users)
     {
-        //
+      try {
+        User::find($users)->delete();
+        return $this->operationSuccessful();
+      } catch(\Illuminate\Database\QueryException $e) {
+        return $this->operationFailed($e);
+      }
+    }
+
+    /**
+     * Remove the specified resources from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function destroyMany()
+    {
+      try {
+        $input = Input::all();
+        User::whereIn('id',$input['users'])->delete();
+        return $this->operationSuccessful();
+      } catch(\Illuminate\Database\QueryException $e) {
+        return $this->operationFailed($e);
+      }
+    }
+
+    /**
+     * The operation was a success
+     * @method operationSuccessful
+     * @return [type]              [description]
+     */
+    private function operationSuccessful()
+    {
+      return [
+        "errors" => false,
+        "message" => "Operation Completed Successfully"
+      ];
+    }
+
+    /**
+     * The operation failed
+     * @method operationFailed
+     * @param  [type]          $e [description]
+     * @return [type]             [description]
+     */
+    private function operationFailed($e)
+    {
+      return [
+        "errors" => true,
+        "message" => "There was a problem completing your request :" . $e->getMessage(),
+      ];
     }
 }

@@ -577,7 +577,7 @@ class ColParamSeeder extends Seeder
         ,	'data-ordering' => '3'
         ,	'data-fieldset' => '1'
         , 'required' => 1
-        , 'data-validType' => 'Email Adress'
+        , 'data-validType' => 'Email Address'
         ]);
 
         // Groups colparams

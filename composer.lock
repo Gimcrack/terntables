@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ee09fab6b44179c4fba6256156195ba8",
+    "hash": "1f5dc7a14fd030b0b6306fdd24f7e91d",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -579,12 +579,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "09971c9aa3ad53a63dcd07d15d4819204dc89c78"
+                "reference": "aade4183db5bd11ea8c22c8e8d04050405a53020"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/09971c9aa3ad53a63dcd07d15d4819204dc89c78",
-                "reference": "09971c9aa3ad53a63dcd07d15d4819204dc89c78",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/aade4183db5bd11ea8c22c8e8d04050405a53020",
+                "reference": "aade4183db5bd11ea8c22c8e8d04050405a53020",
                 "shasum": ""
             },
             "require": {
@@ -605,7 +605,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2015-09-26 00:59:59"
+            "time": "2015-09-28 23:28:14"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -762,12 +762,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jquery-validator.git",
-                "reference": "11bb3ba269d29df48e67a867f62dbe27ab567084"
+                "reference": "9935b0c385fc70ba2becf66b5c558e0afec85422"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jquery-validator/zipball/11bb3ba269d29df48e67a867f62dbe27ab567084",
-                "reference": "11bb3ba269d29df48e67a867f62dbe27ab567084",
+                "url": "https://api.github.com/repos/Gimcrack/jquery-validator/zipball/9935b0c385fc70ba2becf66b5c558e0afec85422",
+                "reference": "9935b0c385fc70ba2becf66b5c558e0afec85422",
                 "shasum": ""
             },
             "type": "library",
@@ -782,7 +782,7 @@
                 }
             ],
             "description": "Custom js form validation class",
-            "time": "2015-09-08 04:19:45"
+            "time": "2015-09-29 19:09:17"
         },
         {
             "name": "ingenious/perfect-scrollbar",
@@ -1650,12 +1650,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/onokumus/metisMenu.git",
-                "reference": "c548bba3ae9e2d85ad1515f77bdce1f52ecdae8e"
+                "reference": "aaa0c7c25eabef21851455cacf2345d07acbe429"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/onokumus/metisMenu/zipball/c548bba3ae9e2d85ad1515f77bdce1f52ecdae8e",
-                "reference": "c548bba3ae9e2d85ad1515f77bdce1f52ecdae8e",
+                "url": "https://api.github.com/repos/onokumus/metisMenu/zipball/aaa0c7c25eabef21851455cacf2345d07acbe429",
+                "reference": "aaa0c7c25eabef21851455cacf2345d07acbe429",
                 "shasum": ""
             },
             "suggest": {
@@ -1684,7 +1684,7 @@
                 "plugin",
                 "web"
             ],
-            "time": "2015-09-01 15:45:28"
+            "time": "2015-09-27 16:21:51"
         },
         {
             "name": "psr/log",
