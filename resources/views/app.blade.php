@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.token')
     <title>Aynchronous Laravel Dashboard</title>
     <link rel="stylesheet" href="/css/all.css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700" media="screen" title="no title" charset="utf-8">

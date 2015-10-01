@@ -9581,7 +9581,7 @@ table {
   border-spacing: 0; }
 
 #page-wrapper {
-  margin: 70px 0 0;
+  margin: 0;
   min-height: 568px;
   transition: all 0.3s linear;
   padding: 0 0 20px;
@@ -9687,7 +9687,7 @@ table {
     height: 400px;
     overflow: scroll; }
   #page-wrapper .panel-grid > .grid-panel-body {
-    margin-top: 288px;
+    margin-top: 378px;
     padding: 0 !important;
     z-index: 99; }
   #page-wrapper.slide {

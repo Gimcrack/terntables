@@ -12,8 +12,14 @@ class GroupsSeeder extends Seeder
      */
     public function run()
     {
-        Group::create(['name' => 'Super Administrators', 'description' => 'Super Administrators']);
-        Group::create(['name' => 'Administrators', 'description' => 'Administrators']);
-        Group::create(['name' => 'AD Users', 'description' => 'AD Users']);
+        $faker = Faker\Factory::create();
+
+        // Group::create(['name' => 'Super Administrators', 'description' => 'Super Administrators']);
+        // Group::create(['name' => 'Administrators', 'description' => 'Administrators']);
+        // Group::create(['name' => 'AD Users', 'description' => 'AD Users']);
+
+        foreach(range(1,20) as $i) {
+          Group::create(['name' => $faker->company, 'description' => $faker->companySuffix]);
+        }
     }
 }
