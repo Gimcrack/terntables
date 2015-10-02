@@ -58,19 +58,19 @@
         @if( Auth::user()->isAdmin() )
           <li class="menu-section-heading"> Admin Menu </li>
     			<li>
-    				<a href="admin/users" ><i class="fa fa-user fa-fw"></i> Manage Users</a>
+    				<a href="{{ url('admin/users')}}" ><i class="fa fa-user fa-fw"></i> Manage Users</a>
     			</li>
     			<li>
-    				<a href="admin/groups.html" data-fn="true" class="ajaxy ajaxy-view"><i class="fa fa-users fa-fw"></i> Manage Groups</a>
+    				<a href="{{ url('admin/groups')}}" ><i class="fa fa-users fa-fw"></i> Manage Groups</a>
     			</li>
     			<li>
-    				<a href="admin/modules.html" data-fn="true" class="ajaxy ajaxy-view"><i class="fa fa-cube fa-fw"></i> Modules Setup</a>
+    				<a href="{{ url('admin/modules')}}" ><i class="fa fa-cube fa-fw"></i> Modules Setup</a>
     			</li>
   			@endif
 
   			<li class="divider"></li>
   			<li>
-  				<a href="profile.html" data-fn="true" class="ajaxy ajaxy-view"><i class="fa fa-gear fa-fw"></i> My Profile</a>
+  				<a href="./profile" data-fn="true" class="ajaxy ajaxy-view"><i class="fa fa-gear fa-fw"></i> My Profile</a>
   			</li>
   			<li>
   				<a href="{{ url('/auth/logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout </a>

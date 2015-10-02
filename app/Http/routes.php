@@ -20,13 +20,17 @@ Route::get('/home', 'PagesController@home');
 
  Route::get('selopts/_{model}_{options}_{labels}', 'PagesController@optionsjson');
 
+ // users
  Route::get('admin/users/json',      'Admin\UserController@indexjson');
  Route::get('admin/users/{id}/json', 'Admin\UserController@showjson');
  Route::delete('admin/users',        'Admin\UserController@destroyMany');
  Route::resource('admin/users',      'Admin\UserController');
 
-
-
+ // groups
+ Route::get('admin/groups/json',      'Admin\GroupController@indexjson');
+ Route::get('admin/groups/{id}/json', 'Admin\GroupController@showjson');
+ Route::delete('admin/groups',        'Admin\GroupController@destroyMany');
+ Route::resource('admin/groups',      'Admin\GroupController');
 
 
 

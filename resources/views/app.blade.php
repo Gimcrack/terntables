@@ -19,9 +19,11 @@
     <script type="text/javascript" src="/js/async-grid/js/jForm.class.js"> </script>
     <script type="text/javascript" src="/js/async-grid/js/jInput.class.js"> </script>
     <script type="text/javascript" src="/js/async-grid/js/jLinkTable.class.js"> </script>
+    <script type="text/javascript" src="/js/async-grid/js/jUtility.class.js"> </script>
 
     <script type="text/javascript" src="/js/async-grid/js/jGrid.class.js"> </script>
     <script type="text/javascript" src="/js/working/admin.users.html.js"> </script>
+    <script type="text/javascript" src="/js/working/admin.groups.html.js"> </script>
   </head>
   <body class="{{ env('CSS_CLASS') }}">
     <div id="wrapper" class="{{ env('CSS_CLASS') }}">

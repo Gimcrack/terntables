@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\User;
+use App\Group;
 use Input;
 
-class UserController extends Controller
+class GroupController extends Controller
 {
 
     /**
@@ -24,11 +23,11 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return view('admin.users.index');
+        return view('admin.groups.index');
     }
 
     /**
@@ -38,14 +37,14 @@ class UserController extends Controller
      */
     public function indexjson()
     {
-        return User::with(['groups'])->get();
+        return Group::with(['users'])->get();
     }
 
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function create()
     {
@@ -55,29 +54,28 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
-     * @return Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        try {
-          $input = Input::all();
-          $input['password'] = bcrypt('P@ssw0rd');
-          $user = User::create($input);
-          if (!empty($input['groups'])) {
-            $user->groups()->attach($input['groups']);
-          }
-          return $this->operationSuccessful();
-        } catch(\Illuminate\Database\QueryException $e) {
-          return $this->operationFailed($e);
+      try {
+        $input = Input::all();
+        $group = Group::create($input);
+        if (!empty($input['users'])) {
+          $group->users()->attach($input['users']);
         }
+        return $this->operationSuccessful();
+      } catch(\Illuminate\Database\QueryException $e) {
+        return $this->operationFailed($e);
+      }
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
@@ -92,14 +90,14 @@ class UserController extends Controller
      */
     public function showjson($id)
     {
-        return User::with(['groups'])->findOrFail($id);
+        return Group::with(['users'])->findOrFail($id);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
@@ -109,18 +107,18 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $users)
+    public function update(Request $request, $groups)
     {
       try {
         $input = Input::all();
-        $user = User::find($users);
-        $user->update($input);
+        $group = Group::find($groups);
+        $group->update($input);
         if (!empty($input['groups'])) {
-          $user->groups()->sync($input['groups']);
+          $group->users()->sync($input['users']);
         }
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
@@ -132,12 +130,12 @@ class UserController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
-    public function destroy($users)
+    public function destroy($groups)
     {
       try {
-        User::find($users)->delete();
+        Group::find($groups)->delete();
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
         return $this->operationFailed($e);
@@ -154,7 +152,7 @@ class UserController extends Controller
     {
       try {
         $input = Input::all();
-        User::whereIn('id',$input['ids'])->delete();
+        Group::whereIn('id',$input['ids'])->delete();
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
         return $this->operationFailed($e);
