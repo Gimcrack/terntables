@@ -18,7 +18,6 @@ class UserController extends Controller
     public function __construct()
     {
       $this->middleware('auth.admin');
-
     }
 
     /**
@@ -38,7 +37,7 @@ class UserController extends Controller
      */
     public function indexjson()
     {
-        return User::with(['groups'])->get();
+        return User::with(['groups.modules'])->get();
     }
 
 
@@ -92,7 +91,7 @@ class UserController extends Controller
      */
     public function showjson($id)
     {
-        return User::with(['groups'])->findOrFail($id);
+        return User::with(['groups.modules'])->findOrFail($id);
     }
 
     /**

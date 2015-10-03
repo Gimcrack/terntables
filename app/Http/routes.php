@@ -19,6 +19,10 @@ Route::get('/home', 'PagesController@home');
  */
 
  Route::get('selopts/_{model}_{options}_{labels}', 'PagesController@optionsjson');
+ Route::get('checkout/_{model}_{id}', 'PagesController@checkout');
+ Route::get('checkedout/_{model}', 'PagesController@getCheckedOutRecords');
+ Route::get('checkin/_{model}_{id}', 'PagesController@checkin');
+ Route::get('checkin/all', 'PagesController@checkinAll');
 
  // users
  Route::get('admin/users/json',      'Admin\UserController@indexjson');
@@ -32,7 +36,11 @@ Route::get('/home', 'PagesController@home');
  Route::delete('admin/groups',        'Admin\GroupController@destroyMany');
  Route::resource('admin/groups',      'Admin\GroupController');
 
-
+ // modules
+ Route::get('admin/modules/json',      'Admin\ModuleController@indexjson');
+ Route::get('admin/modules/{id}/json', 'Admin\ModuleController@showjson');
+ Route::delete('admin/modules',        'Admin\ModuleController@destroyMany');
+ Route::resource('admin/modules',      'Admin\ModuleController');
 
  Route::get('admin/colparams/json/{table}/{column}',  'Admin\ColParamController@columnjson');
  Route::get('admin/colparams/json/{table}',           'Admin\ColParamController@tablejson');

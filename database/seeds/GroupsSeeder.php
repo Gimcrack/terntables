@@ -14,11 +14,11 @@ class GroupsSeeder extends Seeder
     {
         $faker = Faker\Factory::create();
 
-        // Group::create(['name' => 'Super Administrators', 'description' => 'Super Administrators']);
-        // Group::create(['name' => 'Administrators', 'description' => 'Administrators']);
-        // Group::create(['name' => 'AD Users', 'description' => 'AD Users']);
+        Group::create(['name' => 'Super Administrators', 'description' => 'Super Administrators']);
+        Group::create(['name' => 'Administrators', 'description' => 'Administrators']);
+        Group::create(['name' => 'AD Users', 'description' => 'AD Users']);
 
-        foreach(range(1,20) as $i) {
+        foreach(range(1,10) as $i) {
           Group::create(['name' => $faker->company, 'description' => $faker->companySuffix]);
         }
     }

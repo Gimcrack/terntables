@@ -4,14 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Group extends Model
+class Module extends Model
 {
   /**
    * The database table that the model references
    *
    * @var string
    */
-  protected $table = 'groups';
+  protected $table = 'modules';
 
   /**
    * The mass assignable fields
@@ -33,23 +33,12 @@ class Group extends Model
     }
 
   /**
-   * A group is comprised of many users
-   *
-   * @return [type] [description]
-   */
-  public function users()
-  {
-    return $this->belongsToMany('App\User')->withTimestamps();
-  }
-
-  /**
-   * A group can be assigned to many modules
+   * A module can be assigned to many groups
    * @method modules
    * @return [type]  [description]
    */
-  public function modules()
+  public function groups()
   {
-    return $this->belongsToMany('App\Module')->withTimestamps();
-
+    return $this->belongsToMany('App\Group')->withTimestamps();
   }
 }

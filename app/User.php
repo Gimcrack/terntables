@@ -37,6 +37,15 @@ class User extends Model implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
 
+    /**
+     * Polymorphic relationship. Second parameter to morphOne/morphMany
+     * should be the same as the prefix for the *_id/*_type fields.
+     */
+    public function recordLock()
+    {
+        return $this->morphOne('App\RecordLock', 'lockable');
+    }
+
 
     /**
      * A User may belong to many groups

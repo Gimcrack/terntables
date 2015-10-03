@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Group;
+use App\Module;
+use App\RecordLock;
 use Input;
 
-class GroupController extends Controller
+class ModuleController extends Controller
 {
 
     /**
@@ -17,7 +18,6 @@ class GroupController extends Controller
     public function __construct()
     {
       $this->middleware('auth.admin');
-
     }
 
     /**
@@ -27,7 +27,7 @@ class GroupController extends Controller
      */
     public function index()
     {
-        return view('admin.groups.index');
+        return view('admin.modules.index');
     }
 
     /**
@@ -37,7 +37,7 @@ class GroupController extends Controller
      */
     public function indexjson()
     {
-        return Group::with(['users','modules'])->get();
+        return Module::with(['groups.users'])->get();
     }
 
 
@@ -61,9 +61,9 @@ class GroupController extends Controller
     {
       try {
         $input = Input::all();
-        $group = Group::create($input);
-        if (!empty($input['users'])) {
-          $group->users()->attach($input['users']);
+        $module = Module::create($input);
+        if (!empty($input['groups'])) {
+          $module->groups()->attach($input['groups']);
         }
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
@@ -90,7 +90,18 @@ class GroupController extends Controller
      */
     public function showjson($id)
     {
-        return Group::with(['users','modules'])->findOrFail($id);
+        return $module = Module::with(['groups.users'])->findOrFail($id);
+    }
+
+    /**
+     * Checkout the module
+     * @method checkout
+     * @param  [type]   $module [description]
+     * @return [type]           [description]
+     */
+    private function checkout($module)
+    {
+      RecordLock::checkout($module);
     }
 
     /**
@@ -111,14 +122,14 @@ class GroupController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $groups)
+    public function update(Request $request, $modules)
     {
       try {
         $input = Input::all();
-        $group = Group::find($groups);
-        $group->update($input);
+        $module = Module::find($modules);
+        $module->update($input);
         if (!empty($input['groups'])) {
-          $group->users()->sync($input['users']);
+          $module->groups()->sync($input['groups']);
         }
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
@@ -132,10 +143,10 @@ class GroupController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($groups)
+    public function destroy($modules)
     {
       try {
-        Group::find($groups)->delete();
+        Module::find($modules)->delete();
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
         return $this->operationFailed($e);
@@ -152,7 +163,7 @@ class GroupController extends Controller
     {
       try {
         $input = Input::all();
-        Group::whereIn('id',$input['ids'])->delete();
+        Module::whereIn('id',$input['ids'])->delete();
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
         return $this->operationFailed($e);

@@ -32,7 +32,8 @@
         "needim/noty" : "dev-master",
         "onokumus/metismenu" : "dev-master",
         "moment/moment" : "dev-master",
-        "ingenious/history.js": "dev-master"
+        "ingenious/history.js": "dev-master",
+        "Nathanmac/Parser": "3.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

@@ -1,29 +1,29 @@
 // extend the application views
 _.extend( jApp.views.admin, {
 
-	groups : function() {
+	modules : function() {
 
 		_.extend( jApp.oG.admin, {
 
-			groups : new jGrid({
-				table : 'groups',
+			modules : new jGrid({
+				table : 'modules',
 				columnFriendly : 'name',
 				gridHeader : {
 					icon : 'fa-users',
-					headerTitle : 'Manage Groups',
-					helpText : "<strong>Note:</strong> Manage Groups Here"
+					headerTitle : 'Manage Modules',
+					helpText : "<strong>Note:</strong> Manage Modules Here"
 				},
 				tableBtns : {
 					new : {
-						label : 'New Group',
+						label : 'New Module',
 					},
 				},
 				columns : [ 				// columns to query
 					"id",
 					"name",
 					"description",
-					"users",
-					"modules"
+					"groups",
+          "users"
 				],
 				hidCols : [					// columns to hide
 
@@ -32,8 +32,8 @@ _.extend( jApp.views.admin, {
 					"ID",
 					"Name",
 					"Description",
-					"Users",
-					"Modules"
+					"Groups",
+          "Users (Username)",
 				],
 				templates : { 				// html template functions
 
@@ -42,12 +42,14 @@ _.extend( jApp.views.admin, {
 						return temp.slice(-4);
 					},
 
-					"users" : function(arr) {
+					"groups" : function(arr) {
 						return _.pluck(arr, 'name').join(', ');
 					},
 
-					"modules" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
+					"users" : function(arr) {
+            return _.compact(_.flatten(_.map(  jApp.aG().currentRow.groups, function(row, i) {
+							return (row.users.length) ? _.map(row.users, function(user, i) { return user.name + ' (' + user.username + ')' } ) : false
+						} ))).join(', ');
 					},
 
 					"created_at" : function(value) {
@@ -61,16 +63,9 @@ _.extend( jApp.views.admin, {
 				},
 				linkTables : [
 						{
-							selectName : 'users',
-							selectLabel : 'Users',
-							model : 'User',
-							valueColumn : 'id',
-							labelColumn : 'name'
-						},
-						{
-							selectName : 'modules',
-							selectLabel : 'Modules',
-							model : 'Module',
+							selectName : 'groups',
+							selectLabel : 'Groups',
+							model : 'Group',
 							valueColumn : 'id',
 							labelColumn : 'name'
 						}

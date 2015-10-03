@@ -601,5 +601,26 @@ class ColParamSeeder extends Seeder
         ,	'data-fieldset' => '1'
         ]);
 
+        // Modules colparams
+        ColParam::create([	'tableName' => 'modules'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. Maintenance'
+        ,	'_label' => 'Name'
+        ,	'_enabled' => 'yes'
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'modules'
+        ,	'name' => 'description'
+        , 'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 'yes'
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        ]);
+
     }
 }

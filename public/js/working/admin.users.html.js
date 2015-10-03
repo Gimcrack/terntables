@@ -7,6 +7,7 @@ _.extend( jApp.views.admin, {
 
 			users : new jGrid({
 				table : 'users',
+				model : 'User',
 				columnFriendly : 'name',
 				gridHeader : {
 					icon : 'fa-user',
@@ -29,9 +30,7 @@ _.extend( jApp.views.admin, {
 					"email",
 					"username",
 					"groups",
-					"created_at",
-					"updated_at",
-
+					"modules",
 				],
 				hidCols : [					// columns to hide
 
@@ -42,8 +41,7 @@ _.extend( jApp.views.admin, {
 					"Email",
 					"Username",
 					"Groups",
-					"Created Date",
-					"Changed Date",
+					"Modules",
 				],
 				templates : { 				// html template functions
 
@@ -58,6 +56,13 @@ _.extend( jApp.views.admin, {
 
 					"groups" : function(arr) {
 						return _.pluck(arr, 'name').join(', ');
+					},
+
+					"modules" : function(arr) {
+						return _.compact(_.flatten(_.map(  jApp.aG().currentRow.groups, function(row, i) {
+							return (row.modules.length) ? _.pluck(row.modules,'name') : false
+						} ))).join(', ');
+						//return _.pluck(arr, 'name').join(', ');
 					},
 
 					"created_at" : function(value) {
@@ -78,7 +83,6 @@ _.extend( jApp.views.admin, {
 							labelColumn : 'name'
 						}
 				],
-				sortBy : 'EmailLink',			// column to sort by
 				rowsPerPage : 10,			// rows per page to display on grid
 				pageNum	: 1,				// current page number to display
 				html : {
