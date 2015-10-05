@@ -12,12 +12,20 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
+        Schema::create('people', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->timestamps();
+        });
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('password', 60);
+            $table->unsignedInteger('people_id')->nullable();
+            $table->foreign('people_id')->references('id')->on('people')->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -30,6 +38,11 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
+        Schema::table('users', function(Blueprint $table) {
+            $table->dropForeign('users_people_id_foreign');
+        });
+        Schema::drop('people');
+
         Schema::drop('users');
     }
 }

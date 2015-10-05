@@ -37,7 +37,7 @@ class UserController extends Controller
      */
     public function indexjson()
     {
-        return User::with(['groups.modules'])->get();
+        return User::with(['groups.modules','person'])->get();
     }
 
 
@@ -125,6 +125,29 @@ class UserController extends Controller
       } catch(\Illuminate\Database\QueryException $e) {
         return $this->operationFailed($e);
       }
+    }
+
+    /**
+     * Reset password of user with id $id
+     * @param [type] $id [description]
+     */
+    public function resetPassword($id)
+    {
+      try {
+        $input = Input::all();
+        $user = User::find($id);
+        $user->update(['password' => bcrypt($input['Password1'])]);
+
+        /**
+         * To do: notify user of password change.
+         */
+
+        return $this->operationSuccessful();
+
+      } catch(\Illuminate\Database\QueryException $e) {
+        return $this->operationFailed($e);
+      }
+
     }
 
     /**

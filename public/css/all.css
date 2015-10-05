@@ -9580,6 +9580,9 @@ table {
   border-collapse: collapse;
   border-spacing: 0; }
 
+.container-fluid {
+  margin-top: 90px !important; }
+
 #page-wrapper {
   margin: 0;
   min-height: 568px;

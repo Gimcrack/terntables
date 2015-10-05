@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\RecordLock;
+use DB;
 
 class PagesController extends Controller
 {
@@ -42,7 +43,7 @@ class PagesController extends Controller
       $class = "\\App\\{$model}";
       if (empty($labels)) { $labels = $options; }
 
-      return $class::select("{$options} as option","{$labels} as label")->orderBy("{$labels}","ASC")->get();
+      return $class::select("{$options} as option", DB::raw("{$labels} as label"))->orderBy("label","ASC")->get();
     }
 
     /**
@@ -113,13 +114,14 @@ class PagesController extends Controller
     public function checkinAll()
     {
       try {
-        if ( RecordLock::where('user_id', \Auth::id() )->count() ) {
-          RecordLock::where('user_id', \Auth::id() )->delete();
+        $id = \Auth::id();
+
+        if ( RecordLock::ofUser($id)->count() ) {
+          RecordLock::ofUser($id)->delete();
           return $this->operationSuccessful();
         }  else {
           return $this->operationFailed( 'Nothing to check in' );
         }
-
       } catch(\Illuminate\Database\QueryException $e) {
         return $this->operationFailed($e);
       }
@@ -133,8 +135,9 @@ class PagesController extends Controller
      */
     public function getCheckedOutRecords($model)
     {
-      $c = "App\\{$model}";
-      return RecordLock::all()->where('lockable_type',$c);
+      $class = "App\\{$model}";
+      $id = \Auth::id();
+      return RecordLock::with(['User'])->ofType($class)->notOfUser($id)->get();//->where('user_id','!=',$id);
     }
 
     /**

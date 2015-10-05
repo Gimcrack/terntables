@@ -27,8 +27,10 @@ Route::get('/home', 'PagesController@home');
  // users
  Route::get('admin/users/json',      'Admin\UserController@indexjson');
  Route::get('admin/users/{id}/json', 'Admin\UserController@showjson');
+ Route::patch('admin/resetPassword/{id}', 'Admin\UserController@resetPassword');
  Route::delete('admin/users',        'Admin\UserController@destroyMany');
  Route::resource('admin/users',      'Admin\UserController');
+
 
  // groups
  Route::get('admin/groups/json',      'Admin\GroupController@indexjson');

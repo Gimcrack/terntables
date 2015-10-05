@@ -19,7 +19,6 @@ class CreateRecordLocksTable extends Migration
             $table->morphs('lockable');
             $table->unique(['lockable_id','lockable_type']);
             $table->integer('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

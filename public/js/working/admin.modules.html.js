@@ -7,16 +7,12 @@ _.extend( jApp.views.admin, {
 
 			modules : new jGrid({
 				table : 'modules',
+				model : 'Module',
 				columnFriendly : 'name',
 				gridHeader : {
 					icon : 'fa-users',
 					headerTitle : 'Manage Modules',
 					helpText : "<strong>Note:</strong> Manage Modules Here"
-				},
-				tableBtns : {
-					new : {
-						label : 'New Module',
-					},
 				},
 				columns : [ 				// columns to query
 					"id",
@@ -33,7 +29,7 @@ _.extend( jApp.views.admin, {
 					"Name",
 					"Description",
 					"Groups",
-          "Users (Username)",
+          "Users",
 				],
 				templates : { 				// html template functions
 
@@ -48,7 +44,7 @@ _.extend( jApp.views.admin, {
 
 					"users" : function(arr) {
             return _.compact(_.flatten(_.map(  jApp.aG().currentRow.groups, function(row, i) {
-							return (row.users.length) ? _.map(row.users, function(user, i) { return user.name + ' (' + user.username + ')' } ) : false
+							return (row.users.length) ? _.map(row.users, function(user, i) { return user.username } ) : false
 						} ))).join(', ');
 					},
 
@@ -60,18 +56,7 @@ _.extend( jApp.views.admin, {
 						return date('Y-m-d', strtotime(value));
 					}
 
-				},
-				linkTables : [
-						{
-							selectName : 'groups',
-							selectLabel : 'Groups',
-							model : 'Group',
-							valueColumn : 'id',
-							labelColumn : 'name'
-						}
-				],
-				rowsPerPage : 10,			// rows per page to display on grid
-				pageNum	: 1,				// current page number to display
+				}
 			})
 		})
 	}

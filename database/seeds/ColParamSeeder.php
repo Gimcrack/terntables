@@ -21,7 +21,7 @@ class ColParamSeeder extends Seeder
         ,	'type' => 'select'
         ,	'onChange' => 'jApp.activeGrid.fn.updateColParamForm()'
         ,	'_label' => 'Enabled'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '0'
         ,	'data-fieldset' => '1'
         ,	'_optionsSource' => 'yes|no'
@@ -33,7 +33,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_firstlabel'
         ,	'placeholder' => 'Hint Text'
         ,	'_label' => 'First Label'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '30'
         ,	'data-fieldset' => '1'
         ]);
@@ -43,7 +43,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_firstoption'
         ,	'placeholder' => 'Dummy Value'
         ,	'_label' => 'First Options'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '31'
         ,	'data-fieldset' => '1'
         ]);
@@ -53,7 +53,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_label'
         ,	'placeholder' => 'Label'
         ,	'_label' => 'Prompt'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '3'
         ,	'data-fieldset' => '1'
         ]);
@@ -61,7 +61,7 @@ class ColParamSeeder extends Seeder
 
         ColParam::create([	'tableName' => 'col_params'
         ,	'name' => '_labels'
-        ,	'_enabled' => 'no'
+        ,	'_enabled' => 0
         ]);
 
 
@@ -69,7 +69,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_labelssource'
         ,	'placeholder' => 'List | Table.Column'
         ,	'_label' => 'Labels Source'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '32'
         ,	'data-fieldset' => '1'
         ]);
@@ -79,7 +79,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_linkedElmFilterCol'
         ,	'placeholder' => 'Column Name'
         ,	'_label' => 'Linked Element Filter'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '2'
         ]);
@@ -89,7 +89,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_linkedElmID'
         ,	'placeholder' => '#ID of Select Element'
         ,	'_label' => 'Linked Select #ID'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '2'
         ]);
@@ -99,7 +99,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_linkedElmLabels'
         ,	'placeholder' => '[table].[column]'
         ,	'_label' => 'Linked Element Labels Source'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '3'
         ,	'data-fieldset' => '2'
         ]);
@@ -109,7 +109,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_linkedElmOptions'
         ,	'placeholder' => '[table].[column]'
         ,	'_label' => 'Linked Element Options Source'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '4'
         ,	'data-fieldset' => '2'
         ]);
@@ -117,7 +117,7 @@ class ColParamSeeder extends Seeder
 
         ColParam::create([	'tableName' => 'col_params'
         ,	'name' => '_options'
-        ,	'_enabled' => 'no'
+        ,	'_enabled' => 0
         ]);
 
 
@@ -125,7 +125,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_optionsfilter'
         ,	'placeholder' => 'Condition'
         ,	'_label' => 'Options Filter'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '34'
         ,	'data-fieldset' => '1'
         ]);
@@ -135,7 +135,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => '_optionssource'
         ,	'placeholder' => 'List | Table.Column'
         ,	'_label' => 'Options Source'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '33'
         ,	'data-fieldset' => '1'
         ]);
@@ -146,7 +146,7 @@ class ColParamSeeder extends Seeder
         ,	'type' => 'select'
         ,	'onChange' => 'validType.value=this.value'
         ,	'_label' => 'Valid Type Preset'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '6'
         ,	'data-fieldset' => '2'
         ,	'_optionsSource' => '|Anything|file|Number|Integer|Email Address|Zip Code|Phone Number|US State|IPV4|base64|checkbox|radio|select|min>=[value]|max<=[value]|min_val>=[value]|max_val<=[value]|exact==[value]|between==[value],[value]|date_gt_[value]|date_lt_[value]|date_eq_['
@@ -158,7 +158,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'accept'
         ,	'placeholder' => 'File Type(s)'
         ,	'_label' => 'Accept'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '19'
         ,	'data-fieldset' => '1'
         ]);
@@ -168,7 +168,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'alt'
         ,	'placeholder' => 'Alternate Text'
         ,	'_label' => 'Alt'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '20'
         ,	'data-fieldset' => '1'
         ]);
@@ -178,7 +178,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'autocomplete'
         ,	'type' => 'select'
         ,	'_label' => 'Autocomplete'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '9'
         ,	'data-fieldset' => '1'
         ,	'_optionsSource' => '|on|off'
@@ -190,9 +190,9 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'autofocus'
         ,	'size' => '2'
         ,	'type' => 'select'
-        ,	'value' => '__OFF__'
+        ,	'value' => '0'
         ,	'_label' => 'Autofocus?'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '13'
         ,	'data-fieldset' => '3'
         ,	'_optionsSource' => '__OFF__|autofocus'
@@ -204,9 +204,9 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'checked'
         ,	'size' => '2'
         ,	'type' => 'select'
-        ,	'value' => '__OFF__'
+        ,	'value' => 0
         ,	'_label' => 'Checked?'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '17'
         ,	'data-fieldset' => '3'
         ,	'_optionsSource' => '__OFF__|checked'
@@ -219,7 +219,7 @@ class ColParamSeeder extends Seeder
         ,	'placeholder' => 'CSS Class'
         ,	'value' => 'form-control'
         ,	'_label' => 'Class'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '10'
         ,	'data-fieldset' => '1'
         ]);
@@ -229,7 +229,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'data-ordering'
         ,	'placeholder' => 'e.g. 1'
         ,	'_label' => 'Ordering'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '7'
         ,	'data-fieldset' => '1'
         ]);
@@ -238,7 +238,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'cols'
         ,	'placeholder' => 'Number of Columns'
         ,	'_label' => 'Cols'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '24'
         ,	'data-fieldset' => '1'
         ]);
@@ -248,9 +248,9 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'disabled'
         ,	'size' => '2'
         ,	'type' => 'select'
-        ,	'value' => '__OFF__'
+        ,	'value' => 0
         ,	'_label' => 'Disabled?'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '14'
         ,	'data-fieldset' => '3'
         ,	'_optionsSource' => '__OFF__|disabled'
@@ -262,7 +262,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'data-fieldset'
         ,	'placeholder' => 'e.g. 1|2|3'
         ,	'_label' => 'Fieldset'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '6'
         ,	'data-fieldset' => '1'
         ]);
@@ -272,7 +272,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'height'
         ,	'placeholder' => 'Pixels'
         ,	'_label' => 'Height'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '21'
         ,	'data-fieldset' => '1'
         ]);
@@ -282,7 +282,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'id'
         ,	'placeholder' => 'Element ID'
         ,	'_label' => 'ID'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '1'
         ]);
@@ -292,7 +292,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'list'
         ,	'placeholder' => 'datalist_id'
         ,	'_label' => 'List'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '29'
         ,	'data-fieldset' => '1'
         ]);
@@ -302,7 +302,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'max'
         ,	'placeholder' => 'Number | Date'
         ,	'_label' => 'Max Value'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '7'
         ,	'data-fieldset' => '2'
         ]);
@@ -315,7 +315,7 @@ class ColParamSeeder extends Seeder
         ,	'type' => 'number'
         ,	'data-validType' => 'Integer'
         ,	'_label' => 'Max Length'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '27'
         ,	'data-fieldset' => '1'
         ]);
@@ -325,7 +325,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'min'
         ,	'placeholder' => 'Number | Date'
         ,	'_label' => 'Min Value'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '8'
         ,	'data-fieldset' => '2'
         ]);
@@ -335,9 +335,9 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'multiple'
         ,	'size' => '2'
         ,	'type' => 'select'
-        ,	'value' => '__OFF__'
+        ,	'value' => 0
         ,	'_label' => 'Multiple?'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '15'
         ,	'data-fieldset' => '3'
         ,	'_optionsSource' => '__OFF__|multiple'
@@ -349,7 +349,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'name'
         ,	'placeholder' => 'Element Name'
         ,	'_label' => 'Name'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'
         ]);
@@ -359,7 +359,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'onChange'
         ,	'placeholder' => 'function or statement'
         ,	'_label' => 'onChange'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '12'
         ,	'data-fieldset' => '1'
         ]);
@@ -369,7 +369,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'onClick'
         ,	'placeholder' => 'function or statement'
         ,	'_label' => 'onClick'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '11'
         ,	'data-fieldset' => '1'
         ]);
@@ -379,7 +379,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'pattern'
         ,	'placeholder' => 'RegExp'
         ,	'_label' => 'Validation Pattern'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '10'
         ,	'data-fieldset' => '2'
         ]);
@@ -389,7 +389,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'placeholder'
         ,	'placeholder' => 'Hint Text'
         ,	'_label' => 'Placeholder'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '4'
         ,	'data-fieldset' => '1'
         ]);
@@ -399,9 +399,9 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'readonly'
         ,	'size' => '2'
         ,	'type' => 'select'
-        ,	'value' => '__OFF__'
+        ,	'value' => 0
         ,	'_label' => 'Readonly?'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '16'
         ,	'data-fieldset' => '3'
         ,	'_optionsSource' => '__OFF__|readonly'
@@ -413,9 +413,9 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'required'
         ,	'size' => '2'
         ,	'type' => 'select'
-        ,	'value' => '__OFF__'
+        ,	'value' => 0
         ,	'_label' => 'Required?'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '5'
         ,	'data-fieldset' => '2'
         ,	'_optionsSource' => '__OFF__|required'
@@ -427,7 +427,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'rows'
         ,	'placeholder' => 'Number of Rows'
         ,	'_label' => 'Rows'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '25'
         ,	'data-fieldset' => '1'
         ]);
@@ -440,7 +440,7 @@ class ColParamSeeder extends Seeder
         ,	'type' => 'number'
         ,	'data-validType' => 'Integer'
         ,	'_label' => 'Size'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '28'
         ,	'data-fieldset' => '1'
         ]);
@@ -450,7 +450,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'src'
         ,	'placeholder' => 'URL'
         ,	'_label' => 'Src'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '23'
         ,	'data-fieldset' => '1'
         ]);
@@ -460,7 +460,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'step'
         ,	'placeholder' => 'Interval Size'
         ,	'_label' => 'Step'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '9'
         ,	'data-fieldset' => '2'
         ]);
@@ -469,27 +469,27 @@ class ColParamSeeder extends Seeder
         ColParam::create([	'tableName' => 'col_params'
         ,	'name' => 'tableName'
         ,	'type' => 'hidden'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '0'
         ,	'data-fieldset' => '1'
         ]);
 
 
         ColParam::create([	'tableName' => 'col_params'
-        ,	'autofocus' => '__OFF__'
-        ,	'checked' => '__OFF__'
-        ,	'disabled' => '__OFF__'
+        ,	'autofocus' => 0
+        ,	'checked' => 0
+        ,	'disabled' => 0
         ,	'id' => 'type'
-        ,	'multiple' => '__OFF__'
+        ,	'multiple' => 0
         ,	'name' => 'type'
         ,	'placeholder' => 'Element Type'
-        ,	'readonly' => '__OFF__'
-        ,	'required' => '__OFF__'
+        ,	'readonly' => 0
+        ,	'required' => 0
         ,	'type' => 'select'
         ,	'onChange' => 'jApp.activeGrid.fn.updateColParamForm()'
         ,	'class' => 'form-control'
         ,	'_label' => 'Type'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '0'
         ,	'data-fieldset' => '1'
         ,	'_optionsSource' => 'text|textarea|password|button|checkbox|file|hidden|image|radio|reset|select|submit|color|date|datetime|datetime-local|email|month|range|number|search|tel|time|url'
@@ -501,7 +501,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'data-validType'
         ,	'placeholder' => 'Type | Choose Preset'
         ,	'_label' => 'Valid Type'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '6'
         ,	'data-fieldset' => '2'
         ]);
@@ -511,7 +511,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'value'
         ,	'placeholder' => 'Element value'
         ,	'_label' => 'Value'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '5'
         ,	'data-fieldset' => '1'
         ]);
@@ -521,7 +521,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'data-viewName'
         ,	'placeholder' => 'e.g. vw_UserContact'
         ,	'_label' => 'View Name'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '10'
         ,	'data-fieldset' => '1'
         ]);
@@ -531,7 +531,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'width'
         ,	'placeholder' => 'Pixels'
         ,	'_label' => 'Width'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '22'
         ,	'data-fieldset' => '1'
         ]);
@@ -541,28 +541,40 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'wrap'
         ,	'placeholder' => 'hard | soft'
         ,	'_label' => 'Wrap'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '26'
         ,	'data-fieldset' => '1'
         ]);
 
-        // users colparams
-        ColParam::create([	'tableName' => 'users'
-        ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. John Smith'
-        ,	'_label' => 'Name'
-        ,	'_enabled' => 'yes'
+        // people colparams
+        ColParam::create([	'tableName' => 'people'
+        ,	'name' => 'first_name'
+        ,	'placeholder' => 'e.g. John'
+        ,	'_label' => 'First Name'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'
         , 'required' => 1
         , 'data-validType' => 'Anything'
         ]);
 
+        ColParam::create([	'tableName' => 'people'
+        ,	'name' => 'last_name'
+        ,	'placeholder' => 'e.g. Smith'
+        ,	'_label' => 'Last Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        // users colparams
         ColParam::create([	'tableName' => 'users'
         ,	'name' => 'username'
         ,	'placeholder' => 'e.g. jsmith'
         ,	'_label' => 'Username'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '1'
         , 'required' => 1
@@ -573,11 +585,40 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'email'
         ,	'placeholder' => 'email@domain.com'
         ,	'_label' => 'Email Address'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '3'
         ,	'data-fieldset' => '1'
         , 'required' => 1
         , 'data-validType' => 'Email Address'
+        ]);
+
+        ColParam::create([	'tableName' => 'users'
+        ,	'name' => 'people_id'
+        ,	'type' => 'select'
+        ,	'_label' => 'Contact Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'select'
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => 0
+        , '_labelssource' => "Person.CONCAT(last_name, ', ', first_name)"
+        , '_optionssource' => "Person.id"
+        , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'users'
+        ,	'name' => 'groups'
+        ,	'type' => 'select'
+        ,	'_label' => 'User Groups'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Group.name"
+        , '_optionssource' => "Group.id"
+        , 'multiple' => 1
         ]);
 
         // Groups colparams
@@ -585,7 +626,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'name'
         ,	'placeholder' => 'e.g. Administrators'
         ,	'_label' => 'Name'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'
         , 'required' => 1
@@ -596,9 +637,35 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'description'
         , 'type' => 'textarea'
         ,	'_label' => 'Description'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '1'
+        ]);
+
+        ColParam::create([	'tableName' => 'groups'
+        ,	'name' => 'users'
+        ,	'type' => 'select'
+        ,	'_label' => 'Group Users'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "User.username"
+        , '_optionssource' => "User.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'groups'
+        ,	'name' => 'modules'
+        ,	'type' => 'select'
+        ,	'_label' => 'Group Modules'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Module.name"
+        , '_optionssource' => "Module.id"
+        , 'multiple' => 1
         ]);
 
         // Modules colparams
@@ -606,7 +673,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'name'
         ,	'placeholder' => 'e.g. Maintenance'
         ,	'_label' => 'Name'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'
         , 'required' => 1
@@ -617,9 +684,22 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'description'
         , 'type' => 'textarea'
         ,	'_label' => 'Description'
-        ,	'_enabled' => 'yes'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '1'
+        ]);
+
+        ColParam::create([	'tableName' => 'modules'
+        ,	'name' => 'groups'
+        ,	'type' => 'select'
+        ,	'_label' => 'Module Groups'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Group.name"
+        , '_optionssource' => "Group.id"
+        , 'multiple' => 1
         ]);
 
     }

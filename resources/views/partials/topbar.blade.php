@@ -40,12 +40,15 @@
     @else
   	<li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-  			<i class="fa fa-user fa-fw"></i> {{ Auth::user()->name }} <i class="fa fa-caret-down"></i>
+  			<i class="fa fa-user fa-fw"></i> {{ Auth::user()->username }} <i class="fa fa-caret-down"></i>
   		</a>
   		<ul class="dropdown-menu dropdown-admin-settings">
 
         @if (Auth::user()->isSuperAdmin() )
         <li class="menu-section-heading"> SuperAdmin Menu </li>
+          <li>
+            <a href="javascript:void(0)" onclick="jApp.activeGrid.store.flush()"><i class="fa fa-gear fa-fw"></i> Flush Store</a>
+          </li>
           <li>
     				<a href="javascript:void(0)" onclick="jApp.activeGrid.fn.colParamSetup()"><i class="fa fa-gear fa-fw"></i> Setup Forms</a>
     			</li>

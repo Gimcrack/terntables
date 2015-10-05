@@ -8,16 +8,11 @@ _.extend( jApp.views.admin, {
 			users : new jGrid({
 				table : 'users',
 				model : 'User',
-				columnFriendly : 'name',
+				columnFriendly : 'username',
 				gridHeader : {
 					icon : 'fa-user',
 					headerTitle : 'Manage Users',
 					helpText : "<strong>Note:</strong> Manage Users Here"
-				},
-				tableBtns : {
-					new : {
-						label : 'New User',
-					},
 				},
 				rowBtns : {
 					custom : {
@@ -26,9 +21,9 @@ _.extend( jApp.views.admin, {
 				},
 				columns : [ 				// columns to query
 					"id",
+					"username",
 					"name",
 					"email",
-					"username",
 					"groups",
 					"modules",
 				],
@@ -37,9 +32,9 @@ _.extend( jApp.views.admin, {
 				],
 				headers : [ 				// headers for table
 					"ID",
+					"Username",
 					"Name",
 					"Email",
-					"Username",
 					"Groups",
 					"Modules",
 				],
@@ -48,6 +43,14 @@ _.extend( jApp.views.admin, {
 					"id" : function(value) {
 						var temp = '0000' + value;
 						return temp.slice(-4);
+					},
+
+					"name" : function() {
+						var o = jApp.aG().currentRow,
+								fName = ( !! o.person && typeof o.person.first_name !== 'undefined') ? o.person.first_name : '',
+								lName = ( !! o.person && typeof o.person.last_name !== 'undefined') ? o.person.last_name : '';
+
+						return fName + ' ' + lName;
 					},
 
 					"email" : function(value) {
@@ -74,15 +77,6 @@ _.extend( jApp.views.admin, {
 					}
 
 				},
-				linkTables : [
-						{
-							selectName : 'groups',
-							selectLabel : 'User Groups',
-							model : 'Group',
-							valueColumn : 'id',
-							labelColumn : 'name'
-						}
-				],
 				rowsPerPage : 10,			// rows per page to display on grid
 				pageNum	: 1,				// current page number to display
 				html : {
@@ -93,26 +87,23 @@ _.extend( jApp.views.admin, {
 				formDefs : {
 					resetPassword : {
 						table : 'User',
-						dataView : 'dbo.lk_UserContact',
-						pkey : 'ContactID',
+						pkey : 'id',
 						tableFriendly : 'User Password',
-						atts : {
-							name : 'frm_resetUser',
-						},
+						atts : { method : 'PATCH' },
 						fieldset : {
 							'legend' : 'Reset Password',
 						},
 						loadExternal : false,
 						colParams : [
 							{ type : 'hidden', readonly : 'readonly', name : 'ContactID' },
-							{ type : 'password', name : 'Password1', id : 'Password1', required : 'required', validType : 'min>=6', _label : 'New Password', placeholder : '******' },
-							{ type : 'password', name : 'Password2', id : 'Password2', required : 'required', validType : 'field==#Password1', _label : 'Confirm Password', placeholder : '******' },
+							{ type : 'password', name : 'Password1', id : 'Password1', required : 'required', 'data-validType' : 'min>=6', _label : 'New Password', placeholder : '******' },
+							{ type : 'password', name : 'Password2', id : 'Password2', required : 'required', 'data-validType' : 'field==#Password1', _label : 'Confirm Password', placeholder : '******' },
 						],
 					}
 				},
 				fn : {
 					resetPassword : function() {
-						jApp.activeGrid.utility.actionHelper('resetPassword');
+						jUtility.actionHelper('resetPassword');
 					}, //end fn
 				}
 			})

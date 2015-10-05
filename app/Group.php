@@ -7,6 +7,35 @@ use Illuminate\Database\Eloquent\Model;
 class Group extends Model
 {
   /**
+   * Make the model track revision changes
+   */
+  use \Venturecraft\Revisionable\RevisionableTrait;
+
+  /**
+   * Boot the model
+   * @return [type] [description]
+   */
+  public static function boot()
+  {
+      parent::boot();
+  }
+
+  /**
+   * The column that identifies the model
+   * @return [type] [description]
+   */
+  public function identifiableName()
+    {
+        return $this->name;
+    }
+
+  /**
+   * Track creations as revisions
+   * @var [type]
+   */
+  protected $revisionCreationsEnabled = true;
+
+  /**
    * The database table that the model references
    *
    * @var string

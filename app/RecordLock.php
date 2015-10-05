@@ -27,7 +27,41 @@ class RecordLock extends Model
         return $this->morphTo();
     }
 
-    
+    /**
+     * Scope of lockable type
+     * @param  [type] $query [description]
+     * @param  [type] $type  [description]
+     * @return [type]        [description]
+     */
+    public function scopeOfType($query,$type)
+    {
+      return $query->where('lockable_type',$type);
+    }
+
+
+    /**
+     * Scope of user - get recordlocks
+     * of a particular user
+     * @param  [type] $query   [description]
+     * @param  [type] $user_id [description]
+     * @return [type]          [description]
+     */
+    public function scopeOfUser($query,$user_id)
+    {
+      return $query->where('user_id',$user_id);
+    }
+
+    /**
+     * Scope not of user - get record locks
+     * not belonging to a particular user
+     * @param  [type] $query   [description]
+     * @param  [type] $user_id [description]
+     * @return [type]          [description]
+     */
+    public function scopeNotOfUser($query,$user_id)
+    {
+      return $query->where('user_id','<>',$user_id);
+    }
 
     /**
      * Relationship to user.

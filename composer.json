@@ -33,7 +33,8 @@
         "onokumus/metismenu" : "dev-master",
         "moment/moment" : "dev-master",
         "ingenious/history.js": "dev-master",
-        "Nathanmac/Parser": "3.*"
+        "Nathanmac/Parser": "3.*",
+        "venturecraft/revisionable": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
@@ -59,9 +60,7 @@
             "php artisan clear-compiled",
             "php artisan optimize"
         ],
-        "pre-update-cmd": [
-            "php artisan clear-compiled"
-        ],
+        "pre-update-cmd": [],
         "post-update-cmd": [
             "php artisan optimize"
         ],

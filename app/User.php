@@ -17,6 +17,34 @@ class User extends Model implements AuthenticatableContract,
     use Authenticatable, Authorizable, CanResetPassword;
 
     /**
+     * Make the model track revision changes
+     */
+    use \Venturecraft\Revisionable\RevisionableTrait;
+
+    /**
+     * Boot the model
+     * @return [type] [description]
+     */
+    public static function boot()
+    {
+        parent::boot();
+    }
+
+    /**
+     * The column that identifies the model
+     * @return [type] [description]
+     */
+    public function identifiableName()
+      {
+          return $this->name;
+      }
+
+    /**
+     * Track creations as revisions
+     * @var [type]
+     */
+    protected $revisionCreationsEnabled = true;
+    /**
      * The database table used by the model.
      *
      * @var string
@@ -28,7 +56,7 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['name', 'username', 'email', 'password'];
+    protected $fillable = ['username', 'email', 'password', 'people_id'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -44,6 +72,15 @@ class User extends Model implements AuthenticatableContract,
     public function recordLock()
     {
         return $this->morphOne('App\RecordLock', 'lockable');
+    }
+
+    /**
+     * A User may belong to one person
+     * @return [type] [description]
+     */
+    public function person()
+    {
+      return $this->belongsTo('App\Person','people_id');
     }
 
 

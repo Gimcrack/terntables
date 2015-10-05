@@ -20,9 +20,9 @@ class CreateModulesTable extends Migration
         });
 
         Schema::create('group_module', function( Blueprint $table) {
-            $table->integer('group_id')->unsigned()->index();
+            $table->unsignedInteger('group_id')->index();
             $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
-            $table->integer('module_id')->unsigned()->index();
+            $table->unsignedInteger('module_id')->index();
             $table->foreign('module_id')->references('id')->on('modules')->onDelete('cascade');
             $table->text('comment')->nullable();
             $table->timestamps();
@@ -36,6 +36,11 @@ class CreateModulesTable extends Migration
      */
     public function down()
     {
+        Schema::table('group_module', function(Blueprint $table) {
+            $table->dropForeign('group_module_group_id_foreign');
+            $table->dropForeign('group_module_module_id_foreign');
+        });
+
         Schema::drop('modules');
         Schema::drop('group_module');
     }

@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Module extends Model
+class Person extends Model
 {
   /**
    * Make the model track revision changes
@@ -36,38 +36,36 @@ class Module extends Model
   protected $revisionCreationsEnabled = true;
   
   /**
-   * The database table that the model references
+   * The database table used by the model.
    *
    * @var string
    */
-  protected $table = 'modules';
+  protected $table = 'people';
 
   /**
-   * The mass assignable fields
+   * The attributes that are mass assignable.
    *
    * @var array
    */
-  protected $fillable = [
-      'name'
-    , 'description'
-  ];
+  protected $fillable = ['first_name', 'last_name'];
 
   /**
-     * Polymorphic relationship. Second parameter to morphOne/morphMany
-     * should be the same as the prefix for the *_id/*_type fields.
-     */
-    public function recordLock()
-    {
-        return $this->morphOne('App\RecordLock', 'lockable');
-    }
-
-  /**
-   * A module can be assigned to many groups
-   * @method modules
-   * @return [type]  [description]
+   * Polymorphic relationship. Second parameter to morphOne/morphMany
+   * should be the same as the prefix for the *_id/*_type fields.
    */
-  public function groups()
+  public function recordLock()
   {
-    return $this->belongsToMany('App\Group')->withTimestamps();
+      return $this->morphOne('App\RecordLock', 'lockable');
   }
+
+
+  /**
+   * A person may have many user accounts
+   * @return [type] [description]
+   */
+  public function users()
+  {
+      return $this->hasMany('App\User');
+  }
+
 }

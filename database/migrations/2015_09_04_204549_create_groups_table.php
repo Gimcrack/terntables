@@ -20,9 +20,9 @@ class CreateGroupsTable extends Migration
         });
 
         Schema::create('group_user', function( Blueprint $table) {
-            $table->integer('user_id')->unsigned()->index();
+            $table->unsignedInteger('user_id')->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('group_id')->unsigned()->index();
+            $table->unsignedInteger('group_id')->index();
             $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
             $table->text('comment')->nullable();
             $table->timestamps();
@@ -36,6 +36,11 @@ class CreateGroupsTable extends Migration
      */
     public function down()
     {
+        Schema::table('group_user', function(Blueprint $table) {
+            $table->dropForeign('group_user_group_id_foreign');
+            $table->dropForeign('group_user_user_id_foreign');
+        });
+
         Schema::drop('groups');
         Schema::drop('group_user');
     }
