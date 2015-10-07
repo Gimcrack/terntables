@@ -6,18 +6,19 @@ _.extend( jApp.views, {
 		_.extend( jApp.oG, {
 
 			profile : new jGrid({
-
-				table : 'contact',
-				dbView : 'vw_Contact',		// db table
-				pkey : 'ContactID',			// Primary Key Of Table
-				tableFriendly : 'User',
+				table : 'users',
+				model : 'User',
 				columnFriendly : 'FullName',
-				filter : 'ContactID = [[CONTACTID]]',
 				gridHeader : {
 					icon : 'fa-user',
 					headerTitle : 'My Profile',
 					helpText : 'Note: Resetting your password here will affect all Logins assigned to you.'
 				},
+				disabledFrmElements : [
+					'people_id',
+					'groups'
+				],
+				rowDataUrl : 'users/json',
 				toggles : {
 					new : false,
 					del : false,
@@ -25,7 +26,7 @@ _.extend( jApp.views, {
 					autoUpdate : false,
 					paginate : false,
 					withSelected : false,
-					//headerFilters : false,
+					headerFilters : false,
 				},
 				rowBtns : {
 					custom : {
@@ -33,54 +34,64 @@ _.extend( jApp.views, {
 					}
 				},
 				columns : [ 				// columns to query
-					"ContactID",
-					"EmailLink",
-					"UserNames",
-					"ManagerName",
-					"GroupNames",
-					"UserIDs",
-					"GroupIDs",
-					"ManagerID",
+					"id",
+					"username",
+					"name",
+					"email",
+					"groups",
 				],
 				hidCols : [					// columns to hide
-					"UserIDs",
-					"GroupIDs",
-					"ManagerID"
+
 				],
 				headers : [ 				// headers for table
 					"ID",
+					"Username",
 					"Name",
-					"Login(s)",
-					"Reports To",
+					"Email",
 					"Groups",
 				],
 				templates : { 				// html template functions
 
-					"ContactID" : function(value) {
+					"id" : function(value) {
 						var temp = '0000' + value;
 						return temp.slice(-4);
 					},
 
+					"name" : function() {
+						var o = jApp.aG().currentRow,
+								fName = ( !! o.person && typeof o.person.first_name !== 'undefined') ? o.person.first_name : '',
+								lName = ( !! o.person && typeof o.person.last_name !== 'undefined') ? o.person.last_name : '';
+
+						return fName + ' ' + lName;
+					},
+
+					"email" : function(value) {
+						return '<a href="mailto:' + value + '" >' + value + '</a>';
+					},
+
+					"groups" : function(arr) {
+						return _.pluck(arr, 'name').join(', ');
+					},
+
+					"modules" : function(arr) {
+						return _.compact(_.flatten(_.map(  jApp.aG().currentRow.groups, function(row, i) {
+							return (row.modules.length) ? _.pluck(row.modules,'name') : false
+						} ))).join(', ');
+						//return _.pluck(arr, 'name').join(', ');
+					},
+
 				},
-				linkTables : [
-					{ tables : { parent : 'Contact', child : 'Group' }, childFriendlyName : 'GroupName' },
-					{ tables : { parent : 'Contact', child : 'User' }, childFriendlyName : 'UserName' },
-				],
-				sortBy : 'EmailLink',			// column to sort by
-				rowsPerPage : 10,			// rows per page to display on grid
-				pageNum	: 1,				// current page number to display
 				html : {
-					resetPassword : '<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper"> <div class="frm_wrapper"> <div class="panel panel-yellow"> <div class="panel-heading"> <button type="button" class="close" aria-hidden="true">×</button> <i class="fa fa-refresh fa-fw"></i> Reset Password </div> <div class="panel-overlay" style="display:none"></div> <div class="panel-body"> <div class="row side-by-side formContainer"></div> </div> </div> </div> </div>'
+					forms : {
+						resetPassword : '<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper"> <div class="frm_wrapper"> <div class="panel panel-yellow"> <div class="panel-heading"> <button type="button" class="close" aria-hidden="true">×</button> <i class="fa fa-refresh fa-fw"></i> Reset Password </div> <div class="panel-overlay" style="display:none"></div> <div class="panel-body"> <div class="row side-by-side formContainer"></div> </div> </div> </div> </div>'
+					},
 				},
 				formDefs : {
 					resetPassword : {
 						table : 'User',
-						dataView : 'dbo.lk_UserContact',
-						pkey : 'ContactID',
+						pkey : 'id',
 						tableFriendly : 'User Password',
-						atts : {
-							name : 'frm_resetUser',
-						},
+						atts : { method : 'PATCH' },
 						fieldset : {
 							'legend' : 'Reset Password',
 						},
@@ -94,16 +105,9 @@ _.extend( jApp.views, {
 				},
 				fn : {
 					resetPassword : function() {
-						jApp.oG.profile.action = 'resetPassword';
-						// modal overlay
-						jApp.oG.profile.fn.overlay(2,'on');
-
-						//setup target div
-						var $target = jApp.oG.profile.$().find('#div_resetFrm');
-						jApp.oG.profile.fn.setupTargetDiv($target);
+						jUtility.actionHelper('resetPassword');
 					}, //end fn
 				}
-
 			})
 		})
 	}

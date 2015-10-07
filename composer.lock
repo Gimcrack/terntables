@@ -579,12 +579,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "88bf77fb5c224aace51b95aa3eb9f2d2e16e54bd"
+                "reference": "f7355fa6e9ad0a5c98c1ac1c298233d01c5067df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/88bf77fb5c224aace51b95aa3eb9f2d2e16e54bd",
-                "reference": "88bf77fb5c224aace51b95aa3eb9f2d2e16e54bd",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/f7355fa6e9ad0a5c98c1ac1c298233d01c5067df",
+                "reference": "f7355fa6e9ad0a5c98c1ac1c298233d01c5067df",
                 "shasum": ""
             },
             "require": {
@@ -605,7 +605,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2015-10-03 01:04:56"
+            "time": "2015-10-05 04:12:00"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -1516,16 +1516,16 @@
         },
         {
             "name": "nathanmac/parser",
-            "version": "v3.9",
+            "version": "v3.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nathanmac/Parser.git",
-                "reference": "1a51aa4b98539a907f7911002ba4eca596cfe290"
+                "reference": "5472cc6bae23b89e9a9764db8ff0dc475b7006e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nathanmac/Parser/zipball/1a51aa4b98539a907f7911002ba4eca596cfe290",
-                "reference": "1a51aa4b98539a907f7911002ba4eca596cfe290",
+                "url": "https://api.github.com/repos/nathanmac/Parser/zipball/5472cc6bae23b89e9a9764db8ff0dc475b7006e8",
+                "reference": "5472cc6bae23b89e9a9764db8ff0dc475b7006e8",
                 "shasum": ""
             },
             "require": {
@@ -1567,7 +1567,7 @@
                 "parser",
                 "xml"
             ],
-            "time": "2015-08-27 16:30:37"
+            "time": "2015-10-03 21:34:42"
         },
         {
             "name": "needim/noty",

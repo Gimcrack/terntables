@@ -15,6 +15,15 @@ Route::get('/', 'PagesController@home');
 Route::get('/home', 'PagesController@home');
 
 /**
+ * User Routes
+ */
+
+Route::get('profile', 'ProfileController@index');
+Route::get('users/json', 'ProfileController@indexjson');
+Route::patch('users/{id}', 'ProfileController@update');
+Route::patch('resetPassword/{id}', 'ProfileController@resetPassword');
+
+/**
  * Admin Routes
  */
 

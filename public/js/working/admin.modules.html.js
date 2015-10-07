@@ -9,15 +9,20 @@ _.extend( jApp.views.admin, {
 				table : 'modules',
 				model : 'Module',
 				columnFriendly : 'name',
+				tableBtns : {
+					new : {
+						label : 'New Access Control'
+					}
+				},
 				gridHeader : {
-					icon : 'fa-users',
-					headerTitle : 'Manage Modules',
-					helpText : "<strong>Note:</strong> Manage Modules Here"
+					icon : 'fa-lock',
+					headerTitle : 'Access Control',
+					helpText : "<strong>Note:</strong> Setup access controls here."
 				},
 				columns : [ 				// columns to query
 					"id",
 					"name",
-					"description",
+					"permissions",
 					"groups",
           "users"
 				],
@@ -27,7 +32,7 @@ _.extend( jApp.views.admin, {
 				headers : [ 				// headers for table
 					"ID",
 					"Name",
-					"Description",
+					"Permissions",
 					"Groups",
           "Users",
 				],
@@ -46,6 +51,18 @@ _.extend( jApp.views.admin, {
             return _.compact(_.flatten(_.map(  jApp.aG().currentRow.groups, function(row, i) {
 							return (row.users.length) ? _.map(row.users, function(user, i) { return user.username } ) : false
 						} ))).join(', ');
+					},
+
+					"permissions" : function() {
+						var row = jApp.aG().currentRow,
+								p = [];
+
+						if ( !!Number(row.create_enabled) ) p.push('Create');
+						if ( !!Number(row.read_enabled )) p.push('Read');
+						if ( !!Number(row.update_enabled) ) p.push('Update');
+						if ( !!Number(row.delete_enabled) ) p.push('Delete');
+
+						return p.join(', ');
 					},
 
 					"created_at" : function(value) {

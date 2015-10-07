@@ -34,7 +34,7 @@ class Module extends Model
    * @var [type]
    */
   protected $revisionCreationsEnabled = true;
-  
+
   /**
    * The database table that the model references
    *
@@ -49,7 +49,10 @@ class Module extends Model
    */
   protected $fillable = [
       'name'
-    , 'description'
+    , 'create_enabled'
+    , 'read_enabled'
+    , 'update_enabled'
+    , 'delete_enabled'
   ];
 
   /**

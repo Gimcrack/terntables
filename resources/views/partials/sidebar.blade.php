@@ -13,7 +13,7 @@
   			<ul class="nav nav-second-level">
   				<!-- BASE MODULE -->
   				<li>
-  					<a href="profile.html" data-fn="true" class="active ajaxy ajaxy-view"><i class="fa fa-user fa-fw"></i> My Profile</a>
+  					<a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
   				</li>
 
   			</ul>

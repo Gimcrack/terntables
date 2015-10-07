@@ -671,8 +671,8 @@ class ColParamSeeder extends Seeder
         // Modules colparams
         ColParam::create([	'tableName' => 'modules'
         ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. Maintenance'
-        ,	'_label' => 'Name'
+        ,	'placeholder' => 'e.g. Document'
+        ,	'_label' => 'Model Name'
         ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'
@@ -681,12 +681,47 @@ class ColParamSeeder extends Seeder
         ]);
 
         ColParam::create([	'tableName' => 'modules'
-        ,	'name' => 'description'
-        , 'type' => 'textarea'
-        ,	'_label' => 'Description'
+        ,	'name' => 'create_enabled'
+        , 'type' => 'select'
+        ,	'_label' => 'Create Enabled'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '2'
+        , '_optionssource' => '0|1'
+        , '_labelssource' => 'No|Yes'
+        ]);
+
+        ColParam::create([	'tableName' => 'modules'
+        ,	'name' => 'read_enabled'
+        , 'type' => 'select'
+        ,	'_label' => 'Read Enabled'
         ,	'_enabled' => 1
         ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '1'
+        ,	'data-fieldset' => '2'
+        , '_optionssource' => '0|1'
+        , '_labelssource' => 'No|Yes'
+        ]);
+
+        ColParam::create([	'tableName' => 'modules'
+        ,	'name' => 'update_enabled'
+        , 'type' => 'select'
+        ,	'_label' => 'Update Enabled'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '3'
+        ,	'data-fieldset' => '2'
+        , '_optionssource' => '0|1'
+        , '_labelssource' => 'No|Yes'
+        ]);
+
+        ColParam::create([	'tableName' => 'modules'
+        ,	'name' => 'delete_enabled'
+        , 'type' => 'select'
+        ,	'_label' => 'Delete Enabled'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '4'
+        ,	'data-fieldset' => '2'
+        , '_optionssource' => '0|1'
+        , '_labelssource' => 'No|Yes'
         ]);
 
         ColParam::create([	'tableName' => 'modules'
