@@ -1,9 +1,9 @@
 // extend the application views
-_.extend( jApp.views.admin, {
+$.extend( true, jApp.views.admin, {
 
 	users : function() {
 
-		_.extend( jApp.oG.admin, {
+		$.extend( true, jApp.oG.admin, {
 
 			users : new jGrid({
 				table : 'users',

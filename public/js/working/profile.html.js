@@ -1,9 +1,9 @@
 // extend the application views
-_.extend( jApp.views, {
+$.extend(true, jApp.views, {
 
 	profile : function() {
 
-		_.extend( jApp.oG, {
+		$.extend(true, jApp.oG, {
 
 			profile : new jGrid({
 				table : 'users',
