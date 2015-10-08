@@ -6,7 +6,7 @@
   	</button>
     @endif
   	<a class="navbar-brand ajaxy ajaxy-view" href="{{ url('/') }}">
-  		Asynchronous Dashboard
+  		{{ env('APP_HEADER_TITLE','Laravel Dashboard')}}
   		<span class="label label-primary label-small">{{ env('APP_LABEL') }}</span>
   	</a>
   </div>
