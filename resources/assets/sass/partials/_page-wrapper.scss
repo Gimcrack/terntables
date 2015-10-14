@@ -8,7 +8,7 @@
 	margin: 0; // fixing gap in grid
 	//padding: 80px 30px 30px;
 	min-height: 568px;
-	transition:all 0.3s linear;
+	//transition:all 0.3s linear;
 	padding:0 0 20px;
 
 	.header-title {
@@ -27,7 +27,7 @@
 			top:241px;
 			left:0;
 			right:0;
-			transition:all 0.3s linear;
+			//transition:all 0.3s linear;
 			z-index:999;
 			//visibility:hidden;
 
@@ -39,6 +39,7 @@
 				border: 1px solid transparent !important;
 
 				&:first-child {
+					background: $success !important;
 					.table-header:nth-child(-n+1) {
 						width:auto;
 					}
@@ -131,20 +132,20 @@
 	& { // transitions
 		.panel-grid > .panel-heading {
 			z-index:10;
-			transition:all 0.3s linear;
+			//transition:all 0.3s linear;
 
 			.page-header {
-				transition:all 0.3s linear;
+				//transition:all 0.3s linear;
 			}
 
 			.helpText {
-				transition:all 0.3s linear;
+				//transition:all 0.3s linear;
 			}
 
 		}
 
 		.panel-grid > .grid-panel-body {
-			transition:all 0.3s linear;
+			//transition:all 0.3s linear;
 			//z-index:-1 !important;;
 		}
 
@@ -155,19 +156,19 @@
 
 		.panel-grid > .panel-heading {
 			top:25px;
-			transition:all 0.3s linear;
+			//transition:all 0.3s linear;
 
 
 			.page-header {
 
 				font-size:1.3em !important;
-				transition:all 0.3s linear;
+				//transition:all 0.3s linear;
 				margin:40px 0 0;
 
 			}
 
 			.helpText {
-				transition:all 0.3s linear;
+				//transition:all 0.3s linear;
 			}
 
 		}
@@ -176,7 +177,7 @@
 			margin-top:243px;
 			padding:0 !important;
 			z-index:-1;
-			transition:all 0.3s linear;
+			//transition:all 0.3s linear;
 
 			.table-head {
 				top:104px;

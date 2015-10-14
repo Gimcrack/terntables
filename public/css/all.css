@@ -9586,7 +9586,6 @@ table {
 #page-wrapper {
   margin: 0;
   min-height: 568px;
-  transition: all 0.3s linear;
   padding: 0 0 20px;
   /* transition:transform 0.4s ease-in-out;
 	-webkit-transform-origin: 100% 50%;
@@ -9605,7 +9604,6 @@ table {
       top: 241px;
       left: 0;
       right: 0;
-      transition: all 0.3s linear;
       z-index: 999; }
       #page-wrapper .grid-panel-body .table .table-head .table-row {
         float: left;
@@ -9652,28 +9650,16 @@ table {
         #page-wrapper .grid-panel-body .table .table-body .table-row .table-cell.changed, #page-wrapper .grid-panel-body .table .table-body .table-row .table-header.changed {
           background: #FFFF9C; }
   #page-wrapper .panel-grid > .panel-heading {
-    z-index: 10;
-    transition: all 0.3s linear; }
-    #page-wrapper .panel-grid > .panel-heading .page-header {
-      transition: all 0.3s linear; }
-    #page-wrapper .panel-grid > .panel-heading .helpText {
-      transition: all 0.3s linear; }
-  #page-wrapper .panel-grid > .grid-panel-body {
-    transition: all 0.3s linear; }
+    z-index: 10; }
   #page-wrapper.scrolled .panel-grid > .panel-heading {
-    top: 25px;
-    transition: all 0.3s linear; }
+    top: 25px; }
     #page-wrapper.scrolled .panel-grid > .panel-heading .page-header {
       font-size: 1.3em !important;
-      transition: all 0.3s linear;
       margin: 40px 0 0; }
-    #page-wrapper.scrolled .panel-grid > .panel-heading .helpText {
-      transition: all 0.3s linear; }
   #page-wrapper.scrolled .panel-grid > .grid-panel-body {
     margin-top: 243px;
     padding: 0 !important;
-    z-index: -1;
-    transition: all 0.3s linear; }
+    z-index: -1; }
     #page-wrapper.scrolled .panel-grid > .grid-panel-body .table-head {
       top: 104px; }
   #page-wrapper .row {
@@ -10501,24 +10487,21 @@ ul.timeline > li > .timeline-panel:after {
 
 /*}*/
 /**  **  **  **  **  **  **  **  **  **  **  **  **  **  **  **  **
- *  
+ *
  *  _typography.scss - Partial Sass Definitions
- *  
+ *
  *  Matsu Borough CMS
- *  
+ *
  *  Defines typography style definitions
  *  
- *  Jeremy Bloomstrom | jeremy.bloomstrom@matsugov.us
- *  Programmer Analyst
- *  Matsu Borough IT
- *  
+ *
  *  Created: 		8/25/2014
  *  Last Updated: 	8/25/2014
- *  
+ *
  *  Changelog:
  *   8/25/2014 - Added comment header
  */
-/**  **  **  **  **  **  **  **  **  ** 
+/**  **  **  **  **  **  **  **  **  **
  *   TYPOGRAPHY - DEFINE FONT STYLES
  **  **  **  **  **  **  **  **  **  **/
 * {
@@ -10562,7 +10545,6 @@ ul.timeline > li > .timeline-panel:after {
  * Everything Else
  */
 * {
-  font-family: 'Ubuntu', sans-serif;
   border-radius: 0 !important; }
 
 .cursor-move {
