@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use App\User;
+use Auth;
+use Laracasts\Flash\Flash;
+
+class CheckAccess
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next, $role)
+    {
+        if (Auth::check() && Auth::user()->checkAccess($role) ) {
+          return $next($request);
+        }
+
+        Flash::error("You must be logged as a user with {$role} priviledges to do that.");
+
+        return redirect('/auth/login');
+    }
+}

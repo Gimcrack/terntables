@@ -37,11 +37,9 @@ class Administrator
   {
       // determine first if user is logged in
       if ($this->auth->guest()) {
-          if ($request->ajax()) {
-              return response('Unauthorized.', 401);
-          } else {
+          if (!$request->ajax()) {
               return redirect()->guest('auth/login');
-          }
+          } 
       }
 
       // now determine if logged in user is an admin

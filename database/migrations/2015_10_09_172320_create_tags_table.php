@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePeopleTable extends Migration
+class CreateTagsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,12 @@ class CreatePeopleTable extends Migration
      */
     public function up()
     {
-
+        Schema::create('tags', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->morphs('taggable');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -22,6 +27,6 @@ class CreatePeopleTable extends Migration
      */
     public function down()
     {
-        
+        Schema::drop('tags');
     }
 }

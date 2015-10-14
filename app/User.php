@@ -10,6 +10,9 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
+use App\Module;
+use DB;
+
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
@@ -91,7 +94,18 @@ class User extends Model implements AuthenticatableContract,
      */
     public function groups()
     {
-      return $this->belongsToMany('App\Group')->withTimestamps();
+      return $this->belongsToMany('App\Group')->withTimestamps()->with(['modules']);
+    }
+
+
+    /**
+     * A user has modules through groups
+     * @method modules
+     * @return [type]  [description]
+     */
+    public function modules()
+    {
+      return $this->hasManyThrough('App\Module','App\Group');
     }
 
     /**
@@ -132,5 +146,34 @@ class User extends Model implements AuthenticatableContract,
       } else {
         return false;
       }
+    }
+
+    /**
+     * Check if the logged in user has the required access
+     * @method checkAccess
+     * @param  [type]      $role [description]
+     * @return [type]            [description]
+     */
+    public function checkAccess($role)
+    {
+      if ($this->isAdmin()) return 1;
+
+      list($model,$permission) = explode('.',$role);
+
+      $select = "
+        select count(*) as access
+        from group_user
+        inner join group_module
+        on group_user.group_id = group_module.group_id
+        inner join modules on
+        modules.id = group_module.module_id
+        where name = '{$model}'
+        and {$permission}_enabled = 1
+        and group_user.user_id = {$this->id}";
+
+      $access = DB::select( DB::raw("$select" ) );
+
+      return (int) $access[0]->access;
+
     }
 }

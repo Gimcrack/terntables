@@ -12,6 +12,9 @@ class PersonSeeder extends Seeder
      */
     public function run()
     {
-        Person::create(['first_name' => 'Jeremy', 'last_name' => 'Bloomstrom']);
+        //empty table first
+        Person::truncate();
+        
+        Person::create(['name' => 'Jeremy Bloomstrom']);
     }
 }

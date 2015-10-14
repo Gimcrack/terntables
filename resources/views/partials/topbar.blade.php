@@ -29,11 +29,13 @@
     			<i class="fa fa-user fa-fw"></i> Login <i class="fa fa-caret-down"></i>
     		</a>
         <ul class="dropdown-menu">
+          @if( !empty( \App\User::aduser() ) )
           <li>
             <a href="{{ url('/auth/adlogin', ['_token' => csrf_token()]) }}">Continue As {{ \App\User::aduser() }}</a>
           </li>
+          @endif
           <li>
-    				<a href="{{ url('/auth/login') }}">Alternate Login</a>
+    				<a href="{{ url('/auth/login') }}">Login</a>
     			</li>
     		</ul>
       </li>
@@ -60,6 +62,9 @@
 
         @if( Auth::user()->isAdmin() )
           <li class="menu-section-heading"> Admin Menu </li>
+    			<li>
+    				<a href="{{ url('admin/people')}}" ><i class="fa fa-user fa-fw"></i> Manage Contacts</a>
+    			</li>
     			<li>
     				<a href="{{ url('admin/users')}}" ><i class="fa fa-user fa-fw"></i> Manage Users</a>
     			</li>

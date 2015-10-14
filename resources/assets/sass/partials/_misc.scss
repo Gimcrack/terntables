@@ -21,6 +21,14 @@ html {
 
 }
 
+.flash-message {
+	position:fixed;
+	top:50px;
+	left:0;
+	right:0;
+	height:50px;
+}
+
 
 .navbar-toggle {
 	display:block !important;

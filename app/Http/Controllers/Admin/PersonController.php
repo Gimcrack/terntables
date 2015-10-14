@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Module;
-use App\RecordLock;
+use App\Person;
+use App\User;
 use Input;
 
-class ModuleController extends Controller
+class PersonController extends Controller
 {
 
     /**
@@ -27,7 +27,7 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        return view('admin.modules.index');
+        return view('admin.contacts.index');
     }
 
     /**
@@ -37,9 +37,8 @@ class ModuleController extends Controller
      */
     public function indexjson()
     {
-        return Module::with(['groups.users'])->get();
+        return Person::with(['users'])->get();
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -59,16 +58,12 @@ class ModuleController extends Controller
      */
     public function store(Request $request)
     {
-      try {
-        $input = Input::all();
-        $module = Module::create($input);
-        if (!empty($input['groups'])) {
-          $module->groups()->attach($input['groups']);
-        }
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
+      $input = Input::all();
+      $person = Person::create($input);
+      if (!empty($input['users'])) {
+        User::whereIn('id',$input['users'])->update(['people_id' => $person->id]);
       }
+      return $this->operationSuccessful();
     }
 
     /**
@@ -90,18 +85,7 @@ class ModuleController extends Controller
      */
     public function showjson($id)
     {
-        return $module = Module::with(['groups.users'])->findOrFail($id);
-    }
-
-    /**
-     * Checkout the module
-     * @method checkout
-     * @param  [type]   $module [description]
-     * @return [type]           [description]
-     */
-    private function checkout($module)
-    {
-      RecordLock::checkout($module);
+        return Person::with(['users'])->findOrFail($id);
     }
 
     /**
@@ -122,17 +106,21 @@ class ModuleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $modules)
+    public function update(Request $request, $contacts)
     {
       try {
         $input = Input::all();
-        $module = Module::find($modules);
-        $module->update($input);
-        if (!empty($input['groups'])) {
-          $module->groups()->sync($input['groups']);
+        $person = Person::find($contacts);
+        $person->update($input);
+        if (!empty($input['users'])) {
+          User::where('people_id',$person->id)->whereNotIn('id',$input['users'])->update(['people_id' => null]);
+
+          User::whereIn('id',$input['users'])->update(['people_id' => $person->id]);
         }
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
+        return $this->operationFailed($e);
+      } catch(\BadMethodCallException $e) {
         return $this->operationFailed($e);
       }
     }
@@ -143,10 +131,10 @@ class ModuleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($modules)
+    public function destroy($contacts)
     {
       try {
-        Module::find($modules)->delete();
+        Person::find($contacts)->delete();
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
         return $this->operationFailed($e);
@@ -163,7 +151,7 @@ class ModuleController extends Controller
     {
       try {
         $input = Input::all();
-        Module::whereIn('id',$input['ids'])->delete();
+        Person::whereIn('id',$input['ids'])->delete();
         return $this->operationSuccessful();
       } catch(\Illuminate\Database\QueryException $e) {
         return $this->operationFailed($e);

@@ -9109,6 +9109,9 @@ fieldset[disabled] {
 .form_element {
   margin-bottom: 4px !important; }
 
+.form-control {
+  color: black !important; }
+
 .div-btn-edit, .div-btn-reset, .div-btn-delete, .div-btn-new, .div-btn-other {
   height: 64px;
   width: 33.33%;
@@ -9167,7 +9170,7 @@ fieldset[disabled] {
         margin-top: -6px;
         margin-right: 10px;
         outline: none !important; }
-      .div-btn-edit.max .frm_wrapper .form-control input[validtype=color], .div-btn-reset.max .frm_wrapper .form-control input[validtype=color], .div-btn-delete.max .frm_wrapper .form-control input[validtype=color], .div-btn-new.max .frm_wrapper .form-control input[validtype=color], .div-btn-other.max .frm_wrapper .form-control input[validtype=color] {
+      .div-btn-edit.max .frm_wrapper .form-control input[data-validtype=color], .div-btn-reset.max .frm_wrapper .form-control input[data-validtype=color], .div-btn-delete.max .frm_wrapper .form-control input[data-validtype=color], .div-btn-new.max .frm_wrapper .form-control input[data-validtype=color], .div-btn-other.max .frm_wrapper .form-control input[data-validtype=color] {
         text-decoration: underline;
         /* Code for Firefox */
         -webkit-text-decoration-color: black;
@@ -10967,6 +10970,13 @@ html {
       body.homeprod .sidebar ul li ul li,
       html.homeprod .sidebar ul li ul li {
         background: #100c39 !important; }
+
+.flash-message {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  right: 0;
+  height: 50px; }
 
 .navbar-toggle {
   display: block !important; }

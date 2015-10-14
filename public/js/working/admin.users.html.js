@@ -47,10 +47,9 @@ $.extend( true, jApp.views.admin, {
 
 					"name" : function() {
 						var o = jApp.aG().currentRow,
-								fName = ( !! o.person && typeof o.person.first_name !== 'undefined') ? o.person.first_name : '',
-								lName = ( !! o.person && typeof o.person.last_name !== 'undefined') ? o.person.last_name : '';
+								name = ( !! o.person && typeof o.person.name !== 'undefined') ? o.person.name : '';
 
-						return fName + ' ' + lName;
+						return name;
 					},
 
 					"email" : function(value) {

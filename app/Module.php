@@ -49,6 +49,8 @@ class Module extends Model
    */
   protected $fillable = [
       'name'
+    , 'description'
+    , 'role'
     , 'create_enabled'
     , 'read_enabled'
     , 'update_enabled'

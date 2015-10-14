@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\RecordLock;
 use DB;
+use Auth;
 
 class PagesController extends Controller
 {
@@ -28,7 +29,10 @@ class PagesController extends Controller
      */
     public function home()
     {
-      return view('pages.home');
+      if ( !Auth::check() ) {
+        return redirect('/auth/login');
+      }
+      return redirect('/documents');
     }
 
     /**
@@ -138,41 +142,6 @@ class PagesController extends Controller
       $class = "App\\{$model}";
       $id = \Auth::id();
       return RecordLock::with(['User'])->ofType($class)->notOfUser($id)->get();//->where('user_id','!=',$id);
-    }
-
-    /**
-     * The operation was a success
-     * @method operationSuccessful
-     * @return [type]              [description]
-     */
-    private function operationSuccessful()
-    {
-      return [
-        "errors" => false,
-        "message" => "Operation Completed Successfully"
-      ];
-    }
-
-
-    /**
-     * The operation failed
-     * @method operationFailed
-     * @param  [type]          $e [description]
-     * @return [type]             [description]
-     */
-    private function operationFailed($e)
-    {
-      if ( gettype($e) === 'string' ) {
-        return [
-          "errors" => true,
-          "message" => "There was a problem completing your request: " . $e,
-        ];
-      } else {
-        return [
-          "errors" => true,
-          "message" => "There was a problem completing your request: " . $e->getMessage(),
-        ];
-      }
     }
 
 

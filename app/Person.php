@@ -34,7 +34,7 @@ class Person extends Model
    * @var [type]
    */
   protected $revisionCreationsEnabled = true;
-  
+
   /**
    * The database table used by the model.
    *
@@ -47,7 +47,7 @@ class Person extends Model
    *
    * @var array
    */
-  protected $fillable = ['first_name', 'last_name'];
+  protected $fillable = ['name'];
 
   /**
    * Polymorphic relationship. Second parameter to morphOne/morphMany
@@ -65,7 +65,7 @@ class Person extends Model
    */
   public function users()
   {
-      return $this->hasMany('App\User');
+      return $this->hasMany('App\User','people_id');
   }
 
 }

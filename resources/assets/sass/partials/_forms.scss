@@ -6,6 +6,10 @@ fieldset[disabled] {
 	margin-bottom:4px !important;
 }
 
+.form-control {
+	color:black !important;
+}
+
 .div-btn-edit, .div-btn-reset, .div-btn-delete, .div-btn-new, .div-btn-other {
 	height:64px;
 	width:33.33%;
@@ -73,7 +77,7 @@ fieldset[disabled] {
 				outline:none !important;
 			}
 
-			.form-control input[validtype=color] {
+			.form-control input[data-validtype=color] {
 				 text-decoration: underline;
 				-moz-text-decoration-color: black; /* Code for Firefox */
 				text-decoration-color: black;

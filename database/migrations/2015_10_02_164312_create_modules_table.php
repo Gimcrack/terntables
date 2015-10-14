@@ -14,7 +14,9 @@ class CreateModulesTable extends Migration
     {
         Schema::create('modules', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name')->unique();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('role')->nullable();
             $table->boolean('create_enabled')->default(0);
             $table->boolean('read_enabled')->default(0);
             $table->boolean('update_enabled')->default(0);

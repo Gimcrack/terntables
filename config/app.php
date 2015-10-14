@@ -147,6 +147,8 @@ return [
 
         Nathanmac\Utilities\Parser\ParserServiceProvider::class,
 
+        Laracasts\Flash\FlashServiceProvider::class,
+
     ],
 
     /*
@@ -196,6 +198,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View'      => Illuminate\Support\Facades\View::class,
         'Parser'    => Nathanmac\Utilities\Parser\Facades\Parser::class,
+        'Flash'     => Laracasts\Flash\Flash::class,
     ],
 
 ];

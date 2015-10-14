@@ -22,10 +22,12 @@
     <script type="text/javascript" src="/js/async-grid/js/jUtility.class.js"> </script>
 
     <script type="text/javascript" src="/js/async-grid/js/jGrid.class.js"> </script>
+    <script type="text/javascript" src="/js/working/admin.contacts.html.js"> </script>
     <script type="text/javascript" src="/js/working/admin.users.html.js"> </script>
     <script type="text/javascript" src="/js/working/admin.groups.html.js"> </script>
     <script type="text/javascript" src="/js/working/admin.modules.html.js"> </script>
     <script type="text/javascript" src="/js/working/profile.html.js"> </script>
+    <script type="text/javascript" src="/js/working/documents.html.js"> </script>
   </head>
   <body class="{{ env('CSS_CLASS') }}">
     <div id="wrapper" class="{{ env('CSS_CLASS') }}">
@@ -35,11 +37,15 @@
 
       <div id="page-wrapper" class="">
         @yield('content')
+
       </div><!-- /#page-wrapper -->
 
       @include('partials.modalOverlays')
 
     </div><!-- /#wrapper -->
 
+    <div class="flash-message">
+      @include('flash::message')
+    </div>
   </body>
 </html>

@@ -8,16 +8,18 @@
   	<div class="sidebar-nav">
 
   		<ul class="nav" id="side-menu">
-  		<li>
+      <!-- BASE MODULE -->
+      <li>
+        <a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
+      </li>
+
+  		<!-- <li>
   			<a href="#"><i class="fa fa-user fa-fw"></i> My Stuff <span class="fa arrow"></span></a>
   			<ul class="nav nav-second-level">
-  				<!-- BASE MODULE -->
-  				<li>
-  					<a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
-  				</li>
+
 
   			</ul>
-  		</li>
+  		</li> -->
   	</ul>
   	</div>
   	<!-- /.sidebar-collapse -->

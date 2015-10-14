@@ -10,4 +10,31 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 abstract class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    /**
+     * The operation was a success
+     * @method operationSuccessful
+     * @return [type]              [description]
+     */
+    public function operationSuccessful()
+    {
+      return [
+        "errors" => false,
+        "message" => "Operation Completed Successfully"
+      ];
+    }
+
+    /**
+     * The operation failed
+     * @method operationFailed
+     * @param  [type]          $e [description]
+     * @return [type]             [description]
+     */
+    public function operationFailed($e)
+    {
+      return [
+        "errors" => true,
+        "message" => "There was a problem completing your request :" . $e->getMessage(),
+      ];
+    }
 }

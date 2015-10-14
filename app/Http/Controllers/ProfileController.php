@@ -85,38 +85,4 @@ class ProfileController extends Controller
 
     }
 
-    /**
-     * The operation was a success
-     * @method operationSuccessful
-     * @return [type]              [description]
-     */
-    private function operationSuccessful()
-    {
-      return [
-        "errors" => false,
-        "message" => "Operation Completed Successfully"
-      ];
-    }
-
-
-    /**
-     * The operation failed
-     * @method operationFailed
-     * @param  [type]          $e [description]
-     * @return [type]             [description]
-     */
-    private function operationFailed($e)
-    {
-      if ( gettype($e) === 'string' ) {
-        return [
-          "errors" => true,
-          "message" => "There was a problem completing your request: " . $e,
-        ];
-      } else {
-        return [
-          "errors" => true,
-          "message" => "There was a problem completing your request: " . $e->getMessage(),
-        ];
-      }
-    }
 }

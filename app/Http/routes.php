@@ -11,17 +11,27 @@
 |
 */
 
-Route::get('/', 'PagesController@home');
-Route::get('/home', 'PagesController@home');
+
 
 /**
  * User Routes
  */
 
+//misc
+Route::get('/', 'DocumentController@index');
+Route::get('home', 'DocumentController@index');
+
+// profile
 Route::get('profile', 'ProfileController@index');
 Route::get('users/json', 'ProfileController@indexjson');
 Route::patch('users/{id}', 'ProfileController@update');
 Route::patch('resetPassword/{id}', 'ProfileController@resetPassword');
+
+// documents
+Route::get('documents/json',      'DocumentController@indexjson');
+Route::get('documents/{id}/json', 'DocumentController@showjson');
+Route::delete('documents',        'DocumentController@destroyMany');
+Route::resource('documents',      'DocumentController');
 
 /**
  * Admin Routes
@@ -32,6 +42,12 @@ Route::patch('resetPassword/{id}', 'ProfileController@resetPassword');
  Route::get('checkedout/_{model}', 'PagesController@getCheckedOutRecords');
  Route::get('checkin/_{model}_{id}', 'PagesController@checkin');
  Route::get('checkin/all', 'PagesController@checkinAll');
+
+ // people
+ Route::get('admin/people/json',      'Admin\PersonController@indexjson');
+ Route::get('admin/people/{id}/json', 'Admin\PersonController@showjson');
+ Route::delete('admin/people',        'Admin\PersonController@destroyMany');
+ Route::resource('admin/people',      'Admin\PersonController');
 
  // users
  Route::get('admin/users/json',      'Admin\UserController@indexjson');

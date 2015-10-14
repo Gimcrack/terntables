@@ -56,6 +56,7 @@
 
 				</div>
 			</div>
+			@if ( !empty(\App\User::aduser() ) )
 			<div class="panel panel-info">
 				<div class="panel-heading">AD Login</div>
 				<div class="panel-body">
@@ -69,6 +70,7 @@
 					</form>
 				</div>
 			</div>
+			@endif
 		</div>
 	</div>
 </div>

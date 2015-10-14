@@ -8,7 +8,7 @@ $.extend(true, jApp.views, {
 			profile : new jGrid({
 				table : 'users',
 				model : 'User',
-				columnFriendly : 'FullName',
+				columnFriendly : 'username',
 				gridHeader : {
 					icon : 'fa-user',
 					headerTitle : 'My Profile',

@@ -14,6 +14,10 @@ class ColParamSeeder extends Seeder
     public function run()
     {
         Eloquent::unguard();
+
+        //empty table first
+        ColParam::truncate();
+
         // col_params table
         ColParam::create([	'tableName' => 'col_params'
         ,	'name' => '_enabled'
@@ -548,9 +552,9 @@ class ColParamSeeder extends Seeder
 
         // people colparams
         ColParam::create([	'tableName' => 'people'
-        ,	'name' => 'first_name'
-        ,	'placeholder' => 'e.g. John'
-        ,	'_label' => 'First Name'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. John Smith'
+        ,	'_label' => 'Full Name'
         ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'
@@ -559,14 +563,15 @@ class ColParamSeeder extends Seeder
         ]);
 
         ColParam::create([	'tableName' => 'people'
-        ,	'name' => 'last_name'
-        ,	'placeholder' => 'e.g. Smith'
-        ,	'_label' => 'Last Name'
+        ,	'name' => 'users'
+        ,	'type' => 'select'
+        ,	'_label' => 'Username(s)'
         ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '1'
-        , 'required' => 1
-        , 'data-validType' => 'Anything'
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "User.username"
+        , '_optionssource' => "User.id"
+        , 'multiple' => 1
         ]);
 
         // users colparams
@@ -603,7 +608,7 @@ class ColParamSeeder extends Seeder
         , 'data-validType' => 'select'
         , '_firstlabel' => '-Choose-'
         , '_firstoption' => 0
-        , '_labelssource' => "Person.CONCAT(last_name, ', ', first_name)"
+        , '_labelssource' => "Person.name"
         , '_optionssource' => "Person.id"
         , 'multiple' => 0
         ]);
@@ -681,6 +686,26 @@ class ColParamSeeder extends Seeder
         ]);
 
         ColParam::create([	'tableName' => 'modules'
+        ,	'name' => 'role'
+        ,	'placeholder' => 'e.g. Document Managers'
+        ,	'_label' => 'Business Role'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'modules'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '3'
+        ,	'data-fieldset' => '1'
+        ]);
+
+        ColParam::create([	'tableName' => 'modules'
         ,	'name' => 'create_enabled'
         , 'type' => 'select'
         ,	'_label' => 'Create Enabled'
@@ -737,5 +762,39 @@ class ColParamSeeder extends Seeder
         , 'multiple' => 1
         ]);
 
+        // documents colparams
+        ColParam::create([	'tableName' => 'documents'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'A unique name'
+        ,	'_label' => 'Document Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'documents'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'documents'
+        ,	'name' => 'user_id'
+        ,	'type' => 'select'
+        ,	'_label' => 'Document Owner'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Person.name"
+        , '_optionssource' => "Person.id"
+        , 'multiple' => 0
+        ]);
     }
 }
