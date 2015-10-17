@@ -16,10 +16,11 @@ class CreateDocumentsTable extends Migration
             $table->increments('id');
             $table->string('name')->unique();
             $table->text('description')->nullable();
+            $table->string('status')->default('processing');
             $table->text('raw_file_path');
             $table->text('parsed_file_path');
-            $table->unsignedInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->unsignedInteger('people_id')->nullable();
+            $table->foreign('people_id')->references('id')->on('people')->onDelete('set null');
             $table->timestamps();
         });
     }
@@ -32,7 +33,7 @@ class CreateDocumentsTable extends Migration
     public function down()
     {
         Schema::table('documents', function(Blueprint $table) {
-            $table->dropForeign('documents_user_id_foreign');
+            $table->dropForeign('documents_people_id_foreign');
         });
         Schema::drop('documents');
     }

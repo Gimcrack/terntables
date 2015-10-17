@@ -13,8 +13,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'App\Events\SomeEvent' => [
-            'App\Listeners\EventListener',
+        'App\Events\DocumentWasUploaded' => [
+            'App\Listeners\ProcessXMLDocument',
         ],
     ];
 
@@ -31,3 +31,4 @@ class EventServiceProvider extends ServiceProvider
         //
     }
 }
+  

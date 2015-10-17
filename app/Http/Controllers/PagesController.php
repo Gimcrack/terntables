@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\RecordLock;
 use DB;
 use Auth;
+use App\User;
 
 class PagesController extends Controller
 {
@@ -64,22 +65,17 @@ class PagesController extends Controller
       $lock = $item->recordLock;
 
       if ( empty($lock) || $lock->checkExpired() || $lock->checkUser() ) {
-        try {
-          RecordLock::create([
-            'lockable_id' => $item->id,
-            'lockable_type' => get_class($item),
-            'user_id' => \Auth::id()
-          ]);
+        RecordLock::create([
+          'lockable_id' => $item->id,
+          'lockable_type' => get_class($item),
+          'user_id' => \Auth::id()
+        ]);
 
-          return $this->operationSuccessful();
-
-        } catch(\Illuminate\Database\QueryException $e) {
-          return $this->operationFailed($e);
-        }
+        return $this->operationSuccessful();
       }
 
-      $user = \App\User::find( $lock->user_id );
-      $message = 'That record is checked out by : ' . $user->name;
+      $user = User::find( $lock->user_id );
+      $message = 'That record is checked out by : ' . $user->username;
       return $this->operationFailed( $message );
     }
 
@@ -97,13 +93,8 @@ class PagesController extends Controller
       $lock = $item->recordLock;
 
       if ( !empty($lock) ) {
-        try {
-          $lock->delete();
-          return $this->operationSuccessful();
-
-        } catch(\Illuminate\Database\QueryException $e) {
-          return $this->operationFailed($e);
-        }
+        $lock->delete();
+        return $this->operationSuccessful();
       }
 
       $message = 'That record is already checked in';
@@ -117,17 +108,13 @@ class PagesController extends Controller
      */
     public function checkinAll()
     {
-      try {
-        $id = \Auth::id();
+      $id = Auth::id();
 
-        if ( RecordLock::ofUser($id)->count() ) {
-          RecordLock::ofUser($id)->delete();
-          return $this->operationSuccessful();
-        }  else {
-          return $this->operationFailed( 'Nothing to check in' );
-        }
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
+      if ( RecordLock::ofUser($id)->count() ) {
+        RecordLock::ofUser($id)->delete();
+        return $this->operationSuccessful();
+      }  else {
+        return $this->operationFailed( 'Nothing to check in' );
       }
     }
 
@@ -140,10 +127,34 @@ class PagesController extends Controller
     public function getCheckedOutRecords($model)
     {
       $class = "App\\{$model}";
-      $id = \Auth::id();
+      $id = Auth::id();
       return RecordLock::with(['User'])->ofType($class)->notOfUser($id)->get();//->where('user_id','!=',$id);
     }
 
+
+    /**
+     * Check if the current user has the required role
+     * @method checkAccess
+     * @param  [type]      $role [description]
+     * @return [type]            [description]
+     */
+    public function checkAccess($role)
+    {
+      return [
+        'has_access' => Auth::user()->checkAccess($role)
+      ];
+    }
+
+    /**
+     * Get all user permissions on the specified model
+     * @method getPermissions
+     * @param  [type]         $model [description]
+     * @return [type]                [description]
+     */
+    public function getPermissions($model)
+    {
+      return Auth::user()->getPermissions($model);
+    }
 
 
 }

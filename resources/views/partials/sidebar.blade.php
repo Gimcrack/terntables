@@ -13,6 +13,12 @@
         <a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
       </li>
 
+      @if( Auth::user()->checkAccess('Document.read') )
+      <li>
+        <a href="{{ url('documents') }}"><i class="fa fa-file-text-o fa-fw"></i> GIS Documents</a>
+      </li>
+      @endif
+
   		<!-- <li>
   			<a href="#"><i class="fa fa-user fa-fw"></i> My Stuff <span class="fa arrow"></span></a>
   			<ul class="nav nav-second-level">

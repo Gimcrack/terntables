@@ -31,8 +31,6 @@
   </head>
   <body class="{{ env('CSS_CLASS') }}">
     <div id="wrapper" class="{{ env('CSS_CLASS') }}">
-
-
       @include('partials.topbar')
 
       <div id="page-wrapper" class="">

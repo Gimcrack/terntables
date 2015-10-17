@@ -17,6 +17,7 @@
  * User Routes
  */
 
+
 //misc
 Route::get('/', 'DocumentController@index');
 Route::get('home', 'DocumentController@index');
@@ -30,18 +31,24 @@ Route::patch('resetPassword/{id}', 'ProfileController@resetPassword');
 // documents
 Route::get('documents/json',      'DocumentController@indexjson');
 Route::get('documents/{id}/json', 'DocumentController@showjson');
+Route::get('documents/{id}/pdf',  'DocumentController@showpdf');
+Route::get('documents/{id}/raw',  'DocumentController@showraw');
 Route::delete('documents',        'DocumentController@destroyMany');
 Route::resource('documents',      'DocumentController');
+
+// pages
+Route::get('selopts/_{model}_{options}_{labels}', 'PagesController@optionsjson');
+Route::get('checkout/_{model}_{id}', 'PagesController@checkout');
+Route::get('checkedout/_{model}', 'PagesController@getCheckedOutRecords');
+Route::get('checkin/_{model}_{id}', 'PagesController@checkin');
+Route::get('checkin/all', 'PagesController@checkinAll');
+Route::get('checkAccess/{role}', 'PagesController@checkAccess');
+Route::get('getPermissions/{model}', 'PagesController@getPermissions');
 
 /**
  * Admin Routes
  */
 
- Route::get('selopts/_{model}_{options}_{labels}', 'PagesController@optionsjson');
- Route::get('checkout/_{model}_{id}', 'PagesController@checkout');
- Route::get('checkedout/_{model}', 'PagesController@getCheckedOutRecords');
- Route::get('checkin/_{model}_{id}', 'PagesController@checkin');
- Route::get('checkin/all', 'PagesController@checkinAll');
 
  // people
  Route::get('admin/people/json',      'Admin\PersonController@indexjson');
@@ -74,9 +81,6 @@ Route::resource('documents',      'DocumentController');
  Route::get('admin/colparams/json',                   'Admin\ColParamController@indexjson');
  Route::get('admin/colparams/tablelist',              'Admin\ColParamController@tablelist');
  Route::resource('admin/colparams',                   'Admin\ColParamController');
-
- //Route::resource('admin/groups',     'Admin\GroupController');
-
 
 
 /**

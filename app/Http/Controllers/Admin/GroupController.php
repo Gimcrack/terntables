@@ -59,16 +59,14 @@ class GroupController extends Controller
      */
     public function store(Request $request)
     {
-      try {
-        $input = Input::all();
-        $group = Group::create($input);
-        if (!empty($input['users'])) {
-          $group->users()->attach($input['users']);
-        }
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
+
+      $input = Input::all();
+      $group = Group::create($input);
+      if (!empty($input['users'])) {
+        $group->users()->attach($input['users']);
       }
+      return $this->operationSuccessful();
+
     }
 
     /**
@@ -113,17 +111,15 @@ class GroupController extends Controller
      */
     public function update(Request $request, $groups)
     {
-      try {
-        $input = Input::all();
-        $group = Group::find($groups);
-        $group->update($input);
-        if (!empty($input['groups'])) {
-          $group->users()->sync($input['users']);
-        }
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
+
+      $input = Input::all();
+      $group = Group::find($groups);
+      $group->update($input);
+      if (!empty($input['groups'])) {
+        $group->users()->sync($input['users']);
       }
+      return $this->operationSuccessful();
+
     }
 
     /**
@@ -134,12 +130,8 @@ class GroupController extends Controller
      */
     public function destroy($groups)
     {
-      try {
-        Group::find($groups)->delete();
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
-      }
+      Group::find($groups)->delete();
+      return $this->operationSuccessful();
     }
 
     /**
@@ -150,13 +142,9 @@ class GroupController extends Controller
      */
     public function destroyMany()
     {
-      try {
-        $input = Input::all();
-        Group::whereIn('id',$input['ids'])->delete();
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
-      }
+      $input = Input::all();
+      Group::whereIn('id',$input['ids'])->delete();
+      return $this->operationSuccessful();
     }
 
 }

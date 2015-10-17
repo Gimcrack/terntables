@@ -6,6 +6,7 @@ use Closure;
 use App\User;
 use Auth;
 use Laracasts\Flash\Flash;
+use Exception;
 
 class CheckAccess
 {
@@ -20,6 +21,10 @@ class CheckAccess
     {
         if (Auth::check() && Auth::user()->checkAccess($role) ) {
           return $next($request);
+        }
+
+        if ($request->wantsJson() ) {
+          throw new Exception( "You must be logged as a user with {$role} priviledges to do that."  );
         }
 
         Flash::error("You must be logged as a user with {$role} priviledges to do that.");

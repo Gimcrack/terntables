@@ -59,17 +59,13 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-          $input = Input::all();
-          $input['password'] = bcrypt('P@ssw0rd');
-          $user = User::create($input);
-          if (!empty($input['groups'])) {
-            $user->groups()->attach($input['groups']);
-          }
-          return $this->operationSuccessful();
-        } catch(\Illuminate\Database\QueryException $e) {
-          return $this->operationFailed($e);
+        $input = Input::all();
+        $input['password'] = bcrypt('P@ssw0rd');
+        $user = User::create($input);
+        if (!empty($input['groups'])) {
+          $user->groups()->attach( explode(",",$input['groups'][0] ) );
         }
+        return $this->operationSuccessful();
     }
 
     /**
@@ -114,17 +110,13 @@ class UserController extends Controller
      */
     public function update(Request $request, $users)
     {
-      try {
-        $input = Input::all();
-        $user = User::find($users);
-        $user->update($input);
-        if (!empty($input['groups'])) {
-          $user->groups()->sync($input['groups']);
-        }
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
+      $input = Input::all();
+      $user = User::find($users);
+      $user->update($input);
+      if (!empty($input['groups'])) {
+        $user->groups()->sync(  explode(",",$input['groups'][0] ) );
       }
+      return $this->operationSuccessful();
     }
 
     /**

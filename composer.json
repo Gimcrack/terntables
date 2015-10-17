@@ -34,7 +34,10 @@
         "moment/moment" : "dev-master",
         "ingenious/history.js": "dev-master",
         "Nathanmac/Parser": "3.*",
-        "venturecraft/revisionable": "dev-master"
+        "venturecraft/revisionable": "dev-master",
+        "illuminate/html": "^5.0@dev",
+
+        "barryvdh/laravel-dompdf": "0.6.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

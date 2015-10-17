@@ -11,8 +11,11 @@ $.extend(true, jApp.views, {
 				columnFriendly : 'name',
 				gridHeader : {
 					icon : 'fa-file-text-o',
-					headerTitle : 'Documents',
-					helpText : 'Note: Create, Update, and Manage documents here.'
+					headerTitle : 'GIS Documents',
+					helpText : 'Note: Create, Update, and Manage GIS documents here.'
+				},
+				toggles : {
+					ellipses : false
 				},
 				columns : [ 				// columns to query
 					"id",
@@ -21,6 +24,7 @@ $.extend(true, jApp.views, {
 					"raw_file_path",
 					"parsed_file_path",
 					"owner",
+					"status"
 				],
 				hidCols : [					// columns to hide
 
@@ -31,7 +35,8 @@ $.extend(true, jApp.views, {
 					"Description",
 					"Original File",
 					"Parsed File",
-					"Owner"
+					"Owner",
+					"Status"
 				],
 				templates : { 				// html template functions
 
@@ -42,7 +47,28 @@ $.extend(true, jApp.views, {
 
 					"owner" : function(value) {
 						var r = jApp.aG().currentRow;
-						return ( typeof r.owner !== 'undefined' ) ? r.owner.username : '';
+						return ( r.owner != null ) ? r.owner.name : '';
+					},
+
+					"name" : function(value) {
+						var r = jApp.aG().currentRow;
+						return  "<a href=\"documents/" + r.id + "\" >" + value + '</a>';
+					},
+
+					"raw_file_path" : function(value) {
+						var r = jApp.aG().currentRow, v;
+						if (value.length > 30) {
+							v = value.substring(0,30) + '...';
+						}
+						return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/raw\" target=\"_blank\">" + v + '</a>';
+					},
+
+					"parsed_file_path" : function(value) {
+						var r = jApp.aG().currentRow, v;
+						if (value.length > 30) {
+							v = value.substring(0,30) + '...';
+						}
+						return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/raw\" target=\"_blank\">" + v + '</a>';
 					},
 
 				},

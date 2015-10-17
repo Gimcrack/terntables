@@ -144,10 +144,13 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Illuminate\Html\HtmlServiceProvider::class,
 
         Nathanmac\Utilities\Parser\ParserServiceProvider::class,
 
         Laracasts\Flash\FlashServiceProvider::class,
+
+        Barryvdh\DomPDF\ServiceProvider::class,
 
     ],
 
@@ -196,9 +199,12 @@ return [
         'Storage'   => Illuminate\Support\Facades\Storage::class,
         'URL'       => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
+        'Form'      => Illuminate\Html\FormFacade::class,
+        'Html'      => Illuminate\Html\HtmlFacade::class,
         'View'      => Illuminate\Support\Facades\View::class,
         'Parser'    => Nathanmac\Utilities\Parser\Facades\Parser::class,
         'Flash'     => Laracasts\Flash\Flash::class,
+        'PDF'       => Barryvdh\DomPDF\Facade::class,
     ],
 
 ];

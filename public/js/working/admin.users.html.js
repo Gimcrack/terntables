@@ -16,7 +16,7 @@ $.extend( true, jApp.views.admin, {
 				},
 				rowBtns : {
 					custom : {
-						resetPassword : { type : 'button', class : 'btn btn-warning', icon : 'fa-refresh', label : '', fn : 'resetPassword', title : 'Reset Password'  } // etc.
+						resetPassword : { 'data-multiple' : false, 'data-permission' : 'update_enabled', type : 'button', class : 'btn btn-warning', icon : 'fa-refresh', label : 'Reset Password', fn : 'resetPassword'  } // etc.
 					}
 				},
 				columns : [ 				// columns to query

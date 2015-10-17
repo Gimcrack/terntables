@@ -176,4 +176,58 @@ class User extends Model implements AuthenticatableContract,
       return (int) $access[0]->access;
 
     }
+
+    /**
+     * Get permissions on the specified model
+     * @method checkAccess
+     * @param  [type]      $model [description]
+     * @return [type]            [description]
+     */
+    public function getPermissions($model)
+    {
+      $create_enabled = 0;
+      $read_enabled = 0;
+      $update_enabled = 0;
+      $delete_enabled = 0;
+
+      if ($this->isAdmin()) {
+        return [
+          'create_enabled' => 1,
+          'read_enabled' => 1,
+          'update_enabled' => 1,
+          'delete_enabled' => 1
+        ];
+      }
+
+      $select = "
+        select distinct
+          create_enabled,
+          read_enabled,
+          update_enabled,
+          delete_enabled
+        from group_user
+        inner join group_module
+        on group_user.group_id = group_module.group_id
+        inner join modules on
+        modules.id = group_module.module_id
+        where name = '{$model}'
+        and group_user.user_id = {$this->id}";
+
+      $access = DB::select( DB::raw("$select" ) );
+
+      foreach ($access as $row) {
+        $create_enabled = ( !!$row->create_enabled ) ? 1 : $create_enabled;
+        $read_enabled = ( !!$row->read_enabled ) ? 1 : $read_enabled;
+        $update_enabled = ( !!$row->update_enabled ) ? 1 : $update_enabled;
+        $delete_enabled = ( !!$row->delete_enabled ) ? 1 : $delete_enabled;
+      }
+
+      return  [
+        'create_enabled' =>  $create_enabled,
+        'read_enabled' => $read_enabled,
+        'update_enabled' => $update_enabled,
+        'delete_enabled' => $delete_enabled
+      ];
+
+    }
 }

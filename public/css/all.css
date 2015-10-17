@@ -9598,6 +9598,28 @@ table {
   #page-wrapper .header-title {
     font-family: "Open Sans";
     font-weight: bold; }
+  #page-wrapper .table-rowMenu-row {
+    background: #428bca !important; }
+  #page-wrapper .table-menu-row,
+  #page-wrapper .table-rowMenu-row {
+    border: none !important; }
+    #page-wrapper .table-menu-row .table-header,
+    #page-wrapper .table-rowMenu-row .table-header {
+      padding: 0px !important; }
+      #page-wrapper .table-menu-row .table-header .btn-group,
+      #page-wrapper .table-rowMenu-row .table-header .btn-group {
+        margin: 0; }
+        #page-wrapper .table-menu-row .table-header .btn-group .btn,
+        #page-wrapper .table-rowMenu-row .table-header .btn-group .btn {
+          padding: 10px !important; }
+        #page-wrapper .table-menu-row .table-header .btn-group .btn-rowMenu,
+        #page-wrapper .table-rowMenu-row .table-header .btn-group .btn-rowMenu {
+          background: #428bca !important;
+          border: 1px solid #428bca;
+          outline: none !important;
+          cursor: default; }
+  #page-wrapper .tfilters {
+    background: #3d8b3d !important; }
   #page-wrapper .grid-panel-body .table {
     position: relative;
     overflow: hidden;
@@ -9611,14 +9633,16 @@ table {
       #page-wrapper .grid-panel-body .table .table-head .table-row {
         float: left;
         width: 100%;
-        background: #dff3f8 !important;
-        border: 1px solid transparent !important; }
-        #page-wrapper .grid-panel-body .table .table-head .table-row:first-child .table-header:nth-child(-n+1) {
-          width: auto; }
+        background: #dff3f8;
+        border: 1px solid transparent; }
+        #page-wrapper .grid-panel-body .table .table-head .table-row:first-child {
+          background: #5cb85c !important; }
+          #page-wrapper .grid-panel-body .table .table-head .table-row:first-child .table-header:nth-child(-n+1) {
+            width: auto; }
         #page-wrapper .grid-panel-body .table .table-head .table-row:last-child {
           border-bottom: 2px double #85d0e7 !important; }
         #page-wrapper .grid-panel-body .table .table-head .table-row:nth-child(even) {
-          background: #dff3f8 !important; }
+          background: #dff3f8; }
       #page-wrapper .grid-panel-body .table .table-head .table-header {
         font-weight: bold; }
       #page-wrapper .grid-panel-body .table .table-head .table-cell, #page-wrapper .grid-panel-body .table .table-head .table-header {
@@ -9675,7 +9699,7 @@ table {
     left: 0;
     right: 0;
     z-index: 999; }
-  #page-wrapper tbody {
+  #page-wrapper .grid-panel-body tbody {
     height: 400px;
     overflow: scroll; }
   #page-wrapper .panel-grid > .grid-panel-body {

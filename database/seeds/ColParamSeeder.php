@@ -779,13 +779,23 @@ class ColParamSeeder extends Seeder
         ,	'type' => 'textarea'
         ,	'_label' => 'Description'
         ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
+        ,	'data-ordering' => '3'
         ,	'data-fieldset' => '1'
         , 'required' => 0
         ]);
 
         ColParam::create([	'tableName' => 'documents'
-        ,	'name' => 'user_id'
+        ,	'name' => 'original_file'
+        ,	'type' => 'file'
+        ,	'_label' => 'Upload XML File'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'documents'
+        ,	'name' => 'people_id'
         ,	'type' => 'select'
         ,	'_label' => 'Document Owner'
         ,	'_enabled' => 1
@@ -795,6 +805,19 @@ class ColParamSeeder extends Seeder
         , '_labelssource' => "Person.name"
         , '_optionssource' => "Person.id"
         , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'documents'
+        ,	'name' => 'tags'
+        ,	'type' => 'select'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
         ]);
     }
 }
