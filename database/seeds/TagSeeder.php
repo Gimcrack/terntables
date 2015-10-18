@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Person;
+use App\Tag;
 
-class PersonSeeder extends Seeder
+class TagSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -12,15 +12,10 @@ class PersonSeeder extends Seeder
      */
     public function run()
     {
-        //empty table first
-        //Person::truncate();
-
-        Person::create(['name' => 'Jeremy Bloomstrom']);
-
         $faker =  Faker\Factory::create();
 
         foreach(range(1,20) as $num) {
-          Person::create(['name' => $faker->name]);
+          Tag::create(['name' => $faker->word]);
         }
     }
 }

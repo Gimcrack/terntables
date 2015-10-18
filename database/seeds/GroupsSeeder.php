@@ -15,7 +15,7 @@ class GroupsSeeder extends Seeder
         $faker = Faker\Factory::create();
 
         //empty table first
-        Group::truncate();
+        //Group::truncate();
 
         Group::create(['name' => 'Super Administrators', 'description' => 'Super Administrators']);
         Group::create(['name' => 'Administrators', 'description' => 'Administrators']);

@@ -21,9 +21,9 @@ _.extend( jApp.views.admin, {
 				},
 				columns : [ 				// columns to query
 					"id",
-					"name",
 					"role",
-					"description",
+					"name",
+					//"description",
 					"permissions",
 					"groups",
           "users"
@@ -33,9 +33,9 @@ _.extend( jApp.views.admin, {
 				],
 				headers : [ 				// headers for table
 					"ID",
-					"Name",
 					"Business Role",
-					"Description",
+					"Model Name",
+					//"Description",
 					"Permissions",
 					"Groups",
           "Users",

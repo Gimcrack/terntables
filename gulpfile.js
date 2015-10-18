@@ -29,6 +29,7 @@ elixir(function(mix) {
     jqueryBootpag : vendor_path + '/ingenious/jquery-bootpag',
     jqueryMd5 : vendor_path + '/ingenious/jquery-md5',
     jqueryValidator : vendor_path + '/ingenious/jquery-validator',
+    tokenInput : vendor_path + '/ingenious/jquery-tokeninput',
     perfectScrollbar : vendor_path + '/ingenious/perfect-scrollbar',
     bootstrapSlider : vendor_path + '/seiyria/bootstrap-slider',
     noty : vendor_path + '/needim/noty',
@@ -50,6 +51,7 @@ elixir(function(mix) {
     jqueryBootpag : paths.jqueryBootpag + '/lib', // done
     jqueryMd5 : paths.jqueryMd5, // done
     jqueryValidator : paths.jqueryValidator, // done
+    tokenInput : paths.tokenInput + '/src', // done
     perfectScrollbar : paths.perfectScrollbar + '/dist/js', // done
     bootstrapSlider : paths.bootstrapSlider + '/js', // done
     noty : paths.noty + '/js/noty/packaged', // done
@@ -77,6 +79,7 @@ elixir(function(mix) {
     jsPaths.jqueryBootpag + '/jquery.bootpag.js',
     jsPaths.jqueryMd5 + '/jquery.md5.js',
     jsPaths.jqueryValidator + '/jquery.psiblings.js',
+    jsPaths.tokenInput + '/jquery.tokeninput.js',
     //jsPaths.jqueryValidator + '/jquery.validator.js',
     jsPaths.perfectScrollbar + '/perfect-scrollbar.jquery.js',
     jsPaths.bootstrapSlider + '/bootstrap-slider.js',
@@ -95,7 +98,8 @@ elixir(function(mix) {
      paths.bootstrapMultiselect + '/dist/css',
      paths.perfectScrollbar + '/dist/css',
      paths.bootstrapSlider + '/css',
-    paths.metismenu + '/dist',
+     paths.metismenu + '/dist',
+     paths.tokenInput + '/styles'
    ];
 
     //scripts

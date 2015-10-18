@@ -38,6 +38,7 @@ Route::resource('documents',      'DocumentController');
 
 // pages
 Route::get('selopts/_{model}_{options}_{labels}', 'PagesController@optionsjson');
+Route::get('tokenopts/_{model}_{options}_{labels}', 'PagesController@tokensjson');
 Route::get('checkout/_{model}_{id}', 'PagesController@checkout');
 Route::get('checkedout/_{model}', 'PagesController@getCheckedOutRecords');
 Route::get('checkin/_{model}_{id}', 'PagesController@checkin');

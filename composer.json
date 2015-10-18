@@ -37,7 +37,8 @@
         "venturecraft/revisionable": "dev-master",
         "illuminate/html": "^5.0@dev",
 
-        "barryvdh/laravel-dompdf": "0.6.*"
+        "barryvdh/laravel-dompdf": "0.6.*",
+        "ingenious/jquery-tokeninput": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

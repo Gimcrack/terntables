@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e8c716f92f1c54deb905ee0c9cb08fb2",
+    "hash": "9e7a4c7b5ea5d3777f14c0afceb97237",
+    "content-hash": "dde83c018b3a10d748db9e708712adf4",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -414,20 +415,17 @@
         },
         {
             "name": "components/underscore",
-            "version": "1.7.0",
+            "version": "1.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/components/underscore.git",
-                "reference": "dc64d58f5d1079e5822d480110b28d724bda06c2"
+                "reference": "91142c898763ca8bb23a32a9808735e4998839d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/components/underscore/zipball/dc64d58f5d1079e5822d480110b28d724bda06c2",
-                "reference": "dc64d58f5d1079e5822d480110b28d724bda06c2",
+                "url": "https://api.github.com/repos/components/underscore/zipball/91142c898763ca8bb23a32a9808735e4998839d1",
+                "reference": "91142c898763ca8bb23a32a9808735e4998839d1",
                 "shasum": ""
-            },
-            "require": {
-                "robloach/component-installer": "*"
             },
             "type": "component",
             "extra": {
@@ -463,7 +461,7 @@
                 "server",
                 "util"
             ],
-            "time": "2014-09-22 16:48:28"
+            "time": "2015-10-16 14:27:39"
         },
         {
             "name": "danielstjules/stringy",
@@ -714,12 +712,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "12e7dd891891ebb9c390ac18e57d80d26f9b02b9"
+                "reference": "f3147d8471e98f17528f3246518af864d0733019"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/12e7dd891891ebb9c390ac18e57d80d26f9b02b9",
-                "reference": "12e7dd891891ebb9c390ac18e57d80d26f9b02b9",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/f3147d8471e98f17528f3246518af864d0733019",
+                "reference": "f3147d8471e98f17528f3246518af864d0733019",
                 "shasum": ""
             },
             "require": {
@@ -740,7 +738,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2015-10-14 17:42:39"
+            "time": "2015-10-17 00:37:14"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -890,6 +888,34 @@
             ],
             "description": "A jQuery utility function to encode a string in MD5",
             "time": "2015-09-02 18:29:08"
+        },
+        {
+            "name": "ingenious/jquery-tokeninput",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Gimcrack/jquery-tokeninput.git",
+                "reference": "fe65ea8721e55a2fb7b484bcbf4d6a945d92edc9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gimcrack/jquery-tokeninput/zipball/fe65ea8721e55a2fb7b484bcbf4d6a945d92edc9",
+                "reference": "fe65ea8721e55a2fb7b484bcbf4d6a945d92edc9",
+                "shasum": ""
+            },
+            "type": "component",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "James Smith",
+                    "email": "james@loopj.com"
+                }
+            ],
+            "description": "Composer fork of loopj/jquery-tokeninput",
+            "time": "2015-10-18 03:35:21"
         },
         {
             "name": "ingenious/jquery-validator",
@@ -1880,20 +1906,23 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "1.0.5",
+            "version": "1.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "f667aa2000a192adfa53332335a2ae0c1cb9ea6e"
+                "reference": "df1207683dfbd1399f0fa931a368082a28fed50b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/f667aa2000a192adfa53332335a2ae0c1cb9ea6e",
-                "reference": "f667aa2000a192adfa53332335a2ae0c1cb9ea6e",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/df1207683dfbd1399f0fa931a368082a28fed50b",
+                "reference": "df1207683dfbd1399f0fa931a368082a28fed50b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.0"
+            },
+            "suggest": {
+                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
             },
             "type": "library",
             "autoload": {
@@ -1918,7 +1947,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2015-10-08 12:57:25"
+            "time": "2015-10-16 14:10:15"
         },
         {
             "name": "phenx/php-font-lib",
@@ -3020,12 +3049,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/VentureCraft/revisionable.git",
-                "reference": "0a36c86413694c9428f1e19974e84460427c35d2"
+                "reference": "4109e65822746634f726869bfa0c6374aa134d69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VentureCraft/revisionable/zipball/0a36c86413694c9428f1e19974e84460427c35d2",
-                "reference": "0a36c86413694c9428f1e19974e84460427c35d2",
+                "url": "https://api.github.com/repos/VentureCraft/revisionable/zipball/4109e65822746634f726869bfa0c6374aa134d69",
+                "reference": "4109e65822746634f726869bfa0c6374aa134d69",
                 "shasum": ""
             },
             "require": {
@@ -3060,7 +3089,7 @@
                 "model",
                 "revision"
             ],
-            "time": "2015-09-23 03:17:23"
+            "time": "2015-10-17 06:51:51"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -3788,16 +3817,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.13",
+            "version": "4.8.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "be067d6105286b74272facefc2697038f8807b77"
+                "reference": "b4900675926860bef091644849305399b986efa2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/be067d6105286b74272facefc2697038f8807b77",
-                "reference": "be067d6105286b74272facefc2697038f8807b77",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b4900675926860bef091644849305399b986efa2",
+                "reference": "b4900675926860bef091644849305399b986efa2",
                 "shasum": ""
             },
             "require": {
@@ -3856,7 +3885,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-10-14 13:49:40"
+            "time": "2015-10-17 15:03:30"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -4306,7 +4335,8 @@
         "moment/moment": 20,
         "ingenious/history.js": 20,
         "venturecraft/revisionable": 20,
-        "illuminate/html": 20
+        "illuminate/html": 20,
+        "ingenious/jquery-tokeninput": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

@@ -15,8 +15,14 @@ class CreateTagsTable extends Migration
         Schema::create('tags', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->morphs('taggable');
             $table->timestamps();
+        });
+
+        Schema::create('taggables', function( Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('tag_id');
+            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+            $table->morphs('taggable');
         });
     }
 
@@ -27,6 +33,12 @@ class CreateTagsTable extends Migration
      */
     public function down()
     {
+        Schema::table('taggables', function(Blueprint $table) {
+            $table->dropForeign('taggables_tag_id_foreign');
+        });
+
+        Schema::drop('taggables');
+
         Schema::drop('tags');
     }
 }

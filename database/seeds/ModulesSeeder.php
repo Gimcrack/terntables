@@ -14,9 +14,9 @@ class ModulesSeeder extends Seeder
     public function run()
     {
         //empty table first
-        Module::truncate();
+        //Module::truncate();
 
-        
+
         Module::create([
           'name' => 'Document',
           'role' => 'Document Managers',

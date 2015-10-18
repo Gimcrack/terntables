@@ -15,7 +15,7 @@ class UsersSeeder extends Seeder
         $faker = Faker\Factory::create();
 
         //empty table first
-        User::truncate();
+        //User::truncate();
 
         User::create(['people_id' => 1, 'username' => 'jeremy', 'email' => 'jeremy.bloomstrom@gmail.com', 'password' => bcrypt('P@ssw0rd')])->groups()->attach([1,3]);
         User::create(['people_id' => 1, 'username' => 'jeremyadmin', 'email' => 'jeremyadmin@matsugov.us', 'password' => bcrypt('P@ssw0rd')])->groups()->attach([1,3]);

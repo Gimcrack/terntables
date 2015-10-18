@@ -52,6 +52,22 @@ class PagesController extends Controller
     }
 
     /**
+     * Get token options for a model
+     * @param  [type] $model   [description]
+     * @param  [type] $options [description]
+     * @param  [type] $labels  [description]
+     * @return [type]          [description]
+     */
+    public function tokensjson($model,$options,$labels = [])
+    {
+      $class = "\\App\\{$model}";
+      if (empty($labels)) { $labels = $options; }
+      $q = \Input::get('q') ?: '';
+
+      return $class::select("{$options} as id", DB::raw("{$labels} as name"))->where( $labels,'like', "%{$q}%" )->orderBy("name","ASC")->get();
+    }
+
+    /**
      * Checkout a model for editing
      * @method checkout
      * @param  [type]   $model [description]
@@ -128,7 +144,7 @@ class PagesController extends Controller
     {
       $class = "App\\{$model}";
       $id = Auth::id();
-      return RecordLock::with(['User'])->ofType($class)->notOfUser($id)->get();//->where('user_id','!=',$id);
+      return RecordLock::with(['user.person'])->ofType($class)->notOfUser($id)->get();//->where('user_id','!=',$id);
     }
 
 

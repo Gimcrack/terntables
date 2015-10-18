@@ -16,7 +16,7 @@ class ColParamSeeder extends Seeder
         Eloquent::unguard();
 
         //empty table first
-        ColParam::truncate();
+        //ColParam::truncate();
 
         // col_params table
         ColParam::create([	'tableName' => 'col_params'
@@ -809,12 +809,11 @@ class ColParamSeeder extends Seeder
 
         ColParam::create([	'tableName' => 'documents'
         ,	'name' => 'tags'
-        ,	'type' => 'select'
+        ,	'type' => 'tokens'
         ,	'_label' => 'Tags'
         ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '3'
-        , 'data-validType' => 'select'
         , '_labelssource' => "Tag.name"
         , '_optionssource' => "Tag.id"
         , 'multiple' => 1
