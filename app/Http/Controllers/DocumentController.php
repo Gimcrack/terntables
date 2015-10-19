@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App;
 use Response;
 use App\Document;
+use App\Tag;
 use Input;
 use Exception;
 use Event;
@@ -73,8 +74,8 @@ class DocumentController extends Controller
       $input['parsed_file_path'] = 'placeholder';
 
       $document = Document::create($input);
-      if (!empty($input['tags'])) {
-        $document->tags()->attach($input['tags']);
+      if (!empty($input['tags'][0])) {
+        Tag::resolveTags( $document, explode(',',$input['tags'][0]) );
       }
 
       $file_new_name = "{$document->id}_{$file_original_name}_raw.xml";

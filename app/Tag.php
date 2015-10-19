@@ -31,4 +31,21 @@ class Tag extends Model
       return $this->morphedByMany('App\Document', 'taggable');
   }
 
+  /**
+   * Resolve tags
+   * @param  array  $tags [description]
+   * @return [type]       [description]
+   */
+  public static function resolveTags($taggable, array $tags)
+  {
+    $newTagList = [];
+    foreach($tags as $tagName) {
+      $tag = Tag::where('name',$tagName)->first() ?: Tag::create(['name' => $tagName]);
+      $newTagList[] = $tag->id;
+    }
+
+    $taggable->tags()->sync($newTagList);
+
+  }
+
 }

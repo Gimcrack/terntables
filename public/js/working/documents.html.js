@@ -24,7 +24,8 @@ $.extend(true, jApp.views, {
 					"raw_file_path",
 					"parsed_file_path",
 					"owner",
-					"status"
+					"status",
+					"tags"
 				],
 				hidCols : [					// columns to hide
 
@@ -36,7 +37,8 @@ $.extend(true, jApp.views, {
 					"Original File",
 					"Parsed File",
 					"Owner",
-					"Status"
+					"Status",
+					"Tags"
 				],
 				templates : { 				// html template functions
 
@@ -70,6 +72,13 @@ $.extend(true, jApp.views, {
 						}
 						return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/raw\" target=\"_blank\">" + v + '</a>';
 					},
+
+					"tags" : function() {
+						var r = jApp.aG().currentRow;
+						return _.pluck( r.tags, 'name').map( function(val) {
+							return '<div style="margin:3px;" class="label label-info">' + val + '</div>';
+						}).join('');
+					}
 
 				},
 			})

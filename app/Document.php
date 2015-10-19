@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Nathanmac\Utilities\Parser\Parser;
 use Barryvdh\DomPDF\Facade as PDF;
+use App\Tag;
 
 class Document extends Model
 {
@@ -200,6 +201,10 @@ class Document extends Model
     {
       $return = [];
 
+      if (empty($this->parsed['eainfo']['detailed']['attr'])) {
+        return $return;
+      }
+
       foreach ($this->parsed['eainfo']['detailed']['attr'] as $attr) {
         @$return[ $attr['attalias'] ] = $attr['attrdef'] ?: '';
       }
@@ -273,6 +278,9 @@ class Document extends Model
      */
     public function getCoverageArea()
     {
+      if (empty($this->parsed['dataIdInfo']['dataExt'])) {
+        return [];
+      }
       foreach( $this->parsed['dataIdInfo']['dataExt'] as $data) {
         if (!empty($data['exDesc'])) {
           return $data['exDesc'];
