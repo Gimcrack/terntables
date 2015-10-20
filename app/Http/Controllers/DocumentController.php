@@ -157,10 +157,13 @@ class DocumentController extends Controller
       }
 
       $input = Input::all();
-      $document->update($input);
+
       $document = Document::find($documents);
-      if (!empty($input['tags'])) {
-        $document->tags()->sync($input['tags']);
+      $document->update($input);
+
+
+      if (!empty($input['tags'][0])) {
+        Tag::resolveTags( $document, explode(',',$input['tags'][0]) );
       }
 
       if ($request->hasFile('original_file')) {

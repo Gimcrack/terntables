@@ -48,7 +48,7 @@ class PagesController extends Controller
       $class = "\\App\\{$model}";
       if (empty($labels)) { $labels = $options; }
 
-      return $class::select("{$options} as option", DB::raw("{$labels} as label"))->orderBy("label","ASC")->get();
+      return response()->json( $class::select("{$options} as option", DB::raw("{$labels} as label"))->orderBy("label","ASC")->get() );
     }
 
     /**
@@ -64,7 +64,7 @@ class PagesController extends Controller
       if (empty($labels)) { $labels = $options; }
       $q = \Input::get('q') ?: '';
 
-      return $class::select("{$options} as id", DB::raw("{$labels} as name"))->where( $labels,'like', "%{$q}%" )->orderBy("name","ASC")->get();
+      return response()->json( $class::select("{$options} as id", DB::raw("{$labels} as name"))->where( $labels,'like', "%{$q}%" )->orderBy("name","ASC")->get() );
     }
 
     /**

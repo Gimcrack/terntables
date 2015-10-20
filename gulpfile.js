@@ -17,6 +17,8 @@ elixir(function(mix) {
 
   var paths = {
     jquery : vendor_path + '/components/jquery',
+    jqueryui : vendor_path + '/components/jqueryui',
+    jStorage : vendor_path + '/ingenious/jstorage',
     bootstrap : vendor_path + '/twbs/bootstrap-sass/assets',
     fontAwesome : vendor_path + '/components/font-awesome',
     bootstrapDatetimepicker : vendor_path + '/components/bootstrap-datetimepicker',
@@ -29,7 +31,7 @@ elixir(function(mix) {
     jqueryBootpag : vendor_path + '/ingenious/jquery-bootpag',
     jqueryMd5 : vendor_path + '/ingenious/jquery-md5',
     jqueryValidator : vendor_path + '/ingenious/jquery-validator',
-    tokenInput : vendor_path + '/ingenious/jquery-tokeninput',
+    tokenField : vendor_path + '/ingenious/bootstrap-tokenfield',
     perfectScrollbar : vendor_path + '/ingenious/perfect-scrollbar',
     bootstrapSlider : vendor_path + '/seiyria/bootstrap-slider',
     noty : vendor_path + '/needim/noty',
@@ -40,6 +42,8 @@ elixir(function(mix) {
 
   var jsPaths = {
     jquery : paths.jquery, // done
+    jqueryui : paths.jqueryui, // done
+    jStorage : paths.jStorage,
     bootstrap : paths.bootstrap + '/javascripts', // done
     bootstrapDatetimepicker : paths.bootstrapDatetimepicker + '/js', // done
     bootbox : paths.bootbox, // done
@@ -51,7 +55,7 @@ elixir(function(mix) {
     jqueryBootpag : paths.jqueryBootpag + '/lib', // done
     jqueryMd5 : paths.jqueryMd5, // done
     jqueryValidator : paths.jqueryValidator, // done
-    tokenInput : paths.tokenInput + '/src', // done
+    tokenField : paths.tokenField + '/js', // done
     perfectScrollbar : paths.perfectScrollbar + '/dist/js', // done
     bootstrapSlider : paths.bootstrapSlider + '/js', // done
     noty : paths.noty + '/js/noty/packaged', // done
@@ -63,12 +67,17 @@ elixir(function(mix) {
   var jsScripts = [
     jsPaths.jquery + '/jquery.js',
     jsPaths.jquery + '/jquery-migrate.js',
+    jsPaths.jqueryui + '/jquery-ui.js',
+    jsPaths.jStorage +'/jstorage.js',
     jsPaths.bootstrap + '/bootstrap.js',
     jsPaths.bootstrapDatetimepicker + '/bootstrap-datetimepicker.js',
     jsPaths.bootbox + '/bootbox.js',
     jsPaths.modernizr + '/modernizr.js',
     jsPaths.underscore + '/underscore.js',
     jsPaths.asyncGrid + '/jstorage.js',
+    jsPaths.jqueryValidator + '/jquery.psiblings.js',
+    jsPaths.tokenField + '/bootstrap-tokenfield.js',
+    jsPaths.jqueryValidator + '/jquery.validator.js',
     //jsPaths.asyncGrid + '/jForm.class.js',
     //jsPaths.asyncGrid + '/jInput.class.js',
     // jsPaths.asyncGrid + '/jLinkTable.class.js',
@@ -78,9 +87,6 @@ elixir(function(mix) {
     jsPaths.classie + '/classie.js',
     jsPaths.jqueryBootpag + '/jquery.bootpag.js',
     jsPaths.jqueryMd5 + '/jquery.md5.js',
-    jsPaths.jqueryValidator + '/jquery.psiblings.js',
-    jsPaths.tokenInput + '/jquery.tokeninput.js',
-    //jsPaths.jqueryValidator + '/jquery.validator.js',
     jsPaths.perfectScrollbar + '/perfect-scrollbar.jquery.js',
     jsPaths.bootstrapSlider + '/bootstrap-slider.js',
     jsPaths.noty + '/jquery.noty.packaged.js',
@@ -99,7 +105,8 @@ elixir(function(mix) {
      paths.perfectScrollbar + '/dist/css',
      paths.bootstrapSlider + '/css',
      paths.metismenu + '/dist',
-     paths.tokenInput + '/styles'
+     paths.tokenField + '/dist/css',
+     paths.jqueryui + '/themes/ui-lightness'
    ];
 
     //scripts

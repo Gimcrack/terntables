@@ -76,7 +76,7 @@ $.extend(true, jApp.views, {
 					"tags" : function() {
 						var r = jApp.aG().currentRow;
 						return _.pluck( r.tags, 'name').map( function(val) {
-							return '<div style="margin:3px;" class="label label-info">' + val + '</div>';
+							return '<span style="margin:3px;" class="label label-default">' + val + '</span>';
 						}).join('');
 					}
 

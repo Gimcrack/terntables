@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9e7a4c7b5ea5d3777f14c0afceb97237",
-    "content-hash": "dde83c018b3a10d748db9e708712adf4",
+    "hash": "6e1f1cb295c7d8f3a8a1175a73a49dbe",
+    "content-hash": "e27862792aed20a80873efb7134a1c4a",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -346,6 +346,91 @@
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
             "time": "2015-05-08 05:04:47"
+        },
+        {
+            "name": "components/jqueryui",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/components/jqueryui.git",
+                "reference": "c34f8dbf3ba57b3784b93f26119f436c0e8288e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/components/jqueryui/zipball/c34f8dbf3ba57b3784b93f26119f436c0e8288e1",
+                "reference": "c34f8dbf3ba57b3784b93f26119f436c0e8288e1",
+                "shasum": ""
+            },
+            "require": {
+                "components/jquery": ">=1.6"
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "name": "jquery-ui",
+                    "scripts": [
+                        "jquery-ui.js"
+                    ],
+                    "files": [
+                        "ui/**",
+                        "themes/**",
+                        "jquery-ui.min.js"
+                    ],
+                    "shim": {
+                        "deps": [
+                            "jquery"
+                        ],
+                        "exports": "jQuery"
+                    }
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "jQuery UI Team",
+                    "homepage": "http://jqueryui.com/about"
+                },
+                {
+                    "name": "Joern Zaefferer",
+                    "email": "joern.zaefferer@gmail.com",
+                    "homepage": "http://bassistance.de"
+                },
+                {
+                    "name": "Scott Gonzalez",
+                    "email": "scott.gonzalez@gmail.com",
+                    "homepage": "http://scottgonzalez.com"
+                },
+                {
+                    "name": "Kris Borchers",
+                    "email": "kris.borchers@gmail.com",
+                    "homepage": "http://krisborchers.com"
+                },
+                {
+                    "name": "Mike Sherov",
+                    "email": "mike.sherov@gmail.com",
+                    "homepage": "http://mike.sherov.com"
+                },
+                {
+                    "name": "TJ VanToll",
+                    "email": "tj.vantoll@gmail.com",
+                    "homepage": "http://tjvantoll.com"
+                },
+                {
+                    "name": "Corey Frang",
+                    "email": "gnarf37@gmail.com",
+                    "homepage": "http://gnarf.net"
+                },
+                {
+                    "name": "Felix Nagel",
+                    "email": "info@felixnagel.com",
+                    "homepage": "http://www.felixnagel.com"
+                }
+            ],
+            "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
+            "time": "2015-03-13 14:48:12"
         },
         {
             "name": "components/modernizr",
@@ -712,12 +797,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "f3147d8471e98f17528f3246518af864d0733019"
+                "reference": "4e4a2e839bcd3f26680e45b60059be5222e11fe0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/f3147d8471e98f17528f3246518af864d0733019",
-                "reference": "f3147d8471e98f17528f3246518af864d0733019",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/4e4a2e839bcd3f26680e45b60059be5222e11fe0",
+                "reference": "4e4a2e839bcd3f26680e45b60059be5222e11fe0",
                 "shasum": ""
             },
             "require": {
@@ -738,7 +823,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2015-10-17 00:37:14"
+            "time": "2015-10-19 16:32:42"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -770,6 +855,34 @@
             ],
             "description": "Fork of Bootstrap Multiselect Plugin By David Stutz",
             "time": "2015-09-02 17:22:05"
+        },
+        {
+            "name": "ingenious/bootstrap-tokenfield",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Gimcrack/bootstrap-tokenfield.git",
+                "reference": "5b9699eefff819ebe104c1858ed545bf776c6750"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gimcrack/bootstrap-tokenfield/zipball/5b9699eefff819ebe104c1858ed545bf776c6750",
+                "reference": "5b9699eefff819ebe104c1858ed545bf776c6750",
+                "shasum": ""
+            },
+            "type": "component",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "sliptree",
+                    "email": "email@sliptree.com"
+                }
+            ],
+            "description": "Composer fork of sliptree/bootstrap-tokenfield",
+            "time": "2015-10-19 19:06:50"
         },
         {
             "name": "ingenious/classie",
@@ -923,12 +1036,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jquery-validator.git",
-                "reference": "4a2e5159fcb1e93d4fe2dbf46c2bcf1a42388c99"
+                "reference": "362d4ce2ba30a4d38e0e2886d36e754f2a3fa101"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jquery-validator/zipball/4a2e5159fcb1e93d4fe2dbf46c2bcf1a42388c99",
-                "reference": "4a2e5159fcb1e93d4fe2dbf46c2bcf1a42388c99",
+                "url": "https://api.github.com/repos/Gimcrack/jquery-validator/zipball/362d4ce2ba30a4d38e0e2886d36e754f2a3fa101",
+                "reference": "362d4ce2ba30a4d38e0e2886d36e754f2a3fa101",
                 "shasum": ""
             },
             "type": "library",
@@ -943,7 +1056,35 @@
                 }
             ],
             "description": "Custom js form validation class",
-            "time": "2015-09-29 23:51:54"
+            "time": "2015-10-19 19:57:02"
+        },
+        {
+            "name": "ingenious/jstorage",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Gimcrack/jStorage.git",
+                "reference": "cbfca665f02e5c70928ca3ffed3a8e7c4141b59a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gimcrack/jStorage/zipball/cbfca665f02e5c70928ca3ffed3a8e7c4141b59a",
+                "reference": "cbfca665f02e5c70928ca3ffed3a8e7c4141b59a",
+                "shasum": ""
+            },
+            "type": "component",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "unlicense"
+            ],
+            "authors": [
+                {
+                    "name": "Andris Reinman",
+                    "email": "andris.reinman@gmail.com"
+                }
+            ],
+            "description": "Composer for of andris9/jStorage",
+            "time": "2015-10-19 19:24:49"
         },
         {
             "name": "ingenious/perfect-scrollbar",
@@ -1906,16 +2047,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "1.0.7",
+            "version": "1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "df1207683dfbd1399f0fa931a368082a28fed50b"
+                "reference": "7fe2420f8ad46aa08d5b317c92a148611d366d88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/df1207683dfbd1399f0fa931a368082a28fed50b",
-                "reference": "df1207683dfbd1399f0fa931a368082a28fed50b",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/7fe2420f8ad46aa08d5b317c92a148611d366d88",
+                "reference": "7fe2420f8ad46aa08d5b317c92a148611d366d88",
                 "shasum": ""
             },
             "require": {
@@ -1947,7 +2088,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2015-10-16 14:10:15"
+            "time": "2015-10-18 21:39:26"
         },
         {
             "name": "phenx/php-font-lib",
@@ -4336,7 +4477,10 @@
         "ingenious/history.js": 20,
         "venturecraft/revisionable": 20,
         "illuminate/html": 20,
-        "ingenious/jquery-tokeninput": 20
+        "ingenious/jquery-tokeninput": 20,
+        "ingenious/bootstrap-tokenfield": 20,
+        "ingenious/jstorage": 20,
+        "components/jqueryui": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

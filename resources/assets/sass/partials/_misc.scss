@@ -4,6 +4,10 @@
 	border-radius: 0 !important;
 }
 
+.ui-front {
+	z-index: 9999 !important;
+}
+
 .cursor-move {
 	cursor:move;
 }

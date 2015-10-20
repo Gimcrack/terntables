@@ -65,6 +65,10 @@ fieldset[disabled] {
 				overflow:auto;
 			}
 
+			div.form-control.tokeninput {
+				width: 100% !important;
+			}
+
 			.form-control {
 				color: black !important;
 			}
