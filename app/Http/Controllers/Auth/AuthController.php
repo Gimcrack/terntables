@@ -33,6 +33,12 @@ class AuthController extends Controller
     protected $aduser;
 
     /**
+     * The username of the user
+     * @var [type]
+     */
+    protected $username = 'username';
+
+    /**
      * Create a new authentication controller instance.
      *
      * @return void

@@ -70,7 +70,7 @@ $.extend(true, jApp.views, {
 						if (value.length > 30) {
 							v = value.substring(0,30) + '...';
 						}
-						return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/raw\" target=\"_blank\">" + v + '</a>';
+						return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/pdf\" target=\"_blank\">" + v + '</a>';
 					},
 
 					"tags" : function() {

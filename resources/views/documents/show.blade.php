@@ -147,11 +147,11 @@
             </tr>
             @endunless
 
-            @unless (empty($params['dates']))
+            @if ( is_array($params['dates']))
               @foreach($params['dates'] as $key => $value)
                 @unless( empty($value) )
                   <tr>
-                    <th style="width:200px;">{{ $replace[$key] }}</th>
+                    <th style="width:200px;">{{ $replace[$key] ?: $key }}</th>
                     <td>{{ date('Y-m-d', strtotime($value) ) }}</td>
                   </tr>
                 @endunless

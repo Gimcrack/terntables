@@ -799,6 +799,9 @@ class ColParamSeeder extends Seeder
         ,	'type' => 'select'
         ,	'_label' => 'Document Owner'
         ,	'_enabled' => 1
+        , 'required' => 1
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => -1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '3'
         , 'data-validType' => 'select'

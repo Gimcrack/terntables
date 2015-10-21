@@ -25,9 +25,9 @@ class DocumentController extends Controller
     {
       $this->middleware('auth');
       $this->middleware('checkaccess:Document.read');
-      $this->middleware('checkaccess:Document.create',['only' => 'store']);
-      $this->middleware('checkaccess:Document.update',['only' => 'showjson,update']);
-      $this->middleware('checkaccess:Document.delete',['only' => 'destroy,destroyMany']);
+      $this->middleware('checkaccess:Document.create',['only' => ['store'] ]);
+      $this->middleware('checkaccess:Document.update',['only' => ['showjson','update'] ]);
+      $this->middleware('checkaccess:Document.delete',['only' => ['destroy','destroyMany'] ]);
     }
 
     /**
@@ -100,9 +100,7 @@ class DocumentController extends Controller
     {
         $document = Document::find($id);
         $params = $document->parse();
-        $replace = [
-          'pubDate' => 'Date Published',
-        ];
+        $replace = Document::$replace;
 
         return view('documents.show',compact('document', 'params', 'replace') );
     }
@@ -205,7 +203,7 @@ class DocumentController extends Controller
     public function destroyMany()
     {
       $input = Input::all();
-      Document::whereIn('id',$input['ids'])->delete();
+      Document::whereIn('id', explode(',',$input['ids']))->delete();
       return $this->operationSuccessful();
     }
 }

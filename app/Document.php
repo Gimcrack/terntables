@@ -28,6 +28,16 @@ class Document extends Model
     public $params;
 
     /**
+     * Replacement key/value pairs
+     * @var [type]
+     */
+    public static $replace = [
+      'pubDate' => 'Date Published',
+      'createDate' => 'Date Created',
+      'reviseDate' => 'Date Revised'
+    ];
+
+    /**
      * Boot the model
      * @return [type] [description]
      */
@@ -141,11 +151,7 @@ class Document extends Model
     {
       $document = $this;
       $params = $this->parse();
-      $replace = [
-        'pubDate' => 'Date Published',
-      ];
-
-
+      $replace = Document::$replace;
       $this->update(['status' => 'processed']);
 
       $pdf = PDF::loadView('documents.showpdf', compact('document', 'params', 'replace')  );
@@ -226,6 +232,8 @@ class Document extends Model
       }
 
       foreach ($this->parsed['dataIdInfo']['idCitation']['citRespParty'] as $party) {
+        if ( empty($party['role']['RoleCd']['@attributes']['value']) ) continue;
+
         $roleCode = $party['role']['RoleCd']['@attributes']['value'];
 
         switch( $roleCode * 1) {

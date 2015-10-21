@@ -38,9 +38,9 @@ class User extends Model implements AuthenticatableContract,
      * @return [type] [description]
      */
     public function identifiableName()
-      {
-          return $this->name;
-      }
+    {
+        return $this->name;
+    }
 
     /**
      * Track creations as revisions

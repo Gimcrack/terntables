@@ -80,6 +80,10 @@ class PagesController extends Controller
       $item = $class::find($id);
       $lock = $item->recordLock;
 
+      if( !Auth::user()->checkAccess( "{$model}.update" ) ) {
+        return $this->operationFailed( "You must be logged in as a user with {$model}.update permissions to do that." );
+      }
+
       if ( empty($lock) || $lock->checkExpired() || $lock->checkUser() ) {
         RecordLock::create([
           'lockable_id' => $item->id,

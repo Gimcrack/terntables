@@ -32,9 +32,14 @@ abstract class Controller extends BaseController
      */
     public function operationFailed($e)
     {
+      if ( gettype($e) === 'string'  ) {
+        $message = $e;
+      } else {
+        $message = "There was a problem completing your request :" . $e->getMessage();
+      }
       return [
         "errors" => true,
-        "message" => "There was a problem completing your request :" . $e->getMessage(),
+        "message" => $message,
       ];
     }
 }
