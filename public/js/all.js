@@ -38212,7 +38212,7 @@ window.Modernizr = (function( window, document, undefined ) {
 
 		var self = this;
 
-		this.debug = false;
+		this.debug = true;
 
 		if (this.debug) {
 			console.warn( 'DEBUG MODE ON ')
@@ -39042,22 +39042,6 @@ var jApp = new jApp();
     }, // end fn
 
     /**
-     * Prepare form data object
-     * @method function
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
-     */
-    prepareFormData : function( data ) {
-      var fd = new FormData;
-
-      _.each( data, function(value,key) {
-        fd.append(key, value);
-      });
-
-      return fd;
-    }, // end fn
-
-    /**
      * Submit the current form
      * @method function
      * @return {[type]} [description]
@@ -39555,10 +39539,6 @@ var jApp = new jApp();
      * @return {[type]}                [description]
      */
     postJSON : function( requestOptions ) {
-
-        if ( typeof requestOptions.data.append !== 'function' ) {
-          requestOptions.data = jUtility.prepareFormData( requestOptions.data || {} );
-        }
 
         var opts = $.extend(true,
           {
