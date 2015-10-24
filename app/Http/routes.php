@@ -19,8 +19,8 @@
 
 
 //misc
-Route::get('/', 'PagesController@index');
-Route::get('home', 'PagesController@index');
+Route::get('/', 'PagesController@home');
+Route::get('home', 'PagesController@home');
 
 // profile
 Route::get('profile', 'ProfileController@index');
