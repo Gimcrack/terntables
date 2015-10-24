@@ -143,7 +143,7 @@ class GroupController extends Controller
     public function destroyMany()
     {
       $input = Input::all();
-      Group::whereIn('id',$input['ids'])->delete();
+      Group::whereIn('id',explode(',',$input['ids']))->delete();
       return $this->operationSuccessful();
     }
 

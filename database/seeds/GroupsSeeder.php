@@ -20,11 +20,11 @@ class GroupsSeeder extends Seeder
         Group::create(['name' => 'Super Administrators', 'description' => 'Super Administrators']);
         Group::create(['name' => 'Administrators', 'description' => 'Administrators']);
         Group::create(['name' => 'AD Users', 'description' => 'AD Users']);
-        Group::create(['name' => 'Document Viewers', 'description' => 'Document Viewers']);
-        Group::create(['name' => 'Document Managers', 'description' => 'Document Managers']);
+        // Group::create(['name' => 'Document Viewers', 'description' => 'Document Viewers']);
+        // Group::create(['name' => 'Document Managers', 'description' => 'Document Managers']);
 
-        // foreach(range(1,10) as $i) {
-        //   Group::create(['name' => $faker->company, 'description' => $faker->companySuffix]);
-        // }
+        foreach(range(1,10) as $i) {
+          Group::create(['name' => $faker->company, 'description' => $faker->sentence(6)]);
+        }
     }
 }

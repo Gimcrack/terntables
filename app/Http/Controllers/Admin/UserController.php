@@ -166,12 +166,8 @@ class UserController extends Controller
      */
     public function destroyMany()
     {
-      try {
-        $input = Input::all();
-        User::whereIn('id',$input['ids'])->delete();
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
-      }
+      $input = Input::all();
+      User::whereIn('id',explode(',',$input['ids']) )->delete();
+      return $this->operationSuccessful();
     }
 }

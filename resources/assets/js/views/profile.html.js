@@ -12,7 +12,7 @@ $.extend(true, jApp.views, {
 				gridHeader : {
 					icon : 'fa-user',
 					headerTitle : 'My Profile',
-					helpText : 'Note: Resetting your password here will affect all Logins assigned to you.'
+					helpText : 'Manage your profile information and password here.'
 				},
 				disabledFrmElements : [
 					'people_id',
@@ -30,7 +30,7 @@ $.extend(true, jApp.views, {
 				},
 				rowBtns : {
 					custom : {
-						resetPassword : { type : 'button', class : 'btn btn-warning', icon : 'fa-refresh', label : '', fn : 'resetPassword', title : 'Reset Password'  } // etc.
+						resetPassword : { type : 'button', class : 'btn btn-primary', icon : 'fa-refresh', label : 'Reset Password', fn : 'resetPassword', title : 'Reset Password'  } // etc.
 					}
 				},
 				columns : [ 				// columns to query
@@ -58,11 +58,8 @@ $.extend(true, jApp.views, {
 					},
 
 					"name" : function() {
-						var o = jApp.aG().currentRow,
-								fName = ( !! o.person && typeof o.person.first_name !== 'undefined') ? o.person.first_name : '',
-								lName = ( !! o.person && typeof o.person.last_name !== 'undefined') ? o.person.last_name : '';
-
-						return fName + ' ' + lName;
+						var o = jApp.aG().currentRow;
+						return o.person.name;
 					},
 
 					"email" : function(value) {

@@ -161,13 +161,9 @@ class ModuleController extends Controller
      */
     public function destroyMany()
     {
-      try {
-        $input = Input::all();
-        Module::whereIn('id',$input['ids'])->delete();
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
-      }
+      $input = Input::all();
+      Module::whereIn('id',explode(',',$input['ids']))->delete();
+      return $this->operationSuccessful();
     }
 
 }

@@ -149,13 +149,9 @@ class PersonController extends Controller
      */
     public function destroyMany()
     {
-      try {
-        $input = Input::all();
-        Person::whereIn('id',$input['ids'])->delete();
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
-      }
+      $input = Input::all();
+      Person::whereIn('id',explode(',',$input['ids']) )->delete();
+      return $this->operationSuccessful();
     }
 
 }
