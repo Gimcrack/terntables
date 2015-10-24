@@ -30,10 +30,7 @@ class PagesController extends Controller
      */
     public function home()
     {
-      if ( !Auth::check() ) {
-        return redirect('/auth/login');
-      }
-      return redirect('/documents');
+      return view('pages.home');
     }
 
     /**
