@@ -10,7 +10,7 @@
   		<span class="label label-primary label-small">{{ env('APP_LABEL') }}</span>
   	</a>
     <a class="navbar-brand" href="http://in.genio.us/">
-  		<i class="fa fa-fw fa-back"></i> ingenious
+  		<i class="fa fa-fw fa-arrow-left"></i> ingenious
   	</a>
   </div>
   <!-- /.navbar-header -->
