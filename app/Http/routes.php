@@ -28,6 +28,12 @@ Route::get('users/json', 'ProfileController@indexjson');
 Route::patch('users/{id}', 'ProfileController@update');
 Route::patch('resetPassword/{id}', 'ProfileController@resetPassword');
 
+// widgets
+Route::get('widgets/json',        'WidgetController@indexjson');
+Route::get('widgets/{id}/json',   'WidgetController@showjson');
+Route::delete('widgets',          'WidgetController@destroyMany');
+Route::resource('widgets',        'WidgetController');
+
 // documents
 Route::get('documents/json',      'DocumentController@indexjson');
 Route::get('documents/{id}/json', 'DocumentController@showjson');

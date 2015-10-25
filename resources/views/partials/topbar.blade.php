@@ -10,7 +10,7 @@
   		<span class="label label-primary label-small">{{ env('APP_LABEL') }}</span>
   	</a>
     <a class="navbar-brand" href="http://in.genio.us/">
-  		<i class="fa fa-fw fa-arrow-left"></i> ingenious
+  		<i class="fa fa-fw fa-arrow-left"></i> back to ingenious home
   	</a>
   </div>
   <!-- /.navbar-header -->
@@ -44,7 +44,7 @@
       </li>
     @else
   	<li class="dropdown">
-      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+      <a class="dropdown-toggle usermenu" data-toggle="dropdown" href="#">
   			<i class="fa fa-user fa-fw"></i> {{ Auth::user()->username }} <i class="fa fa-caret-down"></i>
   		</a>
   		<ul class="dropdown-menu dropdown-admin-settings">

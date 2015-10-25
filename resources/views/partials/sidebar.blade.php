@@ -10,12 +10,16 @@
   		<ul class="nav" id="side-menu">
       <!-- BASE MODULE -->
       <li>
+        <a href="{{ url('home') }}"><i class="fa fa-home fa-fw"></i> Home</a>
+      </li>
+
+      <li>
         <a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
       </li>
 
       @if( Auth::user()->checkAccess('Document.read') )
       <li>
-        <a href="{{ url('documents') }}"><i class="fa fa-file-text-o fa-fw"></i> GIS Documents</a>
+        <a href="{{ url('widgets') }}"><i class="fa fa-cubes fa-fw"></i> Manage Inventory</a>
       </li>
       @endif
 

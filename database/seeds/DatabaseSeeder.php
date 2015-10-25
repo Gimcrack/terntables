@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PersonSeeder::class);
         $this->call(UsersSeeder::class);
         $this->call(TagSeeder::class);
+        $this->call(WidgetSeeder::class);
 
         Model::reguard();
     }

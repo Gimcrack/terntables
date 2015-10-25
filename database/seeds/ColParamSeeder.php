@@ -821,5 +821,77 @@ class ColParamSeeder extends Seeder
         , '_optionssource' => "Tag.id"
         , 'multiple' => 1
         ]);
+
+        //widgets
+
+        // documents colparams
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. Watchacallits'
+        ,	'_label' => 'Widget Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'product_id'
+        ,	'placeholder' => 'e.g. 1234567890'
+        ,	'_label' => 'Product ID'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '3'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        // documents colparams
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'status'
+        ,	'placeholder' => 'e.g. ordered'
+        ,	'_label' => 'Status'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        // documents colparams
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'quantity'
+        ,	'type' => 'number'
+        , 'step' => 1
+        ,	'_label' => 'Widget Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Integer'
+        ]);
+
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
     }
 }

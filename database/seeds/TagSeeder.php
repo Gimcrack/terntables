@@ -12,10 +12,10 @@ class TagSeeder extends Seeder
      */
     public function run()
     {
-        // $faker =  Faker\Factory::create();
-        //
-        // foreach(range(1,20) as $num) {
-        //   Tag::create(['name' => $faker->word]);
-        // }
+        $faker =  Faker\Factory::create();
+
+        foreach(range(1,50) as $num) {
+           Tag::create(['name' => $faker->word]);
+        }
     }
 }
