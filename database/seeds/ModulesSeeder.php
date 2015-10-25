@@ -18,9 +18,9 @@ class ModulesSeeder extends Seeder
 
 
         Module::create([
-          'name' => 'Document',
-          'role' => 'Document Managers',
-          'description' => 'Can create, update, and delete documents',
+          'name' => 'Widget',
+          'role' => 'Widget Managers',
+          'description' => 'Can create, update, and delete widgets',
           'create_enabled' => 1,
           'read_enabled' => 1,
           'update_enabled' => 1,
@@ -28,8 +28,8 @@ class ModulesSeeder extends Seeder
         ])->groups()->attach(5);
 
         Module::create([
-          'name' => 'Document',
-          'role' => 'Document Viewers',
+          'name' => 'Widget',
+          'role' => 'Widget Viewers',
           'description' => 'Can view documents',
           'read_enabled' => 1,
         ])->groups()->attach(4);

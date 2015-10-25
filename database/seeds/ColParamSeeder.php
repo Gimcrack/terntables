@@ -668,7 +668,7 @@ class ColParamSeeder extends Seeder
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '3'
         , 'data-validType' => 'select'
-        , '_labelssource' => "Module.name"
+        , '_labelssource' => "Module.role"
         , '_optionssource' => "Module.id"
         , 'multiple' => 1
         ]);
