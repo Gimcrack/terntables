@@ -874,7 +874,7 @@ class ColParamSeeder extends Seeder
         ,	'name' => 'quantity'
         ,	'type' => 'number'
         , 'step' => 1
-        ,	'_label' => 'Widget Name'
+        ,	'_label' => 'Quantity'
         ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'

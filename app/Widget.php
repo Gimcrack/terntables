@@ -49,6 +49,7 @@ class Widget extends Model
    */
   protected $fillable = [
       'name'
+    , 'product_id'
     , 'description'
     , 'quantity'
     , 'status'
