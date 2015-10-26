@@ -5,8 +5,8 @@
 <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
-        <h1>Acme Inventory Management Demo</h1>
-        <p>This demo showcases some of the features of Ingenious DMP, set up as an inventory management system.</p>
+        <h1>Acme Training Portal Demo</h1>
+        <p>This demo showcases some of the features of Ingenious DMP, set up as an training management system.</p>
       </div>
     </div>
 

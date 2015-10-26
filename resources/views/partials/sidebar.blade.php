@@ -17,9 +17,9 @@
         <a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
       </li>
 
-      @if( Auth::user()->checkAccess('Document.read') )
+      @if( Auth::user()->checkAccess('Org.read') )
       <li>
-        <a href="{{ url('widgets') }}"><i class="fa fa-cubes fa-fw"></i> Manage Inventory</a>
+        <a href="{{ url('orgs') }}"><i class="fa fa-users fa-fw"></i> Manage Orgs</a>
       </li>
       @endif
 
