@@ -663,7 +663,7 @@ class ColParamSeeder extends Seeder
         ColParam::create([	'tableName' => 'groups'
         ,	'name' => 'modules'
         ,	'type' => 'select'
-        ,	'_label' => 'Group Modules'
+        ,	'_label' => 'Group Roles (Permissions)'
         ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '3'
@@ -752,7 +752,7 @@ class ColParamSeeder extends Seeder
         ColParam::create([	'tableName' => 'modules'
         ,	'name' => 'groups'
         ,	'type' => 'select'
-        ,	'_label' => 'Module Groups'
+        ,	'_label' => 'Apply To Groups'
         ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '3'

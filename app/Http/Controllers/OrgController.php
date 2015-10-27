@@ -85,6 +85,11 @@ class OrgController extends Controller
 
     $input = Input::all();
     $org = Org::find($orgs);
+
+    if ($org->id == $input['parent_id']) {
+      return $this->operationFailed('An org cannot be its own parent.');
+    }
+
     $org->update($input);
 
     if (!empty($input['tags'][0])) {

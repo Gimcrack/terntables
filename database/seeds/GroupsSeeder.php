@@ -20,8 +20,8 @@ class GroupsSeeder extends Seeder
         Group::create(['name' => 'Super Administrators', 'description' => 'Super Administrators']);
         Group::create(['name' => 'Administrators', 'description' => 'Administrators']);
         Group::create(['name' => 'AD Users', 'description' => 'AD Users']);
-        Group::create(['name' => 'Widget Viewers', 'description' => 'Widget Viewers']);
-        Group::create(['name' => 'Widget Managers', 'description' => 'Widget Managers']);
+        Group::create(['name' => 'Org Viewers', 'description' => 'Widget Viewers']);
+        Group::create(['name' => 'Org Managers', 'description' => 'Widget Managers']);
 
         foreach(range(1,10) as $i) {
           Group::create(['name' => $faker->company, 'description' => $faker->sentence(6)]);

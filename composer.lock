@@ -797,12 +797,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "3d1cf6d8c06b451b625250861b47021f076bde49"
+                "reference": "274f85797eceee676fd9ed31f8d312d54c061939"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/3d1cf6d8c06b451b625250861b47021f076bde49",
-                "reference": "3d1cf6d8c06b451b625250861b47021f076bde49",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/274f85797eceee676fd9ed31f8d312d54c061939",
+                "reference": "274f85797eceee676fd9ed31f8d312d54c061939",
                 "shasum": ""
             },
             "require": {
@@ -823,7 +823,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2015-10-24 16:43:09"
+            "time": "2015-10-27 06:34:39"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -1008,12 +1008,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jquery-tokeninput.git",
-                "reference": "fe65ea8721e55a2fb7b484bcbf4d6a945d92edc9"
+                "reference": "81df4d0cfe859aaf7236e14836a8804754a88dbd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jquery-tokeninput/zipball/fe65ea8721e55a2fb7b484bcbf4d6a945d92edc9",
-                "reference": "fe65ea8721e55a2fb7b484bcbf4d6a945d92edc9",
+                "url": "https://api.github.com/repos/Gimcrack/jquery-tokeninput/zipball/81df4d0cfe859aaf7236e14836a8804754a88dbd",
+                "reference": "81df4d0cfe859aaf7236e14836a8804754a88dbd",
                 "shasum": ""
             },
             "type": "component",
@@ -1028,7 +1028,7 @@
                 }
             ],
             "description": "Composer fork of loopj/jquery-tokeninput",
-            "time": "2015-10-18 03:35:21"
+            "time": "2015-10-18 06:02:03"
         },
         {
             "name": "ingenious/jquery-validator",
