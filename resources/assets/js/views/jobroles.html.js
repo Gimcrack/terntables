@@ -1,31 +1,35 @@
 // extend the application views
 _.extend( jApp.views, {
 
-	orgs : function() {
+	jobroles : function() {
 
 		_.extend( jApp.oG, {
 
-			orgs : new jGrid({
-				table : 'orgs',
-				model : 'Org',
+			jobroles : new jGrid({
+				table : 'jobroles',
+				model : 'JobRole',
 				columnFriendly : 'name',
 				gridHeader : {
-					icon : 'fa-building-o',
-					headerTitle : 'Manage Orgs',
-					helpText : "<strong>Note:</strong> Manage Orgs here."
+					icon : 'fa-briefcase',
+					headerTitle : 'Manage Job Roles',
+					helpText : "<strong>Note:</strong> Here you can manage your company job roles."
 				},
 				columns : [ 				// columns to query
 					"id",
 					"name",
-					"description",
-					"parent_id",
+					"occupant",
+					"manager_flag",
+					"manager_id",
+					"org_id",
 					"tags"
 				],
 
 				headers : [ 				// headers for table
 					"ID",
 					"Name",
-					"Description",
+					"Occupant",
+					"Is Manager",
+					"Reports To",
 					"Parent Org",
 					"Tags"
 				],
@@ -41,6 +45,31 @@ _.extend( jApp.views, {
 						return value.link( window.location.href.trim('/') + '/' + r.id );
 					},
 
+					"occupant" : function() {
+						var r = jApp.aG().currentRow;
+
+						if ( !r.occupant ) { return '<div class="label label-danger">Vacant</label>' }
+
+						return r.occupant.name;
+					},
+
+					"manager_flag" : function(value) {
+						return !!(value*1) ?
+						'<div class="label label-success">Yes</div>' :
+						'<div class="label label-danger">No</div>';
+					},
+
+					"manager_id" : function() {
+						var r = jApp.aG().currentRow,
+								tmp;
+
+						if ( !r.manager ) { return 'N/A'}
+
+						return ( !!r.manager.occupant ) ?
+							r.manager.name + ' (' + r.manager.occupant.name + ')' :
+							r.manager.name + ' ( -Vacant- )';
+					},
+
 					"tags" : function() {
 						var r = jApp.aG().currentRow;
 						return _.pluck( r.tags, 'name').map( function(val) {
@@ -48,7 +77,7 @@ _.extend( jApp.views, {
 						}).join('');
 					},
 
-          "parent_id" : function() {
+          "org_id" : function() {
             var r = jApp.aG().currentRow,
 								tmp = [];
 

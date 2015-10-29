@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TagSeeder::class);
         //$this->call(WidgetSeeder::class);
         $this->call(OrgSeeder::class);
+        $this->call(JobRoleSeeder::class);
 
         Model::reguard();
     }

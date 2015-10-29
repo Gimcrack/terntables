@@ -34,6 +34,12 @@ Route::get('orgs/{id}/json',   'OrgController@showjson');
 Route::delete('orgs',          'OrgController@destroyMany');
 Route::resource('orgs',        'OrgController');
 
+// jobroles
+Route::get('jobroles/json',        'JobRoleController@indexjson');
+Route::get('jobroles/{id}/json',   'JobRoleController@showjson');
+Route::delete('jobroles',          'JobRoleController@destroyMany');
+Route::resource('jobroles',        'JobRoleController');
+
 // documents
 Route::get('documents/json',      'DocumentController@indexjson');
 Route::get('documents/{id}/json', 'DocumentController@showjson');

@@ -941,6 +941,98 @@ class ColParamSeeder extends Seeder
         , 'multiple' => 1
         ]);
 
+        // jobroles
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. Comptroller'
+        ,	'_label' => 'Job Title'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'people_id'
+        , 'type' => 'select'
+        ,	'_label' => 'Occupant'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , '_optionssource' => 'Person.id'
+        , '_labelssource' => 'Person.name'
+        , '_firstlabel' => '-Vacant-'
+        , '_firstoption' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'org_id'
+        ,	'type' => 'select'
+        ,	'_label' => 'Parent Org'
+        ,	'_enabled' => 1
+        , 'required' => 1
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => 0
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Org.name"
+        , '_optionssource' => "Org.id"
+        , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'manager_id'
+        ,	'type' => 'select'
+        ,	'_label' => 'Manager'
+        ,	'_enabled' => 1
+        , '_firstlabel' => '-None-'
+        , '_firstoption' => 0
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "JobRole.name"
+        , '_optionssource' => "JobRole.id"
+        , '_optionsfilter' => "manager_flag:1"
+        , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'manager_flag'
+        ,	'type' => 'select'
+        ,	'_label' => 'Is Manager?'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "No|Yes"
+        , '_optionssource' => "0|1"
+        , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
+
 
     }
 }

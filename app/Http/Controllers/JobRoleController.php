@@ -5,23 +5,50 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Org;
+use App\JobRole as JobRole;
 use App\Tag;
 use Input;
 
-
-class OrgController extends Controller
+class JobRoleController extends Controller
 {
+  /**
+   * The class name of the associated model
+   * @var string
+   */
+  public $model_class = 'App\JobRole';
+
+  public $model_short = 'JobRole';
+
+  /**
+   * The associated views
+   * @var [type]
+   */
+  public $views = array(
+    'index' => 'jobroles.index'
+  );
+
+  /**
+   * What relationships to grab with the model
+   * @var [type]
+   */
+  public $with = [
+    'tags',
+    'parent.parent.parent.parent',
+    'manager.occupant',
+    'occupant'
+  ];
+
   /**
    * Spawn a new instance of the controller
    */
   public function __construct()
   {
+    $this->views = (object) $this->views;
     $this->middleware('auth');
-    $this->middleware('checkaccess:Org.read');
-    $this->middleware('checkaccess:Org.create',['only' => ['store'] ]);
-    $this->middleware('checkaccess:Org.update',['only' => ['showjson','update'] ]);
-    $this->middleware('checkaccess:Org.delete',['only' => ['destroy','destroyMany'] ]);
+    $this->middleware("checkaccess:{$this->model_short}.read");
+    $this->middleware("checkaccess:{$this->model_short}.create",['only' => ['store'] ]);
+    $this->middleware("checkaccess:{$this->model_short}.update",['only' => ['showjson','update'] ]);
+    $this->middleware("checkaccess:{$this->model_short}.delete",['only' => ['destroy','destroyMany'] ]);
   }
 
   /**
@@ -31,7 +58,7 @@ class OrgController extends Controller
    */
   public function index()
   {
-      return view('orgs.index');
+      return view($this->views->index);
   }
 
   /**
@@ -41,7 +68,8 @@ class OrgController extends Controller
    */
   public function indexjson()
   {
-      return Org::with(['tags','parent.parent.parent.parent'])->get();
+      $model_class = $this->model_class;
+      return $model_class::with($this->with)->get();
   }
 
   /**
@@ -52,7 +80,8 @@ class OrgController extends Controller
    */
   public function show($id)
   {
-      $model = Org::find($id);
+      $model_class = $this->model_class;
+      $model = $model_class::find($id);
 
       return view('pages.history', compact('model'));
   }
@@ -67,12 +96,12 @@ class OrgController extends Controller
   {
 
     $input = Input::all();
-    $org = Org::create($input);
+    $model_class = $this->model_class;
+    $model = $model_class::create($input);
     if (!empty($input['tags'][0])) {
-      Tag::resolveTags( $org, explode(',',$input['tags'][0]) );
+      Tag::resolveTags( $model, explode(',',$input['tags'][0]) );
     }
     return $this->operationSuccessful();
-
   }
 
   /**
@@ -83,7 +112,8 @@ class OrgController extends Controller
    */
   public function showjson($id)
   {
-      return Org::with(['tags'])->findOrFail($id);
+      $model_class = $this->model_class;
+      return $model_class::with($this->with)->findOrFail($id);
   }
 
   /**
@@ -93,20 +123,18 @@ class OrgController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, $orgs)
+  public function update(Request $request, $ids)
   {
 
     $input = Input::all();
-    $org = Org::find($orgs);
+    $model_class = $this->model_class;
+    $model = $model_class::find($ids);
 
-    if ($org->id == @$input['parent_id']) {
-      return $this->operationFailed('An org cannot be its own parent.');
-    }
 
-    $org->update($input);
+    $model->update($input);
 
     if (!empty($input['tags'][0])) {
-      Tag::resolveTags( $org, explode(',',$input['tags'][0]) );
+      Tag::resolveTags( $model, explode(',',$input['tags'][0]) );
     }
     return $this->operationSuccessful();
 
@@ -118,9 +146,10 @@ class OrgController extends Controller
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function destroy($orgs)
+  public function destroy($id)
   {
-    Org::find($orgs)->delete();
+    $model_class = $this->model_class;
+    $model_class::find($id)->delete();
     return $this->operationSuccessful();
   }
 
@@ -133,7 +162,8 @@ class OrgController extends Controller
   public function destroyMany()
   {
     $input = Input::all();
-    Org::whereIn('id',explode(',',$input['ids']))->delete();
+    $model_class = $this->model_class;
+    $model_class::whereIn('id',explode(',',$input['ids']))->delete();
     return $this->operationSuccessful();
   }
 }

@@ -62,6 +62,7 @@ class CreateColparamsTable extends Migration
             $table->string('_firstoption')->nullable();
             $table->string('_labelssource')->nullable();
             $table->string('_optionssource')->nullable();
+            $table->string('_optionsfilter')->nullable();
 
             $table->string('_linkedElementID')->nullable();
             $table->string('_linkedElementOptions')->nullable();

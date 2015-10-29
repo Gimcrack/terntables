@@ -19,7 +19,13 @@
 
       @if( Auth::user()->checkAccess('Org.read') )
       <li>
-        <a href="{{ url('orgs') }}"><i class="fa fa-users fa-fw"></i> Manage Orgs</a>
+        <a href="{{ url('orgs') }}"><i class="fa fa-building-o fa-fw"></i> Manage Orgs</a>
+      </li>
+      @endif
+
+      @if( Auth::user()->checkAccess('JobRole.read') )
+      <li>
+        <a href="{{ url('jobroles') }}"><i class="fa fa-briefcase fa-fw"></i> Manage Job Roles</a>
       </li>
       @endif
 

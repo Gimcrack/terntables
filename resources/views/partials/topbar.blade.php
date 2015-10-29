@@ -57,9 +57,7 @@
           <li>
     				<a href="javascript:void(0)" onclick="jApp.activeGrid.fn.colParamSetup()"><i class="fa fa-gear fa-fw"></i> Setup Forms</a>
     			</li>
-    			<li>
-    				<a href="admin/history.html" data-fn="true"><i class="fa fa-calendar fa-fw"></i> View History</a>
-    			</li>
+
     			<li class="divider"></li>
         @endif
 
@@ -76,6 +74,9 @@
     			</li>
     			<li>
     				<a href="{{ url('admin/modules')}}" ><i class="fa fa-lock fa-fw"></i> Manage Permissions</a>
+    			</li>
+          <li>
+    				<a href="{{ url('admin/history')}}"><i class="fa fa-calendar fa-fw"></i> View History</a>
     			</li>
   			@endif
 
