@@ -111,18 +111,22 @@ abstract class Controller extends BaseController
       }
 
       // process other m2m relations
-      foreach( $this->relations as $relation ) {
-        if( !empty($input[$relation][0]) && method_exists( $model, $relation ) ) {
-          $model->$relation()->attach( explode(',',$input[$relation][0]) );
+      if (!empty($this->relations)) {
+        foreach( $this->relations as $relation ) {
+          if( !empty($input[$relation][0]) && method_exists( $model, $relation ) ) {
+            $model->$relation()->attach( explode(',',$input[$relation][0]) );
+          }
         }
       }
-
+      
       // process m21 relations
-      foreach ($this->belongs as $relation) {
-        if ( !empty( $input[ $relation['key'] ][0] ) ) {
-          $tmp_model_class = $relation['model'];
-          $ids = explode(',', $input[ $relation['key'] ][0] );
-          $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
+      if (!empty($this->belongs)) {
+        foreach ($this->belongs as $relation) {
+          if ( !empty( $input[ $relation['key'] ][0] ) ) {
+            $tmp_model_class = $relation['model'];
+            $ids = explode(',', $input[ $relation['key'] ][0] );
+            $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
+          }
         }
       }
 
