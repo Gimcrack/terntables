@@ -29,13 +29,21 @@
       </li>
       @endif
 
-  		<!-- <li>
-  			<a href="#"><i class="fa fa-user fa-fw"></i> My Stuff <span class="fa arrow"></span></a>
+  	  <li>
+  			<a href="#"><i class="fa fa-train fa-fw"></i> Training <span class="fa arrow"></span></a>
   			<ul class="nav nav-second-level">
-
+          <li>
+            <a href="{{ url('resources') }}"><i class="fa fa-cube fa-fw"></i> Resources</a>
+          </li>
+          <li>
+            <a href="{{ url('collections') }}"><i class="fa fa-cubes fa-fw"></i> Collections</a>
+          </li>
+          <li>
+            <a href="{{ url('requirements') }}"><i class="fa fa-tasks fa-fw"></i> Requirements</a>
+          </li>
 
   			</ul>
-  		</li> -->
+  		</li>
   	</ul>
   	</div>
   	<!-- /.sidebar-collapse -->

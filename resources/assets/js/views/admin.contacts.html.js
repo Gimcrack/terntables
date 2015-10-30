@@ -18,6 +18,8 @@ $.extend( true, jApp.views.admin, {
 					"id",
 					"name",
           "users",
+					"groups",
+					"jobroles"
 				],
 				hidCols : [					// columns to hide
 
@@ -25,20 +27,35 @@ $.extend( true, jApp.views.admin, {
 				headers : [ 				// headers for table
 					"ID",
 					"Name",
-          "Username(s)"
+          "Username(s)",
+					"Groups",
+					"Job Role(s)"
 				],
 				templates : { 				// html template functions
 
 					"id" : function(value) {
-						var temp = '0000' + value;
-						return temp.slice(-4);
+						return ('0000' + value).slice(-4);
 					},
 
-          "users" : function() {
-            var o = jApp.aG().currentRow;
+					"name" : function(value) {
+						var r = jApp.aG().currentRow;
+						return value.link( window.location.href.trim('/') + '/' + r.id );
+					},
 
-            return _.pluck(o.users, 'username').join(', ');
-          }
+          "users" : function(arr) {
+            return _.pluck(arr, 'username').join(', ');
+          },
+
+					"groups" : function(arr) {
+						return _.compact(_.flatten(_.map(  jApp.aG().currentRow.users, function(row, i) {
+							return (row.groups.length) ? _.pluck(row.groups,'name') : false
+						} ))).join(', ');
+						//return _.pluck(arr, 'name').join(', ');
+					},
+
+					"jobroles" : function(arr) {
+            return _.pluck(arr, 'name').join(', ');
+					}
 
 				}
 			})

@@ -35,13 +35,22 @@ class Authenticate
     public function handle($request, Closure $next)
     {
         if ($this->auth->guest()) {
-            if ($request->ajax()) {
-                return response('Unauthorized.', 401);
-            } else {
+            if (!$request->ajax()) {
                 return redirect()->guest('auth/login');
             }
         }
 
         return $next($request);
+    }
+
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        // set to true instead of false
+        return true;
     }
 }

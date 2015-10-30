@@ -1,24 +1,26 @@
 // extend the application views
 _.extend( jApp.views, {
 
-	orgs : function() {
+	requirements : function() {
 
 		_.extend( jApp.oG, {
 
-			orgs : new jGrid({
-				table : 'orgs',
-				model : 'Org',
+			requirements : new jGrid({
+				table : 'requirements',
+				model : 'Requirement',
 				columnFriendly : 'name',
 				gridHeader : {
-					icon : 'fa-building-o',
-					headerTitle : 'Manage Orgs',
-					helpText : "<strong>Note:</strong> Manage Orgs here."
+					icon : 'fa-tasks',
+					headerTitle : 'Manage Training Requirements',
+					helpText : "<strong>Note:</strong> Assign training collections to requirements, and requirements to job roles."
 				},
 				columns : [ 				// columns to query
 					"id",
 					"name",
 					"description",
-					"parent_id",
+					"org",
+					"collections",
+					"jobroles",
 					"tags"
 				],
 
@@ -27,6 +29,8 @@ _.extend( jApp.views, {
 					"Name",
 					"Description",
 					"Parent Org",
+					"Training Collections",
+					"Assigned Job Roles",
 					"Tags"
 				],
 				templates : { 				// html template functions
@@ -47,16 +51,27 @@ _.extend( jApp.views, {
 						}).join('');
 					},
 
-          "parent_id" : function() {
-            var r = jApp.aG().currentRow,
+					"collections" : function( arr ) {
+						return _.pluck( arr, 'name').join(', ');
+					},
+
+					"jobroles" : function( arr ) {
+						return _.pluck( arr, 'name').join(', ');
+					},
+
+					"org" : function(val) {
+            var r = val,
 								tmp = [];
 
-						if ( !r.parent ) { return 'N/A'}
+						if ( !!r.parent ) {
 
-						while( !!r.parent ) {
-							tmp.unshift( r.parent.name );
-							r = r.parent;
+							while( !!r.parent ) {
+								tmp.unshift( r.parent.name );
+								r = r.parent;
+							}
 						}
+
+						tmp.push(val.name);
 
             return tmp.join('\\');
           }

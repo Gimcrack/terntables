@@ -36,24 +36,26 @@ $.extend( true, jApp.views.admin, {
 					"Name",
 					"Email",
 					"Groups",
-					"Modules",
+					"Access (Permissions)",
 				],
 				templates : { 				// html template functions
 
 					"id" : function(value) {
-						var temp = '0000' + value;
-						return temp.slice(-4);
+						return ('0000' + value).slice(-4);
+					},
+
+					"username" : function(value) {
+						var r = jApp.aG().currentRow;
+						return value.link( window.location.href.trim('/') + '/' + r.id );
 					},
 
 					"name" : function() {
-						var o = jApp.aG().currentRow,
-								name = ( !! o.person && typeof o.person.name !== 'undefined') ? o.person.name : '';
-
-						return name;
+						var o = jApp.aG().currentRow;
+						return ( !! o.person && o.person.name != null) ? o.person.name : '';
 					},
 
 					"email" : function(value) {
-						return '<a href="mailto:' + value + '" >' + value + '</a>';
+						return value.link( 'mailto:' + value );
 					},
 
 					"groups" : function(arr) {
@@ -62,7 +64,7 @@ $.extend( true, jApp.views.admin, {
 
 					"modules" : function(arr) {
 						return _.compact(_.flatten(_.map(  jApp.aG().currentRow.groups, function(row, i) {
-							return (row.modules.length) ? _.pluck(row.modules,'name') : false
+							return (row.modules.length) ? _.map(row.modules, function(o, ii ) { return o.role + ' (' + o.name + ')' }) : false
 						} ))).join(', ');
 						//return _.pluck(arr, 'name').join(', ');
 					},
@@ -76,8 +78,6 @@ $.extend( true, jApp.views.admin, {
 					}
 
 				},
-				rowsPerPage : 10,			// rows per page to display on grid
-				pageNum	: 1,				// current page number to display
 				html : {
 					forms : {
 						resetPassword : '<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper"> <div class="frm_wrapper"> <div class="panel panel-yellow"> <div class="panel-heading"> <button type="button" class="close" aria-hidden="true">×</button> <i class="fa fa-refresh fa-fw"></i> Reset Password </div> <div class="panel-overlay" style="display:none"></div> <div class="panel-body"> <div class="row side-by-side formContainer"></div> </div> </div> </div> </div>'

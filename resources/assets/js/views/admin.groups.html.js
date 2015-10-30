@@ -27,13 +27,17 @@ _.extend( jApp.views.admin, {
 					"Name",
 					"Description",
 					"Users",
-					"Modules"
+					"Module Access (Permissions)"
 				],
 				templates : { 				// html template functions
 
 					"id" : function(value) {
-						var temp = '0000' + value;
-						return temp.slice(-4);
+						return ('0000' + value).slice(-4);
+					},
+
+					"name" : function(value) {
+						var r = jApp.aG().currentRow;
+						return value.link( window.location.href.trim('/') + '/' + r.id );
 					},
 
 					"users" : function(arr) {
@@ -41,7 +45,7 @@ _.extend( jApp.views.admin, {
 					},
 
 					"modules" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
+						return _.pluck(arr, 'role').join(', ');
 					},
 
 				},

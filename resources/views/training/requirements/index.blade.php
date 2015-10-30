@@ -3,7 +3,7 @@
 @section('content')
 
 <script type="text/javascript">
-  jApp.views.admin.groups();
+  jApp.views.requirements();
 </script>
 
 @endsection

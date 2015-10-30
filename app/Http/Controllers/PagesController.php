@@ -145,7 +145,7 @@ class PagesController extends Controller
     {
       $class = "App\\{$model}";
       $id = Auth::id();
-      return RecordLock::with(['user.person'])->ofType($class)->notOfUser($id)->get();//->where('user_id','!=',$id);
+      return response()->json(RecordLock::with(['user.person'])->ofType($class)->notOfUser($id)->get());//->where('user_id','!=',$id);
     }
 
 

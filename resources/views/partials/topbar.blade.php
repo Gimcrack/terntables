@@ -75,9 +75,6 @@
     			<li>
     				<a href="{{ url('admin/modules')}}" ><i class="fa fa-lock fa-fw"></i> Manage Permissions</a>
     			</li>
-          <li>
-    				<a href="{{ url('admin/history')}}"><i class="fa fa-calendar fa-fw"></i> View History</a>
-    			</li>
   			@endif
 
   			<li class="divider"></li>

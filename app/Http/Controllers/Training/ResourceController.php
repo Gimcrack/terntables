@@ -1,34 +1,34 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Training;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Person;
-use App\User;
+use App\Resource;
+use App\Tag;
 use Input;
 
-class PersonController extends Controller
+class ResourceController extends Controller
 {
   /**
    * The class name of the associated model
    * @var string
    */
-  public $model_class = 'App\Person';
+  public $model_class = 'App\Resource';
 
   /**
    * [$model_short description]
    * @var string
    */
-  public $model_short = 'Person';
+  public $model_short = 'Resource';
 
   /**
    * The associated views
    * @var [type]
    */
   public $views = array(
-    'index' => 'admin.contacts.index'
+    'index' => 'training.resources.index'
   );
 
   /**
@@ -36,8 +36,21 @@ class PersonController extends Controller
    * @var [type]
    */
   public $with = [
-    'users.groups',
-    'jobroles'
+    'tags',
+    'org.parent.parent.parent',
+    'collections',
+    'attachments'
+    //'parent.parent.parent.parent',
+    //'manager.occupant',
+    //'occupant'
+  ];
+
+  /**
+   * M2M relationships to save with the model
+   * @var [type]
+   */
+  public $relations = [
+    'collections'
   ];
 
   /**
@@ -46,13 +59,9 @@ class PersonController extends Controller
    */
   public $belongs = [
     [
-      'key' => 'users',
-      'model' => 'App\User',
-      'foreign_key' => 'people_id'
-    ],[
-      'key' => 'jobroles',
-      'model' => 'App\JobRole',
-      'foreign_key' => 'people_id'
+      'key' => 'attachments',
+      'model' => 'App\Attachment',
+      'foreign_key' => 'resource_id'
     ]
   ];
 
@@ -62,9 +71,7 @@ class PersonController extends Controller
   public function __construct()
   {
     $this->views = (object) $this->views;
-    $this->middleware('auth.admin');
-    //$this->checkAccessMiddleware();
+    $this->middleware('auth');
+    $this->checkAccessMiddleware();
   }
-
-
 }

@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Org extends Model
+class Collection extends Model
 {
   /**
    * Make the model track revision changes
@@ -40,7 +40,7 @@ class Org extends Model
    *
    * @var string
    */
-  protected $table = 'orgs';
+  protected $table = 'collections';
 
   /**
    * The mass assignable fields
@@ -50,7 +50,7 @@ class Org extends Model
   protected $fillable = [
       'name'
     , 'description'
-    , 'parent_id'
+    , 'org_id'
   ];
 
   /**
@@ -63,29 +63,39 @@ class Org extends Model
   }
 
   /**
+   * A resource is managed by one Org
+   *
+   * @return [type] [description]
+   */
+  public function org()
+  {
+    return $this->belongsTo('App\Org');
+  }
+
+  /**
+   * A collection can have many resources
+   * @return [type] [description]
+   */
+  public function resources()
+  {
+    return $this->belongsToMany('App\Resource')->withTimestamps();
+  }
+
+  /**
+   * A collection can have many requirements
+   * @return [type] [description]
+   */
+  public function requirements()
+  {
+    return $this->belongsToMany('App\Requirement')->withTimestamps();
+  }
+
+  /**
    * Polymorphic relationship. Second parameter to morphOne/morphMany
    * should be the same as the prefix for the *_id/*_type fields.
    */
   public function tags()
   {
       return $this->morphToMany('App\Tag', 'taggable');
-  }
-
-  /**
-   * An org may have a parent org
-   * @return [type] [description]
-   */
-  public function parent()
-  {
-    return $this->belongsTo('App\Org','parent_id');
-  }
-
-  /**
-   * An org can manage many training requirements
-   * @return [type] [description]
-   */
-  public function requirements()
-  {
-    return $this->hasMany('App\Requirement');
   }
 }

@@ -23,6 +23,9 @@ class DatabaseSeeder extends Seeder
         //$this->call(WidgetSeeder::class);
         $this->call(OrgSeeder::class);
         $this->call(JobRoleSeeder::class);
+        $this->call(ResourceSeeder::class);
+        $this->call(CollectionSeeder::class);
+        $this->call(RequirementSeeder::class);
 
         Model::reguard();
     }

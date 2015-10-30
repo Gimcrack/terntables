@@ -68,4 +68,13 @@ class Person extends Model
       return $this->hasMany('App\User','people_id');
   }
 
+  /**
+   * A person may have many job roles
+   * @return [type] [description]
+   */
+  public function jobroles()
+  {
+      return $this->hasMany('App\JobRole','people_id');
+  }
+
 }

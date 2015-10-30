@@ -28,6 +28,26 @@ Route::get('users/json', 'ProfileController@indexjson');
 Route::patch('users/{id}', 'ProfileController@update');
 Route::patch('resetPassword/{id}', 'ProfileController@resetPassword');
 
+
+//training routes
+// collections
+Route::get('collections/json',        'Training\CollectionController@indexjson');
+Route::get('collections/{id}/json',   'Training\CollectionController@showjson');
+Route::delete('collections',          'Training\CollectionController@destroyMany');
+Route::resource('collections',        'Training\CollectionController');
+
+// resources
+Route::get('resources/json',        'Training\ResourceController@indexjson');
+Route::get('resources/{id}/json',   'Training\ResourceController@showjson');
+Route::delete('resources',          'Training\ResourceController@destroyMany');
+Route::resource('resources',        'Training\ResourceController');
+
+// requirements
+Route::get('requirements/json',        'Training\RequirementController@indexjson');
+Route::get('requirements/{id}/json',   'Training\RequirementController@showjson');
+Route::delete('requirements',          'Training\RequirementController@destroyMany');
+Route::resource('requirements',        'Training\RequirementController');
+
 // orgs
 Route::get('orgs/json',        'OrgController@indexjson');
 Route::get('orgs/{id}/json',   'OrgController@showjson');

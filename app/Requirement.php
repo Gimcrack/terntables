@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Group extends Model
+class Requirement extends Model
 {
   /**
    * Make the model track revision changes
@@ -40,7 +40,7 @@ class Group extends Model
    *
    * @var string
    */
-  protected $table = 'groups';
+  protected $table = 'requirements';
 
   /**
    * The mass assignable fields
@@ -50,6 +50,8 @@ class Group extends Model
   protected $fillable = [
       'name'
     , 'description'
+    , 'optional_flag'
+    , 'org_id'
   ];
 
   /**
@@ -62,22 +64,39 @@ class Group extends Model
     }
 
   /**
-   * A group is comprised of many users
+   * A requirement is managed by one org
    *
    * @return [type] [description]
    */
-  public function users()
+  public function org()
   {
-    return $this->belongsToMany('App\User')->withTimestamps();
+    return $this->belongsTo('App\Org')->withTimestamps();
   }
 
   /**
-   * A group can be assigned to many modules
-   * @method modules
-   * @return [type]  [description]
+   * A requirement may have many training collections
+   * @return [type] [description]
    */
-  public function modules()
+  public function collections()
   {
-    return $this->belongsToMany('App\Module')->withTimestamps();
+    return $this->belongsToMany('App\Collection');
+  }
+
+  /**
+   * A requirement may be required by many job roles
+   * @return [type] [description]
+   */
+  public function jobroles()
+  {
+    return $this->belongsToMany('App\JobRole');
+  }
+
+  /**
+   * Polymorphic relationship. Second parameter to morphOne/morphMany
+   * should be the same as the prefix for the *_id/*_type fields.
+   */
+  public function tags()
+  {
+      return $this->morphToMany('App\Tag', 'taggable');
   }
 }

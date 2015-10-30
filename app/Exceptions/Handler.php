@@ -56,8 +56,7 @@ class Handler extends ExceptionHandler
               $response['exception'] = get_class($e); // Reflection might be better here
               $response['message'] = $e->getMessage();
               $response['trace'] = $e->getTrace();
-          }
-
+          } 
           // Default response of 400
           $status = 400;
 
@@ -69,7 +68,7 @@ class Handler extends ExceptionHandler
           }
 
           // Return a JSON response with the response array and status code
-          return die(json_encode($response));
+          return response()->json($response);
         }
 
         if ($e instanceof ModelNotFoundException) {
