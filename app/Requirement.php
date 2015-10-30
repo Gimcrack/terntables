@@ -70,7 +70,7 @@ class Requirement extends Model
    */
   public function org()
   {
-    return $this->belongsTo('App\Org')->withTimestamps();
+    return $this->belongsTo('App\Org');
   }
 
   /**
@@ -79,7 +79,7 @@ class Requirement extends Model
    */
   public function collections()
   {
-    return $this->belongsToMany('App\Collection');
+    return $this->belongsToMany('App\Collection')->withTimestamps();
   }
 
   /**
@@ -88,7 +88,7 @@ class Requirement extends Model
    */
   public function jobroles()
   {
-    return $this->belongsToMany('App\JobRole');
+    return $this->belongsToMany('App\JobRole', 'jobrole_requirement', 'requirement_id', 'jobrole_id')->withTimestamps();
   }
 
   /**
