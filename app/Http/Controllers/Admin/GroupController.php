@@ -62,8 +62,8 @@ class GroupController extends Controller
 
       $input = Input::all();
       $group = Group::create($input);
-      if (!empty($input['users'])) {
-        $group->users()->attach($input['users']);
+      if (!empty($input['users'][0])) {
+        $group->users()->attach( explode(',',$input['users'][0]) );
       }
       return $this->operationSuccessful();
 
@@ -115,8 +115,8 @@ class GroupController extends Controller
       $input = Input::all();
       $group = Group::find($groups);
       $group->update($input);
-      if (!empty($input['groups'])) {
-        $group->users()->sync($input['users']);
+      if (!empty($input['users'][0])) {
+        $group->users()->sync( explode(',',$input['users'][0]) );
       }
       return $this->operationSuccessful();
 

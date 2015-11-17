@@ -39042,22 +39042,6 @@ var jApp = new jApp();
     }, // end fn
 
     /**
-     * Prepare form data object
-     * @method function
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
-     */
-    prepareFormData : function( data ) {
-      var fd = new FormData;
-
-      _.each( data, function(value,key) {
-        fd.append(key, value);
-      });
-
-      return fd;
-    }, // end fn
-
-    /**
      * Submit the current form
      * @method function
      * @return {[type]} [description]
@@ -39549,6 +39533,22 @@ var jApp = new jApp();
     }, // end fn
 
     /**
+     * Prepare form data
+     * @param  {[type]} data [description]
+     * @return {[type]}      [description]
+     */
+    prepareFormData : function( data ) {
+      var fd = new FormData;
+
+      _.each( data, function(value, key) {
+        fd.append(key, value);
+      })
+
+      return fd;
+
+    }, // end fn
+
+    /**
      * post JSON
      * @method function
      * @param  {[type]} requestOptions [description]
@@ -40021,7 +40021,7 @@ var jApp = new jApp();
 
           ".chk_all" : {
             change : function() {
-              jApp.aG().$().find(':checkbox:visible').prop('checked',$(this).prop('checked'));
+              jApp.aG().$().find('.chk_cid').prop('checked',$(this).prop('checked'));
               $('.chk_cid').eq(0).change();
             }
           },
@@ -41350,6 +41350,18 @@ var jApp = new jApp();
       sortByCol : function( colNum, desc ) {
         var $col;
 
+        if (typeof colNum === 'undefined' && typeof jApp.aG().temp.sortOptions === 'undefined') {
+          return false;
+        }
+
+        if (typeof colNum === 'undefined') {
+          colNum = jApp.aG().temp.sortOptions.colNum;
+          desc = jApp.aG().temp.sortOptions.desc;
+        } else {
+            jApp.aG().temp.sortOptions = { colNum : colNum, desc : desc };
+        }
+
+
         //col
         $col = jApp.tbl().find('.table-body .table-row .table-cell:nth-child(' + colNum + ')')
           .map( function(i,elm) {
@@ -42286,6 +42298,9 @@ var jApp = new jApp();
 
         // adjust permissions
         jUtility.callback.getPermissions( jApp.aG().permissions );
+
+        // perform sort if needed
+        jUtility.DOM.sortByCol();
 
 			}, // end fn
 
