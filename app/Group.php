@@ -79,6 +79,5 @@ class Group extends Model
   public function modules()
   {
     return $this->belongsToMany('App\Module')->withTimestamps();
-
   }
 }

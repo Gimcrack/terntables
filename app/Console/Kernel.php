@@ -26,5 +26,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('inspire')
                  ->hourly();
+
+        $schedule->command('migrate:refresh --seed')
+          ->everyTenMinutes()
+          ->sendOutputTo( storage_path('logs' . DIRECTORY_SEPARATOR . 'schedule.log') );
     }
 }

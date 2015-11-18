@@ -5,9 +5,12 @@
   		<i class="fa fa-bars fa-fw"></i>
   	</button>
     @endif
-  	<a class="navbar-brand ajaxy ajaxy-view" href="{{ url('/') }}">
+  	<a class="navbar-brand" href="{{ url('/') }}">
   		{{ env('APP_HEADER_TITLE','Laravel Dashboard')}}
   		<span class="label label-primary label-small">{{ env('APP_LABEL') }}</span>
+  	</a>
+    <a class="navbar-brand" href="http://in.genio.us/">
+  		<i class="fa fa-fw fa-arrow-left"></i> back to ingenious home
   	</a>
   </div>
   <!-- /.navbar-header -->
@@ -41,7 +44,7 @@
       </li>
     @else
   	<li class="dropdown">
-      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+      <a class="dropdown-toggle usermenu" data-toggle="dropdown" href="#">
   			<i class="fa fa-user fa-fw"></i> {{ Auth::user()->username }} <i class="fa fa-caret-down"></i>
   		</a>
   		<ul class="dropdown-menu dropdown-admin-settings">
@@ -54,9 +57,7 @@
           <li>
     				<a href="javascript:void(0)" onclick="jApp.activeGrid.fn.colParamSetup()"><i class="fa fa-gear fa-fw"></i> Setup Forms</a>
     			</li>
-    			<li>
-    				<a href="admin/history.html" data-fn="true"><i class="fa fa-calendar fa-fw"></i> View History</a>
-    			</li>
+
     			<li class="divider"></li>
         @endif
 

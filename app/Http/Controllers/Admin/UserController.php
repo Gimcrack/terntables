@@ -12,166 +12,68 @@ use Input;
 class UserController extends Controller
 {
 
-    /**
-     * Spawn a new instance of the controller
-     */
-    public function __construct()
-    {
-      $this->middleware('auth.admin');
-    }
+  /**
+   * The class name of the associated model
+   * @var string
+   */
+  public $model_class = 'App\User';
+
+  /**
+   * [$model_short description]
+   * @var string
+   */
+  public $model_short = 'User';
+
+  /**
+   * The associated views
+   * @var [type]
+   */
+  public $views = array(
+    'index' => 'admin.users.index'
+  );
+
+  /**
+   * What relationships to grab with the model
+   * @var [type]
+   */
+  public $with = [
+    'groups.modules',
+    'person'
+  ];
+
+  /**
+   * What relationships to save with the model
+   * @var [type]
+   */
+  public $relations = [
+    'groups',
+  ];
+
+  /**
+   * Spawn a new instance of the controller
+   */
+  public function __construct()
+  {
+    $this->views = (object) $this->views;
+    $this->middleware('auth.admin');
+    //$this->checkAccessMiddleware();
+  }
+
+  /**
+   * Reset password of user with id $id
+   * @param [type] $id [description]
+   */
+  public function resetPassword($id)
+  {
+    $input = Input::all();
+    $user = User::find($id);
+    $user->update(['password' => bcrypt($input['Password1'])]);
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return Response
+     * To do: notify user of password change.
      */
-    public function index()
-    {
-        return view('admin.users.index');
-    }
 
-    /**
-     * Display a listing of the resource in JSON format.
-     *
-     * @return Response
-     */
-    public function indexjson()
-    {
-        return User::with(['groups.modules','person'])->get();
-    }
+    return $this->operationSuccessful();
+  }
 
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        $input = Input::all();
-        $input['password'] = bcrypt('P@ssw0rd');
-        $user = User::create($input);
-        if (!empty($input['groups'])) {
-          $user->groups()->attach( explode(",",$input['groups'][0] ) );
-        }
-        return $this->operationSuccessful();
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource in JSON format.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function showjson($id)
-    {
-        return User::with(['groups.modules'])->findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  Request  $request
-     * @param  int  $id
-     * @return Response
-     */
-    public function update(Request $request, $users)
-    {
-      $input = Input::all();
-      $user = User::find($users);
-      $user->update($input);
-      if (!empty($input['groups'])) {
-        $user->groups()->sync(  explode(",",$input['groups'][0] ) );
-      }
-      return $this->operationSuccessful();
-    }
-
-    /**
-     * Reset password of user with id $id
-     * @param [type] $id [description]
-     */
-    public function resetPassword($id)
-    {
-      try {
-        $input = Input::all();
-        $user = User::find($id);
-        $user->update(['password' => bcrypt($input['Password1'])]);
-
-        /**
-         * To do: notify user of password change.
-         */
-
-        return $this->operationSuccessful();
-
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
-      }
-
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroy($users)
-    {
-      try {
-        User::find($users)->delete();
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
-      }
-    }
-
-    /**
-     * Remove the specified resources from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroyMany()
-    {
-      try {
-        $input = Input::all();
-        User::whereIn('id',$input['ids'])->delete();
-        return $this->operationSuccessful();
-      } catch(\Illuminate\Database\QueryException $e) {
-        return $this->operationFailed($e);
-      }
-    }
 }

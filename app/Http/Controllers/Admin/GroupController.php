@@ -10,141 +10,52 @@ use Input;
 
 class GroupController extends Controller
 {
+  /**
+   * The class name of the associated model
+   * @var string
+   */
+  public $model_class = 'App\Group';
 
-    /**
-     * Spawn a new instance of the controller
-     */
-    public function __construct()
-    {
-      $this->middleware('auth.admin');
+  /**
+   * [$model_short description]
+   * @var string
+   */
+  public $model_short = 'Group';
 
-    }
+  /**
+   * The associated views
+   * @var [type]
+   */
+  public $views = array(
+    'index' => 'admin.groups.index'
+  );
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        return view('admin.groups.index');
-    }
+  /**
+   * What relationships to grab with the model
+   * @var [type]
+   */
+  public $with = [
+    'users',
+    'modules',
+  ];
 
-    /**
-     * Display a listing of the resource in JSON format.
-     *
-     * @return Response
-     */
-    public function indexjson()
-    {
-        return Group::with(['users','modules'])->get();
-    }
+  /**
+   * What relationships to save with the model
+   * @var [type]
+   */
+  public $relations = [
+    'users',
+    'modules'
+  ];
 
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-
-      $input = Input::all();
-      $group = Group::create($input);
-      if (!empty($input['users'][0])) {
-        $group->users()->attach( explode(',',$input['users'][0]) );
-      }
-      return $this->operationSuccessful();
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource in JSON format.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function showjson($id)
-    {
-        return Group::with(['users','modules'])->findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $groups)
-    {
-
-      $input = Input::all();
-      $group = Group::find($groups);
-      $group->update($input);
-      if (!empty($input['users'][0])) {
-        $group->users()->sync( explode(',',$input['users'][0]) );
-      }
-      return $this->operationSuccessful();
-
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($groups)
-    {
-      Group::find($groups)->delete();
-      return $this->operationSuccessful();
-    }
-
-    /**
-     * Remove the specified resources from storage.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function destroyMany()
-    {
-      $input = Input::all();
-      Group::whereIn('id',$input['ids'])->delete();
-      return $this->operationSuccessful();
-    }
+  /**
+   * Spawn a new instance of the controller
+   */
+  public function __construct()
+  {
+    $this->views = (object) $this->views;
+    $this->middleware('auth.admin');
+    //$this->checkAccessMiddleware();
+  }
 
 }

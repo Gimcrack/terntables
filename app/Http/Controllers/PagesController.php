@@ -20,7 +20,7 @@ class PagesController extends Controller
      */
     public function __construct()
     {
-      $this->middleware('auth');
+      $this->middleware('auth', ['except' => 'home']);
     }
 
     /**
@@ -30,10 +30,7 @@ class PagesController extends Controller
      */
     public function home()
     {
-      if ( !Auth::check() ) {
-        return redirect('/auth/login');
-      }
-      return redirect('/documents');
+      return view('pages.home');
     }
 
     /**
@@ -148,7 +145,7 @@ class PagesController extends Controller
     {
       $class = "App\\{$model}";
       $id = Auth::id();
-      return RecordLock::with(['user.person'])->ofType($class)->notOfUser($id)->get();//->where('user_id','!=',$id);
+      return response()->json(RecordLock::with(['user.person'])->ofType($class)->notOfUser($id)->get());//->where('user_id','!=',$id);
     }
 
 

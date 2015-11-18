@@ -10,22 +10,40 @@
   		<ul class="nav" id="side-menu">
       <!-- BASE MODULE -->
       <li>
+        <a href="{{ url('home') }}"><i class="fa fa-home fa-fw"></i> Home</a>
+      </li>
+
+      <li>
         <a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
       </li>
 
-      @if( Auth::user()->checkAccess('Document.read') )
+      @if( Auth::user()->checkAccess('Org.read') )
       <li>
-        <a href="{{ url('documents') }}"><i class="fa fa-file-text-o fa-fw"></i> GIS Documents</a>
+        <a href="{{ url('orgs') }}"><i class="fa fa-building-o fa-fw"></i> Manage Orgs</a>
       </li>
       @endif
 
-  		<!-- <li>
-  			<a href="#"><i class="fa fa-user fa-fw"></i> My Stuff <span class="fa arrow"></span></a>
-  			<ul class="nav nav-second-level">
+      @if( Auth::user()->checkAccess('JobRole.read') )
+      <li>
+        <a href="{{ url('jobroles') }}"><i class="fa fa-briefcase fa-fw"></i> Manage Job Roles</a>
+      </li>
+      @endif
 
+  	  <li>
+  			<a href="#"><i class="fa fa-train fa-fw"></i> Training <span class="fa arrow"></span></a>
+  			<ul class="nav nav-second-level">
+          <li>
+            <a href="{{ url('resources') }}"><i class="fa fa-cube fa-fw"></i> Resources</a>
+          </li>
+          <li>
+            <a href="{{ url('collections') }}"><i class="fa fa-cubes fa-fw"></i> Collections</a>
+          </li>
+          <li>
+            <a href="{{ url('requirements') }}"><i class="fa fa-tasks fa-fw"></i> Requirements</a>
+          </li>
 
   			</ul>
-  		</li> -->
+  		</li>
   	</ul>
   	</div>
   	<!-- /.sidebar-collapse -->

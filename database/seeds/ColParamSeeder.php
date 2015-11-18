@@ -663,12 +663,12 @@ class ColParamSeeder extends Seeder
         ColParam::create([	'tableName' => 'groups'
         ,	'name' => 'modules'
         ,	'type' => 'select'
-        ,	'_label' => 'Group Modules'
+        ,	'_label' => 'Group Roles (Permissions)'
         ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '3'
         , 'data-validType' => 'select'
-        , '_labelssource' => "Module.name"
+        , '_labelssource' => "Module.role"
         , '_optionssource' => "Module.id"
         , 'multiple' => 1
         ]);
@@ -752,7 +752,7 @@ class ColParamSeeder extends Seeder
         ColParam::create([	'tableName' => 'modules'
         ,	'name' => 'groups'
         ,	'type' => 'select'
-        ,	'_label' => 'Module Groups'
+        ,	'_label' => 'Apply To Groups'
         ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '3'
@@ -811,6 +811,446 @@ class ColParamSeeder extends Seeder
         ]);
 
         ColParam::create([	'tableName' => 'documents'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
+
+        //widgets
+
+        // documents colparams
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. Watchacallits'
+        ,	'_label' => 'Widget Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'product_id'
+        ,	'placeholder' => 'e.g. 1234567890'
+        ,	'_label' => 'Product ID'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '3'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'status'
+        ,	'placeholder' => 'e.g. ordered'
+        ,	'_label' => 'Status'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'quantity'
+        ,	'type' => 'number'
+        , 'step' => 1
+        ,	'_label' => 'Quantity'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Integer'
+        ]);
+
+        ColParam::create([	'tableName' => 'widgets'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
+
+        // orgs
+        ColParam::create([	'tableName' => 'orgs'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. Accounts Payable'
+        ,	'_label' => 'Org Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'orgs'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'orgs'
+        ,	'name' => 'parent_id'
+        ,	'type' => 'select'
+        ,	'_label' => 'Parent Org'
+        ,	'_enabled' => 1
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => 0
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Org.name"
+        , '_optionssource' => "Org.id"
+        , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'orgs'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
+
+        // jobroles
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. Comptroller'
+        ,	'_label' => 'Job Title'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'people_id'
+        , 'type' => 'select'
+        ,	'_label' => 'Occupant'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , '_optionssource' => 'Person.id'
+        , '_labelssource' => 'Person.name'
+        , '_firstlabel' => '-Vacant-'
+        , '_firstoption' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'org_id'
+        ,	'type' => 'select'
+        ,	'_label' => 'Parent Org'
+        ,	'_enabled' => 1
+        , 'required' => 1
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => 0
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Org.name"
+        , '_optionssource' => "Org.id"
+        , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'manager_id'
+        ,	'type' => 'select'
+        ,	'_label' => 'Manager'
+        ,	'_enabled' => 1
+        , '_firstlabel' => '-None-'
+        , '_firstoption' => 0
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "JobRole.name"
+        , '_optionssource' => "JobRole.id"
+        , '_optionsfilter' => "manager_flag:1"
+        , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'manager_flag'
+        ,	'type' => 'select'
+        ,	'_label' => 'Is Manager?'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "No|Yes"
+        , '_optionssource' => "0|1"
+        , 'multiple' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'jobroles'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
+
+        // collections
+        ColParam::create([	'tableName' => 'collections'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. HR Policies'
+        ,	'_label' => 'Collection Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'collections'
+        ,	'name' => 'org_id'
+        , 'type' => 'select'
+        ,	'_label' => 'Managing Org'
+        ,	'_enabled' => 1
+        , 'required' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , '_optionssource' => 'Org.id'
+        , '_labelssource' => 'Org.name'
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'collections'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'collections'
+        ,	'name' => 'resources'
+        ,	'type' => 'select'
+        ,	'_label' => 'What resources are in this collection?'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Resource.name"
+        , '_optionssource' => "Resource.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'collections'
+        ,	'name' => 'requirements'
+        ,	'type' => 'select'
+        ,	'_label' => 'What requirements are met with this collection?'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '3'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Requirement.name"
+        , '_optionssource' => "Requirement.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'collections'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
+
+        // resources
+        ColParam::create([	'tableName' => 'resources'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. Employee Conduct Policy'
+        ,	'_label' => 'Resource Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'resources'
+        ,	'name' => 'type'
+        ,	'placeholder' => 'e.g. Memo'
+        ,	'_label' => 'Resource Type'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'resources'
+        ,	'name' => 'location'
+        ,	'placeholder' => 'e.g. http://example.com/folder/page.html'
+        ,	'_label' => 'Resource Location'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'resources'
+        ,	'name' => 'org_id'
+        , 'type' => 'select'
+        ,	'_label' => 'Managing Org'
+        ,	'_enabled' => 1
+        , 'required' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , '_optionssource' => 'Org.id'
+        , '_labelssource' => 'Org.name'
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'resources'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'resources'
+        ,	'name' => 'collections'
+        ,	'type' => 'select'
+        ,	'_label' => 'What collections do this resource belong to?'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Collection.name"
+        , '_optionssource' => "Collection.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'resources'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
+
+        // requirements
+        ColParam::create([	'tableName' => 'requirements'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. HR Policies Certification'
+        ,	'_label' => 'Requirement Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'requirements'
+        ,	'name' => 'org_id'
+        , 'type' => 'select'
+        ,	'_label' => 'Managing Org'
+        ,	'_enabled' => 1
+        , 'required' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , '_optionssource' => 'Org.id'
+        , '_labelssource' => 'Org.name'
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'requirements'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'requirements'
+        ,	'name' => 'collections'
+        ,	'type' => 'select'
+        ,	'_label' => 'What collections belong to this requirement?'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Collection.name"
+        , '_optionssource' => "Collection.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'requirements'
+        ,	'name' => 'jobroles'
+        ,	'type' => 'select'
+        ,	'_label' => 'What job roles have this requirement?'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "JobRole.name"
+        , '_optionssource' => "JobRole.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'requirements'
         ,	'name' => 'tags'
         ,	'type' => 'tokens'
         ,	'_label' => 'Tags'

@@ -43,8 +43,12 @@ _.extend( jApp.views.admin, {
 				templates : { 				// html template functions
 
 					"id" : function(value) {
-						var temp = '0000' + value;
-						return temp.slice(-4);
+						return ('0000' + value).slice(-4);
+					},
+
+					"name" : function(value) {
+						var r = jApp.aG().currentRow;
+						return value.link( window.location.href.trim('/') + '/' + r.id );
 					},
 
 					"groups" : function(arr) {
