@@ -37,7 +37,15 @@ class PersonController extends Controller
    */
   public $with = [
     'users.groups',
-    'jobroles'
+    'servers'
+  ];
+
+  /**
+   * What relationships to save with the model
+   * @var [type]
+   */
+  public $relations = [
+    'servers',
   ];
 
   /**
@@ -48,10 +56,6 @@ class PersonController extends Controller
     [
       'key' => 'users',
       'model' => 'App\User',
-      'foreign_key' => 'people_id'
-    ],[
-      'key' => 'jobroles',
-      'model' => 'App\JobRole',
       'foreign_key' => 'people_id'
     ]
   ];

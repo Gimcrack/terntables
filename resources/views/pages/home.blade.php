@@ -5,8 +5,8 @@
 <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
-        <h1>Acme Training Portal Demo</h1>
-        <p>This demo showcases some of the features of Ingenious DMP, set up as an training management system.</p>
+        <h1>{{ env('APP_TITLE') }}</h1>
+        <p>Utilities and helpers for the Matsu Borough IT Department.</p>
       </div>
     </div>
 
@@ -43,11 +43,10 @@
               <h2>Login To Get Started</h2>
             </div>
             <div class="panel-body">
-              <ul>
-                <li>Username: admin</li>
-                <li>Password: demoadmin</li>
-              </ul>
               @include('partials.loginform')
+            </div>
+            <div class="panel-body">
+              @include('partials.adloginform')
             </div>
           </div>
 
@@ -63,9 +62,6 @@
               <h2> <i class="fa fa-fw fa-user"></i> Welcome {{ Auth::user()->person->name }}</h2>
             </div>
             <div class="panel-body">
-              <div class="alert alert-danger">
-                <strong> <i class="fa fa-fw fa-info"></i> Please Note: </strong> This demo site contains all faked data. Any resemblance to actual data is purely coincidental.  All data on this demo site is restored to defaults every 10 minutes.
-              </div>
 
               <div class="alert alert-info">
                 <p>

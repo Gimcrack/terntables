@@ -20,12 +20,9 @@ class DatabaseSeeder extends Seeder
         $this->call(PersonSeeder::class);
         $this->call(UsersSeeder::class);
         $this->call(TagSeeder::class);
-        //$this->call(WidgetSeeder::class);
-        $this->call(OrgSeeder::class);
-        $this->call(JobRoleSeeder::class);
-        $this->call(ResourceSeeder::class);
-        $this->call(CollectionSeeder::class);
-        $this->call(RequirementSeeder::class);
+        $this->call(ServersSeeder::class);
+        $this->call(ApplicationsSeeder::class);
+        $this->call(DatabasesSeeder::class);
 
         Model::reguard();
     }

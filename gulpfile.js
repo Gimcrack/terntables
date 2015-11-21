@@ -13,7 +13,7 @@ var elixir = require('laravel-elixir');
 
 elixir(function(mix) {
 
-  var vendor_path = './vendor';
+  var vendor_path = '../../../vendor';
 
   var paths = {
     jquery : vendor_path + '/components/jquery',

@@ -18,8 +18,7 @@ $.extend( true, jApp.views.admin, {
 					"id",
 					"name",
           "users",
-					"groups",
-					"jobroles"
+					"groups"
 				],
 				hidCols : [					// columns to hide
 
@@ -28,8 +27,7 @@ $.extend( true, jApp.views.admin, {
 					"ID",
 					"Name",
           "Username(s)",
-					"Groups",
-					"Job Role(s)"
+					"Groups"
 				],
 				templates : { 				// html template functions
 
@@ -51,10 +49,6 @@ $.extend( true, jApp.views.admin, {
 							return (row.groups.length) ? _.pluck(row.groups,'name') : false
 						} ))).join(', ');
 						//return _.pluck(arr, 'name').join(', ');
-					},
-
-					"jobroles" : function(arr) {
-            return _.pluck(arr, 'name').join(', ');
 					}
 
 				}

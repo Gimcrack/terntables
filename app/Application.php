@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Person extends Model
+class Application extends Model
 {
   /**
    * Make the model track revision changes
@@ -36,18 +36,22 @@ class Person extends Model
   protected $revisionCreationsEnabled = true;
 
   /**
-   * The database table used by the model.
+   * The database table that the model references
    *
    * @var string
    */
-  protected $table = 'people';
+  protected $table = 'applications';
 
   /**
-   * The attributes that are mass assignable.
+   * The mass assignable fields
    *
    * @var array
    */
-  protected $fillable = ['name'];
+  protected $fillable = [
+      'name',
+      'description',
+      'inactive_flag'
+  ];
 
   /**
    * Polymorphic relationship. Second parameter to morphOne/morphMany
@@ -58,18 +62,27 @@ class Person extends Model
       return $this->morphOne('App\RecordLock', 'lockable');
   }
 
-
   /**
-   * A person may have many user accounts
-   * @return [type] [description]
+   * Polymorphic relationship. Second parameter to morphOne/morphMany
+   * should be the same as the prefix for the *_id/*_type fields.
    */
-  public function users()
+  public function tags()
   {
-      return $this->hasMany('App\User','people_id');
+      return $this->morphToMany('App\Tag', 'taggable');
   }
 
   /**
-   * A person can manage many servers
+   * A application can be managed by many people
+   * @method people
+   * @return [type] [description]
+   */
+  public function people()
+  {
+    return $this->belongsToMany('App\Person')->withTimestamps();
+  }
+
+  /**
+   * An application may have many servers
    * @method servers
    * @return [type]  [description]
    */
@@ -78,4 +91,13 @@ class Person extends Model
     return $this->belongsToMany('App\Server')->withTimestamps();
   }
 
+  /**
+   * A server can serve many databases
+   * @method databases
+   * @return [type]       [description]
+   */
+  public function databases()
+  {
+    return $this->belongsToMany('App\Database')->withTimestamps();
+  }
 }

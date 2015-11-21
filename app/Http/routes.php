@@ -28,38 +28,6 @@ Route::get('users/json', 'ProfileController@indexjson');
 Route::patch('users/{id}', 'ProfileController@update');
 Route::patch('resetPassword/{id}', 'ProfileController@resetPassword');
 
-
-//training routes
-// collections
-Route::get('collections/json',        'Training\CollectionController@indexjson');
-Route::get('collections/{id}/json',   'Training\CollectionController@showjson');
-Route::delete('collections',          'Training\CollectionController@destroyMany');
-Route::resource('collections',        'Training\CollectionController');
-
-// resources
-Route::get('resources/json',        'Training\ResourceController@indexjson');
-Route::get('resources/{id}/json',   'Training\ResourceController@showjson');
-Route::delete('resources',          'Training\ResourceController@destroyMany');
-Route::resource('resources',        'Training\ResourceController');
-
-// requirements
-Route::get('requirements/json',        'Training\RequirementController@indexjson');
-Route::get('requirements/{id}/json',   'Training\RequirementController@showjson');
-Route::delete('requirements',          'Training\RequirementController@destroyMany');
-Route::resource('requirements',        'Training\RequirementController');
-
-// orgs
-Route::get('orgs/json',        'OrgController@indexjson');
-Route::get('orgs/{id}/json',   'OrgController@showjson');
-Route::delete('orgs',          'OrgController@destroyMany');
-Route::resource('orgs',        'OrgController');
-
-// jobroles
-Route::get('jobroles/json',        'JobRoleController@indexjson');
-Route::get('jobroles/{id}/json',   'JobRoleController@showjson');
-Route::delete('jobroles',          'JobRoleController@destroyMany');
-Route::resource('jobroles',        'JobRoleController');
-
 // documents
 Route::get('documents/json',      'DocumentController@indexjson');
 Route::get('documents/{id}/json', 'DocumentController@showjson');
@@ -67,6 +35,27 @@ Route::get('documents/{id}/pdf',  'DocumentController@showpdf');
 Route::get('documents/{id}/raw',  'DocumentController@showraw');
 Route::delete('documents',        'DocumentController@destroyMany');
 Route::resource('documents',      'DocumentController');
+
+// bi - servers
+Route::get('bi/servers/json',         'BI\ServerController@indexjson');
+Route::get('bi/servers/{id}/json',    'BI\ServerController@showjson');
+Route::delete('bi/servers',           'BI\ServerController@destroyMany');
+Route::patch('bi/servers/massUpdate', 'BI\ServerController@markServers');
+Route::resource('bi/servers',         'BI\ServerController');
+
+// bi - applications
+Route::get('bi/applications/json',         'BI\ApplicationController@indexjson');
+Route::get('bi/applications/{id}/json',    'BI\ApplicationController@showjson');
+Route::delete('bi/applications',           'BI\ApplicationController@destroyMany');
+Route::patch('bi/applications/massUpdate', 'BI\ApplicationController@markApplications');
+Route::resource('bi/applications',         'BI\ApplicationController');
+
+// bi - databases
+Route::get('bi/databases/json',         'BI\DatabaseController@indexjson');
+Route::get('bi/databases/{id}/json',    'BI\DatabaseController@showjson');
+Route::delete('bi/databases',           'BI\DatabaseController@destroyMany');
+Route::patch('bi/databases/massUpdate', 'BI\DatabaseController@markDatabases');
+Route::resource('bi/databases',         'BI\DatabaseController');
 
 // pages
 Route::get('selopts/_{model}_{options}_{labels}', 'PagesController@optionsjson');

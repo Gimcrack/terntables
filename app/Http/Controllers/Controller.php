@@ -10,6 +10,7 @@ use App\Tag;
 use Input;
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use DB;
 
 abstract class Controller extends BaseController
 {
@@ -40,10 +41,16 @@ abstract class Controller extends BaseController
     public $with = [];
 
     /**
-     * Many-To-X Relationships to save
+     * Many-To-Many Relationships to save
      * @var [type]
      */
     public $relations = [];
+
+    /**
+     * Many-To-One, One-To-One relationships to save
+     * @var [type]
+     */
+    public $belongs = [];
 
     /**
      * Load the checkaccess middleware for the controller
@@ -74,7 +81,13 @@ abstract class Controller extends BaseController
      */
     public function indexjson()
     {
+        $input = Input::all();
         $model_class = $this->model_class;
+
+        if (!empty($input['filter'])) {
+          return response()->json( $model_class::with($this->with)->whereRaw($input['filter'])->get() );
+        }
+
         return response()->json( $model_class::with($this->with)->get() );
     }
 
@@ -118,7 +131,7 @@ abstract class Controller extends BaseController
           }
         }
       }
-      
+
       // process m21 relations
       if (!empty($this->belongs)) {
         foreach ($this->belongs as $relation) {
@@ -215,9 +228,32 @@ abstract class Controller extends BaseController
      */
     public function destroyMany()
     {
-      $input = Input::all();
       $model_class = $this->model_class;
-      $model_class::whereIn('id',explode(',',$input['ids']))->delete();
+      $model_class::whereIn('id', $this->getInputIds() )->delete();
+      return $this->operationSuccessful();
+    }
+
+    /**
+     * Get ids from Input
+     * @method getInputIds
+     * @return [type]      [description]
+     */
+    public function getInputIds()
+    {
+      $input = Input::all();
+      return explode(',',$input['ids'][0]);
+    }
+
+    /**
+     * Mass update the models with selected ids with the changes
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function massUpdate($ids, $changes)
+    {
+      $table_name = (new $this->model_class)->getTable();
+      DB::table($table_name)->whereIn('id',$ids)->update($changes);
       return $this->operationSuccessful();
     }
 

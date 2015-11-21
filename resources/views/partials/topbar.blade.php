@@ -9,9 +9,6 @@
   		{{ env('APP_HEADER_TITLE','Laravel Dashboard')}}
   		<span class="label label-primary label-small">{{ env('APP_LABEL') }}</span>
   	</a>
-    <a class="navbar-brand" href="http://in.genio.us/">
-  		<i class="fa fa-fw fa-arrow-left"></i> back to ingenious home
-  	</a>
   </div>
   <!-- /.navbar-header -->
 

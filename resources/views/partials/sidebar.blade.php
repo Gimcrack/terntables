@@ -9,6 +9,7 @@
 
   		<ul class="nav" id="side-menu">
       <!-- BASE MODULE -->
+
       <li>
         <a href="{{ url('home') }}"><i class="fa fa-home fa-fw"></i> Home</a>
       </li>
@@ -17,12 +18,35 @@
         <a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
       </li>
 
-      @if( Auth::user()->checkAccess('Org.read') )
+      @if( Auth::user()->checkAccess('Document.read') )
       <li>
-        <a href="{{ url('orgs') }}"><i class="fa fa-building-o fa-fw"></i> Manage Orgs</a>
+  			<a href="#"><i class="fa fa-globe fa-fw"></i> GIS <span class="fa arrow"></span></a>
+  			<ul class="nav nav-second-level">
+          <li>
+            <a href="{{ url('documents') }}"><i class="fa fa-file-text-o fa-fw"></i> Documents</a>
+          </li>
+        </ul>
       </li>
       @endif
 
+      @if( Auth::user()->checkAccess('Server.read') )
+      <li>
+  			<a href="#"><i class="fa fa-database fa-fw"></i> BI <span class="fa arrow"></span></a>
+  			<ul class="nav nav-second-level">
+          <li>
+            <a href="{{ url('bi/servers') }}"><i class="fa fa-server fa-fw"></i> Servers</a>
+          </li>
+          <li>
+            <a href="{{ url('bi/applications') }}"><i class="fa fa-windows fa-fw"></i> Applications</a>
+          </li>
+          <li>
+            <a href="{{ url('bi/databases') }}"><i class="fa fa-database fa-fw"></i> Databases</a>
+          </li>
+        </ul>
+      </li>
+      @endif
+
+      <!--
       @if( Auth::user()->checkAccess('JobRole.read') )
       <li>
         <a href="{{ url('jobroles') }}"><i class="fa fa-briefcase fa-fw"></i> Manage Job Roles</a>
@@ -43,7 +67,7 @@
           </li>
 
   			</ul>
-  		</li>
+  		</li> -->
   	</ul>
   	</div>
   	<!-- /.sidebar-collapse -->

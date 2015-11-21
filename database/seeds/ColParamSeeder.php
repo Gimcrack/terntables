@@ -822,13 +822,11 @@ class ColParamSeeder extends Seeder
         , 'multiple' => 1
         ]);
 
-        //widgets
-
-        // documents colparams
-        ColParam::create([	'tableName' => 'widgets'
+        // servers colparams
+        ColParam::create([	'tableName' => 'servers'
         ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. Watchacallits'
-        ,	'_label' => 'Widget Name'
+        ,	'placeholder' => 'e.g. MSB01SQL'
+        ,	'_label' => 'Host Name'
         ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'
@@ -836,18 +834,7 @@ class ColParamSeeder extends Seeder
         , 'data-validType' => 'Anything'
         ]);
 
-        ColParam::create([	'tableName' => 'widgets'
-        ,	'name' => 'product_id'
-        ,	'placeholder' => 'e.g. 1234567890'
-        ,	'_label' => 'Product ID'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
-        , 'required' => 1
-        , 'data-validType' => 'Anything'
-        ]);
-
-        ColParam::create([	'tableName' => 'widgets'
+        ColParam::create([	'tableName' => 'servers'
         ,	'name' => 'description'
         ,	'type' => 'textarea'
         ,	'_label' => 'Description'
@@ -857,261 +844,90 @@ class ColParamSeeder extends Seeder
         , 'required' => 0
         ]);
 
-        ColParam::create([	'tableName' => 'widgets'
-        ,	'name' => 'status'
-        ,	'placeholder' => 'e.g. ordered'
-        ,	'_label' => 'Status'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
-        , 'required' => 1
-        , 'data-validType' => 'Anything'
-        ]);
-
-        ColParam::create([	'tableName' => 'widgets'
-        ,	'name' => 'quantity'
-        ,	'type' => 'number'
-        , 'step' => 1
-        ,	'_label' => 'Quantity'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
-        , 'required' => 1
-        , 'data-validType' => 'Integer'
-        ]);
-
-        ColParam::create([	'tableName' => 'widgets'
-        ,	'name' => 'tags'
-        ,	'type' => 'tokens'
-        ,	'_label' => 'Tags'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '3'
-        , '_labelssource' => "Tag.name"
-        , '_optionssource' => "Tag.id"
-        , 'multiple' => 1
-        ]);
-
-        // orgs
-        ColParam::create([	'tableName' => 'orgs'
-        ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. Accounts Payable'
-        ,	'_label' => 'Org Name'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
-        , 'required' => 1
-        , 'data-validType' => 'Anything'
-        ]);
-
-        ColParam::create([	'tableName' => 'orgs'
-        ,	'name' => 'description'
-        ,	'type' => 'textarea'
-        ,	'_label' => 'Description'
+        ColParam::create([	'tableName' => 'servers'
+        ,	'name' => 'cname'
+        , 'type' => 'textarea'
+        ,	'_label' => 'CNAME(s)'
         ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '1'
-        , 'required' => 0
         ]);
 
-        ColParam::create([	'tableName' => 'orgs'
-        ,	'name' => 'parent_id'
-        ,	'type' => 'select'
-        ,	'_label' => 'Parent Org'
-        ,	'_enabled' => 1
-        , '_firstlabel' => '-Choose-'
-        , '_firstoption' => 0
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '3'
-        , 'data-validType' => 'select'
-        , '_labelssource' => "Org.name"
-        , '_optionssource' => "Org.id"
-        , 'multiple' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'orgs'
-        ,	'name' => 'tags'
-        ,	'type' => 'tokens'
-        ,	'_label' => 'Tags'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '3'
-        , '_labelssource' => "Tag.name"
-        , '_optionssource' => "Tag.id"
-        , 'multiple' => 1
-        ]);
-
-        // jobroles
-        ColParam::create([	'tableName' => 'jobroles'
-        ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. Comptroller'
-        ,	'_label' => 'Job Title'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
+        ColParam::create([	'tableName' => 'servers'
+        ,	'name' => 'ip'
+        ,	'_label' => 'IP Address'
         , 'required' => 1
-        , 'data-validType' => 'Anything'
+        , 'data-validType' => 'IPV4'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '4'
+        ,	'data-fieldset' => '1'
         ]);
 
-        ColParam::create([	'tableName' => 'jobroles'
-        ,	'name' => 'people_id'
+        ColParam::create([	'tableName' => 'servers'
+        ,	'name' => 'inactive_flag'
+        ,	'_label' => 'Is the server inactive?'
         , 'type' => 'select'
-        ,	'_label' => 'Occupant'
+        ,	'_optionsSource' => '0|1'
+        ,	'_labelsSource' => 'No|Yes'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '2'
+        ]);
+
+        ColParam::create([	'tableName' => 'servers'
+        ,	'name' => 'production_flag'
+        ,	'_label' => 'Is the server in production'
+        , 'type' => 'select'
+        ,	'_optionsSource' => '1|0'
+        ,	'_labelsSource' => 'Production|Dev or Testing'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '2'
+        ]);
+
+        ColParam::create([	'tableName' => 'servers'
+        ,	'name' => 'people'
+        ,	'type' => 'select'
+        ,	'_label' => 'Server Contacts'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Person.name"
+        , '_optionssource' => "Person.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'servers'
+        ,	'name' => 'applications'
+        ,	'type' => 'select'
+        ,	'_label' => 'Server Applications'
         ,	'_enabled' => 1
         ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '1'
-        , '_optionssource' => 'Person.id'
-        , '_labelssource' => 'Person.name'
-        , '_firstlabel' => '-Vacant-'
-        , '_firstoption' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'jobroles'
-        ,	'name' => 'description'
-        ,	'type' => 'textarea'
-        ,	'_label' => 'Description'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '1'
-        , 'required' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'jobroles'
-        ,	'name' => 'org_id'
-        ,	'type' => 'select'
-        ,	'_label' => 'Parent Org'
-        ,	'_enabled' => 1
-        , 'required' => 1
-        , '_firstlabel' => '-Choose-'
-        , '_firstoption' => 0
-        ,	'data-ordering' => '1'
         ,	'data-fieldset' => '3'
         , 'data-validType' => 'select'
-        , '_labelssource' => "Org.name"
-        , '_optionssource' => "Org.id"
-        , 'multiple' => 0
+        , '_labelssource' => "Application.name"
+        , '_optionssource' => "Application.id"
+        , 'multiple' => 1
         ]);
 
-        ColParam::create([	'tableName' => 'jobroles'
-        ,	'name' => 'manager_id'
-        ,	'type' => 'select'
-        ,	'_label' => 'Manager'
-        ,	'_enabled' => 1
-        , '_firstlabel' => '-None-'
-        , '_firstoption' => 0
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '3'
-        , 'data-validType' => 'select'
-        , '_labelssource' => "JobRole.name"
-        , '_optionssource' => "JobRole.id"
-        , '_optionsfilter' => "manager_flag:1"
-        , 'multiple' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'jobroles'
-        ,	'name' => 'manager_flag'
-        ,	'type' => 'select'
-        ,	'_label' => 'Is Manager?'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '3'
-        , 'data-validType' => 'select'
-        , '_labelssource' => "No|Yes"
-        , '_optionssource' => "0|1"
-        , 'multiple' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'jobroles'
+        ColParam::create([	'tableName' => 'servers'
         ,	'name' => 'tags'
         ,	'type' => 'tokens'
         ,	'_label' => 'Tags'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '3'
-        , '_labelssource' => "Tag.name"
-        , '_optionssource' => "Tag.id"
-        , 'multiple' => 1
-        ]);
-
-        // collections
-        ColParam::create([	'tableName' => 'collections'
-        ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. HR Policies'
-        ,	'_label' => 'Collection Name'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
-        , 'required' => 1
-        , 'data-validType' => 'Anything'
-        ]);
-
-        ColParam::create([	'tableName' => 'collections'
-        ,	'name' => 'org_id'
-        , 'type' => 'select'
-        ,	'_label' => 'Managing Org'
-        ,	'_enabled' => 1
-        , 'required' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '3'
-        , '_optionssource' => 'Org.id'
-        , '_labelssource' => 'Org.name'
-        , '_firstlabel' => '-Choose-'
-        , '_firstoption' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'collections'
-        ,	'name' => 'description'
-        ,	'type' => 'textarea'
-        ,	'_label' => 'Description'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '1'
-        , 'required' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'collections'
-        ,	'name' => 'resources'
-        ,	'type' => 'select'
-        ,	'_label' => 'What resources are in this collection?'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '3'
-        , 'data-validType' => 'select'
-        , '_labelssource' => "Resource.name"
-        , '_optionssource' => "Resource.id"
-        , 'multiple' => 1
-        ]);
-
-        ColParam::create([	'tableName' => 'collections'
-        ,	'name' => 'requirements'
-        ,	'type' => 'select'
-        ,	'_label' => 'What requirements are met with this collection?'
         ,	'_enabled' => 1
         ,	'data-ordering' => '3'
         ,	'data-fieldset' => '3'
-        , 'data-validType' => 'select'
-        , '_labelssource' => "Requirement.name"
-        , '_optionssource' => "Requirement.id"
-        , 'multiple' => 1
-        ]);
-
-        ColParam::create([	'tableName' => 'collections'
-        ,	'name' => 'tags'
-        ,	'type' => 'tokens'
-        ,	'_label' => 'Tags'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '3'
         , '_labelssource' => "Tag.name"
         , '_optionssource' => "Tag.id"
         , 'multiple' => 1
         ]);
 
-        // resources
-        ColParam::create([	'tableName' => 'resources'
+        // applications colparams
+        ColParam::create([	'tableName' => 'applications'
         ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. Employee Conduct Policy'
-        ,	'_label' => 'Resource Name'
+        ,	'placeholder' => 'e.g. Abra'
+        ,	'_label' => 'Application Name'
         ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '1'
@@ -1119,41 +935,78 @@ class ColParamSeeder extends Seeder
         , 'data-validType' => 'Anything'
         ]);
 
-        ColParam::create([	'tableName' => 'resources'
-        ,	'name' => 'type'
-        ,	'placeholder' => 'e.g. Memo'
-        ,	'_label' => 'Resource Type'
+        ColParam::create([	'tableName' => 'applications'
+        ,	'name' => 'description'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Description'
         ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
+        ,	'data-ordering' => '3'
         ,	'data-fieldset' => '1'
         , 'required' => 0
         ]);
 
-        ColParam::create([	'tableName' => 'resources'
-        ,	'name' => 'location'
-        ,	'placeholder' => 'e.g. http://example.com/folder/page.html'
-        ,	'_label' => 'Resource Location'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
-        , 'required' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'resources'
-        ,	'name' => 'org_id'
+        ColParam::create([	'tableName' => 'applications'
+        ,	'name' => 'inactive_flag'
+        ,	'_label' => 'Is the application inactive?'
         , 'type' => 'select'
-        ,	'_label' => 'Managing Org'
+        ,	'_optionsSource' => '0|1'
+        ,	'_labelsSource' => 'No|Yes'
         ,	'_enabled' => 1
-        , 'required' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '2'
+        ]);
+
+        ColParam::create([	'tableName' => 'applications'
+        ,	'name' => 'people'
+        ,	'type' => 'select'
+        ,	'_label' => 'Application Contacts'
+        ,	'_enabled' => 1
         ,	'data-ordering' => '1'
         ,	'data-fieldset' => '3'
-        , '_optionssource' => 'Org.id'
-        , '_labelssource' => 'Org.name'
-        , '_firstlabel' => '-Choose-'
-        , '_firstoption' => 0
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Person.name"
+        , '_optionssource' => "Person.id"
+        , 'multiple' => 1
         ]);
 
-        ColParam::create([	'tableName' => 'resources'
+        ColParam::create([	'tableName' => 'applications'
+        ,	'name' => 'servers'
+        ,	'type' => 'select'
+        ,	'_label' => 'Application Servers'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Server.name"
+        , '_optionssource' => "Server.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'applications'
+        ,	'name' => 'tags'
+        ,	'type' => 'tokens'
+        ,	'_label' => 'Tags'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '4'
+        ,	'data-fieldset' => '3'
+        , '_labelssource' => "Tag.name"
+        , '_optionssource' => "Tag.id"
+        , 'multiple' => 1
+        ]);
+
+        // databases colparams
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'name'
+        ,	'placeholder' => 'e.g. LogosDB'
+        ,	'_label' => 'Database Name'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '1'
+        , 'required' => 1
+        , 'data-validType' => 'Anything'
+        ]);
+
+        ColParam::create([	'tableName' => 'databases'
         ,	'name' => 'description'
         ,	'type' => 'textarea'
         ,	'_label' => 'Description'
@@ -1163,99 +1016,125 @@ class ColParamSeeder extends Seeder
         , 'required' => 0
         ]);
 
-        ColParam::create([	'tableName' => 'resources'
-        ,	'name' => 'collections'
-        ,	'type' => 'select'
-        ,	'_label' => 'What collections do this resource belong to?'
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'rpo'
+        ,	'_label' => 'Recovery Point Objective'
         ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '3'
-        , 'data-validType' => 'select'
-        , '_labelssource' => "Collection.name"
-        , '_optionssource' => "Collection.id"
-        , 'multiple' => 1
-        ]);
-
-        ColParam::create([	'tableName' => 'resources'
-        ,	'name' => 'tags'
-        ,	'type' => 'tokens'
-        ,	'_label' => 'Tags'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
-        ,	'data-fieldset' => '3'
-        , '_labelssource' => "Tag.name"
-        , '_optionssource' => "Tag.id"
-        , 'multiple' => 1
-        ]);
-
-        // requirements
-        ColParam::create([	'tableName' => 'requirements'
-        ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. HR Policies Certification'
-        ,	'_label' => 'Requirement Name'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
-        , 'required' => 1
-        , 'data-validType' => 'Anything'
-        ]);
-
-        ColParam::create([	'tableName' => 'requirements'
-        ,	'name' => 'org_id'
-        , 'type' => 'select'
-        ,	'_label' => 'Managing Org'
-        ,	'_enabled' => 1
-        , 'required' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '3'
-        , '_optionssource' => 'Org.id'
-        , '_labelssource' => 'Org.name'
-        , '_firstlabel' => '-Choose-'
-        , '_firstoption' => 0
-        ]);
-
-        ColParam::create([	'tableName' => 'requirements'
-        ,	'name' => 'description'
-        ,	'type' => 'textarea'
-        ,	'_label' => 'Description'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
+        ,	'data-ordering' => '3'
         ,	'data-fieldset' => '1'
         , 'required' => 0
         ]);
 
-        ColParam::create([	'tableName' => 'requirements'
-        ,	'name' => 'collections'
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'ha_strategy'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'HA Strategy'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '4'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'dr_strategy'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'DR Strategy'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '5'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'upgrade_readiness'
+        ,	'type' => 'textarea'
+        ,	'_label' => 'Upgrade Readiness'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '6'
+        ,	'data-fieldset' => '1'
+        , 'required' => 0
+        ]);
+
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'inactive_flag'
+        ,	'_label' => 'Is the database inactive?'
+        , 'type' => 'select'
+        ,	'_optionsSource' => '0|1'
+        ,	'_labelsSource' => 'No|Yes'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '2'
+        ]);
+
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'production_flag'
+        ,	'_label' => 'Is the database in production?'
+        , 'type' => 'select'
+        ,	'_optionsSource' => '1|0'
+        ,	'_labelsSource' => 'Yes|No'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '2'
+        ,	'data-fieldset' => '2'
+        ]);
+
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'ignore_flag'
+        ,	'_label' => 'Ignore the database?'
+        , 'type' => 'select'
+        ,	'_optionsSource' => '0|1'
+        ,	'_labelsSource' => 'No|Yes'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '3'
+        ,	'data-fieldset' => '2'
+        ]);
+
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'people'
         ,	'type' => 'select'
-        ,	'_label' => 'What collections belong to this requirement?'
+        ,	'_label' => 'Database Contacts'
+        ,	'_enabled' => 1
+        ,	'data-ordering' => '1'
+        ,	'data-fieldset' => '3'
+        , 'data-validType' => 'select'
+        , '_labelssource' => "Person.name"
+        , '_optionssource' => "Person.id"
+        , 'multiple' => 1
+        ]);
+
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'server_id'
+        ,	'type' => 'select'
+        ,	'_label' => 'Database Host Server'
         ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '3'
         , 'data-validType' => 'select'
-        , '_labelssource' => "Collection.name"
-        , '_optionssource' => "Collection.id"
-        , 'multiple' => 1
+        , 'required' => 1
+        , '_firstlabel' => '-Choose-'
+        , '_firstoption' => -1
+        , '_labelssource' => "Server.name"
+        , '_optionssource' => "Server.id"
         ]);
 
-        ColParam::create([	'tableName' => 'requirements'
-        ,	'name' => 'jobroles'
+        ColParam::create([	'tableName' => 'databases'
+        ,	'name' => 'servers'
         ,	'type' => 'select'
-        ,	'_label' => 'What job roles have this requirement?'
+        ,	'_label' => 'Database Servers'
         ,	'_enabled' => 1
         ,	'data-ordering' => '2'
         ,	'data-fieldset' => '3'
         , 'data-validType' => 'select'
-        , '_labelssource' => "JobRole.name"
-        , '_optionssource' => "JobRole.id"
+        , '_labelssource' => "Server.name"
+        , '_optionssource' => "Server.id"
         , 'multiple' => 1
         ]);
 
-        ColParam::create([	'tableName' => 'requirements'
+        ColParam::create([	'tableName' => 'databases'
         ,	'name' => 'tags'
         ,	'type' => 'tokens'
         ,	'_label' => 'Tags'
         ,	'_enabled' => 1
-        ,	'data-ordering' => '2'
+        ,	'data-ordering' => '4'
         ,	'data-fieldset' => '3'
         , '_labelssource' => "Tag.name"
         , '_optionssource' => "Tag.id"
