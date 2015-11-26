@@ -58,8 +58,8 @@ class ServerController extends Controller
   public function __construct()
   {
     $this->views = (object) $this->views;
-    $this->middleware('auth');
-    $this->checkAccessMiddleware();
+    //$this->middleware('auth');
+    //$this->checkAccessMiddleware();
   }
 
   /**

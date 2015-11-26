@@ -12,6 +12,13 @@
 */
 
 
+// api
+
+Route::group(['prefix' => 'api/1.0'], function() {
+  Route::get('bi/servers',      'Api\v1_0\ApiController@servers');
+  Route::get('bi/databases',    'Api\v1_0\ApiController@databases');
+  Route::get('bi/applications', 'Api\v1_0\ApiController@applications');
+});
 
 /**
  * User Routes
@@ -19,6 +26,9 @@
 
 
 //misc
+Route::get('/test', function(){
+  return view('test.index');
+});
 Route::get('/', 'PagesController@home');
 Route::get('home', 'PagesController@home');
 

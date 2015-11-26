@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6e1f1cb295c7d8f3a8a1175a73a49dbe",
-    "content-hash": "e27862792aed20a80873efb7134a1c4a",
+    "hash": "ad434e78b4bf58b5dd72a58cdf4947a3",
+    "content-hash": "4b9c28feb78ada1ee8666c876e76baba",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -220,7 +220,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabinus52/bootstrap-datetimepicker/zipball/9be695081ae944ac4932255c2a90ddc15b648dd1",
+                "url": "https://api.github.com/repos/sabinus52/bootstrap-datetimepicker/zipball/4617091080d8eb58fd35d93564c458238db87396",
                 "reference": "9be695081ae944ac4932255c2a90ddc15b648dd1",
                 "shasum": ""
             },
@@ -801,7 +801,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/274f85797eceee676fd9ed31f8d312d54c061939",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/a4fac1e36b2e9e4e21993447eb3e4148cb363e9f",
                 "reference": "274f85797eceee676fd9ed31f8d312d54c061939",
                 "shasum": ""
             },
@@ -1912,6 +1912,114 @@
             "time": "2015-09-14 13:45:35"
         },
         {
+            "name": "neomerx/cors-illuminate",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/neomerx/cors-illuminate.git",
+                "reference": "2b57608383ff9b56a1431dc841e2fc1f857babe3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/neomerx/cors-illuminate/zipball/2b57608383ff9b56a1431dc841e2fc1f857babe3",
+                "reference": "2b57608383ff9b56a1431dc841e2fc1f857babe3",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "~5.1.0",
+                "neomerx/cors-psr7": "^0.2.0",
+                "php": ">=5.5.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpunit/phpunit": "^4.6",
+                "scrutinizer/ocular": "^1.1",
+                "squizlabs/php_codesniffer": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Neomerx\\CorsIlluminate\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "CORS (Cross-Origin Resource Sharing) support for Laravel and Lumen",
+            "homepage": "https://github.com/neomerx/cors-illuminate",
+            "keywords": [
+                "Cross Origin Resource Sharing",
+                "Cross-Origin Resource Sharing",
+                "cors",
+                "laravel",
+                "lumen",
+                "neomerx"
+            ],
+            "time": "2015-08-19 00:17:16"
+        },
+        {
+            "name": "neomerx/cors-psr7",
+            "version": "v0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/neomerx/cors-psr7.git",
+                "reference": "9d3db684c41e343bfe394c602bba9f6c76616e86"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/neomerx/cors-psr7/zipball/9d3db684c41e343bfe394c602bba9f6c76616e86",
+                "reference": "9d3db684c41e343bfe394c602bba9f6c76616e86",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9.4",
+                "phpunit/phpunit": "~4.6",
+                "scrutinizer/ocular": "~1.1",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Neomerx\\Cors\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "neomerx",
+                    "email": "info@neomerx.com"
+                }
+            ],
+            "description": "Framework agnostic (PSR-7) CORS implementation (www.w3.org/TR/cors/)",
+            "homepage": "https://github.com/neomerx/cors-psr7",
+            "keywords": [
+                "Cross Origin Resource Sharing",
+                "Cross-Origin Resource Sharing",
+                "cors",
+                "neomerx",
+                "psr-7",
+                "psr7",
+                "w3.org",
+                "www.w3.org"
+            ],
+            "time": "2015-08-16 14:49:38"
+        },
+        {
             "name": "nesbot/carbon",
             "version": "1.20.0",
             "source": {
@@ -2123,6 +2231,55 @@
             "description": "A library to read, parse, export and make subsets of different types of font files.",
             "homepage": "https://github.com/PhenX/php-font-lib",
             "time": "2014-02-01 15:22:28"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "85d63699f0dbedb190bbd4b0d2b9dc707ea4c298"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/85d63699f0dbedb190bbd4b0d2b9dc707ea4c298",
+                "reference": "85d63699f0dbedb190bbd4b0d2b9dc707ea4c298",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2015-05-04 20:22:00"
         },
         {
             "name": "psr/log",
@@ -3194,7 +3351,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VentureCraft/revisionable/zipball/4109e65822746634f726869bfa0c6374aa134d69",
+                "url": "https://api.github.com/repos/VentureCraft/revisionable/zipball/832e6ccd5be71066c0c1895d9daa746ac6181b4a",
                 "reference": "4109e65822746634f726869bfa0c6374aa134d69",
                 "shasum": ""
             },
@@ -4480,7 +4637,8 @@
         "ingenious/jquery-tokeninput": 20,
         "ingenious/bootstrap-tokenfield": 20,
         "ingenious/jstorage": 20,
-        "components/jqueryui": 20
+        "components/jqueryui": 20,
+        "neomerx/cors-illuminate": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

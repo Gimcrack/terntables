@@ -1,5 +1,7 @@
 var elixir = require('laravel-elixir');
 
+require('laravel-elixir-livereload');
+
 /*
  |--------------------------------------------------------------------------
  | Elixir Asset Management
@@ -13,7 +15,7 @@ var elixir = require('laravel-elixir');
 
 elixir(function(mix) {
 
-  var vendor_path = '../../../vendor';
+  var vendor_path = './vendor';
 
   var paths = {
     jquery : vendor_path + '/components/jquery',
@@ -40,6 +42,7 @@ elixir(function(mix) {
     historyjs : vendor_path + '/ingenious/history.js',
   }
 
+
   var jsPaths = {
     jquery : paths.jquery, // done
     jqueryui : paths.jqueryui, // done
@@ -64,6 +67,15 @@ elixir(function(mix) {
     historyjs : paths.historyjs + '/scripts/bundled/html4+html5', // done
   }
 
+  var babelScripts = [
+    jsPaths.asyncGrid + '/jApp.class.js',
+    jsPaths.asyncGrid + '/jUtility.class.js',
+    jsPaths.asyncGrid + '/jForm.class.js',
+    jsPaths.asyncGrid + '/jInput.class.js',
+    jsPaths.asyncGrid + '/jLinkTable.class.js',
+    jsPaths.asyncGrid + '/jGrid.class.js',
+  ];
+
   var jsScripts = [
     jsPaths.jquery + '/jquery.js',
     jsPaths.jquery + '/jquery-migrate.js',
@@ -78,12 +90,6 @@ elixir(function(mix) {
     jsPaths.jqueryValidator + '/jquery.psiblings.js',
     jsPaths.tokenField + '/bootstrap-tokenfield.js',
     jsPaths.jqueryValidator + '/jquery.validator.js',
-    jsPaths.asyncGrid + '/jApp.class.js',
-    jsPaths.asyncGrid + '/jUtility.class.js',
-    jsPaths.asyncGrid + '/jForm.class.js',
-    jsPaths.asyncGrid + '/jInput.class.js',
-    jsPaths.asyncGrid + '/jLinkTable.class.js',
-    jsPaths.asyncGrid + '/jGrid.class.js',
     jsPaths.bootstrapMultiselect + '/bootstrap-multiselect.js',
     jsPaths.classie + '/classie.js',
     jsPaths.jqueryBootpag + '/jquery.bootpag.js',
@@ -111,12 +117,14 @@ elixir(function(mix) {
    ];
 
     //scripts
-    mix.scripts(jsScripts, 'public/js/all.js');
+    mix
+      .babel(babelScripts, 'resources/assets/js/async-grid.js')
+      .scripts(jsScripts)
 
     //styles
     mix.sass('app.scss',
       'public/css/all.css', {
         includePaths : cssPaths
-    });
+    });//.livereload();
 
 });

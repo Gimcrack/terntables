@@ -152,6 +152,8 @@ return [
 
         Barryvdh\DomPDF\ServiceProvider::class,
 
+        Neomerx\CorsIlluminate\Providers\LaravelServiceProvider::class,
+
     ],
 
     /*
