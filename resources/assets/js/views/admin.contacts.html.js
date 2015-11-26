@@ -1,3 +1,40 @@
+//define the colparams for the view
+$.extend(true, jApp.colparams, {
+		'Person' : [
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-4',
+					fields : [
+						{
+							name : 'name',
+							placeholder : 'e.g. John Smith',
+							required : true,
+							_label : 'Enter the person\'s full name',
+							_enabled : true,
+							'data-validType' : 'Anything'
+						}
+					]
+				},
+
+				{ // fieldset
+					label : ' ',
+					class : 'col-lg-8',
+					fields : [
+						{
+							name : 'users',
+							type : 'select',
+							_label : 'Associate one or more Usernames with this Person',
+							_enabled : true,
+							_labelssource : 'User.username',
+							_optionssource : 'User.id',
+							multiple : true
+						}
+					]
+				}
+		]
+});
+
 // extend the application views
 $.extend( true, jApp.views.admin, {
 

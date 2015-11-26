@@ -13,8 +13,8 @@ fieldset[disabled] {
 .div-btn-edit, .div-btn-reset, .div-btn-delete, .div-btn-new, .div-btn-other {
 	height:64px;
 	width:33.33%;
-	background:#FFF;
-	border:1px solid $primary;
+	background:#eaeaea;
+	border: none;
 	position:absolute;
 	top:0;
 	left:0;
@@ -38,19 +38,20 @@ fieldset[disabled] {
 
 	&.max {
 		position:fixed;
-		max-height:96%;
 		height:auto;
-		width:96%;
+		width:auto;
 		opacity:1;
 		z-index:9990;
-		top:2%;
-		left:2%;
-		//padding-bottom:40px;
-		overflow:hidden;
+		top:20px;
+		left:20px;
+		right:20px;
+		bottom:20px;
+		overflow:auto;
 
-		//box-shadow: 5px 5px 5px #666666;
-		transition:height 0.3s linear, width 0.3s linear, opacity 0.3s linear;
-
+		.panel-body {
+			padding: 0 !important;
+			margin-top:60px;
+		}
 
 		.frm_wrapper {
 			visibility:visible;
@@ -59,10 +60,10 @@ fieldset[disabled] {
 			opacity:1;
 
 			.row.side-by-side {
-				height:auto;
-				min-height:300px;
-				max-height:60%;
-				overflow:auto;
+				// height:auto;
+				// min-height:300px;
+				// max-height:60%;
+				// overflow:auto;
 			}
 
 			div.form-control.tokeninput {
@@ -82,8 +83,7 @@ fieldset[disabled] {
 			}
 
 			.form-control input[data-validtype=color] {
-				 text-decoration: underline;
-				-moz-text-decoration-color: black; /* Code for Firefox */
+				text-decoration: underline;
 				text-decoration-color: black;
 			}
 
@@ -91,11 +91,36 @@ fieldset[disabled] {
 				padding-bottom:40px;
 			}
 
-			form .panel-heading:last-child {
+			form .panel-btns {
 				position:absolute;
-				bottom:-7px;
-				background:none !important;
-				border: none !important;
+				margin-top:40px;
+				padding:0;
+				top:0px;
+				left:0px;
+				width:100%;
+				background:lighten($primary, 20%) !important;
+				border: none;
+				border-bottom: 1px solid $primary;
+
+				&.footer {
+					bottom:0px !important;
+					margin-top:0 !important;
+					top:inherit;
+					border-top: 1px solid $primary;
+					border-bottom: none;
+				}
+
+				.btn {
+					padding: 10px;
+				}
+
+				.btn-formMenu {
+					background: lighten($primary,10%) !important;
+					border: 1px solid $primary;
+					outline: none !important;
+					cursor: default;
+					color : darken($primary,10%);
+				}
 			}
 
 		}

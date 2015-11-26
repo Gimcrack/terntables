@@ -38,19 +38,19 @@ abstract class Controller extends BaseController
      * What relationships to grab with the model
      * @var [type]
      */
-    public $with = [];
+    public $with;
 
     /**
      * Many-To-Many Relationships to save
      * @var [type]
      */
-    public $relations = [];
+    public $relations;
 
     /**
      * Many-To-One, One-To-One relationships to save
      * @var [type]
      */
-    public $belongs = [];
+    public $belongs;
 
     /**
      * Load the checkaccess middleware for the controller
@@ -58,7 +58,7 @@ abstract class Controller extends BaseController
      */
     public function checkAccessMiddleware()
     {
-      $this->middleware("checkaccess:{$this->model_short}.read");
+      //$this->middleware("checkaccess:{$this->model_short}.read");
       $this->middleware("checkaccess:{$this->model_short}.create",['only' => ['store'] ]);
       $this->middleware("checkaccess:{$this->model_short}.update",['only' => ['showjson','update'] ]);
       $this->middleware("checkaccess:{$this->model_short}.delete",['only' => ['destroy','destroyMany'] ]);
@@ -84,11 +84,13 @@ abstract class Controller extends BaseController
         $input = Input::all();
         $model_class = $this->model_class;
 
-        if (!empty($input['filter'])) {
-          return response()->json( $model_class::with($this->with)->whereRaw($input['filter'])->get() );
-        }
+        $results = ( !empty($input['filter']) ) ?
+          $model_class::with($this->with)->whereRaw($input['filter'])->get() :
+          $model_class::with($this->with)->get();
 
-        return response()->json( $model_class::with($this->with)->get() );
+
+        return response()->json( $results  );
+
     }
 
     /**
@@ -115,19 +117,31 @@ abstract class Controller extends BaseController
     {
 
       $input = Input::all();
+      dd($input);
+
       $model_class = $this->model_class;
       $model = $model_class::create($input);
 
       // process tags
-      if (!empty($input['tags'][0])) {
-        Tag::resolveTags( $model, explode(',',$input['tags'][0]) );
+      if (!empty($input['tags'])) {
+        Tag::resolveTags( $model, $input['tags'] );
       }
 
       // process other m2m relations
       if (!empty($this->relations)) {
         foreach( $this->relations as $relation ) {
-          if( !empty($input[$relation][0]) && method_exists( $model, $relation ) ) {
-            $model->$relation()->attach( explode(',',$input[$relation][0]) );
+          if( !empty($input[$relation]) && method_exists( $model, $relation ) ) {
+            // determine if we have extra columns to save
+            if ( !empty( $input[ $relation . '_extra_columns' ] ) ) {
+
+              $cols = explode(",",$input[ $relation . '_extra_columns' ]);
+
+              foreach( $input[$relation] as $key => $value ) {
+                
+              }
+            } else {
+              $model->$relation()->attach( $input[$relation] );
+            }
           }
         }
       }
@@ -135,9 +149,9 @@ abstract class Controller extends BaseController
       // process m21 relations
       if (!empty($this->belongs)) {
         foreach ($this->belongs as $relation) {
-          if ( !empty( $input[ $relation['key'] ][0] ) ) {
+          if ( !empty( $input[ $relation['key'] ] ) ) {
             $tmp_model_class = $relation['model'];
-            $ids = explode(',', $input[ $relation['key'] ][0] );
+            $ids = $input[ $relation['key'] ];
             $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
           }
         }

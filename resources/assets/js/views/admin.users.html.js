@@ -1,3 +1,76 @@
+//define the colparams for the view
+$.extend(true, jApp.colparams, {
+		'User' : [
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-4',
+					fields : [
+						{
+							name : 'username',
+							placeholder : 'e.g. jsmith',
+							required : true,
+							_label : 'Username',
+							_enabled : true,
+							'data-validType' : 'Anything'
+						},{
+							name : 'email',
+							placeholder : 'email@domain.com',
+							required : true,
+							_label : 'Email Address',
+							_enabled : true,
+							'data-validType' : 'Email Address'
+						},{
+							name : 'people_id',
+							type : 'select',
+							_label : 'Contact Name',
+							_enabled : true,
+			        _firstlabel : '-Choose-',
+			        _firstoption : 0,
+			        _labelssource : "Person.name",
+			        _optionssource : "Person.id",
+							'data-validType' : 'select'
+						}
+					]
+				},
+
+				{ // fieldset
+					label : ' ',
+					class : 'col-lg-8',
+					fields : [
+						{
+							name : 'groups',
+							type : 'array',
+							_label : 'Associate one or more Groups with this User',
+							_enabled : true,
+							headers : [
+								'Group',
+								'Comment'
+							],
+							fields : [
+								{
+									name : 'groups[]',
+									type : 'select',
+									required : true,
+									_firstlabel : '-Choose-',
+									_firstoption : -1,
+									_labelssource : 'Group.name',
+									_optionssource : 'Group.id',
+									_enabled : true,
+									'data-validType' : 'select'
+								},
+								{
+									name : 'comment[]',
+									placeholder : 'Comment',
+									_enabled : true,
+								}
+							]
+						}
+					]
+				}
+		]
+});
+
 // extend the application views
 $.extend( true, jApp.views.admin, {
 

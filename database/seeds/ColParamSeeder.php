@@ -550,30 +550,6 @@ class ColParamSeeder extends Seeder
         ,	'data-fieldset' => '1'
         ]);
 
-        // people colparams
-        ColParam::create([	'tableName' => 'people'
-        ,	'name' => 'name'
-        ,	'placeholder' => 'e.g. John Smith'
-        ,	'_label' => 'Full Name'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '1'
-        , 'required' => 1
-        , 'data-validType' => 'Anything'
-        ]);
-
-        ColParam::create([	'tableName' => 'people'
-        ,	'name' => 'users'
-        ,	'type' => 'select'
-        ,	'_label' => 'Username(s)'
-        ,	'_enabled' => 1
-        ,	'data-ordering' => '1'
-        ,	'data-fieldset' => '3'
-        , '_labelssource' => "User.username"
-        , '_optionssource' => "User.id"
-        , 'multiple' => 1
-        ]);
-
         // users colparams
         ColParam::create([	'tableName' => 'users'
         ,	'name' => 'username'

@@ -41,7 +41,8 @@
         "ingenious/jquery-tokeninput": "dev-master",
         "ingenious/bootstrap-tokenfield": "dev-master",
         "ingenious/jstorage": "dev-master",
-        "components/jqueryui": "dev-master"
+        "components/jqueryui": "dev-master",
+        "neomerx/cors-illuminate": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
