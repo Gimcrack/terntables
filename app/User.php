@@ -94,7 +94,7 @@ class User extends Model implements AuthenticatableContract,
      */
     public function groups()
     {
-      return $this->belongsToMany('App\Group')->withTimestamps()->with(['modules']);
+      return $this->belongsToMany('App\Group')->withTimestamps()->withPivot(['comment','primary_flag'])->with(['modules']);
     }
 
 

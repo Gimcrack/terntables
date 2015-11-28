@@ -50,6 +50,14 @@ class UserController extends Controller
   ];
 
   /**
+   * Default values when creating new users
+   * @var [type]
+   */
+  public $defaults = [
+    'password' => "$2y$10$2JEOr5ARXCNyVdGBurIZoOxejH9V5JF6oe3pqp8ID0G8daZrHipcq"
+  ];
+
+  /**
    * Spawn a new instance of the controller
    */
   public function __construct()

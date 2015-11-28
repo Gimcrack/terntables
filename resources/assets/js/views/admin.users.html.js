@@ -52,16 +52,21 @@ $.extend(true, jApp.colparams, {
 									name : 'groups[]',
 									type : 'select',
 									required : true,
-									_firstlabel : '-Choose-',
+									_firstlabel : 'None selected',
 									_firstoption : -1,
 									_labelssource : 'Group.name',
 									_optionssource : 'Group.id',
 									_enabled : true,
-									'data-validType' : 'select'
+									'data-validType' : 'select',
 								},
 								{
 									name : 'comment[]',
 									placeholder : 'Comment',
+									_enabled : true,
+								},
+								{
+									name : 'primary_flag[]',
+									placeholder : 'Primary Group?',
 									_enabled : true,
 								}
 							]
@@ -132,7 +137,12 @@ $.extend( true, jApp.views.admin, {
 					},
 
 					"groups" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
+						return _.map(arr, function(o ) {
+							if (o.pivot.comment != null) {
+								return o.name + ' (' + o.pivot.comment + ')';
+							}
+							return o.name;
+						}).join(', ');
 					},
 
 					"modules" : function(arr) {

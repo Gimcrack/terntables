@@ -617,8 +617,26 @@ if (!Array.prototype.last) {
       }; // end defaults
     }, // end fn
 
-    arrayAddRow: function arrayAddRow() {
-      var $btn = $(this),
+    /**
+     * Add row to array field from container
+     * @param  {[type]} $container [description]
+     * @return {[type]}            [description]
+     */
+    arrayAddRowFromContainer: function arrayAddRowFromContainer($container, data) {
+      var $table = $container.find('.table'),
+          params = $container.data('colparams'),
+          $tr_new = jUtility.oCurrentForm().fn.populateFieldRow(params, null, data),
+          $btn_add = $table.find('.btn-array-add').detach();
+
+      $table.find('.btn-array-add,.no-row-filler').remove();
+
+      $table.append($tr_new);
+
+      $table.find('tr:last-child').find('td:last-child,th:last-child').append($btn_add);
+    }, // end fn
+
+    arrayAddRow: function arrayAddRow(inpt) {
+      var $btn = $(inpt || this),
           $container = $(this).closest('.array-field-container'),
           $table = $(this).closest('.table'),
           $tr = $(this).closest('tr'),
@@ -629,7 +647,7 @@ if (!Array.prototype.last) {
         return jUtility.msg.warning('This field requires at most ' + params.max + ' selections.');
       }
 
-      $table.find('.btn-array-add').remove();
+      $table.find('.btn-array-add,.no-row-filler').remove();
 
       $table.append($tr_new);
 
@@ -643,6 +661,10 @@ if (!Array.prototype.last) {
       jUtility.formBootup();
     }, // end fn
 
+    /**
+     * Remove a row from an array input table
+     * @return {[type]} [description]
+     */
     arrayRemoveRow: function arrayRemoveRow() {
       var $btn = $(this),
           $container = $(this).closest('.array-field-container'),
@@ -664,7 +686,24 @@ if (!Array.prototype.last) {
       //     $(ee).attr('name', $(ee).attr('data-name') + '_' + i)
       //   });
       // });
+      if (!$table.find('tr').length) {
+        $table.append('<tr class="no-row-filler"><td></td></tr>');
+      }
 
+      $table.find('tr:last-child').find('td:last-child,th:last-child').append($btn_add);
+    }, // end fn
+
+    /**
+     * [function description]
+     * @param  {[type]} $inpt [description]
+     * @return {[type]}       [description]
+     */
+    arrayRemoveAllRows: function arrayRemoveAllRows($container) {
+      var $table = $container.find('table'),
+          $btn_add = $table.find('.btn-array-add').detach();
+
+      $table.empty();
+      $table.append('<tr class="no-row-filler"><td></td></tr>');
       $table.find('tr:last-child').find('td:last-child,th:last-child').append($btn_add);
     }, // end fn
 
@@ -4492,6 +4531,46 @@ $.fn.clearForm = function () {
       }, // end fn
 
       /**
+       * Is the form field an array input
+       * @param  {[type]} oInpt [description]
+       * @return {[type]}       [description]
+       */
+      isArrayFormField: function isArrayFormField(oInpt) {
+        return !!oInpt.arrayField;
+      }, //end fn
+
+      /**
+       * Is the form field a tokens field
+       * @param  {[type]} value [description]
+       * @param  {[type]} oInpt [description]
+       * @return {[type]}       [description]
+       */
+      isTokensFormField: function isTokensFormField(oInpt, value) {
+        return typeof value === 'object' && !!_.pluck(value, 'name').length && typeof oInpt.$().attr('data-tokens') !== 'undefined';
+      }, // end fn
+
+      /**
+       * Populate and array field with the form data
+       * @return {[type]} [description]
+       */
+      populateArrayFormData: function populateArrayFormData(oInpt, data) {
+        jUtility.arrayRemoveAllRows(oInpt.$());
+        jApp.log('------Array Data------');
+        jApp.log(data);
+
+        // iterate through the data rows and populate the form
+        _.each(data, function (obj) {
+
+          // create a row in the array field table
+          jApp.log('--------Adding Row To The Array ---------');
+          jApp.log(oInpt.$());
+          jUtility.arrayAddRowFromContainer(oInpt.$(), obj);
+        });
+
+        jUtility.formBootup();
+      }, // end fn
+
+      /**
        * Get the form data as a FormData object
        * @method function
        * @return {[type]} [description]
@@ -4638,6 +4717,35 @@ $.fn.clearForm = function () {
       }, // end fn
 
       /**
+       * Populate a row with the field inputs
+       * @method function
+       * @param  {[type]} params [description]
+       * @return {[type]}        [description]
+       */
+      populateFieldRow: function populateFieldRow(params, index, data) {
+        var $td,
+            $btn_add = $('<button/>', { type: 'button', 'class': 'btn btn-primary btn-array-add' }).html('<i class="fa fa-fw fa-plus"></i>'),
+            $btn_remove = $('<button/>', { type: 'button', 'class': 'btn btn-danger btn-array-remove' }).html('<i class="fa fa-fw fa-trash-o"></i>'),
+            index = typeof index === 'undefined' ? 0 : index;
+
+        jApp.log('---------Array Row Data---------');
+        jApp.log(data);
+
+        return $('<tr/>').append(_.map(params.fields, function (oo) {
+          var $td = $('<td/>');
+
+          if (data != null) {
+            oo.value = oo.type === 'select' ? data.id : data.pivot[oo.name.replace('[]', '')];
+          } else {
+            delete oo.value;
+          }
+
+          self.fn.processField(oo, $td);
+          return $td;
+        })).append([$('<td/>').append([$btn_remove, index === 0 ? $btn_add : null])]);
+      }, // end fn
+
+      /**
        * Process form field from parameters
        * @method function
        * @param  {[type]} params [description]
@@ -4651,110 +4759,12 @@ $.fn.clearForm = function () {
         jApp.log(params);
 
         // check if the type is array
-        if (params.type == 'array') return self.fn.processArrayField(params, target);
+        //if (params.type == 'array') return self.fn.processArrayField(params, target);
 
         inpt = new jInput({ atts: params });
         self.oInpts[params.name] = inpt;
         target.append(inpt.fn.handle());
         if (params.readonly === 'readonly') self.readonlyFields.push(params.name);
-      }, // end fn
-
-      /**
-       * Process array field from parameters
-       * @method function
-       * @param  {[type]} params [description]
-       * @param  {[type]} target [description]
-       * @return {[type]}        [description]
-       */
-      processArrayField: function processArrayField(params, target) {
-        var $container = $('<div/>', { 'class': 'array-field-container alert alert-info' }).data('colparams', params),
-            $table = $('<table/>', { 'class': 'table' }),
-            $label = $('<label/>').html(params._label),
-            $tr,
-            $th,
-            $td,
-            inpt,
-            hidNames = [];
-
-        _.each(params.fields, function (o) {
-          o['data-name'] = o.name;
-          hidNames.push(o.name.replace('[]', ''));
-        });
-
-        console.log(hidNames);
-
-        // build up the table
-        $table.append([
-        // first row - array label
-        $('<tr/>').append([$('<th/>', { colspan: 100 }).append($label), $('<th/>').html('&nbsp;')])]);
-
-        // append the inputs
-
-        // second row - column headers
-        // $('<tr/>').append(
-        //   _.map( params.headers, function( header ) {
-        //       return $('<th/>').html( header );
-        //   })
-        //
-        // ).append(
-        //   [
-        //       $('<th/>'),
-        //   ]
-        // ),
-
-        // third row - inputs
-
-        if (params.min != null) {
-          for (var ii = +params.min - 1; ii >= 0; ii--) {
-            $table.append(self.fn.populateFieldRow(params, ii));
-          }
-        } else {
-          $table.append(self.fn.populateFieldRow(params));
-        }
-
-        // append the table to the container
-        $container.append($table);
-
-        // rename inputs so they all have unique names
-        // $table.find('tr').each( function( i, elm ) {
-        //   $(elm).find(':input').each( function(ii, ee) {
-        //     $(ee).attr('name', $(ee).attr('data-name') + '_' + i)
-        //   });
-        // });
-
-        // append the container to the target
-        target.append($container);
-
-        var hid = {
-          name: params.name + '_extra_columns',
-          type: 'hidden',
-          value: hidNames.join()
-        };
-
-        var oHid = new jInput({ atts: hid });
-        self.oInpts[hid.name] = oHid;
-        target.append(oHid.fn.handle());
-      }, // end fn
-
-      /**
-       * Populate a row with the field inputs
-       * @method function
-       * @param  {[type]} params [description]
-       * @return {[type]}        [description]
-       */
-      populateFieldRow: function populateFieldRow(params, index) {
-        var $td,
-            $btn_add = $('<button/>', { type: 'button', 'class': 'btn btn-primary btn-array-add' }).html('<i class="fa fa-fw fa-plus"></i>'),
-            $btn_remove = $('<button/>', { type: 'button', 'class': 'btn btn-danger btn-array-remove' }).html('<i class="fa fa-fw fa-trash-o"></i>'),
-            index = typeof index === 'undefined' ? 0 : index;
-
-        return $('<tr/>').append(_.map(params.fields, function (oo) {
-          var $td = $('<td/>');
-
-          self.fn.processField(oo, $td);
-
-          return $td;
-        })).append([$('<td/>').append([$btn_remove, index === 0 ? $btn_add : null])]);
       }, // end fn
 
       processColParams: function processColParams() {
@@ -4942,7 +4952,11 @@ $.fn.clearForm = function () {
             value = value.split('|');
           }
 
-          if (typeof value === 'object' && !!_.pluck(value, 'name').length && typeof $inpt.attr('data-tokens') !== 'undefined') {
+          if (self.fn.isArrayFormField(oInpt)) {
+            // handle an array input
+            jApp.log('-----------------Populating Array Form Field-----------------------');
+            self.fn.populateArrayFormData(oInpt, value);
+          } else if (self.fn.isTokensFormField(oInpt, value)) {
             $inpt.tokenfield('setTokens', _.pluck(value, 'name'));
           } else if (typeof value === 'object' && !!_.pluck(value, 'id').length) {
             oInpt.fn.val(_.pluck(value, 'id'));
@@ -5144,6 +5158,18 @@ $.fn.clearForm = function () {
       $lbl: false
     };
 
+    /**
+     * [oInpts description]
+     * @type {Array}
+     */
+    this.oInpts = [];
+
+    /**
+     * Is this an array field
+     * @type {Boolean}
+     */
+    this.arrayField = false;
+
     this.$ = function () {
       return self.DOM.$inpt;
     };
@@ -5235,6 +5261,10 @@ $.fn.clearForm = function () {
             self.DOM.$inpt = $('<button/>', self.fn.getAtts()).html(oAtts.value).wrap(self.options.wrap);
             break;
 
+          case 'array':
+            self.DOM.$inpt = self.fn.processArrayField(oAtts);
+            break;
+
           default:
             self.DOM.$inpt = $('<input/>', self.fn.getAtts()).wrap(self.options.wrap);
             break;
@@ -5272,6 +5302,101 @@ $.fn.clearForm = function () {
 
         //place in DOM
         //self.DOM.$prnt.appendTo('body');
+      }, // end fn
+
+      /**
+          * Process form field from parameters
+          * @method function
+          * @param  {[type]} params [description]
+          * @param  {[type]} target [description]
+          * @return {[type]}        [description]
+          */
+      processField: function processField(params, target) {
+        var inpt;
+
+        jApp.log('B. Processing Field');
+        jApp.log(params);
+
+        // check if the type is array
+        //if (params.type == 'array') return self.fn.processArrayField(params, target);
+
+        inpt = new jInput({ atts: params });
+        self.oInpts[params.name] = inpt;
+        target.append(inpt.fn.handle());
+        if (params.readonly === 'readonly') self.readonlyFields.push(params.name);
+      }, // end fn
+
+      /**
+          * Process array field from parameters
+          * @method function
+          * @param  {[type]} params [description]
+          * @param  {[type]} target [description]
+          * @return {[type]}        [description]
+          */
+      processArrayField: function processArrayField(params) {
+        var $container = $('<div/>', { 'class': 'array-field-container alert alert-info' }).data('colparams', params),
+            $table = $('<table/>', { 'class': 'table' }),
+
+        //$label = $('<label/>').html( params._label ),
+        $tr,
+            $th,
+            $td,
+            inpt,
+            hidNames = [];
+
+        // Set the arrayField flag
+        self.arrayField = true;
+
+        _.each(params.fields, function (o) {
+          o['data-name'] = o.name;
+          hidNames.push(o.name.replace('[]', ''));
+        });
+
+        console.log(hidNames);
+
+        // append the inputs
+        if (params.min != null) {
+          for (var ii = +params.min - 1; ii >= 0; ii--) {
+            $table.append(self.fn.populateFieldRow(params, ii));
+          }
+        } else {
+          $table.append(self.fn.populateFieldRow(params));
+        }
+
+        // append the table to the container
+        $container.append($table);
+
+        var hid = {
+          name: params.name + '_extra_columns',
+          type: 'hidden',
+          value: hidNames.join()
+        };
+
+        var oHid = new jInput({ atts: hid });
+        $container.append(oHid.fn.handle());
+
+        return $container;
+      }, // end fn
+
+      /**
+       * Populate a row with the field inputs
+       * @method function
+       * @param  {[type]} params [description]
+       * @return {[type]}        [description]
+       */
+      populateFieldRow: function populateFieldRow(params, index) {
+        var $td,
+            $btn_add = $('<button/>', { type: 'button', 'class': 'btn btn-primary btn-array-add' }).html('<i class="fa fa-fw fa-plus"></i>'),
+            $btn_remove = $('<button/>', { type: 'button', 'class': 'btn btn-danger btn-array-remove' }).html('<i class="fa fa-fw fa-trash-o"></i>'),
+            index = typeof index === 'undefined' ? 0 : index;
+
+        return $('<tr/>').append(_.map(params.fields, function (oo) {
+          var $td = $('<td/>');
+          oo['data-pivot'] = _.pluck('name', params.fields);
+          oo['data-array-input'] = true;
+          self.fn.processField(oo, $td);
+          return $td;
+        })).append([$('<td/>').append([$btn_remove, index === 0 ? $btn_add : null])]);
       }, // end fn
 
       getAtts: function getAtts() {

@@ -53,6 +53,12 @@ abstract class Controller extends BaseController
     public $belongs;
 
     /**
+     * Default values when creating a new model
+     * @var [type]
+     */
+    public $defaults = [];
+
+    /**
      * Load the checkaccess middleware for the controller
      * @return [type] [description]
      */
@@ -107,6 +113,87 @@ abstract class Controller extends BaseController
         return view('pages.history', compact('model'));
     }
 
+
+    /**
+     * Handle model relations
+     * @param  [type] $model [description]
+     * @return [type]        [description]
+     */
+    public function handleRelations($model)
+    {
+      $input = Input::all();
+
+      foreach($this->relations as $relation) {
+        if (!empty($input[$relation]) && method_exists( $model, $relation ) ) {
+            $this->handleRelation($model, $relation);
+        }
+      }
+    }
+
+    /**
+     * Handle model relation
+     * @param  [type] $mode     [description]
+     * @param  [type] $relation [description]
+     * @return [type]           [description]
+     */
+    public function handleRelation($model, $relation)
+    {
+      $input = Input::all();
+      $sync = $input[$relation];
+
+      /**
+       * Determine if there are extra columns
+       * to handle with the relation
+       */
+      if ( $this->relationHasExtraColumns($input,$relation) ) {
+        $cols = $this->getRelationExtraColumns($input,$relation);
+        $sync = [];
+
+        /**
+         * Iterate through the relation values and attach the
+         * related column values
+         */
+        foreach( $input[$relation] as $key => $value ) {
+          $sync[$value] = [];
+          foreach( $cols as $col ) {
+            if( isset( $input[$col][$key] ) ) {
+              $sync[$value][$col] = $input[$col][$key];
+            }
+          }
+        }
+
+      }
+
+      // sync the model with the relation
+      return $model->$relation()->sync( $sync );
+    }
+
+    /**
+     * Get relation extra columns
+     * @param  [type] $input    [description]
+     * @param  [type] $relation [description]
+     * @return [type]           [description]
+     */
+    public function getRelationExtraColumns($input,$relation)
+    {
+      $cols = explode(",",$input[ $relation . '_extra_columns' ]);
+
+      unset($cols[ array_search( $relation, $cols ) ]);
+
+      return $cols;
+    }
+
+    /**
+     * Determine if a relation has extra columns
+     * @param  [type] $input    [description]
+     * @param  [type] $relation [description]
+     * @return [type]           [description]
+     */
+    public function relationHasExtraColumns($input,$relation)
+    {
+      return !empty( $input[ $relation . '_extra_columns' ] );
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -116,8 +203,7 @@ abstract class Controller extends BaseController
     public function store(Request $request)
     {
 
-      $input = Input::all();
-      dd($input);
+      $input = array_merge($this->defaults, Input::all() );
 
       $model_class = $this->model_class;
       $model = $model_class::create($input);
@@ -127,23 +213,9 @@ abstract class Controller extends BaseController
         Tag::resolveTags( $model, $input['tags'] );
       }
 
-      // process other m2m relations
+      // process model relations
       if (!empty($this->relations)) {
-        foreach( $this->relations as $relation ) {
-          if( !empty($input[$relation]) && method_exists( $model, $relation ) ) {
-            // determine if we have extra columns to save
-            if ( !empty( $input[ $relation . '_extra_columns' ] ) ) {
-
-              $cols = explode(",",$input[ $relation . '_extra_columns' ]);
-
-              foreach( $input[$relation] as $key => $value ) {
-                
-              }
-            } else {
-              $model->$relation()->attach( $input[$relation] );
-            }
-          }
-        }
+        $this->handleRelations($model);
       }
 
       // process m21 relations
@@ -189,31 +261,28 @@ abstract class Controller extends BaseController
 
       $model->update($input);
 
-      if (!empty($input['tags'][0])) {
-        Tag::resolveTags( $model, explode(',',$input['tags'][0]) );
+      // process tags
+      if (!empty($input['tags'])) {
+        Tag::resolveTags( $model, $input['tags'] );
       }
 
-      // process other relations
-      foreach( $this->relations as $relation ) {
-        if( !empty($input[$relation][0]) && method_exists( $model, $relation ) ) {
-          $model->$relation()->sync( explode(',',$input[$relation][0]) );
-        }
+      // process model relations
+      if (!empty($this->relations)) {
+        $this->handleRelations($model);
       }
 
       // process m21 relations
-      foreach ($this->belongs as $relation) {
-        if ( !empty( $input[ $relation['key'] ][0] ) ) {
-          // get the class name of the model we will associate with the current model
-          $tmp_model_class = $relation['model'];
+      if (!empty($this->belongs)) {
+        foreach ($this->belongs as $relation) {
+          if ( !empty( $input[ $relation['key'] ] ) ) {
+            $tmp_model_class = $relation['model'];
+            $ids = $input[ $relation['key'] ];
 
-          // get the ids of the models we are going to attach
-          $ids = explode(',', $input[ $relation['key'] ][0] );
+            // remove existing attachments that are not in the new list of attachments
+            $tmp_model_class::where( $relation['foreign_key'], $model->id )->whereNotIn('id', $ids)->update(  [ $relation['foreign_key'] => null ] );
 
-          // remove existing attachments that are not in the new list of attachments
-          $tmp_model_class::where( $relation['foreign_key'], $model->id )->whereNotIn('id', $ids)->update(  [ $relation['foreign_key'] => null ] );
-
-          //add new attachments
-          $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
+            $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
+          }
         }
       }
 
@@ -255,7 +324,7 @@ abstract class Controller extends BaseController
     public function getInputIds()
     {
       $input = Input::all();
-      return explode(',',$input['ids'][0]);
+      return $input['ids'];
     }
 
     /**

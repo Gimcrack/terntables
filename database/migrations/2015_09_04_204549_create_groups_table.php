@@ -25,6 +25,7 @@ class CreateGroupsTable extends Migration
             $table->unsignedInteger('group_id')->index();
             $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
             $table->text('comment')->nullable();
+            $table->boolean('primary_flag')->default(0);
             $table->timestamps();
         });
     }
