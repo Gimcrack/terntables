@@ -1,9 +1,66 @@
+$.extend(true, jApp.colparams, {
+	'Group' : [
+		{ // fieldset
+			label : 'Details',
+			helptext : 'Please fill out the group details',
+			class : 'col-lg-4',
+			fields : [
+				{
+					name : 'name',
+					placeholder : 'e.g. Administrators',
+					_label : 'Group Name',
+					_enabled : true,
+					required : true,
+					'data-validType' : 'Anything',
+				}, {
+					name : 'description',
+					type : 'textarea',
+					_label : 'Description',
+					_enabled : true
+				}, {
+					name : 'modules',
+					type : 'select',
+					_label : 'Assign roles/permissions to this group',
+					_enabled : true,
+					_labelssource : 'Module.role',
+					_optionssource : 'Module.id',
+					multiple : true,
+				}
+			]
+		}, {
+			class : 'col-lg-8',
+			fields : [
+				{
+					name : 'users',
+					type : 'array',
+					_label : 'Add Users to this Group',
+					_enabled : true,
+					fields : [
+						{
+							name : 'users',
+							type : 'select',
+							_labelssource : 'User.username',
+							_optionssource : 'User.id',
+							_enabled : true,
+							multiple : true,
+						}, {
+							name : 'comment[]',
+							placeholder : 'Optional Comment',
+							_enabled : true,
+						}
+					]
+				},
+			]
+		}
+	]
+});
+
 // extend the application views
-_.extend( jApp.views.admin, {
+$.extend( true, jApp.views.admin, {
 
 	groups : function() {
 
-		_.extend( jApp.oG.admin, {
+		$.extend( true, jApp.oG.admin, {
 
 			groups : new jGrid({
 				table : 'groups',

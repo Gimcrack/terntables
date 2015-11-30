@@ -43,10 +43,6 @@ $.extend(true, jApp.colparams, {
 							type : 'array',
 							_label : 'Associate one or more Groups with this User',
 							_enabled : true,
-							headers : [
-								'Group',
-								'Comment'
-							],
 							fields : [
 								{
 									name : 'groups[]',

@@ -48040,7 +48040,7 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
 
     var self = this;
 
-    this.debug = true;
+    this.debug = false;
 
     if (this.debug) {
       console.warn('DEBUG MODE ON ');
@@ -48117,6 +48117,12 @@ typeof JSON!="object"&&(JSON={}),function(){"use strict";function f(e){return e<
     this.log = function (msg, force) {
       if (!!self.debug || !!self.force) {
         console.log(msg);
+      }
+    };
+
+    this.warn = function (msg, force) {
+      if (!!self.debug || !!self.force) {
+        console.warn(msg);
       }
     };
   };
@@ -52534,6 +52540,7 @@ $.fn.clearForm = function () {
 
         // create and append the hidden elements
         _.each(self.options.hiddenElms, function (o, key) {
+          o.form = self;
           inpt = new jInput(o);
           self.oInpts[o.atts.name] = inpt;
           self.DOM.$Inpts.append(inpt.fn.handle());
@@ -52590,6 +52597,7 @@ $.fn.clearForm = function () {
           jUtility.arrayAddRowFromContainer(oInpt.$(), obj);
         });
 
+        // boot the form
         jUtility.formBootup();
       }, // end fn
 
@@ -52621,20 +52629,38 @@ $.fn.clearForm = function () {
         return self.$().serialize();
       }, // end fn
 
+      /**
+       * Get the DOM handle of the form
+       * @return {[type]} [description]
+       */
       handle: function handle() {
         return self.DOM.$prnt;
       }, // end fn
 
+      /**
+       * Get the form fieldset
+       * @return {[type]} [description]
+       */
       $fieldset: function $fieldset() {
         return self.DOM.$frm.find('fieldset');
       }, //end fn
 
+      /**
+       * Get form input by id
+       * @param  {[type]} id [description]
+       * @return {[type]}    [description]
+       */
       getElmById: function getElmById(id) {
         id = id.replace('#', '');
 
         return self.oInpts[id];
       },
 
+      /**
+       * Render the form html
+       * @param  {[type]} params [description]
+       * @return {[type]}        [description]
+       */
       render: function render(params) {
         var tmp = self.DOM.$prnt.prop('outerHTML');
 
@@ -52647,10 +52673,19 @@ $.fn.clearForm = function () {
         return tmp;
       }, //end fn
 
+      /**
+       * Add inputs to the form
+       * @param  {[type]} arr [description]
+       * @return {[type]}     [description]
+       */
       addElements: function addElements(arr) {
         self.options.colParamsAdd = _.union(self.options.colParamsAdd, arr);
       }, //end fn
 
+      /**
+       * Get external column parameters - deprecated
+       * @return {[type]} [description]
+       */
       getColParams: function getColParams() {
         jApp.log('A. Getting external colparams');
         self.options.colParams = jApp.colparams[self.options.model];
@@ -52663,6 +52698,11 @@ $.fn.clearForm = function () {
         self.fn.processBtns();
       }, //end fn
 
+      /**
+       * Pre-Filter column parameters to remove invalid entries
+       * @param  {[type]} unfilteredParams [description]
+       * @return {[type]}                  [description]
+       */
       preFilterColParams: function preFilterColParams(unfilteredParams) {
         return _.filter(unfilteredParams, function (o) {
           if (o == null) return false;
@@ -52676,6 +52716,12 @@ $.fn.clearForm = function () {
         });
       }, // end fn
 
+      /**
+       * Get row data for the form
+       * @param  {[type]}   url      [description]
+       * @param  {Function} callback [description]
+       * @return {[type]}            [description]
+       */
       getRowData: function getRowData(url, callback) {
 
         $('.panel-overlay').show();
@@ -52754,16 +52800,11 @@ $.fn.clearForm = function () {
         jApp.log('---------Array Row Data---------');
         jApp.log(data);
 
-        return $('<tr/>').append(_.map(params.fields, function (oo) {
-          var $td = $('<td/>');
+        return $('<tr/>').append(_.map(params.fields, function (oo, ii) {
+          var $td = $('<td/>'),
+              value = ii == 0 ? data.id : data.pivot[oo.name.replace('[]', '')] || null;
 
-          if (data != null) {
-            oo.value = oo.type === 'select' ? data.id : data.pivot[oo.name.replace('[]', '')];
-          } else {
-            delete oo.value;
-          }
-
-          self.fn.processField(oo, $td);
+          self.fn.processField(oo, $td, value);
           return $td;
         })).append([$('<td/>').append([$btn_remove, index === 0 ? $btn_add : null])]);
       }, // end fn
@@ -52775,7 +52816,7 @@ $.fn.clearForm = function () {
        * @param  {[type]} target [description]
        * @return {[type]}        [description]
        */
-      processField: function processField(params, target) {
+      processField: function processField(params, target, value) {
         var inpt;
 
         jApp.log('B. Processing Field');
@@ -52784,12 +52825,17 @@ $.fn.clearForm = function () {
         // check if the type is array
         //if (params.type == 'array') return self.fn.processArrayField(params, target);
 
-        inpt = new jInput({ atts: params });
+        inpt = new jInput({ atts: params, form: self });
         self.oInpts[params.name] = inpt;
+        inpt.fn.val(value);
         target.append(inpt.fn.handle());
         if (params.readonly === 'readonly') self.readonlyFields.push(params.name);
       }, // end fn
 
+      /**
+       * Process externally loaded column parameters - deprecated
+       * @return {[type]} [description]
+       */
       processColParams: function processColParams() {
         self.DOM.$Inpts.find('.fs, .panel-heading').remove();
 
@@ -52810,7 +52856,7 @@ $.fn.clearForm = function () {
           if (!!o && !!o.name && _.indexOf(self.options.disabledElements, o.name) === -1) {
 
             eq = !!o['data-fieldset'] ? Number(o['data-fieldset']) - 1 : 0;
-            inpt = new jInput({ atts: o });
+            inpt = new jInput({ atts: o, form: self });
             self.oInpts[o.name] = inpt;
             self.DOM.$Inpts.find('.fs').eq(self.options.layout === 'standard' ? eq : 0).append(inpt.fn.handle());
             if (o.readonly === 'readonly') {
@@ -52828,7 +52874,7 @@ $.fn.clearForm = function () {
           if (!!o && !!o.name && _.indexOf(self.options.disabledElements, o.name) === -1) {
 
             eq = !!o['data-fieldset'] ? Number(o['data-fieldset']) - 1 : 0;
-            inpt = new jInput({ atts: o });
+            inpt = new jInput({ atts: o, form: self });
             self.oInpts[o.name] = inpt;
             self.DOM.$Inpts.find('.fs').eq(self.options.layout === 'standard' ? eq : 0).append(inpt.fn.handle());
             if (o.readonly === 'readonly') {
@@ -52915,6 +52961,10 @@ $.fn.clearForm = function () {
         self.DOM.$Inpts.append([btnPanel, btnFooter]);
       }, //end fn
 
+      /**
+       * Submit the form
+       * @return {[type]} [description]
+       */
       submit: function submit() {
 
         self.fn.toggleSubmitted();
@@ -52928,6 +52978,10 @@ $.fn.clearForm = function () {
         }).done(self.fn.toggleSubmitted);
       }, //end fn
 
+      /**
+       * Toggle the submited flag of the form
+       * @return {[type]} [description]
+       */
       toggleSubmitted: function toggleSubmitted() {
         if (!self.submitted) {
           self.submitted = true;
@@ -52945,6 +52999,11 @@ $.fn.clearForm = function () {
 
     this.callback = {
 
+      /**
+       * Get row data callback
+       * @param  {[type]} response [description]
+       * @return {[type]}          [description]
+       */
       getRowData: function getRowData(response) {
         var oInpt, $inpt;
 
@@ -53008,7 +53067,6 @@ $.fn.clearForm = function () {
   window.jForm = jForm; // add to global scope
 })(window, $, jQuery);
 
-/* jshint ignore:start */
 /**  **  **  **  **  **  **  **  **  **  **  **  **  **  **  **  **
  *
  *  jInput.class.js - Custom Form Input JS class
@@ -53028,8 +53086,7 @@ $.fn.clearForm = function () {
  *
  *   4-30-15	Added the feedback icon container and help block container
  */
-// javascript closure
-/* jshint ignore:end */
+
 ;(function (window, $) {
 
   'use strict';
@@ -53043,6 +53100,7 @@ $.fn.clearForm = function () {
     var self = this;
     this.store = $.jStorage;
     this.readonly = false;
+    this.form = options.form || options.atts.form || {};
 
     /**  **  **  **  **  **  **  **  **  **
      *   DEFAULT OPTIONS
@@ -53100,8 +53158,6 @@ $.fn.clearForm = function () {
 
     // alias to attributes object
     var oAtts = self.options.atts;
-
-    oAtts.name = Number(oAtts.multiple) || oAtts.multiple === true || oAtts.multiple === 'multiple' ? oAtts.name.replace('[]', '') + '[]' : oAtts.name;
 
     /**  **  **  **  **  **  **  **  **  **
     	 *   ALLOWABLE ATTRIBUTES BY INPUT TYPE
@@ -53205,6 +53261,9 @@ $.fn.clearForm = function () {
       _init: function _init() {
         var $br = !!self.options.separator ? $('<br/>') : false;
         self.type = oAtts.type;
+
+        // get the input name
+        self.fn.resolveInputName();
 
         //set the parent element
         self.DOM.$prnt = self.options.parent;
@@ -53328,6 +53387,24 @@ $.fn.clearForm = function () {
       }, // end fn
 
       /**
+       * Resolve the input name
+       * @return {[type]} [description]
+       */
+      resolveInputName: function resolveInputName() {
+        if (self.fn.isMultiple()) {
+          oAtts.name = oAtts.name.replace('[]', '') + '[]';
+        }
+      }, // end fn
+
+      /**
+       * Does the input accept multiple values
+       * @return {[type]} [description]
+       */
+      isMultiple: function isMultiple() {
+        return oAtts.multiple != null && (!!oAtts.multiple || oAtts.multiple === 'multiple');
+      },
+
+      /**
           * Process form field from parameters
           * @method function
           * @param  {[type]} params [description]
@@ -53343,7 +53420,7 @@ $.fn.clearForm = function () {
         // check if the type is array
         //if (params.type == 'array') return self.fn.processArrayField(params, target);
 
-        inpt = new jInput({ atts: params });
+        inpt = new jInput({ atts: params, form: self.form });
         self.oInpts[params.name] = inpt;
         target.append(inpt.fn.handle());
         if (params.readonly === 'readonly') self.readonlyFields.push(params.name);
@@ -53359,9 +53436,8 @@ $.fn.clearForm = function () {
       processArrayField: function processArrayField(params) {
         var $container = $('<div/>', { 'class': 'array-field-container alert alert-info' }).data('colparams', params),
             $table = $('<table/>', { 'class': 'table' }),
-
-        //$label = $('<label/>').html( params._label ),
-        $tr,
+            inpt,
+            $tr,
             $th,
             $td,
             inpt,
@@ -53370,23 +53446,49 @@ $.fn.clearForm = function () {
         // Set the arrayField flag
         self.arrayField = true;
 
-        _.each(params.fields, function (o) {
-          o['data-name'] = o.name;
-          hidNames.push(o.name.replace('[]', ''));
+        // Grab the first input and put it in the first row
+        inpt = new jInput({ atts: params.fields.shift() });
+        self.oInpts.push(inpt);
+
+        inpt.fn.handle().off('change.arrayCustom').on('change.arrayCustom', function () {
+          var selected = $(this).find(':selected').map(function (i, elm) {
+            return $(elm).html();
+          }).get();
+
+          // remove non-matching rows
+          $table.find('[data-array-placeholder]').filter(function (i, elm) {
+            return _.indexOf(selected, $(elm).val()) === -1;
+          }).closest('tr').remove();
+
+          // add the extra fields for each of the selected values
+          _.each(selected, function (val) {
+            // make sure the row hasn't been made yet
+            if ($table.find('[data-array-placeholder]').filter(function (i, elm) {
+              return $(elm).val() === val;
+            }).length) return false;
+
+            var fields = _.clone(params.fields);
+
+            fields.unshift({
+              name: params.name,
+              disabled: true,
+              'data-array-placeholder': true,
+              value: val
+            });
+
+            $table.append(self.fn.populateFieldRow(fields));
+          });
         });
 
-        console.log(hidNames);
+        $container.append(inpt.fn.handle());
 
-        // append the inputs
-        if (params.min != null) {
-          for (var ii = +params.min - 1; ii >= 0; ii--) {
-            $table.append(self.fn.populateFieldRow(params, ii));
+        _.each(params.fields, function (o) {
+          if (o.name != null) {
+            o['data-name'] = o.name;
+            hidNames.push(o.name.replace('[]', ''));
           }
-        } else {
-          $table.append(self.fn.populateFieldRow(params));
-        }
+        });
 
-        // append the table to the container
         $container.append($table);
 
         var hid = {
@@ -53407,19 +53509,16 @@ $.fn.clearForm = function () {
        * @param  {[type]} params [description]
        * @return {[type]}        [description]
        */
-      populateFieldRow: function populateFieldRow(params, index) {
-        var $td,
-            $btn_add = $('<button/>', { type: 'button', 'class': 'btn btn-primary btn-array-add' }).html('<i class="fa fa-fw fa-plus"></i>'),
-            $btn_remove = $('<button/>', { type: 'button', 'class': 'btn btn-danger btn-array-remove' }).html('<i class="fa fa-fw fa-trash-o"></i>'),
-            index = typeof index === 'undefined' ? 0 : index;
+      populateFieldRow: function populateFieldRow(fields) {
+        var $td;
 
-        return $('<tr/>').append(_.map(params.fields, function (oo) {
+        return $('<tr/>').append(_.map(fields, function (oo) {
           var $td = $('<td/>');
-          oo['data-pivot'] = _.pluck('name', params.fields);
+          oo['data-pivot'] = _.pluck('name', fields);
           oo['data-array-input'] = true;
           self.fn.processField(oo, $td);
           return $td;
-        })).append([$('<td/>').append([$btn_remove, index === 0 ? $btn_add : null])]);
+        }));
       }, // end fn
 
       getAtts: function getAtts() {
@@ -53728,27 +53827,32 @@ $.fn.clearForm = function () {
         // make an add button, if the model is not the same as the current form
         if (self.fn.getModel() !== jApp.opts().model) {
 
-          var frmDef = {
-            table: jApp.model2table(self.fn.getModel()),
+          jApp.log('----------------------INPUT-------------------');
+          jApp.log(self);
+
+          var model = self.fn.getModel(),
+              frmDef = {
+            table: jApp.model2table(model),
+            model: model,
             pkey: 'id',
-            tableFriendly: self.fn.getModel(),
+            tableFriendly: model,
             atts: { method: 'POST' }
           },
-              key = 'new' + self.fn.getModel() + 'Frm';
+              key = 'new' + model + 'Frm';
 
           if (!jUtility.isFormExists(key)) {
             console.log('building the form: ' + key);
-            jUtility.DOM.buildForm(frmDef, key, 'newOtherFrm', self.fn.getModel());
+            jUtility.DOM.buildForm(frmDef, key, 'newOtherFrm', model);
             jUtility.processFormBindings();
           }
 
           var $btnAdd = $('<button/>', {
             type: 'button',
             'class': 'btn btn-primary btn-add',
-            title: 'Add ' + self.fn.getModel()
-          }).html('<i class="fa fa-fw fa-plus"></i> ' + self.fn.getModel() + ' <i class="fa fa-fw fa-external-link"></i>').off('click.custom').on('click.custom', function () {
+            title: 'Add ' + model
+          }).html('<i class="fa fa-fw fa-plus"></i> ' + model + ' <i class="fa fa-fw fa-external-link"></i>').off('click.custom').on('click.custom', function () {
 
-            jUtility.actionHelper('new' + self.fn.getModel() + 'Frm');
+            jUtility.actionHelper('new' + model + 'Frm');
           });
 
           self.DOM.$prnt.find('.btn-group .btn-add').remove().end().find('.btn-group').append($btnAdd);
@@ -53782,126 +53886,6 @@ $.fn.clearForm = function () {
 
   window.jInput = jInput; // add to global scope
 })(window, $);
-
-/**  **  **  **  **  **  **  **  **  **  **  **  **  **  **  **  **
- *
- *  jLinkTable.class.js - Aysnc Grid LinkTable Class
- *
- *  Matsu Borough IT Dashboard
- *
- *  Defines the properties and methods of the
- *  custom LinkTable Class.
- *
- *  Jeremy Bloomstrom | jeremy.bloomstrom@matsugov.us
- *  Programmer Analyst
- *  Matsu Borough IT
- *
- *  Created: 		5/1/15
- *  Last Updated: 	4/20/15
- *
- *  Prereqs: 	jQuery, jStorage.js
- *
- *  Changelog:
- *   5-1-15		Created the class
- *
- */
-// javascript closure
-;(function (window, jQuery, $, jInput, jForm, jApp) {
-
-  'use strict';
-
-  var jLinkTable = function jLinkTable(options) {
-    /**  **  **  **  **  **  **  **  **  **
-    	 *   VARS
-    	 **  **  **  **  **  **  **  **  **  **/
-
-    // alias this
-    var self = this;
-    this.store = $.jStorage;
-    this.form = {};
-    this.linkTable = '';
-    this.colParams = [];
-
-    /**  **  **  **  **  **  **  **  **  **
-     *   DEFAULT OPTIONS
-     *
-     *  Set the default options for the
-     *  instance here. Any values specified
-     *  at runtime will overwrite these
-     *  values.
-     **  **  **  **  **  **  **  **  **  **/
-
-    this.options = {
-
-      oFrm: {},
-
-      // the name of the input element
-      selectLabel: '',
-      selectName: '',
-
-      // the eloquent model name, value column and label column
-      model: '',
-      valueColumn: '',
-      labelColumn: '',
-
-      // whether to allow multiple
-      multiple: true,
-
-      // whether the value is required
-      required: false,
-
-      // html attributes
-      atts: {
-        'type': 'text',
-        'class': 'form-control'
-      },
-
-      // external data for tables, etc.
-      extData: false,
-
-      // TTL for external data (mins)
-      ttl: 60 * 60000,
-
-      // callback for the completed colParams
-      callback: alert
-
-    }; // end options
-
-    // set the runtime values for the options
-    $.extend(true, this.options, options);
-
-    /**  **  **  **  **  **  **  **  **  **
-    	 *   FUNCTION DEFS
-    	 **  **  **  **  **  **  **  **  **  **/
-    this.fn = {
-
-      _init: function _init() {
-        self.colParams = [{
-          type: 'select',
-          name: self.options.selectName,
-          multiple: self.options.multiple,
-          _label: self.options.selectLabel,
-          _optionssource: self.options.model + '.' + self.options.valueColumn,
-          _labelssource: self.options.model + '.' + self.options.labelColumn,
-          _firstlabel: !!self.options.multiple ? false : '--Choose--',
-          _firstoption: !!self.options.multiple ? false : '0',
-          required: !!self.options.required ? 'required' : '__OFF__',
-          'data-validType': !!self.options.required ? 'select' : '__OFF__',
-          'data-fieldset': 3,
-          'data-ordering': 3
-        }];
-      } };
-
-    // end fn
-    // initialize
-    this.fn._init();
-
-    // callback the processed result
-    this.options.callback(this.colParams);
-  }; // end jInput declaration
-
-  window.jLinkTable = jLinkTable; // add to global scope
-})(window, jQuery, $, jInput, jForm, jApp);
 
 /**
  *  jGrid.class.js - Custom Data Grid JS class
@@ -55140,12 +55124,69 @@ $.extend( true, jApp.views.admin, {
 	}
 });
 
+$.extend(true, jApp.colparams, {
+	'Group' : [
+		{ // fieldset
+			label : 'Details',
+			helptext : 'Please fill out the group details',
+			class : 'col-lg-4',
+			fields : [
+				{
+					name : 'name',
+					placeholder : 'e.g. Administrators',
+					_label : 'Group Name',
+					_enabled : true,
+					required : true,
+					'data-validType' : 'Anything',
+				}, {
+					name : 'description',
+					type : 'textarea',
+					_label : 'Description',
+					_enabled : true
+				}, {
+					name : 'modules',
+					type : 'select',
+					_label : 'Assign roles/permissions to this group',
+					_enabled : true,
+					_labelssource : 'Module.role',
+					_optionssource : 'Module.id',
+					multiple : true,
+				}
+			]
+		}, {
+			class : 'col-lg-8',
+			fields : [
+				{
+					name : 'users',
+					type : 'array',
+					_label : 'Add Users to this Group',
+					_enabled : true,
+					fields : [
+						{
+							name : 'users',
+							type : 'select',
+							_labelssource : 'User.username',
+							_optionssource : 'User.id',
+							_enabled : true,
+							multiple : true,
+						}, {
+							name : 'comment[]',
+							placeholder : 'Optional Comment',
+							_enabled : true,
+						}
+					]
+				},
+			]
+		}
+	]
+});
+
 // extend the application views
-_.extend( jApp.views.admin, {
+$.extend( true, jApp.views.admin, {
 
 	groups : function() {
 
-		_.extend( jApp.oG.admin, {
+		$.extend( true, jApp.oG.admin, {
 
 			groups : new jGrid({
 				table : 'groups',
@@ -55330,10 +55371,6 @@ $.extend(true, jApp.colparams, {
 							type : 'array',
 							_label : 'Associate one or more Groups with this User',
 							_enabled : true,
-							headers : [
-								'Group',
-								'Comment'
-							],
 							fields : [
 								{
 									name : 'groups[]',

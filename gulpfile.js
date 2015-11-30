@@ -72,7 +72,6 @@ elixir(function(mix) {
     jsPaths.asyncGrid + '/jUtility.class.js',
     jsPaths.asyncGrid + '/jForm.class.js',
     jsPaths.asyncGrid + '/jInput.class.js',
-    jsPaths.asyncGrid + '/jLinkTable.class.js',
     jsPaths.asyncGrid + '/jGrid.class.js',
   ];
 
