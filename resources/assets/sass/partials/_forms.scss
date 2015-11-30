@@ -51,6 +51,7 @@ fieldset[disabled] {
 		.panel-body {
 			padding: 0 !important;
 			margin-top:60px;
+			margin-bottom:70px;
 		}
 
 		.frm_wrapper {
@@ -97,17 +98,22 @@ fieldset[disabled] {
 				padding:0;
 				top:0px;
 				left:0px;
-				width:100%;
+				right:0px;
+
+				width:auto;
 				background:lighten($primary, 20%) !important;
 				border: none;
 				border-bottom: 1px solid $primary;
 
 				&.footer {
-					bottom:0px !important;
 					margin-top:0 !important;
 					top:inherit;
 					border-top: 1px solid $primary;
 					border-bottom: none;
+					position:fixed;
+					bottom:20px !important;
+					left:20px !important;
+					right:20px !important;
 				}
 
 				.btn {
