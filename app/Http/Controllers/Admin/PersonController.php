@@ -11,17 +11,6 @@ use Input;
 
 class PersonController extends Controller
 {
-  /**
-   * The class name of the associated model
-   * @var string
-   */
-  public $model_class = 'App\Person';
-
-  /**
-   * [$model_short description]
-   * @var string
-   */
-  public $model_short = 'Person';
 
   /**
    * The associated views
@@ -32,33 +21,10 @@ class PersonController extends Controller
   );
 
   /**
-   * What relationships to grab with the model
-   * @var [type]
+   * The class of the model
+   * @var string
    */
-  public $with = [
-    'users.groups',
-    'servers'
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $relations = [
-    'servers',
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $belongs = [
-    [
-      'key' => 'users',
-      'model' => 'App\User',
-      'foreign_key' => 'people_id'
-    ]
-  ];
+  public $model_class = 'App\Person';
 
   /**
    * Spawn a new instance of the controller
@@ -67,8 +33,6 @@ class PersonController extends Controller
   {
     $this->views = (object) $this->views;
     $this->middleware('auth.admin');
-    //$this->checkAccessMiddleware();
   }
-
 
 }

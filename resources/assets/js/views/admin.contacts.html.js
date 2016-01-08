@@ -1,95 +1,87 @@
-//define the colparams for the view
-$.extend(true, jApp.colparams, {
-		'Person' : [
+/**
+ * admin.contacts.html.js
+ *
+ * admin.contacts view definition
+ */
+;(function(jApp) {
+
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			placeholder : 'e.g. John Smith',
+			required : true,
+			_label : 'Enter the person\'s full name',
+			'data-validType' : 'Anything'
+		}
+	], fieldset_2__fields = [
+		{
+			name : 'users',
+			type : 'array',
+			_label : 'Associate one or more Usernames with this Person',
+			fields : [
+				{
+					name : 'users',
+					type : 'select',
+					_label : 'Select Users',
+					_labelssource : 'User.username',
+					_optionssource : 'User.id',
+					multiple : true
+				}, {
+					name : 'comment',
+					placeholder : 'Comment',
+				}, {
+					name : 'primary_flag',
+					type : 'select',
+					_labelssource : 'Primary Username?|No|Yes',
+					_optionssource : '|0|1',
+					'data-no-bsms' : true
+				}
+			]
+		}
+	];
+
+	/**
+	 * Add the view
+	 */
+	jApp.addView('admin.contacts',
+		{ // grid definition
+			model : 'Person',
+			columnFriendly : 'name',
+			gridHeader : {
+				icon : 'fa-user',
+				headerTitle : 'Manage Contacts',
+				helpText : "<strong>Note:</strong> Manage Contacts Here"
+			},
+			columns : [ 				// columns to query
+				"id",
+				"name",
+				"users",
+				"user_groups"
+			],
+			headers : [ 				// headers for table
+				"ID",
+				"Name",
+				"Username(s)",
+				"Groups"
+			],
+		},
+		[ // colparams
 				{ // fieldset
 					label : 'Details',
 					helpText : 'Please fill out the form',
-					class : 'col-lg-4',
-					fields : [
-						{
-							name : 'name',
-							placeholder : 'e.g. John Smith',
-							required : true,
-							_label : 'Enter the person\'s full name',
-							_enabled : true,
-							'data-validType' : 'Anything'
-						}
-					]
+					class : 'col-lg-5',
+					fields : fieldset_1__fields
 				},
 
 				{ // fieldset
 					label : ' ',
-					class : 'col-lg-8',
-					fields : [
-						{
-							name : 'users',
-							type : 'select',
-							_label : 'Associate one or more Usernames with this Person',
-							_enabled : true,
-							_labelssource : 'User.username',
-							_optionssource : 'User.id',
-							multiple : true
-						}
-					]
+					class : 'col-lg-5',
+					fields : fieldset_2__fields
 				}
 		]
-});
+	)
 
-// extend the application views
-$.extend( true, jApp.views.admin, {
-
-	contacts : function() {
-
-		$.extend( true, jApp.oG.admin, {
-
-			contacts : new jGrid({
-				table : 'people',
-				model : 'Person',
-				columnFriendly : 'name',
-				gridHeader : {
-					icon : 'fa-user',
-					headerTitle : 'Manage Contacts',
-					helpText : "<strong>Note:</strong> Manage Contacts Here"
-				},
-				columns : [ 				// columns to query
-					"id",
-					"name",
-          "users",
-					"groups"
-				],
-				hidCols : [					// columns to hide
-
-				],
-				headers : [ 				// headers for table
-					"ID",
-					"Name",
-          "Username(s)",
-					"Groups"
-				],
-				templates : { 				// html template functions
-
-					"id" : function(value) {
-						return ('0000' + value).slice(-4);
-					},
-
-					"name" : function(value) {
-						var r = jApp.aG().currentRow;
-						return value.link( window.location.href.trim('/') + '/' + r.id );
-					},
-
-          "users" : function(arr) {
-            return _.pluck(arr, 'username').join(', ');
-          },
-
-					"groups" : function(arr) {
-						return _.compact(_.flatten(_.map(  jApp.aG().currentRow.users, function(row, i) {
-							return (row.groups.length) ? _.pluck(row.groups,'name') : false
-						} ))).join(', ');
-						//return _.pluck(arr, 'name').join(', ');
-					}
-
-				}
-			})
-		})
-	}
-});
+})(jApp);

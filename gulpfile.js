@@ -40,7 +40,7 @@ elixir(function(mix) {
     metismenu : vendor_path + '/onokumus/metismenu',
     moment : vendor_path + '/moment/moment',
     historyjs : vendor_path + '/ingenious/history.js',
-  }
+  };
 
 
   var jsPaths = {
@@ -52,7 +52,7 @@ elixir(function(mix) {
     bootbox : paths.bootbox, // done
     modernizr : paths.modernizr, // done
     underscore : paths.underscore, // done
-    asyncGrid : paths.asyncGrid + '/js', //done
+    asyncGrid : paths.asyncGrid + '/build', //done
     bootstrapMultiselect : paths.bootstrapMultiselect + '/dist/js', // done
     classie : paths.classie, // done
     jqueryBootpag : paths.jqueryBootpag + '/lib', // done
@@ -65,27 +65,27 @@ elixir(function(mix) {
     metismenu : paths.metismenu + '/dist', // done
     moment : paths.moment, // done
     historyjs : paths.historyjs + '/scripts/bundled/html4+html5', // done
-  }
+  };
 
-  var babelScripts = [
-    jsPaths.asyncGrid + '/jApp.class.js',
-    jsPaths.asyncGrid + '/jUtility.class.js',
-    jsPaths.asyncGrid + '/jForm.class.js',
-    jsPaths.asyncGrid + '/jInput.class.js',
-    jsPaths.asyncGrid + '/jGrid.class.js',
-  ];
+  // var babelScripts = [
+  //   jsPaths.asyncGrid + '/jApp.class.js',
+  //   jsPaths.asyncGrid + '/jUtility.class.js',
+  //   jsPaths.asyncGrid + '/jForm.class.js',
+  //   jsPaths.asyncGrid + '/jInput.class.js',
+  //   jsPaths.asyncGrid + '/jGrid.class.js',
+  // ];
 
   var jsScripts = [
     jsPaths.jquery + '/jquery.js',
     jsPaths.jquery + '/jquery-migrate.js',
     jsPaths.jqueryui + '/jquery-ui.js',
     jsPaths.jStorage +'/jstorage.js',
-    jsPaths.bootstrap + '/bootstrap.js',
+    //jsPaths.bootstrap + '/bootstrap.js',
     jsPaths.bootstrapDatetimepicker + '/bootstrap-datetimepicker.js',
     jsPaths.bootbox + '/bootbox.js',
     jsPaths.modernizr + '/modernizr.js',
     jsPaths.underscore + '/underscore.js',
-    jsPaths.asyncGrid + '/jstorage.js',
+    jsPaths.asyncGrid + '/async-grid.js',
     jsPaths.jqueryValidator + '/jquery.psiblings.js',
     jsPaths.tokenField + '/bootstrap-tokenfield.js',
     jsPaths.jqueryValidator + '/jquery.validator.js',
@@ -117,8 +117,8 @@ elixir(function(mix) {
 
     //scripts
     mix
-      .babel(babelScripts, 'resources/assets/js/async-grid.js')
-      .scripts(jsScripts)
+      //.babel(babelScripts, 'resources/assets/js/async-grid.js')
+      .scripts(jsScripts);
 
     //styles
     mix.sass('app.scss',

@@ -13,18 +13,6 @@ class ModuleController extends Controller
 {
 
   /**
-   * The class name of the associated model
-   * @var string
-   */
-  public $model_class = 'App\Module';
-
-  /**
-   * [$model_short description]
-   * @var string
-   */
-  public $model_short = 'Module';
-
-  /**
    * The associated views
    * @var [type]
    */
@@ -33,20 +21,10 @@ class ModuleController extends Controller
   );
 
   /**
-   * What relationships to grab with the model
-   * @var [type]
+   * The class of the model
+   * @var string
    */
-  public $with = [
-    'groups.users'
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $relations = [
-    'groups'
-  ];
+  public $model_class = 'App\Module';
 
   /**
    * Spawn a new instance of the controller
@@ -55,7 +33,6 @@ class ModuleController extends Controller
   {
     $this->views = (object) $this->views;
     $this->middleware('auth.admin');
-    //$this->checkAccessMiddleware();
   }
 
 }

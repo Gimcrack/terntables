@@ -17,7 +17,7 @@ class UsersSeeder extends Seeder
         //empty table first
         //User::truncate();
 
-        User::create(['people_id' => 1, 'username' => 'jeremy', 'email' => 'jeremy.bloomstrom@gmail.com', 'password' => bcrypt('P@ssw0rd')])->groups()->attach([1,3]);
+        User::create(['people_id' => 1, 'username' => 'jeremy', 'email' => 'jeremy.bloomstrom@gmail.com', 'password' => bcrypt('P@ssw0rd'), 'comment' => 'main username', 'primary_flag' => 1])->groups()->attach([1,3]);
         User::create(['people_id' => 1, 'username' => 'jeremyadmin', 'email' => 'jeremyadmin@matsugov.us', 'password' => bcrypt('P@ssw0rd')])->groups()->attach([1,3]);
         User::create(['people_id' => 1, 'username' => 'jb30111', 'email' => 'jeremy.bloomstrom@matsugov.us', 'password' => bcrypt('P@ssw0rd')])->groups()->attach([1,3]);
         User::create(['people_id' => 1, 'username' => 'jeremy_standard', 'email' => 'jeremy_standard@matsugov.us', 'password' => bcrypt('P@ssw0rd')])->groups()->attach([4]);

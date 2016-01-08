@@ -1,112 +1,99 @@
-$.extend(true, jApp.colparams, {
-	'Group' : [
-		{ // fieldset
-			label : 'Details',
-			helptext : 'Please fill out the group details',
-			class : 'col-lg-4',
-			fields : [
-				{
-					name : 'name',
-					placeholder : 'e.g. Administrators',
-					_label : 'Group Name',
-					_enabled : true,
-					required : true,
-					'data-validType' : 'Anything',
-				}, {
-					name : 'description',
-					type : 'textarea',
-					_label : 'Description',
-					_enabled : true
-				}, {
-					name : 'modules',
-					type : 'select',
-					_label : 'Assign roles/permissions to this group',
-					_enabled : true,
-					_labelssource : 'Module.role',
-					_optionssource : 'Module.id',
-					multiple : true,
-				}
-			]
+/**
+ * admin.groups.html.js
+ *
+ * admin.groups view definition
+ */
+;(function(jApp) {
+
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			placeholder : 'e.g. Administrators',
+			_label : 'Group Name',
+			required : true,
+			'data-validType' : 'Anything',
 		}, {
-			class : 'col-lg-8',
+			name : 'description',
+			type : 'textarea',
+			_label : 'Description',
+		}, {
+			name : 'modules',
+			type : 'select',
+			_label : 'Assign roles/permissions to this group',
+			_labelssource : 'Module.role',
+			_optionssource : 'Module.id',
+			multiple : true,
+		}
+	], fieldset_2__fields = [
+		{
+			name : 'users',
+			type : 'array',
+			_label : 'What Users are in this Group?',
 			fields : [
 				{
 					name : 'users',
-					type : 'array',
-					_label : 'Add Users to this Group',
-					_enabled : true,
-					fields : [
-						{
-							name : 'users',
-							type : 'select',
-							_labelssource : 'User.username',
-							_optionssource : 'User.id',
-							_enabled : true,
-							multiple : true,
-						}, {
-							name : 'comment[]',
-							placeholder : 'Optional Comment',
-							_enabled : true,
-						}
-					]
-				},
+					type : 'select',
+					_label : 'Select Users',
+					_labelssource : 'User.username',
+					_optionssource : 'User.id',
+					multiple : true
+				}, {
+					name : 'comment',
+					placeholder : 'Comment',
+				}, {
+					name : 'primary_flag',
+					type : 'select',
+					_labelssource : 'Primary Group?|No|Yes',
+					_optionssource : '|0|1',
+					'data-no-bsms' : true
+				}
 			]
-		}
-	]
-});
+		},
+	];
 
-// extend the application views
-$.extend( true, jApp.views.admin, {
+	/**
+	 * Add the view
+	 */
+	jApp.addView('admin.groups',
+		{ // grid definition
+			model : 'Group',
+			columnFriendly : 'name',
+			gridHeader : {
+				icon : 'fa-users',
+				headerTitle : 'Manage Groups',
+				helpText : "<strong>Note:</strong> Manage Groups Here"
+			},
+			columns : [ 				// columns to query
+				"id",
+				"name",
+				"description",
+				"users",
+				"modules"
+			],
 
-	groups : function() {
+			headers : [ 				// headers for table
+				"ID",
+				"Name",
+				"Description",
+				"Users",
+				"Roles (Permissions)"
+			],
+		},
+		[ // colparams
+			{ // fieldset
+				label : 'Group Information',
+				helpText : 'Please fill out the following information about the group.',
+				class : 'col-lg-5',
+				fields : fieldset_1__fields
+			},
+			{	// fieldset
+				class : 'col-lg-5',
+				fields : fieldset_2__fields
+			}
+		]
+	);
 
-		$.extend( true, jApp.oG.admin, {
-
-			groups : new jGrid({
-				table : 'groups',
-				model : 'Group',
-				columnFriendly : 'name',
-				gridHeader : {
-					icon : 'fa-users',
-					headerTitle : 'Manage Groups',
-					helpText : "<strong>Note:</strong> Manage Groups Here"
-				},
-				columns : [ 				// columns to query
-					"id",
-					"name",
-					"description",
-					"users",
-					"modules"
-				],
-
-				headers : [ 				// headers for table
-					"ID",
-					"Name",
-					"Description",
-					"Users",
-					"Module Access (Permissions)"
-				],
-				templates : { 				// html template functions
-
-					"id" : function(value) {
-						return ('0000' + value).slice(-4);
-					},
-
-					"name" : function(value) {
-						var r = jApp.aG().currentRow;
-						return value.link( window.location.href.trim('/') + '/' + r.id );
-					},
-
-					"users" : function(arr) {
-						return _.pluck(arr, 'username').join(', ');
-					},
-
-					"modules" : function(arr) {
-						return _.pluck(arr, 'role').join(', ');
-					},
-
-				},
-			})
-		})
-	}
-});
+})(jApp)

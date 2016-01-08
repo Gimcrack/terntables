@@ -10,17 +10,7 @@ use Input;
 
 class GroupController extends Controller
 {
-  /**
-   * The class name of the associated model
-   * @var string
-   */
-  public $model_class = 'App\Group';
 
-  /**
-   * [$model_short description]
-   * @var string
-   */
-  public $model_short = 'Group';
 
   /**
    * The associated views
@@ -31,22 +21,10 @@ class GroupController extends Controller
   );
 
   /**
-   * What relationships to grab with the model
-   * @var [type]
+   * The class of the model
+   * @var string
    */
-  public $with = [
-    'users',
-    'modules',
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $relations = [
-    'users',
-    'modules'
-  ];
+  public $model_class = 'App\Group';
 
   /**
    * Spawn a new instance of the controller

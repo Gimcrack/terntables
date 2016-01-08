@@ -25,6 +25,8 @@ class CreateUsersTable extends Migration
             $table->string('password', 60);
             $table->unsignedInteger('people_id')->nullable();
             //$table->foreign('people_id')->references('id')->on('people')->onDelete('set null');
+            $table->string('comment')->nullable();
+            $table->boolean('primary_flag')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

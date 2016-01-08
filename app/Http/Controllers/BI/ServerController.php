@@ -11,17 +11,6 @@ use Input;
 
 class ServerController extends Controller
 {
-  /**
-   * The class name of the associated model
-   * @var string
-   */
-  public $model_class = 'App\Server';
-
-  /**
-   * [$model_short description]
-   * @var string
-   */
-  public $model_short = 'Server';
 
   /**
    * The associated views
@@ -32,25 +21,10 @@ class ServerController extends Controller
   );
 
   /**
-   * What relationships to grab with the model
-   * @var [type]
+   * The class of the model
+   * @var string
    */
-  public $with = [
-    'applications',
-    'databases',
-    'people',
-    'tags',
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $relations = [
-    'people',
-    'applications',
-    'databases'
-  ];
+  public $model_class = 'App\Server';
 
   /**
    * Spawn a new instance of the controller
@@ -58,19 +32,7 @@ class ServerController extends Controller
   public function __construct()
   {
     $this->views = (object) $this->views;
-    //$this->middleware('auth');
-    //$this->checkAccessMiddleware();
-  }
-
-  /**
-   * Mark servers as prod/not prod/inactive/not inactive
-   * @method markServers
-   * @return [type]      [description]
-   */
-  public function markServers()
-  {
-    $fillable = ['production_flag', 'inactive_flag'];
-    return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
+    $this->middleware('auth');
   }
 
 }

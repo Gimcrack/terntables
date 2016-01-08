@@ -22,11 +22,11 @@ var urlParams;
 
 
 String.prototype.ucfirst = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1);
+    return this.toString().charAt(0).toUpperCase() + this.slice(1);
 }
 
 String.prototype.ucwords = function() {
-    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    return this.toString().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
 function htmlspecialchars_decode(string, quote_style) {
@@ -93,91 +93,6 @@ function htmlspecialchars_decode(string, quote_style) {
   string = string.replace(/&amp;/g, '&');
 
   return string;
-}
-
-
-
-/**
- *  Format phone numbers
-*/
-function formatPhone(phonenum) {
-    var regexObj = /^(?:\+?1[-. ]?)?(?:\(?([0-9]{3})\)?[-. ]?)?([0-9]{3})[-. ]?([0-9]{4})$/;
-    if (regexObj.test(phonenum)) {
-        var parts = phonenum.match(regexObj);
-        var phone = "";
-        if (parts[1]) { phone += "(" + parts[1] + ") "; }
-        phone += parts[2] + "-" + parts[3];
-        return phone;
-    }
-    else {
-        //invalid phone number
-        return phonenum;
-    }
-}
-
-/**
- * Format postal code
-*/
-function formatZip(z) {
-    z = z.replace(/[^0-9-]/gi, "");
-	if (/^\d{6,9}$/.test(z)) {
-		z = z.substring(0,5) + "-" + z.substring(5);
-		return z;
-	}
-	else {
-		return z.substring(0,10);
-	}
-}
-
-function formatNumber(z) {
-	if ( isNaN(parseFloat(z)) ) {
-		if ( !isNaN( z.replace(/[^0-9\.]/gi, "") ) ) {
-			return z.replace(/[^0-9\.]/gi,"") ;
-		} else {
-			return '';
-		}
-	}
-	else {
-		return parseFloat(z);
-	}
-}
-
-function formatInteger(z) {
-	if (!isNaN(z)) {
-		return Math.round(z);
-	}
-	else {
-		return z.replace(/[^0-9]/gi, "");
-	}
-}
-
-function formatSSN(z) {
-	z = z.replace(/\D/g, '');
-	var ret;
-
-	switch (z.length) {
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-			ret = z;
-		break;
-
-		case 4:
-		case 5:
-			ret = z.substr(0,3) + '-' + z.substr(3);
-		break;
-
-		default:
-			ret = z.substr(0,3) + '-' + z.substr(3,2) + '-' + z.substr(5);
-		break;
-
-	}
-	return ret;
-}
-
-function formatUC(z) {
-	return z.toUpperCase()
 }
 
 function strtotime(text, now) {

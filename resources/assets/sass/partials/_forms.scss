@@ -48,6 +48,16 @@ fieldset[disabled] {
 		bottom:20px;
 		overflow:auto;
 
+		.array-field-container {
+			//max-height:300px;
+			//overflow:hidden;
+			position:relative;
+
+			.form-control {
+				margin-bottom: 0px !important;
+			}
+		}
+
 		.panel-body {
 			padding: 0 !important;
 			margin-top:60px;

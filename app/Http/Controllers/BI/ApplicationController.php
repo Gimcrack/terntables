@@ -11,17 +11,6 @@ use Input;
 
 class ApplicationController extends Controller
 {
-  /**
-   * The class name of the associated model
-   * @var string
-   */
-  public $model_class = 'App\Application';
-
-  /**
-   * [$model_short description]
-   * @var string
-   */
-  public $model_short = 'Application';
 
   /**
    * The associated views
@@ -32,25 +21,10 @@ class ApplicationController extends Controller
   );
 
   /**
-   * What relationships to grab with the model
-   * @var [type]
+   * The class of the model
+   * @var string
    */
-  public $with = [
-    'databases',
-    'servers',
-    'people',
-    'tags'
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $relations = [
-    'people',
-    'servers',
-    'databases'
-  ];
+  public $model_class = 'App\Application';
 
   /**
    * Spawn a new instance of the controller
@@ -59,18 +33,6 @@ class ApplicationController extends Controller
   {
     $this->views = (object) $this->views;
     $this->middleware('auth');
-    $this->checkAccessMiddleware();
-  }
-
-  /**
-   * Mark applications as inactive/not inactive
-   * @method markApplications
-   * @return [type]      [description]
-   */
-  public function markApplications()
-  {
-    $fillable = ['inactive_flag'];
-    return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
   }
 
 }

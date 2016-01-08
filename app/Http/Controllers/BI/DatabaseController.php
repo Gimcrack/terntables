@@ -12,18 +12,6 @@ use Input;
 class DatabaseController extends Controller
 {
   /**
-   * The class name of the associated model
-   * @var string
-   */
-  public $model_class = 'App\Database';
-
-  /**
-   * [$model_short description]
-   * @var string
-   */
-  public $model_short = 'Database';
-
-  /**
    * The associated views
    * @var [type]
    */
@@ -32,26 +20,10 @@ class DatabaseController extends Controller
   );
 
   /**
-   * What relationships to grab with the model
-   * @var [type]
+   * The class of the model
+   * @var string
    */
-  public $with = [
-    'applications',
-    'servers',
-    'people',
-    'tags',
-    'host'
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $relations = [
-    'people',
-    'applications',
-    'servers'
-  ];
+  public $model_class = 'App\Database';
 
   /**
    * Spawn a new instance of the controller
@@ -60,17 +32,7 @@ class DatabaseController extends Controller
   {
     $this->views = (object) $this->views;
     $this->middleware('auth');
-    $this->checkAccessMiddleware();
   }
 
-  /**
-   * Mark databases as prod/not prod/inactive/not inactive
-   * @method markServers
-   * @return [type]      [description]
-   */
-  public function markDatabases()
-  {
-    $fillable = ['production_flag', 'inactive_flag', 'ignore_flag'];
-    return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
-  }
+
 }
