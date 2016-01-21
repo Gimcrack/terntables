@@ -12,11 +12,11 @@ class CreateModulesTable extends Migration
      */
     public function up()
     {
-        Schema::create('modules', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('role')->nullable();
+            $table->string('model')->nullable();
             $table->boolean('create_enabled')->default(0);
             $table->boolean('read_enabled')->default(0);
             $table->boolean('update_enabled')->default(0);
@@ -24,11 +24,11 @@ class CreateModulesTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create('group_module', function( Blueprint $table) {
+        Schema::create('group_role', function( Blueprint $table) {
             $table->unsignedInteger('group_id')->index();
             $table->foreign('group_id')->references('id')->on('groups')->onDelete('cascade');
-            $table->unsignedInteger('module_id')->index();
-            $table->foreign('module_id')->references('id')->on('modules')->onDelete('cascade');
+            $table->unsignedInteger('role_id')->index();
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
             $table->text('comment')->nullable();
             $table->timestamps();
         });
@@ -41,12 +41,12 @@ class CreateModulesTable extends Migration
      */
     public function down()
     {
-        Schema::table('group_module', function(Blueprint $table) {
-            $table->dropForeign('group_module_group_id_foreign');
-            $table->dropForeign('group_module_module_id_foreign');
+        Schema::table('group_role', function(Blueprint $table) {
+            $table->dropForeign('group_role_group_id_foreign');
+            $table->dropForeign('group_role_role_id_foreign');
         });
 
-        Schema::drop('modules');
-        Schema::drop('group_module');
+        Schema::drop('roles');
+        Schema::drop('group_role');
     }
 }

@@ -57,18 +57,18 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::delete('Person',                 'Api\v1\PersonController@destroyMany');
   Route::resource('Person',               'Api\v1\PersonController');
 
-  Route::delete('Module',                 'Api\v1\ModuleController@destroyMany');
-  Route::resource('Module',               'Api\v1\ModuleController');
+  Route::delete('Role',                 'Api\v1\RoleController@destroyMany');
+  Route::resource('Role',               'Api\v1\RoleController');
 });
 
 /**
  * Admin Routes
  */
 Route::group(['prefix' => 'admin'], function(){
-  Route::get('people', 'Admin\PersonController@index');
-  Route::get('users',  'Admin\UserController@index');
-  Route::get('groups', 'Admin\GroupController@index');
-  Route::get('modules','Admin\ModuleController@index');
+  Route::resource('people', 'Admin\PersonController', [ 'only' => [ 'index','show'] ]);
+  Route::resource('users',  'Admin\UserController', [ 'only' => [ 'index','show'] ]);
+  Route::resource('groups', 'Admin\GroupController', [ 'only' => [ 'index','show'] ]);
+  Route::resource('roles',   'Admin\RoleController', [ 'only' => [ 'index','show'] ]);
 });
 
 /**

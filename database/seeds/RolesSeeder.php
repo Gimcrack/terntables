@@ -2,9 +2,9 @@
 
 use Illuminate\Database\Seeder;
 use App\User;
-use App\Module;
+use App\Role;
 
-class ModulesSeeder extends Seeder
+class RolesSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,12 +14,12 @@ class ModulesSeeder extends Seeder
     public function run()
     {
         //empty table first
-        //Module::truncate();
+        //Role::truncate();
 
 
-        Module::create([
-          'name' => 'Org',
-          'role' => 'Org Managers',
+        Role::create([
+          'name' => 'Org Managers',
+          'model' => 'Org',
           'description' => 'Can create, update, and delete orgs',
           'create_enabled' => 1,
           'read_enabled' => 1,
@@ -27,9 +27,9 @@ class ModulesSeeder extends Seeder
           'delete_enabled' => 1,
         ])->groups()->attach(5);
 
-        Module::create([
-          'name' => 'Org',
-          'role' => 'Org Viewers',
+        Role::create([
+          'name' => 'Org Viewers',
+          'model' => 'Org',
           'description' => 'Can view orgs',
           'read_enabled' => 1,
         ])->groups()->attach(4);

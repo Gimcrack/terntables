@@ -8,20 +8,20 @@ use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
 use Input;
 
-class ModuleController extends ApiController
+class RoleController extends ApiController
 {
 
   /**
    * The class name of the associated model
    * @var string
    */
-  public $model_class = 'App\Module';
+  public $model_class = 'App\Role';
 
   /**
    * [$model_short description]
    * @var string
    */
-  public $model_short = 'Module';
+  public $model_short = 'Role';
 
   /**
    * What relationships to grab with the model

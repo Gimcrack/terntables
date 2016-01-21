@@ -3,7 +3,7 @@
 @section('content')
 
 <script type="text/javascript">
-  jApp.views.admin.modules();
+  jApp.views.admin.roles();
 </script>
 
 @endsection

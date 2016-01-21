@@ -72,12 +72,12 @@ class Group extends Model
   }
 
   /**
-   * A group can be assigned to many modules
-   * @method modules
+   * A group can be assigned to many roles
+   * @method roles
    * @return [type]  [description]
    */
-  public function modules()
+  public function roles()
   {
-    return $this->belongsToMany('App\Module')->withTimestamps();
+    return $this->belongsToMany('App\Role')->withTimestamps();
   }
 }

@@ -85,7 +85,7 @@
 			"person_name",
 			"email",
 			"groups",
-			"group_modules",
+			"group_roles",
 		],
 		headers : [ 				// headers for table
 			"ID",
@@ -93,7 +93,7 @@
 			"Name",
 			"Email",
 			"Groups",
-			"Access (Permissions)",
+			"Role (Model)",
 		],
 		html : {
 			forms : {

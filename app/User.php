@@ -10,7 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-use App\Module;
+use App\Role;
 use DB;
 
 class User extends Model implements AuthenticatableContract,
@@ -59,7 +59,7 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['username', 'email', 'password', 'people_id'];
+    protected $fillable = ['username', 'email', 'password', 'people_id', 'comment', 'primary_flag'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -94,18 +94,18 @@ class User extends Model implements AuthenticatableContract,
      */
     public function groups()
     {
-      return $this->belongsToMany('App\Group')->withTimestamps()->withPivot(['comment','primary_flag'])->with(['modules']);
+      return $this->belongsToMany('App\Group')->withTimestamps()->withPivot(['comment','primary_flag'])->with(['roles']);
     }
 
 
     /**
-     * A user has modules through groups
-     * @method modules
+     * A user has roles through groups
+     * @method roles
      * @return [type]  [description]
      */
-    public function modules()
+    public function roles()
     {
-      return $this->hasManyThrough('App\Module','App\Group');
+      return $this->hasManyThrough('App\Role','App\Group');
     }
 
     /**
@@ -163,10 +163,10 @@ class User extends Model implements AuthenticatableContract,
       $select = "
         select count(*) as access
         from group_user
-        inner join group_module
-        on group_user.group_id = group_module.group_id
-        inner join modules on
-        modules.id = group_module.module_id
+        inner join group_role
+        on group_user.group_id = group_role.group_id
+        inner join roles on
+        roles.id = group_role.role_id
         where name = '{$model}'
         and {$permission}_enabled = 1
         and group_user.user_id = {$this->id}";
@@ -206,10 +206,10 @@ class User extends Model implements AuthenticatableContract,
           update_enabled,
           delete_enabled
         from group_user
-        inner join group_module
-        on group_user.group_id = group_module.group_id
-        inner join modules on
-        modules.id = group_module.module_id
+        inner join group_role
+        on group_user.group_id = group_role.group_id
+        inner join roles on
+        roles.id = group_role.role_id
         where name = '{$model}'
         and group_user.user_id = {$this->id}";
 

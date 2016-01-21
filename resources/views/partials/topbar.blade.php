@@ -70,7 +70,7 @@
     				<a href="{{ url('admin/groups')}}" ><i class="fa fa-users fa-fw"></i> Manage Groups</a>
     			</li>
     			<li>
-    				<a href="{{ url('admin/modules')}}" ><i class="fa fa-lock fa-fw"></i> Manage Permissions</a>
+    				<a href="{{ url('admin/roles')}}" ><i class="fa fa-lock fa-fw"></i> Manage Roles</a>
     			</li>
   			@endif
 

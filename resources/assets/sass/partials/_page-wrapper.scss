@@ -19,7 +19,14 @@
 	.table-rowMenu-row {
 		background: lighten($primary,20%) !important;
 		border-top:1px solid $primary !important;
+
+		&.other {
+			background: lighten($warning,20%) !important;
+			border-top:1px solid $warning !important;
+		}
 	}
+
+
 
 	.table-menu-row,
 	.table-rowMenu-row {
@@ -41,6 +48,12 @@
 					outline: none !important;
 					cursor: default;
 					color : darken($primary,10%);
+
+					&.other {
+						background: lighten($warning,10%) !important;
+						color : darken($warning,10%);
+						border:1px solid $warning;
+					}
 				}
 
 				.btn-tblMenu {

@@ -28,7 +28,7 @@ class UserController extends ApiController
    * @var [type]
    */
   public $with = [
-    'groups.modules',
+    'groups.roles',
     'person'
   ];
 

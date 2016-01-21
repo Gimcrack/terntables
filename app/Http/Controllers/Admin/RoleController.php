@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Module;
+use App\Role;
 use App\RecordLock;
 use Input;
 
-class ModuleController extends Controller
+class RoleController extends Controller
 {
 
   /**
@@ -17,14 +17,14 @@ class ModuleController extends Controller
    * @var [type]
    */
   public $views = array(
-    'index' => 'admin.modules.index'
+    'index' => 'admin.roles.index'
   );
 
   /**
    * The class of the model
    * @var string
    */
-  public $model_class = 'App\Module';
+  public $model_class = 'App\Role';
 
   /**
    * Spawn a new instance of the controller

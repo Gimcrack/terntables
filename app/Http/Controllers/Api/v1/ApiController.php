@@ -93,9 +93,15 @@ class ApiController extends Controller
   {
       $model_class = $this->model_class;
 
-      $data = $model_class::with($this->with)->findOrFail($id);
+      array_push($this->with,'RevisionHistory');
 
-      return response()->json( $data );
+      $data = $model_class::with( $this->with)->findOrFail($id);
+
+      $return = $data->toArray();
+
+      $return['readable_history'] = $this->getHistory($data);
+
+      return response()->json( $return );
   }
 
   /**
@@ -352,6 +358,31 @@ class ApiController extends Controller
   public function getPermissions($model)
   {
     return Auth::user()->getPermissions($model);
+  }
+
+  /**
+   * Get history on the model
+   * @method getHistory
+   * @param  [type]     $data [description]
+   * @return [type]           [description]
+   */
+  public function getHistory($data)
+  {
+    $readable_history = [];
+
+    foreach($data->revisionHistory as $history) {
+      $readable_history[] = [
+        'date' => date('Y-m-d H:i', strtotime( $history->updated_at )),
+        'dateForHumans' => $history->updated_at->diffForHumans(),
+        'person' => @$history->userResponsible()->person->name ?: 'System',
+        'description' => ( !is_null($history->old_value) ) ?
+            "[{$history->fieldName()}] changed from '{$history->oldValue()}' to '{$history->newValue()}'" :
+            "Record Created"
+      ];
+    }
+
+    return $readable_history;
+
   }
 
   /**

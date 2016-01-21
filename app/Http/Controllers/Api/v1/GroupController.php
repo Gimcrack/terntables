@@ -29,7 +29,7 @@ class GroupController extends ApiController
    */
   public $with = [
     'users',
-    'modules',
+    'roles',
   ];
 
   /**
@@ -38,7 +38,7 @@ class GroupController extends ApiController
    */
   public $relations = [
     'users',
-    'modules'
+    'roles'
   ];
 
   /**

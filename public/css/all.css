@@ -16510,6 +16510,11 @@ table {
   border-top: 1px solid #428bca !important;
 }
 
+#page-wrapper .table-rowMenu-row.other {
+  background: #f8d9ac !important;
+  border-top: 1px solid #f0ad4e !important;
+}
+
 #page-wrapper .table-menu-row,
 #page-wrapper .table-rowMenu-row {
   border: none !important;
@@ -16537,6 +16542,13 @@ table {
   outline: none !important;
   cursor: default;
   color: #3071a9;
+}
+
+#page-wrapper .table-menu-row .table-header .btn-group .btn-rowMenu.other,
+#page-wrapper .table-rowMenu-row .table-header .btn-group .btn-rowMenu.other {
+  background: #f4c37d !important;
+  color: #ec971f;
+  border: 1px solid #f0ad4e;
 }
 
 #page-wrapper .table-menu-row .table-header .btn-group .btn-tblMenu,

@@ -29,7 +29,7 @@ class PersonController extends ApiController
    */
   public $with = [
     'users.groups',
-    'servers'
+    'servers',
   ];
 
   /**

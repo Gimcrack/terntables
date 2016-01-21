@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Module extends Model
+class Role extends Model
 {
   /**
    * Make the model track revision changes
@@ -40,7 +40,7 @@ class Module extends Model
    *
    * @var string
    */
-  protected $table = 'modules';
+  protected $table = 'roles';
 
   /**
    * The mass assignable fields
@@ -50,7 +50,7 @@ class Module extends Model
   protected $fillable = [
       'name'
     , 'description'
-    , 'role'
+    , 'model'
     , 'create_enabled'
     , 'read_enabled'
     , 'update_enabled'
@@ -67,8 +67,8 @@ class Module extends Model
     }
 
   /**
-   * A module can be assigned to many groups
-   * @method modules
+   * A role can be assigned to many groups
+   * @method groups
    * @return [type]  [description]
    */
   public function groups()

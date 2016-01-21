@@ -51,7 +51,7 @@
 			model : 'Person',
 			columnFriendly : 'name',
 			gridHeader : {
-				icon : 'fa-user',
+				icon : 'fa-male',
 				headerTitle : 'Manage Contacts',
 				helpText : "<strong>Note:</strong> Manage Contacts Here"
 			},

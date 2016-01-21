@@ -38,7 +38,7 @@ class ProfileController extends Controller
     public function indexjson()
     {
         $id = \Auth::id();
-        return User::with(['groups.modules','person'])->where('id',$id)->get();
+        return User::with(['groups.roles','person'])->where('id',$id)->get();
     }
 
     /**

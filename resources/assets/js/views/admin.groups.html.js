@@ -20,11 +20,11 @@
 			type : 'textarea',
 			_label : 'Description',
 		}, {
-			name : 'modules',
+			name : 'roles',
 			type : 'select',
 			_label : 'Assign roles/permissions to this group',
-			_labelssource : 'Module.role',
-			_optionssource : 'Module.id',
+			_labelssource : 'Role.name',
+			_optionssource : 'Role.id',
 			multiple : true,
 		}
 	], fieldset_2__fields = [
@@ -71,7 +71,7 @@
 				"name",
 				"description",
 				"users",
-				"modules"
+				"roles"
 			],
 
 			headers : [ 				// headers for table
@@ -79,7 +79,7 @@
 				"Name",
 				"Description",
 				"Users",
-				"Roles (Permissions)"
+				"Roles"
 			],
 		},
 		[ // colparams

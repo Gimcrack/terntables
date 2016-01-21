@@ -124,6 +124,6 @@ elixir(function(mix) {
     mix.sass('app.scss',
       'public/css/all.css', {
         includePaths : cssPaths
-    });//.livereload();
+    }).livereload();
 
 });
