@@ -9,6 +9,8 @@ The Dashboard is a collection of utilities used internally by the MSB IT Departm
 
 ### List All Servers [GET]
 
+You may get a list of all the servers maintained by the IT Department.
+
 + Response 200 (application/json)
 
         {
@@ -75,53 +77,35 @@ The Dashboard is a collection of utilities used internally by the MSB IT Departm
                 }
             ]
         }
-                        
-                    
-                
-                        
 
-### Create a New Question [POST]
+### Create a New Server [POST]
 
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
+You may create a new Server using this action. It takes a JSON
+object containing the server attributes.
 
 + Request (application/json)
 
         {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
+            "name": "shareptapp",
+            "description" : "Production Sharepoint Application Server",
+            "cname" : "spapp",
+            "ip" : "192.168.1.11",
+            "inactive_flag" : 0,
+            "production_flag" : 1,
+            "people" : [1,3,12,17],
+            "applications" : [4,10,12],
+            "tags" : [1,4,10]
         }
 
 + Response 201 (application/json)
 
     + Headers
 
-            Location: /questions/2
+            Location: /Server/2
 
     + Body
 
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
+                "errors": false,
+                "message": "Operation Completed Successfully"
             }
