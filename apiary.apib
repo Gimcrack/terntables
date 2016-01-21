@@ -1,37 +1,84 @@
 FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
+HOST: http://itdashboard-dev/api/v1
 
-# msbitdashboard
+# Matsu Borough IT Dashboard API
 
-Polls is a simple API allowing consumers to view polls and vote in them.
+The Dashboard is a collection of utilities used internally by the MSB IT Department.
 
-## Questions Collection [/questions]
+## Server Collection [/Server]
 
-### List All Questions [GET]
+### List All Servers [GET]
 
 + Response 200 (application/json)
 
-        [
-            {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
-            }
-        ]
+        {
+            "total": 86,
+            "per_page": 100,
+            "current_page": 1,
+            "last_page": 1,
+            "next_page_url": null,
+            "prev_page_url": null,
+            "from": 1,
+            "to": 86,
+            "data": [
+                {
+                    "id": "1",
+                    "name": "poseidon",
+                    "description": "Hosts many of the smaller SQL databases.",
+                    "cname": "neptune",
+                    "ip": "192.168.1.10",
+                    "inactive_flag": "0",
+                    "production_flag": "1",
+                    "last_windows_update": "2015-09-24",
+                    "created_at": "2016-01-13 18:24:58.000",
+                    "updated_at": "2016-01-13 18:24:58.000",
+                    "applications": [
+                        {
+                            "id": "3",
+                            "name": "Microsoft SQL Server",
+                            "description": "Relational DB Server",
+                            "inactive_flag": "0",
+                            "created_at": "2016-01-13 18:24:59.000",
+                            "updated_at": "2016-01-13 18:24:59.000",
+                            "pivot": {
+                                "server_id": "1",
+                                "application_id": "3",
+                                "created_at": "2016-01-13 18:24:59.000",
+                                "updated_at": "2016-01-13 18:24:59.000"
+                            }
+                        }
+                    ],
+                    "databases": [
+                        {
+                            "id": "3",
+                            "name": "Training",
+                            "description": "Training Database",
+                            "rpo": "15 min",
+                            "rto": "1 hour",
+                            "dr_strategy": "mirrored, synchronous",
+                            "ha_strategy": "n/a",
+                            "upgrade_readiness": "ready",
+                            "inactive_flag": "0",
+                            "ignore_flag": "0",
+                            "production_flag": "1",
+                            "server_id": "1",
+                            "created_at": "2016-01-13 18:24:59.000",
+                            "updated_at": "2016-01-13 18:24:59.000",
+                            "pivot": {
+                                "server_id": "1",
+                                "database_id": "3",
+                                "created_at": "2016-01-13 18:24:59.000",
+                                "updated_at": "2016-01-13 18:24:59.000"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+                        
+                    
+                
+                        
 
 ### Create a New Question [POST]
 
