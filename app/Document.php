@@ -2,18 +2,12 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use Nathanmac\Utilities\Parser\Parser;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Tag;
 
 class Document extends Model
 {
-    /**
-     * Make the model track revision changes
-     */
-    use \Venturecraft\Revisionable\RevisionableTrait;
-
     /**
      * The parsed xml object
      * @var [type]
@@ -38,30 +32,6 @@ class Document extends Model
     ];
 
     /**
-     * Boot the model
-     * @return [type] [description]
-     */
-    public static function boot()
-    {
-        parent::boot();
-    }
-
-    /**
-     * The column that identifies the model
-     * @return [type] [description]
-     */
-    public function identifiableName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Track creations as revisions
-     * @var [type]
-     */
-    protected $revisionCreationsEnabled = true;
-
-    /**
      * The database table that the model references
      *
      * @var string
@@ -81,15 +51,6 @@ class Document extends Model
       , 'people_id'
       , 'status'
     ];
-
-    /**
-     * Polymorphic relationship. Second parameter to morphOne/morphMany
-     * should be the same as the prefix for the *_id/*_type fields.
-     */
-    public function recordLock()
-    {
-        return $this->morphOne('App\RecordLock', 'lockable');
-    }
 
     /**
      * Polymorphic relationship. Second parameter to morphOne/morphMany

@@ -116,14 +116,15 @@ elixir(function(mix) {
    ];
 
     //scripts
-    mix
-      //.babel(babelScripts, 'resources/assets/js/async-grid.js')
-      .scripts(jsScripts);
+    // mix
+    //   //.babel(babelScripts, 'resources/assets/js/async-grid.js')
+    //   .scripts(jsScripts);
+    //
+    // //styles
+    // mix.sass('app.scss',
+    //   'public/css/all.css', {
+    //     includePaths : cssPaths
+    // }).livereload().phpUnit();
 
-    //styles
-    mix.sass('app.scss',
-      'public/css/all.css', {
-        includePaths : cssPaths
-    }).livereload();
-
+    mix.phpUnit();
 });

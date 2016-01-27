@@ -46,6 +46,11 @@ return [
 
     'connections' => [
 
+        'test' => [
+            'driver' => 'sqlite',
+            'database' => storage_path('testdb.sqlite')
+        ],
+
         'sqlite' => [
             'driver'   => 'sqlite',
             'database' => storage_path('database.sqlite'),

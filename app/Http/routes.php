@@ -20,14 +20,16 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::get('{model}/_tokenOptions/{options}_{labels}',  'Api\v1\ApiController@getTokensOptions');
   Route::get('{model}/_getPermissions', 'Api\v1\ApiController@getPermissions');
   Route::get('{model}/_checkedOut',     'Api\v1\ApiController@getCheckedOutRecords');
+  Route::get('{model}/_checkinAll',     'Api\v1\ApiController@checkinAll');
   Route::get('{model}/{id}/_checkout',  'Api\v1\ApiController@checkout');
   Route::get('{model}/{id}/_checkin',   'Api\v1\ApiController@checkin');
+
   Route::get('_checkinAll',             'Api\v1\ApiController@checkinAll');
   Route::get('_checkAccess/{role}',     'Api\v1\ApiController@checkAccess');
 
   //user routes
-  Route::patch('Profile/{id}/resetPassword', 'Api\v1\ProfileController@resetPassword');
-  Route::patch('Profile/{id}',      'Api\v1\ProfileController@update');
+  Route::patch('Profile/resetPassword', 'Api\v1\ProfileController@resetPassword');
+  Route::patch('Profile/',              'Api\v1\ProfileController@update');
 
   // bi routes
   Route::delete('Server',           'Api\v1\ServerController@destroyMany');
@@ -54,6 +56,7 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::delete('Group',                  'Api\v1\GroupController@destroyMany');
   Route::resource('Group',                'Api\v1\GroupController');
 
+  Route::patch('Person/_massUpdate',      'Api\v1\PersonController@massUpdate');
   Route::delete('Person',                 'Api\v1\PersonController@destroyMany');
   Route::resource('Person',               'Api\v1\PersonController');
 

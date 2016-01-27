@@ -8,57 +8,38 @@ use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
 use Input;
 
-class PersonController extends ApiController
+class DocumentController extends ApiController
 {
-
   /**
    * The class name of the associated model
    * @var string
    */
-  public $model_class = 'App\Person';
+  public $model_class = 'App\Document';
 
   /**
    * [$model_short description]
    * @var string
    */
-  public $model_short = 'Person';
+  public $model_short = 'Document';
 
   /**
    * What relationships to grab with the model
    * @var [type]
    */
-  public $with = [
-    'users.groups',
-    'servers',
-  ];
+  public $with = [];
 
   /**
    * What relationships to save with the model
    * @var [type]
    */
-  public $relations = [
-    'servers',
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $belongs = [
-    [
-      'key' => 'users',
-      'model' => 'App\User',
-      'foreign_key' => 'people_id'
-    ]
-  ];
+  public $relations = [];
 
   /**
    * Spawn a new instance of the controller
    */
   public function __construct()
   {
-    $this->model_short = 'Person';
-    $this->middleware('auth.admin');
+    $this->middleware('auth');
     $this->checkAccessMiddleware();
   }
 }
