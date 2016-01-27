@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -19,34 +18,6 @@ class User extends Model implements AuthenticatableContract,
 {
     use Authenticatable, Authorizable, CanResetPassword;
 
-    /**
-     * Make the model track revision changes
-     */
-    use \Venturecraft\Revisionable\RevisionableTrait;
-
-    /**
-     * Boot the model
-     * @return [type] [description]
-     */
-    public static function boot()
-    {
-        parent::boot();
-    }
-
-    /**
-     * The column that identifies the model
-     * @return [type] [description]
-     */
-    public function identifiableName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Track creations as revisions
-     * @var [type]
-     */
-    protected $revisionCreationsEnabled = true;
     /**
      * The database table used by the model.
      *
@@ -67,15 +38,6 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     protected $hidden = ['password', 'remember_token'];
-
-    /**
-     * Polymorphic relationship. Second parameter to morphOne/morphMany
-     * should be the same as the prefix for the *_id/*_type fields.
-     */
-    public function recordLock()
-    {
-        return $this->morphOne('App\RecordLock', 'lockable');
-    }
 
     /**
      * A User may belong to one person

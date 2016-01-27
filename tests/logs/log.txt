@@ -1,0 +1,10 @@
+PHPUnit 4.8.21 by Sebastian Bergmann and contributors.
+
+Runtime:	PHP 5.5.14
+Configuration:	B:\_webroot_\dashboard-dev\phpunit.xml
+
+.................
+
+Time: 9.89 seconds, Memory: 30.50Mb
+
+OK (17 tests, 82 assertions)

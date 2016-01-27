@@ -37,9 +37,15 @@ class SuperAdministrator
     {
       // determine first if user is logged in
       if ($this->auth->guest()) {
-          if (!$request->ajax()) {
-              return redirect()->guest('auth/login');
-          } 
+        if ($request->wantsJson()) {
+          return response()->json([
+            'errors' => true,
+            'message' => "You must be logged on as a super administrator to do that."
+          ], 403);
+        }
+        if (!$request->ajax()) {
+          return redirect()->guest('auth/login');
+        }
       }
 
 

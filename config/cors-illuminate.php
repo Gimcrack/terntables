@@ -22,6 +22,7 @@ return [
      */
     Settings::KEY_ALLOWED_ORIGINS => [
         'http://itdashboard'         => true,
+        'http://itdashboard-dev'     => true,
         'http://portal-tst.msb.matsugov.lan' => true,
         //'*' => true
     ],

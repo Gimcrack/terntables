@@ -37,9 +37,15 @@ class Administrator
   {
       // determine first if user is logged in
       if ($this->auth->guest()) {
-          if (!$request->ajax()) {
-              return redirect()->guest('auth/login');
-          } 
+        if ($request->wantsJson()) {
+          return response()->json([
+            'errors' => true,
+            'message' => "You must be logged on as an administrator to do that."
+          ], 403);
+        }
+        if (!$request->ajax()) {
+            return redirect()->guest('auth/login');
+        }
       }
 
       // now determine if logged in user is an admin

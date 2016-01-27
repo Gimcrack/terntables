@@ -35,6 +35,12 @@ class Authenticate
     public function handle($request, Closure $next)
     {
         if ($this->auth->guest()) {
+            if ($request->wantsJson()) {
+              return response()->json([
+                'errors' => true,
+                'message' => "You must be logged on as a user to do that."
+              ], 403);
+            }
             if (!$request->ajax()) {
                 return redirect()->guest('auth/login');
             }
