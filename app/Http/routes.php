@@ -31,16 +31,19 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::patch('Profile/resetPassword', 'Api\v1\ProfileController@resetPassword');
   Route::patch('Profile/',              'Api\v1\ProfileController@update');
 
+  // ad routes
+  Route::get('AD/User',                 'ActiveDirectoryController@index');
+
   // bi routes
-  Route::delete('Server',           'Api\v1\ServerController@destroyMany');
+  Route::delete('Server',           'Api\v1\ServerController@destroy');
   Route::patch('Server/_massUpdate', 'Api\v1\ServerController@markServers');
   Route::resource('Server',         'Api\v1\ServerController');
 
-  Route::delete('Database',           'Api\v1\DatabaseController@destroyMany');
+  Route::delete('Database',           'Api\v1\DatabaseController@destroy');
   Route::patch('Database/_massUpdate', 'Api\v1\DatabaseController@markDatabases');
   Route::resource('Database',         'Api\v1\DatabaseController');
 
-  Route::delete('Application',           'Api\v1\ApplicationController@destroyMany');
+  Route::delete('Application',           'Api\v1\ApplicationController@destroy');
   Route::patch('Application/_massUpdate', 'Api\v1\ApplicationController@markApplications');
   Route::resource('Application',          'Api\v1\ApplicationController');
 
@@ -50,17 +53,17 @@ Route::group(['prefix' => 'api/v1'], function() {
 
   // admin routes
   Route::patch('User/{id}/resetPassword/','Api\v1\UserController@resetPassword');
-  Route::delete('User',                   'Api\v1\UserController@destroyMany');
+  Route::delete('User',                   'Api\v1\UserController@destroy');
   Route::resource('User',                 'Api\v1\UserController');
 
-  Route::delete('Group',                  'Api\v1\GroupController@destroyMany');
+  Route::delete('Group',                  'Api\v1\GroupController@destroy');
   Route::resource('Group',                'Api\v1\GroupController');
 
   Route::patch('Person/_massUpdate',      'Api\v1\PersonController@massUpdate');
-  Route::delete('Person',                 'Api\v1\PersonController@destroyMany');
+  Route::delete('Person',                 'Api\v1\PersonController@destroy');
   Route::resource('Person',               'Api\v1\PersonController');
 
-  Route::delete('Role',                 'Api\v1\RoleController@destroyMany');
+  Route::delete('Role',                 'Api\v1\RoleController@destroy');
   Route::resource('Role',               'Api\v1\RoleController');
 });
 
