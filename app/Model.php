@@ -3,6 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model as BaseModel;
+use Input;
+use App\Tag;
+use App\Exceptions\OperationRequiresCheckoutException;
 
 abstract class Model extends BaseModel
 {
@@ -42,6 +45,16 @@ abstract class Model extends BaseModel
   public function recordLock()
   {
       return $this->morphOne('App\RecordLock', 'lockable');
+  }
+
+  /**
+   * Is the record checked out
+   * @method isCheckedOut
+   * @return boolean      [description]
+   */
+  public function isCheckedOut()
+  {
+    return ( !! $this->recordLock );
   }
 
   /**
@@ -89,5 +102,82 @@ abstract class Model extends BaseModel
     return $this;
   }
 
+  /**
+   * Checkout this model to the logged in user
+   * @method checkoutToMe
+   * @return [type]       [description]
+   */
+  public function checkoutToMe()
+  {
+    return $this->checkoutToId( \Auth::id() );
+  }
+
+  /**
+   * Checkin the model
+   * @method checkin
+   * @return [type]  [description]
+   */
+  public function checkin()
+  {
+    if ( ! $this->isCheckedOutToMe() ) {
+      throw new OperationRequiresCheckoutException($this, 'checkin');
+    }
+
+    $this->recordLock->delete();
+
+    return true;
+  }
+
+  /**
+   * Can this model be checked out
+   * @method canBeCheckedOut
+   * @return [type]          [description]
+   */
+  public function canBeCheckedOut()
+  {
+    $lock = $this->recordLock;
+    return ( empty($lock) || $lock->checkExpired() || $lock->checkUser() );
+  }
+
+  /**
+   * Can this model not be checked out
+   * @method cannotBeCheckedOut
+   * @return [type]             [description]
+   */
+  public function cannotBeCheckedOut()
+  {
+    return ! $this->canBeCheckedOut();
+  }
+
+  /**
+   * Get the user that the record is checked out to
+   * @method checkedOutToUser
+   * @return [type]           [description]
+   */
+  public function checkedOutToUser()
+  {
+    if ( ! $this->isCheckedOut() ) {
+      return null;
+    }
+
+    $id = $this->recordLock->user_id;
+
+    return \App\User::find($id);
+  }
+
+  /**
+   * Update tags for the model
+   * @method updateTags
+   * @return [type]     [description]
+   */
+  public function updateTags()
+  {
+    if ( ! method_exists($this, 'tags') ) return $this;
+
+    $tags = Input::get('tags', [] );
+    Tag::resolveTags( $this, $tags );
+
+    return $this;
+  }
 
 }

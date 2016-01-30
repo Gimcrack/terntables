@@ -9,6 +9,8 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
+use Illuminate\Database\Eloquent\Collection;
+
 use App\Role;
 use DB;
 
@@ -191,5 +193,30 @@ class User extends Model implements AuthenticatableContract,
         'delete_enabled' => $delete_enabled
       ];
 
+    }
+
+    /**
+     * Get the checked out records of this user
+     * @method getCheckedOutRecords
+     * @return [type]               [description]
+     */
+    public function getCheckedOutRecords($class = null)
+    {
+      $locks = RecordLock::ofUser( $this->id )->ofType($class);
+      $collection = new Collection();
+
+      foreach( $locks->get() as $lock ) {
+        $model_class = $lock->lockable_type;
+        $id = $lock->lockable_id;
+
+        $model = $model_class::find($id);
+
+        if ( !! $model ) {
+          $collection->push( $model );
+        }
+
+      }
+
+      return $collection;
     }
 }

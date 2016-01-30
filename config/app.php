@@ -154,6 +154,8 @@ return [
 
         Neomerx\CorsIlluminate\Providers\LaravelServiceProvider::class,
 
+        Adldap\Laravel\AdldapAuthServiceProvider::class
+
     ],
 
     /*

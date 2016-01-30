@@ -4,29 +4,30 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-PersonApiTest	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^class PersonApiTest extends ApiTest {$/;"	class	line:4
-__construct	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function __construct()$/;"	function	line:8
-testGetPeople	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testGetPeople()$/;"	function	line:25
-testGetPerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testGetPerson()$/;"	function	line:40
-testGetAFakePerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testGetAFakePerson()$/;"	function	line:55
-testCreatePerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCreatePerson()$/;"	function	line:70
-testCreatePersonWhileNotLoggedIn	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCreatePersonWhileNotLoggedIn()$/;"	function	line:90
-testUpdatePerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testUpdatePerson() {$/;"	function	line:115
-testUpdateMultiplePeople	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testUpdateMultiplePeople()$/;"	function	line:145
-testUpdateFakePerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testUpdateFakePerson()$/;"	function	line:165
-testUpdatePersonWhileNotLoggedIn	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testUpdatePersonWhileNotLoggedIn() {$/;"	function	line:181
-testUpdatePersonWithoutCheckingItOut	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testUpdatePersonWithoutCheckingItOut() {$/;"	function	line:203
-testUpdatePersonCheckedOutToSomeoneElse	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testUpdatePersonCheckedOutToSomeoneElse() {$/;"	function	line:228
-testDeletePerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testDeletePerson()$/;"	function	line:248
-testDeleteFakePerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testDeleteFakePerson()$/;"	function	line:275
-testDeleteAPersonWhoIsCheckedOutToSomeoneElse	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testDeleteAPersonWhoIsCheckedOutToSomeoneElse()$/;"	function	line:288
-testDeletePersonWhileNotLoggedIn	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testDeletePersonWhileNotLoggedIn()$/;"	function	line:304
-testDeleteMultiplePeople	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testDeleteMultiplePeople()$/;"	function	line:322
-testCheckoutPerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCheckoutPerson()$/;"	function	line:334
-testCheckoutAFakePerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCheckoutAFakePerson()$/;"	function	line:351
-testCheckoutAPersonWhileNotLoggedIn	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCheckoutAPersonWhileNotLoggedIn()$/;"	function	line:361
-testCheckoutAPersonWhoIsAlreadyCheckedOut	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCheckoutAPersonWhoIsAlreadyCheckedOut()$/;"	function	line:375
-testCheckinAPerson	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCheckinAPerson()$/;"	function	line:399
-testCheckinAPersonWhoIsAlreadyCheckedIn	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCheckinAPersonWhoIsAlreadyCheckedIn()$/;"	function	line:417
-testCheckinMultiplePersonsAtOnce	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCheckinMultiplePersonsAtOnce()$/;"	function	line:442
-testCheckinEverythingAtOnce	\\webdev\Apache24\htdocs\dashboard-dev\tests\PersonApiTest.php	/^  public function testCheckinEverythingAtOnce()$/;"	function	line:471
+ApiController	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^class ApiController extends Controller$/;"	class	line:19
+name	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^   * The class name of the associated model e.g. App\\Tag$/;"	class	line:22
+checkAccessMiddleware	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkAccessMiddleware()$/;"	function	line:67
+index	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function index()$/;"	function	line:80
+show	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function show($id)$/;"	function	line:98
+store	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function store(Request $request)$/;"	function	line:115
+update	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function update(Request $request, $ids)$/;"	function	line:136
+destroy	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function destroy($id = null)$/;"	function	line:164
+handleRelations	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function handleRelations($model)$/;"	function	line:199
+handleRelation	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function handleRelation($model, $relation)$/;"	function	line:231
+getRelationExtraColumns	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getRelationExtraColumns($input,$relation)$/;"	function	line:269
+relationHasExtraColumns	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function relationHasExtraColumns($input,$relation)$/;"	function	line:284
+getInputIds	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getInputIds()$/;"	function	line:294
+massUpdate	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function massUpdate($ids = null, $changes = null)$/;"	function	line:305
+getSelectOptions	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getSelectOptions($model,$options,$labels = [])$/;"	function	line:337
+getTokensOptions	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getTokensOptions($model,$options,$labels = [])$/;"	function	line:352
+getPermissions	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getPermissions($model)$/;"	function	line:367
+getHistory	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getHistory($data)$/;"	function	line:378
+checkAccess	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkAccess($role)$/;"	function	line:403
+getCheckedOutRecords	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getCheckedOutRecords($model)$/;"	function	line:416
+checkout	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkout($model,$id)$/;"	function	line:430
+checkin	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkin($model,$id)$/;"	function	line:455
+checkinAll	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkinAll($model = null)$/;"	function	line:473
+operationSuccessful	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function operationSuccessful($message = false, $statusCode = 200)$/;"	function	line:506
+operationFailed	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function operationFailed($e, $statusCode = 404)$/;"	function	line:533
+notFound	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function notFound()$/;"	function	line:560
+notAllowed	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function notAllowed($message = null, $permission = "update")$/;"	function	line:572

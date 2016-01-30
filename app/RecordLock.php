@@ -33,8 +33,10 @@ class RecordLock extends BaseModel
      * @param  [type] $type  [description]
      * @return [type]        [description]
      */
-    public function scopeOfType($query,$type)
+    public function scopeOfType($query,$type = null)
     {
+      if (! $type ) return $query;
+      
       return $query->where('lockable_type',$type);
     }
 

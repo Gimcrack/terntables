@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as BaseModel;
 
-class Tag extends Model
+class Tag extends BaseModel
 {
   /**
    * The database table that the model references
@@ -36,7 +36,7 @@ class Tag extends Model
    * @param  array  $tags [description]
    * @return [type]       [description]
    */
-  public static function resolveTags($taggable, array $tags)
+  public static function resolveTags($taggable, array $tags = [])
   {
     $newTagList = [];
     foreach($tags as $tagName) {
