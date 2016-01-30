@@ -1,13 +1,13 @@
 <?php
 
-class PersonApiTest extends ApiTest {
+class UserApiTest extends ApiTest {
 
 
   public function __construct()
   {
-    $this->model_class = "App\\Person";
-    $this->model_short = 'Person';
-    $this->friendly_identifier = 'name';
+    $this->model_class = "App\\User";
+    $this->model_short = 'User';
+    $this->friendly_identifier = 'username';
 
     parent::__construct();
   }

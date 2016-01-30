@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Exceptions\OperationRequiresCheckoutException;
+use App\Exceptions\ModelCheckedOutToSomeoneElseException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Response;
 use App\Http\Requests;
@@ -37,13 +40,13 @@ class ApiController extends Controller
    * Many-To-Many Relationships to save
    * @var [type]
    */
-  public $relations;
+  public $relations = [];
 
   /**
    * Many-To-One, One-To-One relationships to save
    * @var [type]
    */
-  public $belongs;
+  public $belongs = [];
 
   /**
    * Default values when creating a new model
@@ -95,17 +98,9 @@ class ApiController extends Controller
   public function show($id)
   {
       $model_class = $this->model_class;
-
-      array_push($this->with,'RevisionHistory');
-
-      $model = $model_class::with( $this->with )->find($id);
-
-      if ( ! $model ) {
-        return $this->notFound();
-      }
+      $model = $model_class::with( $this->with, 'RevisionHistory' )->findOrFail($id);
 
       $return = $model->toArray();
-
       $return['readable_history'] = $this->getHistory($model);
 
       return response()->json( $return );
@@ -119,32 +114,14 @@ class ApiController extends Controller
    */
   public function store(Request $request)
   {
-
+    $model_class = $this->model_class;
     $input = array_merge($this->defaults, Input::all() );
 
-    $model_class = $this->model_class;
-    $model = $model_class::create($input);
-
-    // process tags
-    if (!empty($input['tags'])) {
-      Tag::resolveTags( $model, $input['tags'] );
-    }
-
-    // process model relations
-    if (!empty($this->relations)) {
+    DB::transaction( function() use ($model_class, $input)
+    {
+      $model = $model_class::create($input)->updateTags();
       $this->handleRelations($model);
-    }
-
-    // process m21 relations
-    if (!empty($this->belongs)) {
-      foreach ($this->belongs as $relation) {
-        if ( !empty( $input[ $relation['key'] ] ) ) {
-          $tmp_model_class = $relation['model'];
-          $ids = $input[ $relation['key'] ];
-          $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
-        }
-      }
-    }
+    }); // end transaction
 
     return $this->operationSuccessful(201);
   }
@@ -158,92 +135,56 @@ class ApiController extends Controller
    */
   public function update(Request $request, $ids)
   {
-
-    $input = Input::all();
-
     $model_class = $this->model_class;
-    $model = $model_class::find($ids);
+    $model = $model_class::findOrFail($ids);
 
-    if ( ! $model ) {
-      return $this->notFound();
-    }
-
+    // make sure I have the model checked out before attempting the update
     if ( ! $model->isCheckedOutToMe() ) {
-      return $this->operationRequiresCheckout( $model );
+      throw new OperationRequiresCheckoutException( $model, 'update' );
     }
 
-    $model->update($input);
-
-    // process tags
-    if (!empty($input['tags'])) {
-      Tag::resolveTags( $model, $input['tags'] );
-    }
-
-    // process model relations
-    if (!empty($this->relations)) {
+    // perform the update as a transaction
+    DB::transaction( function() use ($model)
+    {
+      $model->update( Input::all() );
+      $model->updateTags();
       $this->handleRelations($model);
-    }
-
-    // process m21 relations
-    if (!empty($this->belongs)) {
-      foreach ($this->belongs as $relation) {
-        if ( !empty( $input[ $relation['key'] ] ) ) {
-          $tmp_model_class = $relation['model'];
-          $ids = $input[ $relation['key'] ];
-
-          // remove existing attachments that are not in the new list of attachments
-          $tmp_model_class::where( $relation['foreign_key'], $model->id )->whereNotIn('id', $ids)->update(  [ $relation['foreign_key'] => null ] );
-
-          $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
-        }
-      }
-    }
+    }); // end transaction
 
     return $this->operationSuccessful(200);
 
   }
 
   /**
-   * Remove the specified resource from storage.
+   * Remove the specified resource(s) from storage.
    *
    * @param  int  $id
    * @return \Illuminate\Http\Response
    */
-  public function destroy($id)
+  public function destroy($id = null)
   {
     $model_class = $this->model_class;
-    $model = $model_class::find($id);
+    $models = ( !! $id ) ?
+      $model_class::findOrFail($id) :
+      $model_class::whereIn('id', $this->getInputIds() );;
 
-    if ( ! $model ) {
-      return $this->notFound();
-    }
-
-    if ( $model->isCheckedOutToSomeoneElse() ) {
-      return $this->operationFailed("Delete Failed. That model is checked out to someone else.",409);
-    }
-
-    $model->delete();
-    return $this->operationSuccessful("{$this->model_short} record deleted.", 200);
-  }
-
-  /**
-   * Remove the specified resources from storage.
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  public function destroyMany()
-  {
-    $model_class = $this->model_class;
-    $models = $model_class::whereIn('id', $this->getInputIds() );
-
+    // make sure the collection is not empty
     if ( ! $models ) {
-      return $this->notFound();
+      throw new ModelNotFoundException();
     }
 
+    // make sure no one has any of the models checked out
+    foreach($models->get() as $model) {
+      if ( $model->isCheckedOutToSomeoneElse() ) {
+        throw new ModelCheckedOutToSomeoneElseException($model, 'delete');
+      }
+    }
+
+    // prepare the response
     $count = $models->count();
     $message = "{$this->model_short} record(s) deleted.";
 
+    // delete the records
     $models->delete();
 
 
@@ -259,11 +200,26 @@ class ApiController extends Controller
   {
     $input = Input::all();
 
+    // handle m-m relations
     foreach($this->relations as $relation) {
       if (!empty($input[$relation]) && method_exists( $model, $relation ) ) {
           $this->handleRelation($model, $relation);
       }
     }
+
+    // handle 1-m and 1-1 relations
+    foreach ($this->belongs as $relation) {
+      if ( !empty( $input[ $relation['key'] ] ) ) {
+        $tmp_model_class = $relation['model'];
+        $ids = $input[ $relation['key'] ];
+
+        // remove existing attachments that are not in the new list of attachments
+        $tmp_model_class::where( $relation['foreign_key'], $model->id )->whereNotIn('id', $ids)->update(  [ $relation['foreign_key'] => null ] );
+
+        $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
+      }
+    }
+
   }
 
   /**
@@ -351,16 +307,23 @@ class ApiController extends Controller
     $ids = $ids ?: $this->getInputIds();
     $changes = $changes ?: Input::get('changes', null);
 
-    if ( ! $ids ) {
-      return $this->operationFailed('Mass update failed. Please specify what records to change and try again.', 406);
+    if ( ! $ids || ! $changes ) {
+      throw new InvalidArgumentException();
+      //return $this->operationFailed('Mass update failed. Please specify what records to change and try again.', 406);
     }
 
-    if ( ! $changes ) {
-      return $this->operationFailed('Mass update failed. Please specify what changes to make and try again.', 406);
-    }
+    // if ( ! $changes ) {
+    //   return $this->operationFailed('Mass update failed. Please specify what changes to make and try again.', 406);
+    // }
 
     $table_name = (new $this->model_class)->getTable();
-    DB::table($table_name)->whereIn('id',$ids)->update($changes);
+    $models = DB::table($table_name)->whereIn('id',$ids);
+
+    if ( ! $models->get()->count() ) {
+      throw new ModelNotFoundException();
+    }
+
+    $models->update($changes);
     return $this->operationSuccessful();
   }
 
@@ -472,23 +435,14 @@ class ApiController extends Controller
     }
 
     $class = "\\App\\{$model}";
-    $item = $class::find($id);
+    $item = $class::findOrFail($id);
 
-    if ( ! $item ) {
-      return $this->notFound();
+    if ( $item->cannotBeCheckedOut() ) {
+      throw new ModelCheckedOutToSomeoneElseException($item, 'checkout');
     }
 
-    $lock = $item->recordLock;
-
-    if ( empty($lock) || $lock->checkExpired() || $lock->checkUser() ) {
-      $item->checkoutToId( \Auth::id() );
-
-      return $this->operationSuccessful('Record Checked Out For Editing.', 200);
-    }
-
-    $user = User::find( $lock->user_id );
-    $message = 'That record is checked out by : ' . $user->username;
-    return $this->operationFailed( $message, 410 );
+    $item->checkoutToMe();
+    return $this->operationSuccessful('Record Checked Out For Editing.', 200);
   }
 
   /**
@@ -501,21 +455,14 @@ class ApiController extends Controller
   public function checkin($model,$id)
   {
     $class = "\\App\\{$model}";
-    $item = $class::find($id);
+    $item = $class::findOrFail($id);
 
-    if ( ! $item ) {
-      return $this->notFound();
+    // attempt to checkin the item
+    if ( ! $item->checkin() ) {
+      throw new ItemCheckinException($item);
     }
 
-    $lock = $item->recordLock;
-
-    if ( !empty($lock) ) {
-      $lock->delete();
-      return $this->operationSuccessful('Record Checked In.', 200);
-    }
-
-    $message = 'That record is already checked in';
-    return $this->operationFailed( $message, 410 );
+    return $this->operationSuccessful('Record Checked In.', 200);
   }
 
   /**
@@ -525,28 +472,30 @@ class ApiController extends Controller
    */
   public function checkinAll($model = null)
   {
-    $id = Auth::id();
     $class = ( !! $model ) ? "App\\{$model}" : null;
 
-    //dd(RecordLock::all()->toArray());
+    // get checked out models
+    $models = Auth::user()->getCheckedOutRecords($class);
+    $count = $models->count();
 
-    if ( !! $class && RecordLock::ofUser($id)->ofType($class)->count() ) {
-      $message = "All {$model} records checked in.";
-      $count = RecordLock::ofUser($id)->ofType($class)->count();
-
-      RecordLock::ofUser($id)->ofType($model)->delete();
-      return $this->operationSuccessful( compact('message', 'count'), 200);
+    // make sure there is something to be checked in
+    if ( ! $count ) {
+      throw new OperationRequiresCheckoutException(null, 'checkin');
     }
 
-    if ( ! $class && RecordLock::ofUser($id)->count() ) {
-      $message = "All records checked in.";
-      $count = RecordLock::ofUser($id)->count();
+    // perform the checkin
+    DB::transaction( function() use ($models)
+    {
+      foreach($models as $model) {
+        $model->checkin();
+      }
+    });
 
-      RecordLock::ofUser($id)->delete();
-      return $this->operationSuccessful( compact('message', 'count'), 200);
-    }
+    // prepare the message
+    $model_message = ( !! $model ) ? " {$model} " :  " ";
+    $message = "All{$model_message}records checked in.";
 
-    return $this->operationFailed( 'Nothing to check in', 410 );
+    return $this->operationSuccessful( compact('message', 'count'), 200);
   }
 
   /**
@@ -600,22 +549,6 @@ class ApiController extends Controller
     ];
 
     return Response::json($data, $statusCode);
-  }
-
-
-  /**
-   * Let the user know the operation they are attempting requires the model
-   *  be checked out first
-   * @method operationRequiresCheckout
-   * @param  [type]                    $model [description]
-   * @return [type]                           [description]
-   */
-  public function operationRequiresCheckout($model)
-  {
-    if ( $model->isCheckedOutToSomeoneElse() ) {
-      return $this->operationFailed( "Error performing action. Someone else has checked out that record.", 409 );
-    }
-    return $this->operationFailed("Error performing action. Checkout the record and try again.", 405);
   }
 
 
