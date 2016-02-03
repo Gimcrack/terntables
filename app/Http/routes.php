@@ -31,9 +31,6 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::patch('Profile/resetPassword', 'Api\v1\ProfileController@resetPassword');
   Route::patch('Profile/',              'Api\v1\ProfileController@update');
 
-  // ad routes
-  Route::get('AD/User',                 'ActiveDirectoryController@index');
-
   // bi routes
   Route::delete('Server',           'Api\v1\ServerController@destroy');
   Route::patch('Server/_massUpdate', 'Api\v1\ServerController@markServers');
