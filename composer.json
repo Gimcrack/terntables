@@ -43,6 +43,7 @@
         "ingenious/jstorage": "dev-master",
         "components/jqueryui": "dev-master",
         "neomerx/cors-illuminate": "dev-master",
+        "adldap2/adldap2-laravel": "1.3.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
