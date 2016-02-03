@@ -154,7 +154,7 @@ return [
 
         Neomerx\CorsIlluminate\Providers\LaravelServiceProvider::class,
 
-        Adldap\Laravel\AdldapAuthServiceProvider::class
+        Adldap\Laravel\AdldapServiceProvider::class
 
     ],
 
@@ -209,6 +209,7 @@ return [
         'Parser'    => Nathanmac\Utilities\Parser\Facades\Parser::class,
         'Flash'     => Laracasts\Flash\Flash::class,
         'PDF'       => Barryvdh\DomPDF\Facade::class,
+        'Adldap'    => Adldap\Laravel\Facades\Adldap::class
     ],
 
 ];

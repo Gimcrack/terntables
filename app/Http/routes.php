@@ -26,6 +26,9 @@ Route::group(['prefix' => 'api/v1'], function() {
 
   Route::get('_checkinAll',             'Api\v1\ApiController@checkinAll');
   Route::get('_checkAccess/{role}',     'Api\v1\ApiController@checkAccess');
+  
+  Route::get('AD/User', 'Api\v1\ActiveDirectoryController@index');
+  Route::get('AD/User/{id}', 'Api\v1\ActiveDirectoryController@show');
 
   //user routes
   Route::patch('Profile/resetPassword', 'Api\v1\ProfileController@resetPassword');
