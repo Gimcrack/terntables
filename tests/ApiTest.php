@@ -771,4 +771,24 @@ abstract class ApiTest extends TestCase
       return App\User::create(['username' => 'JohnDoe', 'email' => 'jdoe@email.com', 'password' => 'password']);
     }
 
+    /**
+     * Create a new group
+     * @method createGroup
+     * @return [type]     [description]
+     */
+    public function createGroup()
+    {
+      return App\Group::create(['name' => 'Test Group', 'description' => 'Test Group']);
+    }
+
+    /**
+     * Create a new role
+     * @method createRole
+     * @return [type]     [description]
+     */
+    public function createRole()
+    {
+      return App\Role::create(['name' => 'Test Role', 'description' => 'Test Role']);
+    }
+
 }
