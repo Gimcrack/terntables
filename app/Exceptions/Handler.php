@@ -77,7 +77,7 @@ class Handler extends ExceptionHandler
           // Add the exception class name, message and stack trace to response
           $response['exception'] = get_class($e); // Reflection might be better here
           $response['message'] = $e->getMessage();
-          //$response['trace'] = $e->getTrace();
+          $response['trace'] = $e->getTrace();
       }
 
       switch( $e ) {

@@ -26,7 +26,7 @@ Route::group(['prefix' => 'api/v1'], function() {
 
   Route::get('_checkinAll',             'Api\v1\ApiController@checkinAll');
   Route::get('_checkAccess/{role}',     'Api\v1\ApiController@checkAccess');
-  
+
   Route::get('AD/User', 'Api\v1\ActiveDirectoryController@index');
   Route::get('AD/User/{id}', 'Api\v1\ActiveDirectoryController@show');
 
@@ -80,6 +80,17 @@ Route::group(['prefix' => 'admin'], function(){
 /**
  * User Routes
  */
+
+ /**
+  * Metrics Routes
+  */
+ Route::group(['prefix' => 'metrics'], function() {
+   Route::get('tickets/archive/{groupOrIndividual}/{id}/{period}', 'MetricsController@archiveTickets');
+   Route::get('tickets/archive/{groupOrIndividual}/{id}',          'MetricsController@archiveTickets');
+   Route::get('tickets/archive',                                   'MetricsController@archiveTickets');
+   Route::get('tickets/{groupOrIndividual}/{id}',                  'MetricsController@tickets');
+   Route::get('tickets',                                           'MetricsController@tickets');
+ });
 
 
 /**

@@ -4,30 +4,3 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-ApiController	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^class ApiController extends Controller$/;"	class	line:19
-name	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^   * The class name of the associated model e.g. App\\Tag$/;"	class	line:22
-checkAccessMiddleware	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkAccessMiddleware()$/;"	function	line:67
-index	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function index()$/;"	function	line:80
-show	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function show($id)$/;"	function	line:98
-store	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function store(Request $request)$/;"	function	line:115
-update	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function update(Request $request, $ids)$/;"	function	line:136
-destroy	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function destroy($id = null)$/;"	function	line:164
-handleRelations	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function handleRelations($model)$/;"	function	line:199
-handleRelation	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function handleRelation($model, $relation)$/;"	function	line:231
-getRelationExtraColumns	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getRelationExtraColumns($input,$relation)$/;"	function	line:269
-relationHasExtraColumns	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function relationHasExtraColumns($input,$relation)$/;"	function	line:284
-getInputIds	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getInputIds()$/;"	function	line:294
-massUpdate	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function massUpdate($ids = null, $changes = null)$/;"	function	line:305
-getSelectOptions	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getSelectOptions($model,$options,$labels = [])$/;"	function	line:337
-getTokensOptions	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getTokensOptions($model,$options,$labels = [])$/;"	function	line:352
-getPermissions	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getPermissions($model)$/;"	function	line:367
-getHistory	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getHistory($data)$/;"	function	line:378
-checkAccess	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkAccess($role)$/;"	function	line:403
-getCheckedOutRecords	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function getCheckedOutRecords($model)$/;"	function	line:416
-checkout	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkout($model,$id)$/;"	function	line:430
-checkin	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkin($model,$id)$/;"	function	line:455
-checkinAll	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function checkinAll($model = null)$/;"	function	line:473
-operationSuccessful	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function operationSuccessful($message = false, $statusCode = 200)$/;"	function	line:506
-operationFailed	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function operationFailed($e, $statusCode = 404)$/;"	function	line:533
-notFound	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function notFound()$/;"	function	line:560
-notAllowed	B:\Code\dashboard-dev-local\app\Http\Controllers\Api\v1\ApiController.php	/^  public function notAllowed($message = null, $permission = "update")$/;"	function	line:572

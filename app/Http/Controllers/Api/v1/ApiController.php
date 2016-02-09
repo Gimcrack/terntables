@@ -202,22 +202,43 @@ class ApiController extends Controller
 
     // handle m-m relations
     foreach($this->relations as $relation) {
-      if (!empty($input[$relation]) && method_exists( $model, $relation ) ) {
+      if ( isset($input[$relation]) && method_exists( $model, $relation ) ) {
           $this->handleRelation($model, $relation);
       }
     }
 
     // handle 1-m and 1-1 relations
-    foreach ($this->belongs as $relation) {
-      if ( !empty( $input[ $relation['key'] ] ) ) {
-        $tmp_model_class = $relation['model'];
-        $ids = $input[ $relation['key'] ];
+    foreach ($this->belongs as $belongs) {
+        $this->handleBelongs( $model, $belongs );
+    }
 
-        // remove existing attachments that are not in the new list of attachments
-        $tmp_model_class::where( $relation['foreign_key'], $model->id )->whereNotIn('id', $ids)->update(  [ $relation['foreign_key'] => null ] );
+  }
 
-        $tmp_model_class::whereIn( 'id', $ids )->update([ $relation['foreign_key'] => $model->id ]);
-      }
+  /**
+   * Handle model belongs
+   * @method handleBelongs
+   * @param  [type]        $model    [description]
+   * @param  [type]        $relation [description]
+   * @return [type]                  [description]
+   */
+  public function handleBelongs($model, $relation)
+  {
+    $input = Input::all();
+
+    $tmp_model_class = $relation['model'];
+    $ids = Input::get( $relation['key'], [] );
+
+    // remove existing attachments
+    $tmp_model_class::where( $relation['foreign_key'], $model->id )
+      ->update( $relation['reset'] ?: [] );
+
+    foreach( $ids as $index => $value) {
+      $find = ( is_numeric($value) ) ? $value : $index;
+      $update = ( is_numeric($value) ) ? [] : $value;
+      $update = array_merge( [ $relation['foreign_key'] => $model->id ], $update );
+
+      $tmp_model_class::find( $find )
+        ->update( $update );
     }
 
   }

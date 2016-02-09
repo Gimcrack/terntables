@@ -48,7 +48,8 @@ class PersonController extends ApiController
     [
       'key' => 'users',
       'model' => 'App\User',
-      'foreign_key' => 'people_id'
+      'foreign_key' => 'people_id',
+      'reset' => [ 'people_id' => null, 'comment' => null , 'primary_flag' => 0]
     ]
   ];
 

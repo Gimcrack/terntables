@@ -41065,6 +41065,19 @@ module.exports = function (options) {
     }, // end fn
 
     /**
+     * Serialize the input values
+     * @method function
+     * @return {[type]} [description]
+     */
+    serialize: function serialize() {
+      var ret = {};
+      _.each(self.oInpts, function (o, i) {
+        ret[i] = o.fn.serialize();
+      });
+      return ret;
+    }, // end fn
+
+    /**
      * The the value of the input
      * @method function
      * @param  {[type]} value [description]
@@ -41136,7 +41149,7 @@ module.exports = function (options) {
       //     });
       // })
 
-      return self.$().serialize();
+      return self.fn.serialize();
     }, // end fn
 
     /**
@@ -41346,9 +41359,13 @@ module.exports = function (options) {
         // if its not the first input, grab the value from the pivot data
         if (ii > 0 && !!data && !!oo['data-pivotName'] && !!data.pivot && !!data.pivot[oo['data-pivotName']]) {
           value = data.pivot[oo['data-pivotName']];
-        }
 
-        self.fn.processField(oo, $td, value);
+          // if it's not a m-m relationship, look for the data in the root of the object
+        } else if (ii > 0 && !!data && !!oo['data-pivotName'] && !!data[oo['data-pivotName']]) {
+            value = data[oo['data-pivotName']];
+          }
+
+        self.fn.processField(oo, $td, value, true);
         return $td;
       })).append([$('<td/>', { nowrap: 'nowrap' }).append([$btn_remove, $btn_add])]);
     }, // end fn
@@ -41360,7 +41377,7 @@ module.exports = function (options) {
      * @param  {[type]} target [description]
      * @return {[type]}        [description]
      */
-    processField: function processField(params, target, value) {
+    processField: function processField(params, target, value, isArrayFormField) {
       var inpt;
 
       jApp.log('B. Processing Field');
@@ -41373,10 +41390,10 @@ module.exports = function (options) {
 
       inpt = new jInput({ atts: params, form: self });
       jApp.log(inpt);
-      self.oInpts[params.name] = inpt;
+      if (!isArrayFormField) self.oInpts[params.name] = inpt;
       inpt.fn.val(value);
       target.append(inpt.fn.handle());
-      if (params.readonly === 'readonly') self.readonlyFields.push(params.name);
+      //if (params.readonly === 'readonly') self.readonlyFields.push(params.name);
     }, // end fn
 
     /**
@@ -41520,7 +41537,7 @@ module.exports = function (options) {
         //dataType : 'json',
         method: 'POST',
         url: jApp.prefixURL(self.options.atts.action),
-        data: self.$().serialize(),
+        data: self.fn.serialize(),
         success: self.callback.submit
       }).done(self.fn.toggleSubmitted);
     }, //end fn
@@ -41672,7 +41689,7 @@ module.exports = function (options) {
        * Container for jInput objects
        * @type {Array}
        */
-      self.oInpts = [];
+      self.oInpts = {};
 
       /**
        * Initialize the rowData object
@@ -41742,7 +41759,7 @@ module.exports = function (options) {
           atts = colparams.atts || {};
 
       // add the jInput object to the oInpts array
-      self.oInpts[atts.name || index] == inpt;
+      self.oInpts[atts.name] = inpt;
 
       // add the input DOM handle to the DOM
       self.DOM.$Inpts.append(inpt.fn.handle());
@@ -42157,6 +42174,7 @@ module.exports = ['_enabled', '_label', 'data-fieldset', 'data-ordering', 'data-
 
                   // add a row with the master select
                   inpt = new jInput({ atts: masterSelect, form: self.form });
+                  inpt.DOM.$container = $container;
                   self.oInpts[masterSelect.name] = inpt;
                   $container.append(inpt.fn.handle());
 
@@ -42710,7 +42728,42 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         default:
           return self.DOM.$inpt.val();
       }
-    },
+    }, // end fn
+
+    /**
+     * Serialize the input value and return the object representation
+     * @method function
+     * @return {[type]} [description]
+     */
+    serialize: function serialize() {
+      var ret = {};
+
+      if (!self.arrayField) {
+        return self.fn.val();
+      } else {
+        self.DOM.$container.find('tr').each(function (i, row) {
+          var $inpts = $(row).find(':input:not(button)'),
+              key,
+              val;
+
+          $inpts.each(function (ii, inpt) {
+            val = $(inpt).val();
+            name = $(inpt).attr('data-pivotName');
+
+            if (name == null) return false;
+
+            if (ii == 0) {
+              key = val;
+              ret[key] = {};
+            } else {
+              ret[key][name] = val;
+            }
+          });
+        });
+
+        return ret;
+      }
+    }, // end fn
 
     /**
      * Refresh the attributes of the element
@@ -56561,7 +56614,7 @@ module.exports = function (element) {
 
 /*!
  @package noty - jQuery Notification Plugin
- @version version: 2.3.7
+ @version version: 2.3.8
  @contributors https://github.com/needim/noty/graphs/contributors
 
  @documentation Examples and Documentation - http://needim.github.com/noty/
@@ -56591,15 +56644,10 @@ module.exports = function (element) {
             if($.noty.themes[this.options.theme])
                 this.options.theme = $.noty.themes[this.options.theme];
             else
-                options.themeClassName = this.options.theme;
-
-            delete options.layout;
-            delete options.theme;
+                this.options.themeClassName = this.options.theme;
 
             this.options = $.extend({}, this.options, this.options.layout.options);
             this.options.id = 'noty_' + (new Date().getTime() * Math.floor(Math.random() * 1000000));
-
-            this.options = $.extend({}, this.options, options);
 
             // Build the noty dom initial structure
             this._build();
@@ -57997,7 +58045,7 @@ return window.noty;
 
 });
 /*
- * metismenu - v2.2.0
+ * metismenu - v2.4.0
  * A jQuery menu plugin
  * https://github.com/onokumus/metisMenu#readme
  *
@@ -58005,7 +58053,15 @@ return window.noty;
  * Under MIT License
  */
 
-(function($) {
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['jquery'], factory);
+  } else if (typeof exports === 'object') {
+    module.exports = factory(require('jquery'));
+  } else {
+    root.sortable = factory(root.jQuery);
+  }
+}(this, function($) {
   'use strict';
 
   function transitionEnd() {
@@ -58125,6 +58181,9 @@ return window.noty;
         var $list = $parent.children('ul');
         if($this.options.preventDefault){
           e.preventDefault();
+        }
+        if(self.attr('aria-disabled') === 'true'){
+            return;
         }
         if ($parent.hasClass(activeClass) && !$this.options.doubleTapToGo) {
           $this.hide($list);
@@ -58281,11 +58340,10 @@ return window.noty;
     $.fn.metisMenu = old;
     return this;
   };
-
-})(jQuery);
+}));
 
 //! moment.js
-//! version : 2.11.0
+//! version : 2.11.2
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -58556,7 +58614,7 @@ return window.noty;
     function loadLocale(name) {
         var oldLocale = null;
         // TODO: Find a better way to register and load all the locales in Node
-        if (!locales[name] && !isUndefined(module) &&
+        if (!locales[name] && (typeof module !== 'undefined') &&
                 module && module.exports) {
             try {
                 oldLocale = globalLocale._abbr;
@@ -58824,13 +58882,13 @@ return window.noty;
 
     // any word (or two) characters or numbers including two/three word month in arabic.
     // includes scottish gaelic two word and hyphenated months
-    var matchWord = /[0-9]*(a[mn]\s?)?['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF\-]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i;
+    var matchWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i;
 
 
     var regexes = {};
 
     function addRegexToken (token, regex, strictRegex) {
-        regexes[token] = isFunction(regex) ? regex : function (isStrict) {
+        regexes[token] = isFunction(regex) ? regex : function (isStrict, localeData) {
             return (isStrict && strictRegex) ? strictRegex : regex;
         };
     }
@@ -58845,9 +58903,13 @@ return window.noty;
 
     // Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
     function unescapeFormat(s) {
-        return s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
+        return regexEscape(s.replace('\\', '').replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
             return p1 || p2 || p3 || p4;
-        }).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        }));
+    }
+
+    function regexEscape(s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     }
 
     var tokens = {};
@@ -58916,8 +58978,12 @@ return window.noty;
 
     addRegexToken('M',    match1to2);
     addRegexToken('MM',   match1to2, match2);
-    addRegexToken('MMM',  matchWord);
-    addRegexToken('MMMM', matchWord);
+    addRegexToken('MMM',  function (isStrict, locale) {
+        return locale.monthsShortRegex(isStrict);
+    });
+    addRegexToken('MMMM', function (isStrict, locale) {
+        return locale.monthsRegex(isStrict);
+    });
 
     addParseToken(['M', 'MM'], function (input, array) {
         array[MONTH] = toInt(input) - 1;
@@ -58942,7 +59008,7 @@ return window.noty;
             this._months[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
     }
 
-    var defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sept_Oct_Nov_Dec'.split('_');
+    var defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_');
     function localeMonthsShort (m, format) {
         return isArray(this._monthsShort) ? this._monthsShort[m.month()] :
             this._monthsShort[MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'][m.month()];
@@ -59017,6 +59083,72 @@ return window.noty;
         return daysInMonth(this.year(), this.month());
     }
 
+    var defaultMonthsShortRegex = matchWord;
+    function monthsShortRegex (isStrict) {
+        if (this._monthsParseExact) {
+            if (!hasOwnProp(this, '_monthsRegex')) {
+                computeMonthsParse.call(this);
+            }
+            if (isStrict) {
+                return this._monthsShortStrictRegex;
+            } else {
+                return this._monthsShortRegex;
+            }
+        } else {
+            return this._monthsShortStrictRegex && isStrict ?
+                this._monthsShortStrictRegex : this._monthsShortRegex;
+        }
+    }
+
+    var defaultMonthsRegex = matchWord;
+    function monthsRegex (isStrict) {
+        if (this._monthsParseExact) {
+            if (!hasOwnProp(this, '_monthsRegex')) {
+                computeMonthsParse.call(this);
+            }
+            if (isStrict) {
+                return this._monthsStrictRegex;
+            } else {
+                return this._monthsRegex;
+            }
+        } else {
+            return this._monthsStrictRegex && isStrict ?
+                this._monthsStrictRegex : this._monthsRegex;
+        }
+    }
+
+    function computeMonthsParse () {
+        function cmpLenRev(a, b) {
+            return b.length - a.length;
+        }
+
+        var shortPieces = [], longPieces = [], mixedPieces = [],
+            i, mom;
+        for (i = 0; i < 12; i++) {
+            // make the regex if we don't have it already
+            mom = create_utc__createUTC([2000, i]);
+            shortPieces.push(this.monthsShort(mom, ''));
+            longPieces.push(this.months(mom, ''));
+            mixedPieces.push(this.months(mom, ''));
+            mixedPieces.push(this.monthsShort(mom, ''));
+        }
+        // Sorting makes sure if one month (or abbr) is a prefix of another it
+        // will match the longer piece.
+        shortPieces.sort(cmpLenRev);
+        longPieces.sort(cmpLenRev);
+        mixedPieces.sort(cmpLenRev);
+        for (i = 0; i < 12; i++) {
+            shortPieces[i] = regexEscape(shortPieces[i]);
+            longPieces[i] = regexEscape(longPieces[i]);
+            mixedPieces[i] = regexEscape(mixedPieces[i]);
+        }
+
+        this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+        this._monthsShortRegex = this._monthsRegex;
+        this._monthsStrictRegex = new RegExp('^(' + longPieces.join('|') + ')$', 'i');
+        this._monthsShortStrictRegex = new RegExp('^(' + shortPieces.join('|') + ')$', 'i');
+    }
+
     function checkOverflow (m) {
         var overflow;
         var a = m._a;
@@ -59048,7 +59180,8 @@ return window.noty;
     }
 
     function warn(msg) {
-        if (utils_hooks__hooks.suppressDeprecationWarnings === false && !isUndefined(console) && console.warn) {
+        if (utils_hooks__hooks.suppressDeprecationWarnings === false &&
+                (typeof console !==  'undefined') && console.warn) {
             console.warn('Deprecation warning: ' + msg);
         }
     }
@@ -59216,6 +59349,11 @@ return window.noty;
 
     // FORMATTING
 
+    addFormatToken('Y', 0, 0, function () {
+        var y = this.year();
+        return y <= 9999 ? '' + y : '+' + y;
+    });
+
     addFormatToken(0, ['YY', 2], 0, function () {
         return this.year() % 100;
     });
@@ -59242,6 +59380,9 @@ return window.noty;
     });
     addParseToken('YY', function (input, array) {
         array[YEAR] = utils_hooks__hooks.parseTwoDigitYear(input);
+    });
+    addParseToken('Y', function (input, array) {
+        array[YEAR] = parseInt(input, 10);
     });
 
     // HELPERS
@@ -59494,6 +59635,8 @@ return window.noty;
         for (i = 0; i < tokens.length; i++) {
             token = tokens[i];
             parsedInput = (string.match(getParseRegexForToken(token, config)) || [])[0];
+            // console.log('token', token, 'parsedInput', parsedInput,
+            //         'regex', getParseRegexForToken(token, config));
             if (parsedInput) {
                 skipped = string.substr(0, string.indexOf(parsedInput));
                 if (skipped.length > 0) {
@@ -59769,8 +59912,8 @@ return window.noty;
         return pickBy('isAfter', args);
     }
 
-    var now = Date.now || function () {
-        return +(new Date());
+    var now = function () {
+        return Date.now ? Date.now() : +(new Date());
     };
 
     function Duration (duration) {
@@ -60017,7 +60160,7 @@ return window.noty;
     }
 
     // ASP.NET json date format regex
-    var aspNetRegex = /(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/;
+    var aspNetRegex = /^(\-)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?\d*)?$/;
 
     // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
     // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
@@ -61328,11 +61471,15 @@ return window.noty;
     prototype__proto.set             = locale_set__set;
 
     // Month
-    prototype__proto.months       =        localeMonths;
-    prototype__proto._months      = defaultLocaleMonths;
-    prototype__proto.monthsShort  =        localeMonthsShort;
-    prototype__proto._monthsShort = defaultLocaleMonthsShort;
-    prototype__proto.monthsParse  =        localeMonthsParse;
+    prototype__proto.months            =        localeMonths;
+    prototype__proto._months           = defaultLocaleMonths;
+    prototype__proto.monthsShort       =        localeMonthsShort;
+    prototype__proto._monthsShort      = defaultLocaleMonthsShort;
+    prototype__proto.monthsParse       =        localeMonthsParse;
+    prototype__proto._monthsRegex      = defaultMonthsRegex;
+    prototype__proto.monthsRegex       = monthsRegex;
+    prototype__proto._monthsShortRegex = defaultMonthsShortRegex;
+    prototype__proto.monthsShortRegex  = monthsShortRegex;
 
     // Week
     prototype__proto.week = localeWeek;
@@ -61401,9 +61548,6 @@ return window.noty;
     }
 
     locale_locales__getSetGlobalLocale('en', {
-        monthsParse : [/^jan/i, /^feb/i, /^mar/i, /^apr/i, /^may/i, /^jun/i, /^jul/i, /^aug/i, /^sep/i, /^oct/i, /^nov/i, /^dec/i],
-        longMonthsParse : [/^january$/i, /^february$/i, /^march$/i, /^april$/i, /^may$/i, /^june$/i, /^july$/i, /^august$/i, /^september$/i, /^october$/i, /^november$/i, /^december$/i],
-        shortMonthsParse : [/^jan$/i, /^feb$/i, /^mar$/i, /^apr$/i, /^may$/i, /^jun$/i, /^jul$/i, /^aug/i, /^sept?$/i, /^oct$/i, /^nov$/i, /^dec$/i],
         ordinalParse: /\d{1,2}(th|st|nd|rd)/,
         ordinal : function (number) {
             var b = number % 10,
@@ -61771,7 +61915,7 @@ return window.noty;
     // Side effect imports
 
 
-    utils_hooks__hooks.version = '2.11.0';
+    utils_hooks__hooks.version = '2.11.2';
 
     setHookCallback(local__createLocal);
 
