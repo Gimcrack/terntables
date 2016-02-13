@@ -150,6 +150,17 @@ fieldset[disabled] {
 	}
 }
 
+#div_inspect.max {
+	.panel-body {
+		margin-top:0px !important;
+
+		.panel-body {
+			padding:0 15px !important;
+			margin:0;
+		}
+	}
+}
+
 .side-by-side {
 
 

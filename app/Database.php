@@ -55,7 +55,7 @@ class Database extends Model
    */
   public function people()
   {
-    return $this->belongsToMany('App\Person')->withTimestamps();
+    return $this->belongsToMany('App\Person')->withTimestamps()->withPivot(['contact_type','comment']);
   }
 
   /**
@@ -65,7 +65,7 @@ class Database extends Model
    */
   public function applications()
   {
-    return $this->belongsToMany('App\Application')->withTimestamps();
+    return $this->belongsToMany('App\Application')->withTimestamps()->withPivot(['database_type','comment']);
   }
 
   /**
@@ -75,7 +75,7 @@ class Database extends Model
    */
   public function servers()
   {
-    return $this->belongsToMany('App\Server')->withTimestamps();
+    return $this->belongsToMany('App\Server')->withTimestamps()->withPivot(['server_type','comment']);
   }
 
   /**
@@ -86,5 +86,15 @@ class Database extends Model
   public function host()
   {
     return $this->belongsTo('App\Server','server_id');
+  }
+
+  /**
+   * Get the hostname of the Database
+   * @method getHostnameAttribute
+   * @return [type]               [description]
+   */
+  public function getHostnameAttribute()
+  {
+    return $this->host->name;
   }
 }

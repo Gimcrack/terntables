@@ -27,6 +27,15 @@ class PersonController extends Controller
   public $model_class = 'App\Person';
 
   /**
+   * What relationships to grab with the model
+   * @var [type]
+   */
+  public $with = [
+    'users.groups',
+    'servers',
+  ];
+
+  /**
    * Spawn a new instance of the controller
    */
   public function __construct()

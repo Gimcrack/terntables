@@ -39322,6 +39322,19 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     return text.link('mailto:' + value);
   };
 
+  _.getTags = function (arr) {
+    return _.map(arr, function (o, i) {
+      return '<div class="label label-primary" style="margin-right:3px">' + o.name + '</div>';
+    }).join(' ');
+  };
+
+  _.getFlag = function (value, trueLabel, falseLabel, trueClass, falseClass) {
+    var label = !! +value ? trueLabel || 'Yes' : falseLabel || 'No',
+        className = !! +value ? trueClass || 'success' : falseClass || 'danger';
+
+    return '<span style="margin:3px;" class="label label-' + className + '">' + label + '</span>';
+  };
+
   _.get = function (key, target, callback, icon, model) {
     var tmpKeyArr = key.split('.'),
         tmpKeyNext,
@@ -39347,7 +39360,12 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     if (target != null) {
       return _.map(target, function (row, i) {
         var iconString = !!icon ? '<i class="fa fa-fw ' + icon + '"></i>' : '';
-        return '<button style="padding:4px" class="btn btn-link btn-editOther" data-id="' + row.id + '" data-model="' + model + '">' + iconString + row[key] + '</button>';
+
+        if (model != null) {
+          return '<button style="padding:4px" class="btn btn-link btn-editOther" data-id="' + row.id + '" data-model="' + model + '">' + iconString + row[key] + '</button>';
+        } else {
+          return '<div style="padding:4px">' + iconString + row[key] + '</div>';
+        }
       });
     } else {
 
@@ -39447,6 +39465,25 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         return _.nameButton(value, 'fa-server');
       },
 
+      databaseName: function databaseName(value) {
+        var r = jApp.aG().currentRow,
+            flags = [];
+
+        if (+r.inactive_flag == 1) {
+          flags.push('<div class="label label-danger label-sm" style="margin-right:3px">Inactive</div>');
+        }
+
+        if (+r.ignore_flag == 1) {
+          flags.push('<div class="label label-warning label-sm" style="margin-right:3px">Ignored</div>');
+        }
+
+        if (+r.production_flag == 1) {
+          flags.push('<div class="label label-primary label-sm" style="margin-right:3px">Prod</div>');
+        }
+
+        return _.nameButton(r.name, 'fa-database') + flags.join(' ');
+      },
+
       username: function username(value) {
         return _.nameButton(value, 'fa-user');
       },
@@ -39471,9 +39508,27 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         return _.get('name', arr, 'fa-users', 'Group');
       },
 
+      people: function people(arr) {
+        return _.get('name', arr, 'fa-user', 'Person');
+      },
+
+      tags: function tags(arr) {
+        return _.getTags(arr);
+      },
+
+      profile_groups: function profile_groups(arr) {
+        return _.get('name', arr, 'fa-users');
+      },
+
       group_roles: function group_roles(arr) {
         return _.pivotExtract('groups', function (row, i) {
           return row.roles.length ? _.get('name', row.roles, 'fa-briefcase', 'Role') : false;
+        });
+      },
+
+      profile_group_roles: function profile_group_roles(arr) {
+        return _.pivotExtract('groups', function (row, i) {
+          return row.roles.length ? _.get('name', row.roles, 'fa-briefcase') : false;
         });
       },
 
@@ -39745,6 +39800,34 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     }, // end fn
 
     /**
+     * Get url relative to current url
+     * @method function
+     * @param  {[type]} url [description]
+     * @return {[type]}     [description]
+     */
+    getRelativeUrl: function getRelativeUrl(url) {
+      var parser,
+          path = url;
+
+      // handle well-formed urls
+      if (url.indexOf('http:') === 0) {
+        parser = document.createElement('a');
+        parser.href = url;
+        path = parser.pathname;
+      }
+      // remove the route prefix
+      path = path.toString().replace(self.apiRoutePrefix, '');
+
+      // trim trailing and leading slashes and remove any double slashes
+      path = path.split('/').filter(function (str) {
+        if (!!str) return str;
+      }).join('/');
+
+      // add the location origin and return it
+      return location.origin + '/' + path;
+    }, // end fn
+
+    /**
      * Get the table from the corresponding model
      * @param  {[type]} model [description]
      * @return {[type]}       [description]
@@ -39833,6 +39916,17 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         return jApp.prefixURL(jApp.routing.default(route || model, model || null));
       }
     },
+
+    /**
+     * Inspect the selected model
+     * @method function
+     * @param  {[type]} model [description]
+     * @param  {[type]} id    [description]
+     * @return {[type]}       [description]
+     */
+    inspect: function inspect(model, id) {
+      return model + '/' + id + '/_inspect';
+    }, // end fn
 
     /**
      * Checked out records route
@@ -41390,7 +41484,7 @@ module.exports = function (options) {
 
       inpt = new jInput({ atts: params, form: self });
       jApp.log(inpt);
-      if (!isArrayFormField) self.oInpts[params.name] = inpt;
+      if (!isArrayFormField) self.oInpts[params.name.replace('[]', '')] = inpt;
       inpt.fn.val(value);
       target.append(inpt.fn.handle());
       //if (params.readonly === 'readonly') self.readonlyFields.push(params.name);
@@ -42444,7 +42538,8 @@ module.exports = ['_enabled', '_label', 'data-fieldset', 'data-ordering', 'data-
       // get the external options
       self.fn.getExtOptions();
 
-      var atts = $.extend(true, self.fn.getAtts(), {
+      var runtime = self.fn.getAtts(),
+          atts = $.extend(true, runtime, {
         type: 'text',
         'data-tokens': true,
         'data-url': self.fn.getExtUrl('tokens')
@@ -42683,7 +42778,9 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
           return self.fn;
 
         case 'tokens':
+          console.log(' --tokens', _.pluck(value, 'name'));
           self.DOM.$inpt.tokenfield('setTokens', _.pluck(value, 'name'));
+
           return self.fn;
 
         case 'array':
@@ -43079,6 +43176,8 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 },{}],59:[function(require,module,exports){
 'use strict';
 
+function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+
 /**
  * options.js
  *
@@ -43233,7 +43332,12 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       self.refreshAfterLoadingOptions = !!refresh ? true : false;
 
       // local data
-      if (!!oAtts()._optionssource && oAtts()._optionssource.indexOf('|') !== -1) {
+      if (!!oAtts()._optionssource && _typeof(oAtts()._optionssource) === 'object') {
+        self.options.extData = false;
+        oAtts()._options = oAtts()._optionssource;
+        oAtts()._labels = !!oAtts()._labelssource ? oAtts()._labelssource : oAtts()._optionssource;
+        self.fn.buildOptions();
+      } else if (!!oAtts()._optionssource && oAtts()._optionssource.indexOf('|') !== -1) {
         jApp.log(' - local options data - ');
         self.options.extData = false;
         oAtts()._options = oAtts()._optionssource.split('|');
@@ -45504,6 +45608,10 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     boot: jUtility.DOM.applyHeaderFilters
   },
 
+  "button.close, .btn-cancel": {
+    click: jUtility.exitCurrentForm
+  },
+
   ".tbl-sort": {
     click: function click() {
       var $btn, $btnIndex, $desc;
@@ -45624,6 +45732,12 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
   ".btn-editOther": {
     click: jUtility.DOM.editOtherButtonHandler
+  },
+
+  ".btn-inspect": {
+    click: function click() {
+      jUtility.actionHelper('inspect');
+    }
   },
 
   ".btn-headerFilters": {
@@ -46040,6 +46154,16 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
   }, // end fn
 
   /**
+   * Does the current action require a form?
+   * @method function
+   * @return {[type]} [description]
+   */
+  needsForm: function needsForm() {
+    if (jApp.aG().action !== 'inspect') return true;
+    return false;
+  }, // end fn
+
+  /**
    * The row needs to be checked out
    * @method function
    * @return {[type]} [description]
@@ -46086,6 +46210,12 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
    *  used by the various AJAX calls
    **  **  **  **  **  **  **  **  **  **/
   callback: {
+
+    inspectSelected: function inspectSelected(response) {
+      $('#div_inspect').find('.panel-body .target').html(response);
+      jUtility.maximizeCurrentForm();
+      console.log('loaded');
+    }, // end fn
 
     /**
      * Process the result of the form submission
@@ -46876,13 +47006,27 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       if (!!options) {
         $('.chk_cid:checked,.chk_all').prop('checked', false).prop('indeterminate', false);
 
-        $row.addClass('other').find('.btn-rowMenu').addClass('other').find('i').attr('data-tmpClass', options.icon).removeClass(iconClass).removeClass('fa-check-square-o').addClass(options.icon).end().end().find('.btn-primary').removeClass('btn-primary').addClass('btn-warning').end().find('.btn-history').hide();
+        $row.addClass('other').find('[data-custom]').hide().end().find('[data-custom-menu] .btn').hide().end().find('.btn-rowMenu').addClass('other').find('i').attr('data-tmpClass', options.icon).removeClass(iconClass).removeClass('fa-check-square-o').addClass(options.icon).end().end().find('.btn-primary').removeClass('btn-primary').addClass('btn-warning').end().find('.btn-history').hide().end();
 
         jUtility.DOM.toggleRowMenuItems(false);
       } else {
 
-        $row.removeClass('other').find('.btn-rowMenu').removeClass('other').find('i').removeClass(iconClass).addClass('fa-check-square-o').removeAttr('data-tmpClass').end().end().find('.btn-warning').removeClass('btn-warning').addClass('btn-primary').end().find('.btn-history').show();
+        $row.removeClass('other').find('[data-custom]').show().end().find('[data-custom-menu] .btn').show().end().find('.btn-rowMenu').removeClass('other').find('i').removeClass(iconClass).addClass('fa-check-square-o').removeAttr('data-tmpClass').end().end().find('.btn-warning').removeClass('btn-warning').addClass('btn-primary').end().find('.btn-history').show().end();
       }
+    }, // end fn
+
+    /**
+     * Inspect the selected item
+     * @method function
+     * @return {[type]} [description]
+     */
+    inspectSelected: function inspectSelected() {
+      console.log('loading...');
+
+      jUtility.get({
+        url: jUtility.getCurrentRowInspectUrl(),
+        success: jUtility.callback.inspectSelected
+      });
     }, // end fn
 
     /**
@@ -47095,7 +47239,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
           // prepare the value
           value = jUtility.prepareValue(value, key);
 
-          if (td.html().trim() !== value.trim()) {
+          if (td.html().trim() !== value.toString().trim()) {
             // set the cell value
             td.html(value).addClass('changed');
           }
@@ -47189,6 +47333,9 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
                 jApp.log('Button disabled : ' + kk);
                 oo.disabled = true;
               }
+
+              // mark this as a custom button
+              oo['data-custom'] = true;
 
               if (type == 'buttons') {
                 jUtility.DOM.createMenuButton(oo).appendTo(target);
@@ -47315,7 +47462,9 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
       if (_typeof(params[0]) === 'object') {
         // determine if button is a dropdown menu
-        $btn = $('<div/>', { class: 'btn-group btn-group-sm' });
+
+        $btn = $('<div/>', { class: 'btn-group btn-group-sm', 'data-custom-menu': true });
+
         // params[0] will contain the dropdown toggle button
         $btn_a = $('<a/>', {
           type: 'button',
@@ -47389,6 +47538,10 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         var signature = 'btn_' + Array(26).join((Math.random().toString(36) + '000000000000000000000').slice(2, 18)).slice(0, 25);
 
         $btn = $('<button/>', _.omit(params, ['fn'])).attr('data-signature', signature);
+
+        if (!!params['data-custom']) {
+          $btn.attr('btn-custom', true);
+        }
 
         //add ignore flag for toggle buttons
         if ($btn.hasClass('btn-toggle')) {
@@ -47904,10 +48057,10 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
           // open a new form
           jApp.openForms.push({
             wrapper: jUtility.$currentFormWrapper(),
-            obj: jUtility.oCurrentForm(),
+            obj: jUtility.oCurrentForm() || {},
             $: jUtility.$currentForm(),
             action: jApp.aG().action,
-            model: jUtility.oCurrentForm().model
+            model: !!jUtility.oCurrentForm() ? jUtility.oCurrentForm().model : jUtility.getActionModel()
           });
         }
 
@@ -48144,6 +48297,8 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         action = jApp.aG().action,
         model;
 
+    if (!jUtility.needsForm()) return {};
+
     jApp.log(' Getting current form for action: ' + action, true);
 
     switch (jApp.aG().action) {
@@ -48202,7 +48357,10 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
    **  **  **  **  **  **  **  **  **  **/
   $currentForm: function $currentForm() {
     try {
-      return jUtility.oCurrentForm().$();
+      if (jUtility.needsForm()) {
+        return jUtility.oCurrentForm().$();
+      }
+      return $('#div_inspect').find('.target');
     } catch (e) {
       console.warn('No current form object found');
       return false;
@@ -48238,12 +48396,17 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
    **  **  **  **  **  **  **  **  **  **/
   setupFormContainer: function setupFormContainer() {
     jUtility.DOM.overlay(2, 'on');
-    jApp.aG().hideOverlayOnError = false;
-    jUtility.resetCurrentForm();
-    jUtility.maximizeCurrentForm();
-    jUtility.setCurrentFormFocus();
-    jUtility.formBootup();
-    jUtility.getCurrentFormRowData();
+
+    if (jUtility.needsForm()) {
+      jApp.aG().hideOverlayOnError = false;
+      jUtility.resetCurrentForm();
+      jUtility.maximizeCurrentForm();
+      jUtility.setCurrentFormFocus();
+      jUtility.formBootup();
+      jUtility.getCurrentFormRowData();
+    } else {
+      jUtility.DOM.inspectSelected();
+    }
   }, // end fn
 
   /**
@@ -48627,9 +48790,9 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       model = jUtility.getActionModel();
 
       jUtility.checkout(id, model);
-    } else {
-      jUtility.setupFormContainer();
     }
+
+    jUtility.setupFormContainer();
   }, // end fn
 
   /**
@@ -49245,6 +49408,15 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
   }, //end fn
 
   /**
+   * Get the inspect url of the current row
+   * @method function
+   * @return {[type]} [description]
+   */
+  getCurrentRowInspectUrl: function getCurrentRowInspectUrl() {
+    return jApp.routing.get('inspect', jUtility.getActionModel(), jUtility.getCurrentRowId());
+  }, //end fn
+
+  /**
    * Kill pending ajax request
    * @method function
    * @param  {[type]} requestName [description]
@@ -49257,6 +49429,26 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       // nothing to abort
     }
   }, //end fn
+
+  /**
+   * get the requested url
+   * @method function
+   * @param  {[type]} requestOptions [description]
+   * @return {[type]}                [description]
+   */
+  get: function get(requestOptions) {
+    var opts = $.extend(true, {
+      url: null,
+      data: {},
+      success: function success() {},
+      fail: function fail() {},
+      always: jUtility.callback.displayResponseErrors,
+      complete: function complete() {}
+    }, requestOptions);
+
+    jApp.log('6.5 ajax options set, executing ajax request');
+    return $.get(opts.url, opts.data, opts.success).fail(opts.fail).always(opts.always).complete(opts.complete);
+  }, // end fn
 
   /**
    * get JSON
@@ -49414,7 +49606,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 ;module.exports = {
 
   // main grid body
-  tmpMainGridBody: "<div class=\"row\">\n                      <div class=\"col-lg-12\">\n                        <div class=\"panel panel-info panel-grid panel-grid1\">\n                          <div class=\"panel-heading\">\n                            <h1 class=\"page-header\"><i class=\"fa {@icon} fa-fw\"></i><span class=\"header-title\"> {@headerTitle} </span></h1>\n                            <div class=\"alert alert-warning alert-dismissible helpText\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\"><span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span></button> {@helpText} </div>\n                          </div>\n                          <div class=\"panel-body grid-panel-body\">\n                            <div class=\"table-responsive\">\n                              <div class=\"table table-bordered table-grid\">\n                                <div class=\"table-head\">\n                                  <div class=\"table-row table-menu-row\">\n                                    <div class=\"table-header table-menu-header\" style=\"width:100%\">\n                                      <div class=\"btn-group btn-group-sm table-btn-group\">  </div>\n                                    </div>\n                                  </div>\n                                  <div style=\"display:none\" class=\"table-row table-rowMenu-row\"></div>\n                                  <div style=\"display:none\" class=\"table-row table-otherMenu-row\"></div>\n                                  <div class=\"table-row tfilters\" style=\"display:none\">\n                                    <div style=\"width:10px;\" class=\"table-header\">&nbsp;</div>\n                                    <div style=\"width:175px;\" class=\"table-header\" align=\"right\"> <span class=\"label label-info filter-showing\"></span> </div>\n                                  </div>\n                                </div>\n                                <div class=\"table-body\" id=\"tbl_grid_body\">\n                                  <!--{$tbody}-->\n                                </div>\n                                <div class=\"table-foot\">\n                                  <div class=\"row\">\n                                    <div class=\"col-md-3\">\n                                      <div style=\"display:none\" class=\"ajax-activity-preloader pull-left\"></div>\n                                      <div class=\"divRowsPerPage pull-right\">\n                                        <select style=\"width:180px;display:inline-block\" type=\"select\" name=\"RowsPerPage\" id=\"RowsPerPage\" class=\"form-control\">\n                                          <option value=\"10\">10</option>\n                                          <option value=\"15\">15</option>\n                                          <option value=\"25\">25</option>\n                                          <option value=\"50\">50</option>\n                                          <option value=\"100\">100</option>\n                                          <option value=\"10000\">All</option>\n                                        </select>\n                                      </div>\n                                    </div>\n                                    <div class=\"col-md-9\">\n                                      <div class=\"paging\"></div>\n                                    </div>\n                                  </div>\n                                </div>\n                                <!-- /. table-foot -->\n                              </div>\n                            </div>\n                            <!-- /.table-responsive -->\n                          </div>\n                          <!-- /.panel-body -->\n                        </div>\n                        <!-- /.panel -->\n                      </div>\n                      <!-- /.col-lg-12 -->\n                    </div>\n                    <!-- /.row -->",
+  tmpMainGridBody: "<div class=\"row\">\n                      <div class=\"col-lg-12\">\n                        <div class=\"panel panel-info panel-grid panel-grid1\">\n                          <div class=\"panel-heading\">\n                            <h1 class=\"page-header\"><i class=\"fa {@icon} fa-fw\"></i><span class=\"header-title\"> {@headerTitle} </span></h1>\n                            <div class=\"alert alert-warning alert-dismissible helpText\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\"><span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span></button> {@helpText} </div>\n                          </div>\n                          <div class=\"panel-body grid-panel-body\">\n                            <div class=\"table-responsive\">\n                              <div class=\"table table-bordered table-grid\">\n                                <div class=\"table-head\">\n                                  <div class=\"table-row table-menu-row\">\n                                    <div class=\"table-header table-menu-header\" style=\"width:100%\">\n                                      <div class=\"btn-group btn-group-sm table-btn-group\">  </div>\n                                    </div>\n                                  </div>\n                                  <div style=\"display:none\" class=\"table-row table-rowMenu-row\"></div>\n                                  <div style=\"display:none\" class=\"table-row table-otherMenu-row\"></div>\n                                  <div class=\"table-row tfilters\" style=\"display:none\">\n                                    <div style=\"width:10px;\" class=\"table-header\">&nbsp;</div>\n                                    <div style=\"width:175px;\" class=\"table-header\" align=\"right\"> <span class=\"label label-info filter-showing\"></span> </div>\n                                  </div>\n                                </div>\n                                <div class=\"table-body\" id=\"tbl_grid_body\">\n                                  <!--{$tbody}-->\n                                </div>\n                                <div class=\"table-foot\">\n                                  <div class=\"row\">\n                                    <div class=\"col-md-3\">\n                                      <div style=\"display:none\" class=\"ajax-activity-preloader pull-left\"></div>\n                                      <div class=\"divRowsPerPage pull-right\">\n                                        <select style=\"width:180px;display:inline-block\" type=\"select\" name=\"RowsPerPage\" id=\"RowsPerPage\" class=\"form-control\">\n                                          <option value=\"10\">10</option>\n                                          <option value=\"15\">15</option>\n                                          <option value=\"25\">25</option>\n                                          <option value=\"50\">50</option>\n                                          <option value=\"100\">100</option>\n                                          <option value=\"10000\">All</option>\n                                        </select>\n                                      </div>\n                                    </div>\n                                    <div class=\"col-md-9\">\n                                      <div class=\"paging\"></div>\n                                    </div>\n                                  </div>\n                                </div>\n                                <!-- /. table-foot -->\n                              </div>\n                            </div>\n                            <!-- /.table-responsive -->\n                          </div>\n                          <!-- /.panel-body -->\n                        </div>\n                        <!-- /.panel -->\n                      </div>\n                      <!-- /.col-lg-12 -->\n                    </div>\n                    <!-- /.row -->\n                    <div id=\"div_inspect\" class=\"div-btn-edit min div-form-panel-wrapper\">\n                      <div class=\"frm_wrapper\">\n                        <form>\n                          <div class=\"panel panel-info\">\n                            <div class=\"panel-heading\"> <button type=\"button\" class=\"close\" aria-hidden=\"true\" data-original-title=\"\" title=\"\">×</button> <i class=\"fa fa-info fa-fw\"></i> <span class=\"spn_editFriendlyName\">{@Name}</span> [Inspecting] </div>\n                            <div class=\"panel-overlay\" style=\"display:none\"></div>\n                            <div class=\"panel-body\">\n                                <div class=\"target\"></div>\n                            </div>\n                            <div class=\"panel-btns footer\">\n                              <button type=\"button\" class=\"btn btn-primary btn-formMenu\" id=\"btn_form_menu_heading\"><i class=\"fa fa-fw fa-bars\"></i></button>\n                              <button type=\"button\" class=\"btn btn-primary btn-cancel\" id=\"btn_cancel\"><i class=\"fa fa-fw fa-times\"></i> Close</button>\n                            </div>\n                          </div>\n                        </form>\n                      </div>\n                    </div>",
 
   // check all checkbox template
   tmpCheckAll: "<label for=\"chk_all\" class=\"btn btn-default pull-right\"> <input id=\"chk_all\" type=\"checkbox\" class=\"chk_all\" name=\"chk_all\"> </label>",
@@ -63200,15 +63392,6 @@ $(function() {
 			required : true,
 			_label : 'Email Address',
 			'data-validType' : 'Email Address'
-		},{
-			name : 'people_id',
-			type : 'select',
-			_label : 'Contact Name',
-			_firstlabel : '-Choose-',
-			_firstoption : 0,
-			_labelssource : "Person.name",
-			_optionssource : "Person.id",
-			'data-validType' : 'select'
 		}
 	], fieldset_2__fields = [
 		{
@@ -63239,6 +63422,27 @@ $(function() {
 				}
 			]
 		}
+	], fieldset_3__fields = [
+		, {
+			name : 'people_id',
+			type : 'select',
+			_label : 'Contact Name',
+			_firstlabel : '-Choose-',
+			_firstoption : 0,
+			_labelssource : "Person.name",
+			_optionssource : "Person.id",
+			'data-validType' : 'select'
+		}, {
+			name : 'comment',
+			_label : 'Purpose of User Account',
+			placeholder : 'e.g. Admin Username'
+		}, {
+			name : 'primary_flag',
+			type : 'select',
+			_label : 'Is Primary User?',
+			_labelssource : 'No|Yes',
+			_optionssource : '0|1',
+		},
 	];
 
 	/**
@@ -63306,10 +63510,16 @@ $(function() {
 	},
 		[ // colparams
 			{ // fieldset
-				label : 'User Details',
+				label : 'User',
 				helpText : 'Please fill out the User information',
-				class : 'col-lg-5',
+				class : 'col-lg-3',
 				fields : fieldset_1__fields
+			},
+			{ // fieldset
+				label : 'Contact',
+				helpText : 'A user account can only be assigned to one person. A person can have multiple user accounts.',
+				class : 'col-lg-4',
+				fields : fieldset_3__fields
 			},
 			{	// fieldset
 				class : 'col-lg-5',
@@ -63320,35 +63530,158 @@ $(function() {
 
 })(jApp)
 
-// extend the application views
-$.extend( true, jApp.views, {
+/**
+ * applications.html.js
+ *
+ * applications view definition
+ */
+;(function(jApp) {
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			placeholder : 'e.g. Abra',
+			required : true,
+			_label : 'Enter the Application name',
+			'data-validType' : 'Anything'
+		},
+		{
+			name : 'description',
+			type : 'textarea',
+			_label : 'Description',
+		},
+		{
+			name : 'inactive_flag',
+			type : 'select',
+			_label : 'Is the application inactive?',
+			_optionssource : '0|1',
+			_labelssource : 'No|Yes',
+		}
+	], fieldset_2__fields = [
+		{
+			name : 'people',
+			type : 'array',
+			_label : 'Application Contacts',
+			fields : [
+				{
+					name : 'people',
+					type : 'select',
+					_label : 'Select Contacts',
+					_labelssource : 'Person.name',
+					_optionssource : 'Person.id',
+					multiple : true
+				}, {
+					name : 'contact_type',
+					type : 'select',
+					_optionssource : [
+						'Primary',
+						'Secondary',
+						'Other',
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'servers',
+			type : 'array',
+			_label : 'Application Servers',
+			fields : [
+				{
+					name : 'servers',
+					type : 'select',
+					_label : 'Select Servers',
+					_labelssource : 'Server.name',
+					_optionssource : 'Server.id',
+					multiple : true
+				}, {
+					name : 'server_type',
+					type : 'select',
+					_optionssource : [
+						'Primary Application Server',
+						'Secondary Application Server',
+						'Primary Database Server',
+						'Secondary Database Server',
+						'Primary Report Server',
+						'Secondary Report Server',
+						'Primary Web Server',
+						'Secondary Web Server',
+						'Primary DR Server',
+						'Secondary DR Server',
+						'Test Application Server',
+						'Test Report Server',
+						'Test Database Server',
+						'Test Web Server',
+						'Other'
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'databases',
+			type : 'array',
+			_label : 'Application Databases',
+			fields : [
+				{
+					name : 'databases',
+					type : 'select',
+					_label : 'Select Databases',
+					_labelssource : 'Database.hostname,name',
+					_optionssource : 'Database.id',
+					multiple : true
+				}, {
+					name : 'database_type',
+					type : 'select',
+					_optionssource : [
+						'Production Database',
+						'Test Database',
+						'Development Database',
+						'Reporting Database'
+						,'DR Database'
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'tags[]',
+			multiple : true,
+			type : 'tokens',
+			_label : 'Tags',
+			_labelssource : 'Tag.name',
+			_optionssource : 'Tag.id',
+		}
+	];
 
-	applications : function() {
-
-		$.extend( true, jApp.oG, {
-
-			applications : new jGrid({
-				table : 'applications',
-				model : 'Application',
-				columnFriendly : 'name',
-				gridHeader : {
-					icon : 'fa-windows',
-					headerTitle : 'Manage Applications',
-					helpText : "<strong>Note:</strong> Manage Applications Here"
-				},
-				tableBtns : {
-					custom : {
-						toggleInactive : {
-	            type : 'button',
-	            class : 'btn btn-success active btn-toggle',
-	            icon : 'fa-toggle-on',
-	            label : 'Toggle Inactive',
-							fn : 'toggleInactive',
-							'data-order' : 100
-	          },
+	/**
+	 * Add the view
+	 */
+	jApp.addView('applications',
+		{ // grid definition
+			model : 'Application',
+			columnFriendly : 'name',
+			gridHeader : {
+				icon : 'fa-windows',
+				headerTitle : 'Manage Applications',
+				helpText : "<strong>Note:</strong> Manage Applications Here"
+			},
+			tableBtns : {
+				custom : {
+					toggleInactive : {
+						type : 'button',
+						class : 'btn btn-success active btn-toggle',
+						icon : 'fa-toggle-on',
+						label : 'Toggle Inactive',
+						fn : 'toggleInactive',
+						'data-order' : 100
 					},
 				},
-				rowBtns : {
+			},
+			rowBtns : {
+				custom : {
 					markSelected : [
 						{ label: 'Flag Selected Applications', class: 'btn btn-primary', icon : 'fa-check-square-o' },
 						{
@@ -63373,125 +63706,304 @@ $.extend( true, jApp.views, {
 						},
 					]
 				},
-				columns : [ 				// columns to query
-					"id",
-					"name",
-					"description",
-					"people",
-					"servers",
-					'tags',
-				],
-				hidCols : [					// columns to hide
+			},
+			columns : [ 				// columns to query
+				"id",
+				"name",
+				"description",
+				"people",
+				"servers",
+				'tags',
+			],
+			headers : [ 				// headers for table
+				"ID",
+				"Name",
+				"Description",
+				"Contacts",
+				"Servers",
+				"Tags"
+			],
+			templates : { 				// html template functions
 
-				],
-				headers : [ 				// headers for table
-					"ID",
-					"Name",
-					"Description",
-					"Contacts",
-					"Servers",
-					"Tags"
-				],
-				templates : { 				// html template functions
+				name : function( value ) {
+					var r = jApp.activeGrid.currentRow, status, className, label = '';
 
-					"id" : function(value) {
-						return ('0000' + value).slice(-4);
-					},
-
-					"name" : function(value) {
-						var r = jApp.aG().currentRow, flags = [];
-
-						if ( +r.inactive_flag == 1 ) {
-							flags.push('<div class="label label-danger label-sm" style="margin-right:3px">Inactive</div>');
-						}
-
-						return flags.join(' ') + value.toUpperCase().link( window.location.href.trim('/') + '/' + r.id );
-					},
-
-					"tags" : function() {
-						var r = jApp.aG().currentRow;
-						return _.pluck( r.tags, 'name').map( function(val) {
-							return '<span style="margin:3px;" class="label label-default">' + val + '</span>';
-						}).join('');
-					},
-
-					"people" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
-					},
-
-					"servers" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
-					},
-
-					"created_at" : function(value) {
-						return date('Y-m-d', strtotime(value));
-					},
-
-					"updated_at" : function(value) {
-						return date('Y-m-d', strtotime(value));
+					if ( !! +r.inactive_flag ) {
+						label = '<div class="label-sm label label-warning">Inactive</div> ';
 					}
 
+					return label + _.nameButton( value, 'fa-windows' );
 				},
-				fn : {
-					/**
-					 * Mark selected applications as inactive/active
-					 * @method function
-					 * @return {[type]} [description]
-					 */
-					markApplication			: function( atts ) {
-						jApp.aG().action = 'withSelectedUpdate';
-						jUtility.withSelected('custom', function(ids) {
-							jUtility.postJSON( {
-                url : jUtility.getCurrentFormAction(),
-                success : jUtility.callback.submitCurrentForm,
-                data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
-              });
+
+				"servers" : function(arr) {
+					return _.get('name', arr, 'fa-server', 'Server' );
+				},
+			},
+			fn : {
+				/**
+				 * Mark selected applications as inactive/active
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				markApplication			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction(),
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
 						});
-					}, // end fn
+					});
+				}, // end fn
 
-					/**
-					 * Update the grid filter with the current values
-					 * @method function
-					 * @return {[type]} [description]
-					 */
-					updateGridFilter : function() {
-						var filter = [], temp = jApp.activeGrid.temp;
+				/**
+				 * Update the grid filter with the current values
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				updateGridFilter : function() {
+					var filter = [], temp = jApp.activeGrid.temp;
 
-						if (typeof temp.hideInactive !== 'undefined' && !!temp.hideInactive) {
-							filter.push('inactive_flag = 0');
-						}
+					if (typeof temp.hideInactive !== 'undefined' && !!temp.hideInactive) {
+						filter.push('inactive_flag = 0');
+					}
 
-						jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
+					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
 
-					}, // end fn
+				}, // end fn
 
-					/**
-					 * Toggle inactive server visibility
-					 * @method function
-					 * @return {[type]} [description]
-					 */
-					toggleInactive : function( ) {
-						jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
-							? true : !jApp.activeGrid.temp.hideInactive;
-						jApp.activeGrid.fn.updateGridFilter();
-						jUtility.executeGridDataRequest();
-						$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
-					}, //end fn
+				/**
+				 * Toggle inactive server visibility
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				toggleInactive : function( ) {
+					jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
+						? true : !jApp.activeGrid.temp.hideInactive;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+			}
+		},
+		[ // colparams
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-5',
+					fields : fieldset_1__fields
+				},
+
+				{ // fieldset
+					label : ' ',
+					class : 'col-lg-5',
+					fields : fieldset_2__fields
 				}
-			})
-		})
-	}
-});
+		]
+	)
+})(jApp);
 
-// extend the application views
-$.extend( true, jApp.views, {
+/**
+ * databases.html.js
+ *
+ * databases view definition
+ */
 
-	databases : function() {
+;(function(jApp) {
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			placeholder : 'e.g. LogosDB',
+			required : true,
+			_label : 'Enter the Database name',
+			'data-validType' : 'Anything'
+		},
+		{
+			name : 'server_id',
+			type : 'select',
+			_label : 'Select the Primary Database Host Server',
+			required : true,
+			_firstlabel : '-Choose-',
+			_firstoption : -1,
+			_labelssource : 'Server.name',
+			_optionssource : 'Server.id'
+		},
+		{
+			name : 'description',
+			type : 'textarea',
+			_label : 'Description',
+		},
+		{
+			name : 'ha_strategy',
+			type : 'textarea',
+			_label : 'High Availability Strategy',
+		},
+		{
+			name : 'dr_strategy',
+			type : 'textarea',
+			_label : 'Disaster Recovery Strategy',
+		},
+		{
+			name : 'upgrade_readiness',
+			type : 'textarea',
+			_label : 'SQL Server Upgrade Readiness',
+		},
+	],
 
-		$.extend( true, jApp.oG, {
+	fieldset_2__fields = [
+		{
+			name : 'rpo',
+			type : 'select',
+			_label : 'Recovery Point Objective',
+			_optionssource : [
+				'-Unspecified-',
+				'15 Min',
+				'1 Hour',
+				'1 Day',
+				'1 Week'
+			]
+		},
+		{
+			name : 'rto',
+			type : 'select',
+			_label : 'Recovery Time Objective',
+			_optionssource : [
+				'-Unspecified-',
+				'15 Min',
+				'1 Hour',
+				'1 Day',
+				'1 Week'
+			]
+		},
+		{
+			name : 'production_flag',
+			type : 'select',
+			_label : 'Is this database in production ( say yes for prod reporting databases)?',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		},
+		{
+			name : 'inactive_flag',
+			type : 'select',
+			_label : 'Is this database inactive?',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		},
+		{
+			name : 'ignore_flag',
+			type : 'select',
+			_label : 'Ignore this database?',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		},
+	],
 
-			servers : new jGrid({
-				table : 'databases',
+	fieldset_3__fields = [
+		{
+			name : 'servers',
+			type : 'array',
+			_label : 'All Database Servers (Include the Primary Host Server)',
+			fields : [
+				{
+					name : 'servers',
+					type : 'select',
+					_label : 'Select Servers',
+					_labelssource : 'Server.name',
+					_optionssource : 'Server.id',
+					multiple : true
+				}, {
+					name : 'server_type',
+					type : 'select',
+					_optionssource : [
+						'Primary Host Server',
+						'Secondary Host Server',
+						'Primary DR Server',
+						'Secondary DR Server',
+						'Reporting Server',
+						'Other'
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'people',
+			type : 'array',
+			_label : 'Database Contacts',
+			fields : [
+				{
+					name : 'people',
+					type : 'select',
+					_label : 'Select Contacts',
+					_labelssource : 'Person.name',
+					_optionssource : 'Person.id',
+					multiple : true
+				}, {
+					name : 'contact_type',
+					type : 'select',
+					_optionssource : [
+						'Primary',
+						'Secondary',
+						'Other',
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'applications',
+			type : 'array',
+			_label : 'Database Applications',
+			fields : [
+				{
+					name : 'applications',
+					type : 'select',
+					_label : 'Select Applications',
+					_labelssource : 'Application.name',
+					_optionssource : 'Application.id',
+					multiple : true
+				}, {
+					name : 'database_type',
+					type : 'select',
+					_optionssource : [
+						'Production Database',
+						'Test Database',
+						'Development Database',
+						'Reporting Database',
+						'DR Database'
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'tags[]',
+			multiple : true,
+			type : 'tokens',
+			_label : 'Tags',
+			_labelssource : 'Tag.name',
+			_optionssource : 'Tag.id',
+		}
+	];
+
+		/**
+		 * Add the view
+		 * @method addView
+		 * @param  {[type]} 'databases' [description]
+		 * @param  {[type]} jGridDef    [description]
+		 * @param  {[type]} [           					{        						label                  :             'Details' [description]
+		 * @param  {[type]} helpText    :             'Please                      fill          out       the           form' [description]
+		 * @param  {[type]} class       :             'col-lg-5'                   [description]
+		 * @param  {[type]} fields      :             fieldset_1__fields					}     [description]
+		 * @param  {[type]} {           						label   :                            '             '         [description]
+		 * @param  {[type]} class       :             'col-lg-5'                   [description]
+		 * @param  {[type]} fields      :             fieldset_2__fields					}			] [description]
+		 */
+		jApp.addView('databases',
+		{
 				model : 'Database',
 				columnFriendly : 'name',
 				filter : 'ignore_flag = 0',
@@ -63506,114 +64018,113 @@ $.extend( true, jApp.views, {
 				tableBtns : {
 					custom : {
 						toggleInactive : {
-	            type : 'button',
-	            class : 'btn btn-success active btn-toggle',
-	            icon : 'fa-toggle-on',
-	            label : 'Toggle Inactive',
+							type : 'button',
+							class : 'btn btn-success active btn-toggle',
+							icon : 'fa-toggle-on',
+							label : 'Toggle Inactive',
 							fn : 'toggleInactive',
 							'data-order' : 100
-	          },
+						},
 						toggleNonProd: {
-	            type : 'button',
-	            class : 'btn btn-success active btn-toggle',
-	            icon : 'fa-toggle-on',
-	            label : 'Toggle Non-Production',
+							type : 'button',
+							class : 'btn btn-success active btn-toggle',
+							icon : 'fa-toggle-on',
+							label : 'Toggle Non-Production',
 							fn : 'toggleNonProd',
 							'data-order' : 101
-	          },
+						},
 						toggleIgnored: {
-	            type : 'button',
-	            class : 'btn btn-success btn-toggle',
-	            icon : 'fa-toggle-off',
-	            label : 'Toggle Ignored',
+							type : 'button',
+							class : 'btn btn-success btn-toggle',
+							icon : 'fa-toggle-off',
+							label : 'Toggle Ignored',
 							fn : 'toggleIgnored',
 							'data-order' : 102
-	          },
+						},
 					},
 				},
 				rowBtns : {
-					markSelected : [
-						{ label: 'Flag Selected Databases', class: 'btn btn-primary', icon : 'fa-check-square-o' },
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
+					custom : {
+						markSelected : [
+							{ label: 'Flag Selected Databases', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+							{
+								'data-multiple' : true,
+								'data-permission' : 'update_enabled',
+								type : 'button',
+								fn : function(e) {
+										e.preventDefault();
+										jApp.activeGrid.fn.markDatabase( { 'inactive_flag' : 1} );
+								},
+								label : 'As Inactive'
+							},
+							{
+								'data-multiple' : true,
+								'data-permission' : 'update_enabled',
+								type : 'button',
+								fn : function(e) {
 									e.preventDefault();
-									jApp.activeGrid.fn.markDatabase( { 'inactive_flag' : 1} );
+									jApp.activeGrid.fn.markDatabase({ 'inactive_flag' : 0})
+								},
+								label : 'As Not Inactive'
 							},
-							label : 'As Inactive'
-						},
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
-								e.preventDefault();
-								jApp.activeGrid.fn.markDatabase({ 'inactive_flag' : 0})
+							{
+								'data-multiple' : true,
+								'data-permission' : 'update_enabled',
+								type : 'button',
+								fn : function(e) {
+									e.preventDefault();
+									jApp.activeGrid.fn.markDatabase({ 'production_flag' : 1})
+								},
+								label : 'As Production'
 							},
-							label : 'As Not Inactive'
-						},
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
-								e.preventDefault();
-								jApp.activeGrid.fn.markDatabase({ 'production_flag' : 1})
+							{
+								'data-multiple' : true,
+								'data-permission' : 'update_enabled',
+								type : 'button',
+								fn : function(e) {
+									e.preventDefault();
+									jApp.activeGrid.fn.markDatabase({ 'production_flag' : 0})
+								},
+								label : 'As Not Production'
 							},
-							label : 'As Production'
-						},
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
-								e.preventDefault();
-								jApp.activeGrid.fn.markDatabase({ 'production_flag' : 0})
+							{
+								'data-multiple' : true,
+								'data-permission' : 'update_enabled',
+								type : 'button',
+								fn : function(e) {
+									e.preventDefault();
+									jApp.activeGrid.fn.markDatabase({ 'ignore_flag' : 1})
+								},
+								label : 'As Ignored'
 							},
-							label : 'As Not Production'
-						},
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
-								e.preventDefault();
-								jApp.activeGrid.fn.markDatabase({ 'ignore_flag' : 1})
-							},
-							label : 'As Ignored'
-						},
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
-								e.preventDefault();
-								jApp.activeGrid.fn.markDatabase({ 'ignore_flag' : 0})
-							},
-							label : 'As Not Ignored'
-						}
-					]
+							{
+								'data-multiple' : true,
+								'data-permission' : 'update_enabled',
+								type : 'button',
+								fn : function(e) {
+									e.preventDefault();
+									jApp.activeGrid.fn.markDatabase({ 'ignore_flag' : 0})
+								},
+								label : 'As Not Ignored'
+							}
+						]
+					}
 				},
 				columns : [ 				// columns to query
 					"id",
-					"name",
+					"databaseName",
+					"host_name",
 					"description",
-					//"rpo",
 					"people",
 					"applications",
 					"servers",
 					'tags',
 				],
-				hidCols : [					// columns to hide
-
-				],
 				headers : [ 				// headers for table
 					"ID",
 					"Database",
+					"Host",
 					"Description",
-					//"RPO / RTO",
 					"Contacts",
 					"Applications",
 					"Servers",
@@ -63621,11 +64132,11 @@ $.extend( true, jApp.views, {
 				],
 				templates : { 				// html template functions
 
-					"id" : function(value) {
-						return ('0000' + value).slice(-4);
+					host_name : function(value) {
+						return _.get('host.name','fa-server');
 					},
 
-					"rpo" : function(value) {
+					rpo : function(value) {
 						var r = jApp.aG().currentRow,
 							rpo = ( r.rpo != null ) ? r.rpo : '-',
 							rto = ( r.rto != null ) ? r.rto : '-';
@@ -63633,61 +64144,22 @@ $.extend( true, jApp.views, {
 						return rpo + ' / ' + rto;
 					},
 
-					"production_flag" : function(value) {
-						return ( +value == 1 ) ?
-							'<span style="margin:3px;" class="label label-primary">Production</span>' :
-							'<span style="margin:3px;" class="label label-success">Test/Dev</span>';
+					production_flag : function(value) {
+						_.getFlag(value,'Production','Test','danger','success');
 					},
 
-					"name" : function(value) {
-						var r = jApp.aG().currentRow, flags = [];
-
-						if ( +r.inactive_flag == 1 ) {
-							flags.push('<div class="label label-danger label-sm" style="margin-right:3px">Inactive</div>');
-						}
-
-						if ( +r.ignore_flag == 1 ) {
-							flags.push('<div class="label label-warning label-sm" style="margin-right:3px">Ignored</div>');
-						}
-
-						if ( +r.production_flag == 1 ) {
-							flags.push('<div class="label label-primary label-sm" style="margin-right:3px">Prod</div>');
-						}
-
-						return flags.join(' ') + (r.host.name + '.' + value).link( window.location.href.trim('/') + '/' + r.id );
+					applications : function(arr) {
+						return _.get('name', arr, 'fa-windows', 'Application' );
 					},
 
-					"tags" : function() {
-						var r = jApp.aG().currentRow;
-						return _.pluck( r.tags, 'name').map( function(val) {
-							return '<span style="margin:3px;" class="label label-default">' + val + '</span>';
-						}).join('');
+					servers : function(arr) {
+						return _.get('name', arr, 'fa-server', 'Server' );
 					},
-
-					"applications" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
-					},
-
-					"servers" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
-					},
-
-					"people" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
-					},
-
-					"created_at" : function(value) {
-						return date('Y-m-d', strtotime(value));
-					},
-
-					"updated_at" : function(value) {
-						return date('Y-m-d', strtotime(value));
-					}
 
 				},
 				fn : {
 					/**
-					 * Mark selected servers as inactive
+					 * Mark selected databases
 					 * @method function
 					 * @return {[type]} [description]
 					 */
@@ -63695,10 +64167,10 @@ $.extend( true, jApp.views, {
 						jApp.aG().action = 'withSelectedUpdate';
 						jUtility.withSelected('custom', function(ids) {
 							jUtility.postJSON( {
-                url : jUtility.getCurrentFormAction(),
-                success : jUtility.callback.submitCurrentForm,
-                data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
-              });
+								url : jUtility.getCurrentFormAction(),
+								success : jUtility.callback.submitCurrentForm,
+								data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+							});
 						});
 					}, // end fn
 
@@ -63765,10 +64237,29 @@ $.extend( true, jApp.views, {
 						$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
 					}, //end fn
 				}
-			})
-		})
-	}
-});
+			},
+			[ // colparams
+					{ // fieldset
+						label : 'Details',
+						helpText : 'Please fill out the form',
+						class : 'col-lg-3',
+						fields : fieldset_1__fields
+					},
+
+					{ // fieldset
+						label : ' ',
+						class : 'col-lg-4',
+						fields : fieldset_2__fields
+					},
+
+					{ // fieldset
+						label : ' ',
+						class : 'col-lg-5',
+						fields : fieldset_3__fields
+					},
+			]);
+
+})(jApp);
 
 // extend the application views
 $.extend(true, jApp.views, {
@@ -63858,117 +64349,115 @@ $.extend(true, jApp.views, {
 	}
 });
 
-// extend the application views
-$.extend(true, jApp.views, {
+/**
+ * admin.groups.html.js
+ *
+ * admin.groups view definition
+ */
+;(function(jApp) {
 
-	profile : function() {
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'username',
+			placeholder : 'e.g. jsmith',
+			required : true,
+			_label : 'Username',
+			'data-validType' : 'Anything'
+		},{
+			name : 'email',
+			placeholder : 'email@domain.com',
+			required : true,
+			_label : 'Email Address',
+			'data-validType' : 'Email Address'
+		}
+	];
 
-		$.extend(true, jApp.oG, {
+	/**
+	 * Add the view
+	 */
+	jApp.addView('profile',
+	{
+		model : 'Profile',
+		columnFriendly : 'username',
+		toggles : {
+			new : false,
+			del : false,
+		},
+		gridHeader : {
+			icon : 'fa-user',
+			headerTitle : 'My Profile',
+			helpText : "<strong>Note:</strong> Manage your user accounts here"
+		},
+		rowBtns : {
+			custom : {
+				resetPassword : { 'data-multiple' : false, 'data-permission' : 'read_enabled', type : 'button', class : 'btn btn-primary', icon : 'fa-refresh', label : 'Password Reset ...', fn : 'resetPassword'  } // etc.
+			}
+		},
+		columns : [ 				// columns to query
+			"id",
+			"username",
+			"person_name",
+			"email",
+			"groups",
+			"profile_group_roles",
+		],
+		headers : [ 				// headers for table
+			"ID",
+			"Username",
+			"Name",
+			"Email",
+			"Groups",
+			"Roles",
+		],
+		html : {
+			forms : {
+				resetPassword : '<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper"> <div class="frm_wrapper"> <div class="panel panel-yellow"> <div class="panel-heading"> <button type="button" class="close" aria-hidden="true">×</button> <i class="fa fa-refresh fa-fw"></i> Reset Password </div> <div class="panel-overlay" style="display:none"></div> <div class="panel-body"> <div class="row side-by-side formContainer"></div> </div> </div> </div> </div>'
+			},
+		},
+		templates : {
+			groups : function(arr) {
+        return _.get('name', arr, 'fa-users');
+      },
+		},
+		formDefs : {
+			resetPassword : {
+				table : 'User',
+				pkey : 'id',
+				tableFriendly : 'User Password',
+				atts : { method : 'PATCH' },
+				//loadExternal : false, // treat it like an externally loaded form, but specify params locally
+				colParams : [{
+					label : 'Reset Password',
+					helpText : 'Specify a new password then confirm it to continue.',
+					class : 'col-lg-3',
+					fields : [
+						{ type : 'hidden', readonly : 'readonly', name : 'ContactID' },
+						{ type : 'password', name : 'Password1', id : 'Password1', required : 'required', 'data-validType' : 'min>=6', _label : 'New Password', placeholder : '******' },
+						{ type : 'password', name : 'Password2', id : 'Password2', required : 'required', 'data-validType' : 'field==#Password1', _label : 'Confirm Password', placeholder : '******' },
+					]
+				}],
+			}
+		},
+		fn : {
+			resetPassword : function() {
+				jUtility.actionHelper('resetPassword');
+			}, //end fn
+		}
+	},
+		[ // colparams
+			{ // fieldset
+				label : 'User',
+				helpText : 'Update your information here',
+				class : 'col-lg-3',
+				fields : fieldset_1__fields
+			}
+		]
+	);
 
-			profile : new jGrid({
-				table : 'users',
-				model : 'User',
-				columnFriendly : 'username',
-				gridHeader : {
-					icon : 'fa-user',
-					headerTitle : 'My Profile',
-					helpText : 'Manage your profile information and password here.'
-				},
-				disabledFrmElements : [
-					'people_id',
-					'groups'
-				],
-				rowDataUrl : 'users/json',
-				toggles : {
-					new : false,
-					del : false,
-					sort : false,
-					autoUpdate : false,
-					paginate : false,
-					withSelected : false,
-					headerFilters : false,
-				},
-				rowBtns : {
-					custom : {
-						resetPassword : { type : 'button', class : 'btn btn-primary', icon : 'fa-refresh', label : 'Reset Password', fn : 'resetPassword', title : 'Reset Password'  } // etc.
-					}
-				},
-				columns : [ 				// columns to query
-					"id",
-					"username",
-					"name",
-					"email",
-					"groups",
-				],
-				hidCols : [					// columns to hide
-
-				],
-				headers : [ 				// headers for table
-					"ID",
-					"Username",
-					"Name",
-					"Email",
-					"Groups",
-				],
-				templates : { 				// html template functions
-
-					"id" : function(value) {
-						var temp = '0000' + value;
-						return temp.slice(-4);
-					},
-
-					"name" : function() {
-						var o = jApp.aG().currentRow;
-						return o.person.name;
-					},
-
-					"email" : function(value) {
-						return '<a href="mailto:' + value + '" >' + value + '</a>';
-					},
-
-					"groups" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
-					},
-
-					"modules" : function(arr) {
-						return _.compact(_.flatten(_.map(  jApp.aG().currentRow.groups, function(row, i) {
-							return (row.modules.length) ? _.pluck(row.modules,'name') : false
-						} ))).join(', ');
-						//return _.pluck(arr, 'name').join(', ');
-					},
-
-				},
-				html : {
-					forms : {
-						resetPassword : '<div id="div_resetFrm" class="div-btn-reset min div-form-panel-wrapper"> <div class="frm_wrapper"> <div class="panel panel-yellow"> <div class="panel-heading"> <button type="button" class="close" aria-hidden="true">×</button> <i class="fa fa-refresh fa-fw"></i> Reset Password </div> <div class="panel-overlay" style="display:none"></div> <div class="panel-body"> <div class="row side-by-side formContainer"></div> </div> </div> </div> </div>'
-					},
-				},
-				formDefs : {
-					resetPassword : {
-						table : 'User',
-						pkey : 'id',
-						tableFriendly : 'User Password',
-						atts : { method : 'PATCH' },
-						fieldset : {
-							'legend' : 'Reset Password',
-						},
-						loadExternal : false,
-						colParams : [
-							{ type : 'hidden', readonly : 'readonly', name : 'ContactID' },
-							{ type : 'password', name : 'Password1', id : 'Password1', required : 'required', 'data-validType' : 'min>=6', _label : 'New Password', placeholder : '******' },
-							{ type : 'password', name : 'Password2', id : 'Password2', required : 'required', 'data-validType' : 'field==#Password1', _label : 'Confirm Password', placeholder : '******' },
-						],
-					}
-				},
-				fn : {
-					resetPassword : function() {
-						jUtility.actionHelper('resetPassword');
-					}, //end fn
-				}
-			})
-		})
-	}
-});
+})(jApp)
 
 // extend the application views
 $.extend( true, jApp.views, {

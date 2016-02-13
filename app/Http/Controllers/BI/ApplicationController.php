@@ -21,6 +21,17 @@ class ApplicationController extends Controller
   );
 
   /**
+   * What relationships to grab with the model
+   * @var [type]
+   */
+  public $with = [
+    'databases',
+    'servers',
+    'people',
+    'tags'
+  ];
+
+  /**
    * The class of the model
    * @var string
    */

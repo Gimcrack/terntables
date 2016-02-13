@@ -38,7 +38,7 @@ class Application extends Model
    */
   public function people()
   {
-    return $this->belongsToMany('App\Person')->withTimestamps();
+    return $this->belongsToMany('App\Person')->withTimestamps()->withPivot(['contact_type','comment']);
   }
 
   /**
@@ -48,7 +48,7 @@ class Application extends Model
    */
   public function servers()
   {
-    return $this->belongsToMany('App\Server')->withTimestamps();
+    return $this->belongsToMany('App\Server')->withTimestamps()->withPivot(['server_type','comment']);
   }
 
   /**
@@ -58,6 +58,6 @@ class Application extends Model
    */
   public function databases()
   {
-    return $this->belongsToMany('App\Database')->withTimestamps();
+    return $this->belongsToMany('App\Database')->withTimestamps()->withPivot(['database_type','comment']);
   }
 }

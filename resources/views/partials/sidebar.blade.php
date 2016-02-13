@@ -46,28 +46,9 @@
       </li>
       @endif
 
-      <!--
-      @if( Auth::user()->checkAccess('JobRole.read') )
       <li>
-        <a href="{{ url('jobroles') }}"><i class="fa fa-briefcase fa-fw"></i> Manage Job Roles</a>
+        <a href="{{ url('/auth/logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout </a>
       </li>
-      @endif
-
-  	  <li>
-  			<a href="#"><i class="fa fa-train fa-fw"></i> Training <span class="fa arrow"></span></a>
-  			<ul class="nav nav-second-level">
-          <li>
-            <a href="{{ url('resources') }}"><i class="fa fa-cube fa-fw"></i> Resources</a>
-          </li>
-          <li>
-            <a href="{{ url('collections') }}"><i class="fa fa-cubes fa-fw"></i> Collections</a>
-          </li>
-          <li>
-            <a href="{{ url('requirements') }}"><i class="fa fa-tasks fa-fw"></i> Requirements</a>
-          </li>
-
-  			</ul>
-  		</li> -->
   	</ul>
   	</div>
   	<!-- /.sidebar-collapse -->

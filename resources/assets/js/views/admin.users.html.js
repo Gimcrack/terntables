@@ -21,15 +21,6 @@
 			required : true,
 			_label : 'Email Address',
 			'data-validType' : 'Email Address'
-		},{
-			name : 'people_id',
-			type : 'select',
-			_label : 'Contact Name',
-			_firstlabel : '-Choose-',
-			_firstoption : 0,
-			_labelssource : "Person.name",
-			_optionssource : "Person.id",
-			'data-validType' : 'select'
 		}
 	], fieldset_2__fields = [
 		{
@@ -60,6 +51,27 @@
 				}
 			]
 		}
+	], fieldset_3__fields = [
+		, {
+			name : 'people_id',
+			type : 'select',
+			_label : 'Contact Name',
+			_firstlabel : '-Choose-',
+			_firstoption : 0,
+			_labelssource : "Person.name",
+			_optionssource : "Person.id",
+			'data-validType' : 'select'
+		}, {
+			name : 'comment',
+			_label : 'Purpose of User Account',
+			placeholder : 'e.g. Admin Username'
+		}, {
+			name : 'primary_flag',
+			type : 'select',
+			_label : 'Is Primary User?',
+			_labelssource : 'No|Yes',
+			_optionssource : '0|1',
+		},
 	];
 
 	/**
@@ -127,10 +139,16 @@
 	},
 		[ // colparams
 			{ // fieldset
-				label : 'User Details',
+				label : 'User',
 				helpText : 'Please fill out the User information',
-				class : 'col-lg-5',
+				class : 'col-lg-3',
 				fields : fieldset_1__fields
+			},
+			{ // fieldset
+				label : 'Contact',
+				helpText : 'A user account can only be assigned to one person. A person can have multiple user accounts.',
+				class : 'col-lg-4',
+				fields : fieldset_3__fields
 			},
 			{	// fieldset
 				class : 'col-lg-5',

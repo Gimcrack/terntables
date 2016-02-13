@@ -29,6 +29,11 @@ abstract class Controller extends BaseController
     public $model_class;
 
     /**
+     * The relationships to return with the information
+     */
+    public $with = [];
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -47,9 +52,39 @@ abstract class Controller extends BaseController
     public function show($id)
     {
         $model_class = $this->model_class;
-        $model = $model_class::find($id);
+        $model = $model_class::with($this->with)->findOrFail($id);
 
-        return view('pages.history', compact('model'));
+        $attributes = $model->attributesForHumans();
+        $history = $this->getHistory($model);
+
+        $name = $model->name ?: $model->username;
+
+        return view('pages.inspect', compact('name','model','attributes','history'));
+    }
+
+    /**
+     * Get history on the model
+     * @method getHistory
+     * @param  [type]     $data [description]
+     * @return [type]           [description]
+     */
+    public function getHistory($data)
+    {
+      $readable_history = [];
+
+      foreach($data->revisionHistory as $history) {
+        $readable_history[] = [
+          'date' => date('Y-m-d H:i', strtotime( $history->updated_at )),
+          'dateForHumans' => $history->updated_at->diffForHumans(),
+          'person' => @$history->userResponsible()->person->name ?: 'System',
+          'description' => ( !is_null($history->old_value) ) ?
+              "[{$history->fieldName()}] changed from '{$history->oldValue()}' to '{$history->newValue()}'" :
+              "Record Created"
+        ];
+      }
+
+      return $readable_history;
+
     }
 
 }

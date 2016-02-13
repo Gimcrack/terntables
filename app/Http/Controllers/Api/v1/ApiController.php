@@ -107,6 +107,31 @@ class ApiController extends Controller
   }
 
   /**
+   * Inspect the specified model
+   * @method inspect
+   * @param  [type]  $model [description]
+   * @param  [type]  $id    [description]
+   * @return [type]         [description]
+   */
+  public function inspect($model, $id)
+  {
+      $classControllers = [
+        'Person'  => 'Admin\PersonController',
+        'Profile' => 'Admin\UserController',
+        'User'    => 'Admin\UserController',
+        'Group'   => 'Admin\GroupController',
+        'Role'    => 'Admin\RoleController',
+        'Server'  => 'BI\ServerController',
+        'Application' => 'BI\ApplicationController',
+        'Database'    => 'BI\DatabaseController',
+        'Document'    => 'GIS\DocumentController',
+      ];
+
+      $class = 'App\Http\Controllers' . "\\" . $classControllers[$model];
+      return ( new $class() )->show($id);
+  }
+
+  /**
    * Store a newly created resource in storage.
    *
    * @param  \Illuminate\Http\Request  $request
@@ -278,7 +303,7 @@ class ApiController extends Controller
     }
 
     // sync the model with the relation
-    return $model->$relation()->sync( $sync );
+    return $model->$relation()->sync( $sync ?: [] );
   }
 
   /**
@@ -327,6 +352,7 @@ class ApiController extends Controller
   {
     $ids = $ids ?: $this->getInputIds();
     $changes = $changes ?: Input::get('changes', null);
+    $class = $this->model_class;
 
     if ( ! $ids || ! $changes ) {
       throw new InvalidArgumentException();
@@ -338,9 +364,9 @@ class ApiController extends Controller
     // }
 
     $table_name = (new $this->model_class)->getTable();
-    $models = DB::table($table_name)->whereIn('id',$ids);
+    $models = $class::whereIn('id',$ids);
 
-    if ( ! $models->get()->count() ) {
+    if ( ! $models->count() ) {
       throw new ModelNotFoundException();
     }
 
@@ -360,7 +386,32 @@ class ApiController extends Controller
     $class = "\\App\\{$model}";
     if (empty($labels)) { $labels = $options; }
 
-    return response()->json( $class::select("{$options} as option", DB::raw("{$labels} as label"))->orderBy("label","ASC")->get() );
+    $select = explode(",",$labels);
+
+    $ret = [];
+    foreach( $class::all() as $o ) {
+      $ret2 = [];
+      $ret2['label'] = [];
+      $ret2['option'] = $o->$options;
+
+      foreach( $select as $key ) {
+        $ret2['label'][] = $o->$key;
+      }
+      $ret2['label'] = implode(".",$ret2['label']);
+      $ret[] = $ret2;
+    }
+
+    usort( $ret, function($a,$b) {
+      $al = $a['label'];
+      $bl = $b['label'];
+
+      if ($al > $bl) return 1;
+      if ($al < $bl) return -1;
+      return 0;
+
+    });
+
+    return response()->json($ret);
   }
 
   /**

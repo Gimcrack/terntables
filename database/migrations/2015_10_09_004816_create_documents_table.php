@@ -32,9 +32,10 @@ class CreateDocumentsTable extends Migration
      */
     public function down()
     {
-        Schema::table('documents', function(Blueprint $table) {
-            $table->dropForeign('documents_people_id_foreign');
-        });
+      DB::statement('EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all"');
+        // Schema::table('documents', function(Blueprint $table) {
+        //     $table->dropForeign('documents_people_id_foreign');
+        // });
         Schema::drop('documents');
     }
 }

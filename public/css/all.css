@@ -15950,6 +15950,15 @@ fieldset[disabled] {
   opacity: 0;
 }
 
+#div_inspect.max .panel-body {
+  margin-top: 0px !important;
+}
+
+#div_inspect.max .panel-body .panel-body {
+  padding: 0 15px !important;
+  margin: 0;
+}
+
 .side-by-side .form-control {
   display: inline-block;
   width: auto;

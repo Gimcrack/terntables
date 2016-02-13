@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 use Input;
 use App\Tag;
 use App\Exceptions\OperationRequiresCheckoutException;
+use \Venturecraft\Revisionable\RevisionableTrait as RevisionableTrait;
 
 abstract class Model extends BaseModel
 {
   /**
    * Make the model track revision changes
    */
-  use \Venturecraft\Revisionable\RevisionableTrait;
+  use RevisionableTrait;
 
   /**
    * Boot the model
@@ -100,6 +101,228 @@ abstract class Model extends BaseModel
     ]);
 
     return $this;
+  }
+
+  /**
+   * Return attributes formatted for humans
+   * @method attributesForHumans
+   * @return [type]              [description]
+   */
+  public function attributesForHumans()
+  {
+    $atts = $this->toArray();
+    return $this->flattenToList($atts);
+  }
+
+  /**
+   * Flatten the array to a list
+   * @method flattenToList
+   * @param  [type]        $val [description]
+   * @return [type]             [description]
+   */
+  public function flattenToList($arr)
+  {
+    $return = [];
+    $readable_keys = $this->readableKeys($arr);
+
+    $return[] = '<table class="table table-striped">';
+
+
+    foreach($arr as $key => $value ) {
+      if ( $this->shouldIgnoreKey($key) ) continue;
+
+      $return[] = '<tr>';
+      $return[] = '<th style="text-align:left">';
+      $return[] = $readable_keys[$key];
+      $return[] = '</th>';
+      $return[] = '<td>';
+      $return[] = $this->readableValue( $value, $key );
+      $return[] = '</td>';
+      $return[] = '</tr>';
+    }
+
+    $return[] = '</table>';
+
+    return implode("\n",$return);
+  }
+
+  /**
+   * Return the key in a readable format
+   * @method readableKey
+   * @param  [type]      $key [description]
+   * @return [type]           [description]
+   */
+  public function readableKey($key)
+  {
+    $search = [ "_", "_at", " at", "_flag", " flag", "pivot" ];
+    $replace = [ " ", "", "", "", "", "relationship" ];
+
+    switch(true) {
+      case ( strpos($key,"_at") !== false ) :
+        return ucwords( "Date " . str_replace($search, $replace, $key) );
+
+      case ( strpos($key,"_flag") !== false ) :
+        return ucwords ( "Is " . str_replace($search, $replace, $key) . "?" );
+
+      default :
+        return ucwords ( str_replace($search, $replace, $key) );
+    }
+
+  }
+
+  /**
+   * Return the value in a readable format
+   * @method readableValue
+   * @param  [type]        $value [description]
+   * @param  [type]        $key   [description]
+   * @return [type]               [description]
+   */
+  public function readableValue( $value, $key )
+  {
+    switch(true) {
+      case ( strpos($key,"_at") !== false ) :
+        return date('Y-m-d H:i',strtotime($value));
+
+      case ( strpos($key,"_flag") !== false ) :
+        return ( !! $value ) ? "Yes" : "No";
+
+      case ( $key === 'pivot' ) :
+        return $this->pivotExtractType($value);
+
+      case (is_array($value)) :
+        return $this->arrayToTable( $value );
+
+      default :
+        return $value;
+    }
+
+  }
+
+  /**
+   * [pivotExtractType description]
+   * @method pivotExtractType
+   * @param  [type]           $arr [description]
+   * @return [type]                [description]
+   */
+  public function pivotExtractType($arr)
+  {
+    $return = '';
+    foreach($arr as $key => $value) {
+      if (strpos($key,'type') !== false) {
+        $return .= $this->readableKey($key) . " : " . $value;
+      }
+    }
+
+    return $return;
+  }
+
+  /**
+   * Render an array as a tbale
+   * @method arrayToTable
+   * @return [type]       [description]
+   */
+  public function arrayToTable($arr)
+  {
+    // check for multi-dimensional array
+    if ( !empty($arr[0]) && is_array($arr[0]) ) {
+      return $this->multidimensionalArrayToTable( $arr );
+    }
+
+    $return=[];
+    //setup the table
+    $return[] = '<table class="table table-striped">';
+    foreach( $arr as $cell_key => $cell ) {
+      if ( $this->shouldIgnoreKey($cell_key) ) continue;
+      $return[] = '<tr>';
+      $return[] = "<th>{$this->readableKey($cell_key)}</th>";
+      $return[] = "<td>{$this->readableValue($cell, $cell_key)}</td>";
+      $return[] = '<tr>';
+    }
+    $return[] = '</table>';
+
+    return implode("\n",$return);
+
+  }
+
+  /**
+   * Render a multi-dimensional array as a table
+   * @method multidimensionalArrayToTable
+   * @param  [type]                       $value [description]
+   * @return [type]                              [description]
+   */
+  public function multidimensionalArrayToTable( $value )
+  {
+    $return=[];
+
+    //setup the table
+    $return[] = '<table class="table table-striped">';
+
+    // setup the headers
+    $return[] = '<tr>';
+    foreach( array_keys($value[0]) as $header ) {
+      if ( $this->shouldIgnoreKey($header) ) continue;
+      $return[] = "<th>{$this->readableKey($header)}</th>";
+    }
+    $return[] = '</tr>';
+
+    // fill in the body
+    foreach( $value as $row ) {
+      $return[] = '<tr>';
+      foreach($row as $cell_key => $cell) {
+        if ( $this->shouldIgnoreKey($cell_key) ) continue;
+        if ($cell_key === 'pivot') {
+          $return[] = '<td>';
+          $return[] = $this->pivotExtractType($cell);
+          $return[] = '</td>';
+        }
+        elseif (is_array($cell)) {
+          $return[] = '<td>';
+          $return[] = implode(", ", array_column($cell,'name'));
+          $return[] = '</td>';
+        } else {
+          $return[] = "<td>{$this->readableValue( $cell, $cell_key )}</td>";
+        }
+      }
+      $return[] = '</tr>';
+    }
+
+    $return[] = '</table>';
+
+    return implode("\n", $return);
+  }
+
+  /**
+   * Should the key be ignored
+   * @method shouldIgnoreKey
+   * @param  [type]          $key [description]
+   * @return [type]               [description]
+   */
+  public function shouldIgnoreKey($key)
+  {
+    switch(true) {
+      case ( $key === 'id' ) :
+      case ( strpos($key,'_id') !== false ) :
+      //case ( $key === 'pivot' ) :
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * Iterate through the keys and return the readable version of each
+   * @method readableKeys
+   * @param  [type]       $arr [description]
+   * @return [type]            [description]
+   */
+  public function readableKeys($arr)
+  {
+    $return = [];
+    foreach(array_keys($arr) as $key) {
+      if ($key === 'id' || strpos($key,'id') !== false) continue;
+      $readableKey = $this->readableKey($key);
+      $return[$key] = "<th>{$readableKey}</th>";
+    }
+    return $return;
   }
 
   /**

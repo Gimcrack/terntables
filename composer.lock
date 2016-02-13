@@ -903,12 +903,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "1b31890b867934dc2311444d3a55b1a9c8338a03"
+                "reference": "b12d67eb88d8aada43eb7343e6c0face2bba9806"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/1b31890b867934dc2311444d3a55b1a9c8338a03",
-                "reference": "1b31890b867934dc2311444d3a55b1a9c8338a03",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/b12d67eb88d8aada43eb7343e6c0face2bba9806",
+                "reference": "b12d67eb88d8aada43eb7343e6c0face2bba9806",
                 "shasum": ""
             },
             "require": {
@@ -932,7 +932,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2016-02-09 01:11:39"
+            "time": "2016-02-11 21:18:57"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -4726,16 +4726,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.22",
+            "version": "4.8.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "dfb11aa5236376b4fc63853cf746af39fe780e72"
+                "reference": "6e351261f9cd33daf205a131a1ba61c6d33bd483"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/dfb11aa5236376b4fc63853cf746af39fe780e72",
-                "reference": "dfb11aa5236376b4fc63853cf746af39fe780e72",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6e351261f9cd33daf205a131a1ba61c6d33bd483",
+                "reference": "6e351261f9cd33daf205a131a1ba61c6d33bd483",
                 "shasum": ""
             },
             "require": {
@@ -4794,7 +4794,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-02-02 09:01:21"
+            "time": "2016-02-11 14:56:33"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

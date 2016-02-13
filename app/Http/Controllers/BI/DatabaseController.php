@@ -26,6 +26,18 @@ class DatabaseController extends Controller
   public $model_class = 'App\Database';
 
   /**
+   * What relationships to grab with the model
+   * @var [type]
+   */
+  public $with = [
+    'applications',
+    'servers',
+    'people',
+    'tags',
+    'host'
+  ];
+
+  /**
    * Spawn a new instance of the controller
    */
   public function __construct()

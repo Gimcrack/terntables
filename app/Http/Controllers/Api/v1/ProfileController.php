@@ -49,6 +49,24 @@ class ProfileController extends ApiController
   }
 
   /**
+   * Display a listing of the resource in JSON format.
+   *
+   * @return Response
+   */
+  public function index()
+  {
+    $input = Input::all();
+    $model_class = $this->model_class;
+
+    $results = $model_class::with($this->with)->whereHas('person', function($query) {
+      $query->where('id', \Auth::user()->person->id );
+    })->paginate( $this->limitPerPage );
+
+    return response()->json( $results );
+  }
+
+
+  /**
    * Update the specified resource in storage.
    *
    * @param  \Illuminate\Http\Request  $request
@@ -57,12 +75,18 @@ class ProfileController extends ApiController
    */
   public function update(Request $request, $ids = null)
   {
-
     $input = Input::all();
+    $model_class = $this->model_class;
 
-    $user = Auth::user();
+    $model = $model_class::with($this->with)->whereHas('person', function($query) {
+      $query->where('id', \Auth::user()->person->id );
+    })->where('id', $ids)->first();
 
-    $user->update($input);
+    if ( ! $model->count() ) {
+      throw new ModelNotFoundException();
+    }
+
+    $model->update($input);
 
     return $this->operationSuccessful();
 

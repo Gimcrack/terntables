@@ -23,6 +23,7 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::get('{model}/_checkinAll',     'Api\v1\ApiController@checkinAll');
   Route::get('{model}/{id}/_checkout',  'Api\v1\ApiController@checkout');
   Route::get('{model}/{id}/_checkin',   'Api\v1\ApiController@checkin');
+  Route::get('{model}/{id}/_inspect',   'Api\v1\ApiController@inspect');
 
   Route::get('_checkinAll',             'Api\v1\ApiController@checkinAll');
   Route::get('_checkAccess/{role}',     'Api\v1\ApiController@checkAccess');
@@ -31,8 +32,10 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::get('AD/User/{id}', 'Api\v1\ActiveDirectoryController@show');
 
   //user routes
+  Route::get('Profile',                 'Api\v1\ProfileController@index');
+  Route::get('Profile/{id}',            'Api\v1\ProfileController@show');
   Route::patch('Profile/resetPassword', 'Api\v1\ProfileController@resetPassword');
-  Route::patch('Profile/',              'Api\v1\ProfileController@update');
+  Route::patch('Profile/{id}',          'Api\v1\ProfileController@update');
 
   // bi routes
   Route::delete('Server',           'Api\v1\ServerController@destroy');

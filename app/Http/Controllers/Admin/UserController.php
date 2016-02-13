@@ -27,6 +27,15 @@ class UserController extends Controller
   public $model_class = 'App\User';
 
   /**
+   * What relationships to grab with the model
+   * @var [type]
+   */
+  public $with = [
+    'groups.roles',
+    'person'
+  ];
+
+  /**
    * Spawn a new instance of the controller
    */
   public function __construct()

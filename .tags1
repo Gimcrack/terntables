@@ -4,3 +4,6 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
+Tag	\\webdev\Apache24\htdocs\dashboard-dev\app\Tag.php	/^class Tag extends BaseModel$/;"	class	line:7
+documents	\\webdev\Apache24\htdocs\dashboard-dev\app\Tag.php	/^  public function documents()$/;"	function	line:29
+resolveTags	\\webdev\Apache24\htdocs\dashboard-dev\app\Tag.php	/^  public static function resolveTags($taggable, $tags = [])$/;"	function	line:39

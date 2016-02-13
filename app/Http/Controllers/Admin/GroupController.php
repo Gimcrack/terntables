@@ -27,6 +27,15 @@ class GroupController extends Controller
   public $model_class = 'App\Group';
 
   /**
+   * What relationships to grab with the model
+   * @var [type]
+   */
+  public $with = [
+    'users',
+    'roles',
+  ];
+
+  /**
    * Spawn a new instance of the controller
    */
   public function __construct()
