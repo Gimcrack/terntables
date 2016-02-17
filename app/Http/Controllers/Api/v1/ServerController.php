@@ -32,6 +32,8 @@ class ServerController extends ApiController
     'databases',
     'people',
     'tags',
+    'owner',
+    'operatingSystem'
   ];
 
   /**

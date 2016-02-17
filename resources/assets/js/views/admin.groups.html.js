@@ -29,6 +29,14 @@
 		}
 	], fieldset_2__fields = [
 		{
+			name : 'servers',
+			type : 'select',
+			_label : 'What Servers belong to this group?',
+			_labelssource : 'Server.name',
+			_optionssource : 'Server.id',
+			multiple : true,
+		},
+		{
 			name : 'users',
 			type : 'array',
 			_label : 'What Users are in this Group?',
@@ -71,7 +79,8 @@
 				"name",
 				"description",
 				"users",
-				"roles"
+				"roles",
+				"servers",
 			],
 
 			headers : [ 				// headers for table
@@ -79,8 +88,16 @@
 				"Name",
 				"Description",
 				"Users",
-				"Roles"
+				"Roles",
+				"Servers"
 			],
+
+			templates : {
+				servers : function(arr) {
+					console.log('servers',arr);
+					return _.get('name',arr,'fa-server','Server');
+				}
+			}
 		},
 		[ // colparams
 			{ // fieldset

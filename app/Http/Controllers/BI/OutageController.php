@@ -6,37 +6,22 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Server;
-use Input;
 
-class ServerController extends Controller
+class OutageController extends Controller
 {
-
   /**
    * The associated views
    * @var [type]
    */
   public $views = array(
-    'index' => 'bi.servers.index'
+    'index' => 'bi.outages.index'
   );
 
   /**
    * The class of the model
    * @var string
    */
-  public $model_class = 'App\Server';
-
-  /**
-   * What relationships to grab with the model
-   * @var [type]
-   */
-  public $with = [
-    'applications',
-    'databases',
-    'people',
-    'tags',
-    'owner'
-  ];
+  public $model_class = 'App\Outage';
 
   /**
    * Spawn a new instance of the controller
@@ -46,5 +31,4 @@ class ServerController extends Controller
     $this->views = (object) $this->views;
     $this->middleware('auth');
   }
-
 }

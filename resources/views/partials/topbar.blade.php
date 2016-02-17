@@ -45,7 +45,7 @@
   			<i class="fa fa-user fa-fw"></i> {{ Auth::user()->username }} <i class="fa fa-caret-down"></i>
   		</a>
   		<ul class="dropdown-menu dropdown-admin-settings">
-        
+
         @if( Auth::user()->isAdmin() )
           <li class="menu-section-heading"> Admin Menu </li>
     			<li>
@@ -59,6 +59,9 @@
     			</li>
     			<li>
     				<a href="{{ url('admin/roles')}}" ><i class="fa fa-lock fa-fw"></i> Manage Roles</a>
+    			</li>
+    			<li>
+    				<a href="{{ url('admin/operatingSystems')}}" ><i class="fa fa-windows fa-fw"></i> Manage Operating Systems</a>
     			</li>
   			@endif
 

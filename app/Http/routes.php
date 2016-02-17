@@ -50,6 +50,14 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::patch('Application/_massUpdate', 'Api\v1\ApplicationController@markApplications');
   Route::resource('Application',          'Api\v1\ApplicationController');
 
+  Route::delete('Outage',           'Api\v1\OutageController@destroy');
+  Route::patch('Outage/_massUpdate', 'Api\v1\OutageController@markOutages');
+  Route::resource('Outage',          'Api\v1\OutageController');
+
+  Route::delete('OutageTask',             'Api\v1\OutageTaskController@destroy');
+  Route::patch('OutageTask/_massUpdate',  'Api\v1\OutageTaskController@markOutageTasks');
+  Route::resource('OutageTask',           'Api\v1\OutageTaskController');
+
   // gis routes
   Route::delete('Document',                 'Api\v1\DocumentController@destroyMany');
   Route::resource('Document',               'Api\v1\DocumentController');
@@ -68,6 +76,9 @@ Route::group(['prefix' => 'api/v1'], function() {
 
   Route::delete('Role',                 'Api\v1\RoleController@destroy');
   Route::resource('Role',               'Api\v1\RoleController');
+
+  Route::delete('OperatingSystem',                 'Api\v1\OperatingSystemController@destroy');
+  Route::resource('OperatingSystem',               'Api\v1\OperatingSystemController');
 });
 
 /**
@@ -78,6 +89,7 @@ Route::group(['prefix' => 'admin'], function(){
   Route::resource('users',  'Admin\UserController', [ 'only' => [ 'index','show'] ]);
   Route::resource('groups', 'Admin\GroupController', [ 'only' => [ 'index','show'] ]);
   Route::resource('roles',   'Admin\RoleController', [ 'only' => [ 'index','show'] ]);
+  Route::resource('operatingSystems',   'Admin\OperatingSystemController', [ 'only' => [ 'index','show'] ]);
 });
 
 /**
@@ -110,6 +122,8 @@ Route::group(['prefix' => 'admin'], function(){
    Route::resource('servers',       'BI\ServerController', [ 'only' => [ 'index','show'] ] );
    Route::resource('applications',  'BI\ApplicationController', [ 'only' => [ 'index', 'show'] ] );
    Route::resource('databases',     'BI\DatabaseController', [ 'only' => [ 'index', 'show'] ] );
+   Route::resource('outages',       'BI\OutageController', [ 'only' => [ 'index', 'show'] ] );
+   Route::resource('outageTasks',   'BI\OutageTaskController', [ 'only' => [ 'index', 'show'] ] );
  });
 
 //misc

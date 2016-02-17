@@ -23,7 +23,10 @@ class Server extends Model
       'ip',
       'inactive_flag',
       'production_flag',
+      'windows_updatable_flag',
       'last_windows_update',
+      'group_id',
+      'operating_system_id'
   ];
 
   /**
@@ -42,7 +45,7 @@ class Server extends Model
    */
   public function people()
   {
-    return $this->belongsToMany('App\Person')->withTimestamps();
+    return $this->belongsToMany('App\Person')->withTimestamps()->withPivot(['comment','contact_type']);
   }
 
   /**
@@ -52,7 +55,7 @@ class Server extends Model
    */
   public function applications()
   {
-    return $this->belongsToMany('App\Application')->withTimestamps();
+    return $this->belongsToMany('App\Application')->withTimestamps()->withPivot(['comment','server_type']);
   }
 
   /**
@@ -62,6 +65,26 @@ class Server extends Model
    */
   public function databases()
   {
-    return $this->belongsToMany('App\Database')->withTimestamps();
+    return $this->belongsToMany('App\Database')->withTimestamps()->withPivot(['comment','server_type']);
+  }
+
+  /**
+   * A server is managaed by one group
+   * @method owner
+   * @return [type] [description]
+   */
+  public function owner()
+  {
+    return $this->belongsTo('App\Group','group_id');
+  }
+
+  /**
+   * A server has one operating system
+   * @method owner
+   * @return [type] [description]
+   */
+  public function operatingSystem()
+  {
+    return $this->belongsTo('App\OperatingSystem','operating_system_id');
   }
 }

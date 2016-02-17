@@ -42,6 +42,15 @@ class User extends Model implements AuthenticatableContract,
     protected $hidden = ['password', 'remember_token'];
 
     /**
+     * The column that identifies the model
+     * @return [type] [description]
+     */
+    public function identifiableName()
+    {
+        return $this->name;
+    }
+
+    /**
      * A User may belong to one person
      * @return [type] [description]
      */

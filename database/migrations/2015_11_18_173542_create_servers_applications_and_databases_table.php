@@ -13,14 +13,25 @@ class CreateServersApplicationsAndDatabasesTable extends Migration
     public function up()
     {
       DB::transaction( function() {
+        Schema::create('operating_systems', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->unique();
+            $table->timestamps();
+        });
+
         Schema::create('servers', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
+            $table->unsignedInteger('group_id')->nullable();
+            $table->foreign('group_id')->references('id')->on('groups')->onDelete('SET NULL');
             $table->text('description')->nullable();
             $table->text('cname')->nullable();
             $table->string('ip')->unique();
+            $table->unsignedInteger('operating_system_id')->nullable();
+            $table->foreign('operating_system_id')->references('id')->on('operating_systems')->onDelete('SET NULL');
             $table->boolean('inactive_flag')->default(0);
             $table->boolean('production_flag')->default(1);
+            $table->boolean('windows_updatable_flag')->default(1);
             $table->date('last_windows_update')->nullable();
             $table->timestamps();
         });
@@ -56,6 +67,7 @@ class CreateServersApplicationsAndDatabasesTable extends Migration
             $table->unsignedInteger('server_id');
             $table->foreign('server_id')->references('id')->on('servers')->onDelete('cascade');
             $table->string('comment')->nullable();
+            $table->string('contact_type')->nullable();
             $table->timestamps();
         });
 
@@ -120,6 +132,11 @@ class CreateServersApplicationsAndDatabasesTable extends Migration
     public function down()
     {
       DB::transaction( function() {
+
+        Schema::table('servers', function(Blueprint $table) {
+          $table->dropForeign('servers_group_id_foreign');
+          $table->dropForeign('servers_operating_system_id_foreign');
+        });
 
         Schema::table('person_server', function(Blueprint $table) {
           $table->dropForeign('person_server_person_id_foreign');

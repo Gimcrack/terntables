@@ -34,7 +34,7 @@ class ApiController extends Controller
    * What relationships to grab with the model
    * @var [type]
    */
-  public $with;
+  public $with = [];
 
   /**
    * Many-To-Many Relationships to save
@@ -124,6 +124,7 @@ class ApiController extends Controller
         'Server'  => 'BI\ServerController',
         'Application' => 'BI\ApplicationController',
         'Database'    => 'BI\DatabaseController',
+        'Outage'      => 'BI\OutageController',
         'Document'    => 'GIS\DocumentController',
       ];
 

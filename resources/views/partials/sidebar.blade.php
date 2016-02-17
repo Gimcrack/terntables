@@ -42,6 +42,12 @@
           <li>
             <a href="{{ url('bi/databases') }}"><i class="fa fa-database fa-fw"></i> Databases</a>
           </li>
+          <li>
+            <a href="{{ url('bi/outages') }}"><i class="fa fa-power-off fa-fw"></i> Outages</a>
+          </li>
+          <li>
+            <a href="{{ url('bi/outageTasks') }}"><i class="fa fa-tasks fa-fw"></i> Outage Tasks</a>
+          </li>
         </ul>
       </li>
       @endif

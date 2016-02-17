@@ -1,39 +1,35 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\BI;
 
 use Illuminate\Http\Request;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Group;
-use Input;
 
-class GroupController extends Controller
+class OutageTaskController extends Controller
 {
-
-
   /**
    * The associated views
    * @var [type]
    */
   public $views = array(
-    'index' => 'admin.groups.index'
+    'index' => 'bi.outages.tasks'
   );
 
   /**
    * The class of the model
    * @var string
    */
-  public $model_class = 'App\Group';
+  public $model_class = 'App\OutageTask';
 
-  /**
-   * What relationships to grab with the model
-   * @var [type]
-   */
   public $with = [
-    'users',
-    'roles',
-    'servers'
+    'owner',
+    'outages',
+    'servers',
+    'applications',
+    'groups',
+    'people'
   ];
 
   /**
@@ -42,8 +38,6 @@ class GroupController extends Controller
   public function __construct()
   {
     $this->views = (object) $this->views;
-    $this->middleware('auth.admin');
-    //$this->checkAccessMiddleware();
+    $this->middleware('auth');
   }
-
 }

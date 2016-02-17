@@ -39357,9 +39357,17 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       callback = null;
     }
 
-    if (target != null) {
-      return _.map(target, function (row, i) {
+    if (typeof target !== 'undefined') {
+      if (target === null) return '';
+
+      var target_array = typeof target.push === 'function' ? target : [target];
+
+      return _.map(target_array, function (row, i) {
         var iconString = !!icon ? '<i class="fa fa-fw ' + icon + '"></i>' : '';
+
+        if (row[key] == null) {
+          return '';
+        }
 
         if (model != null) {
           return '<button style="padding:4px" class="btn btn-link btn-editOther" data-id="' + row.id + '" data-model="' + model + '">' + iconString + row[key] + '</button>';
@@ -39482,6 +39490,26 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         }
 
         return _.nameButton(r.name, 'fa-database') + flags.join(' ');
+      },
+
+      serverName: function serverName(value) {
+        var r = jApp.aG().currentRow,
+            flags = [],
+            cname = '';
+
+        if (r.cname != null && r.cname.trim() != '') {
+          cname = ' (' + r.cname + ') ';
+        }
+
+        if (+r.inactive_flag == 1) {
+          flags.push('<div class="label label-danger label-sm" style="margin:0 3px">Inactive</div>');
+        }
+
+        if (+r.production_flag == 1) {
+          flags.push('<div class="label label-primary label-sm" style="margin:0 3px">Prod</div>');
+        }
+
+        return _.nameButton(r.name.toUpperCase(), 'fa-server') + cname + flags.join(' ');
       },
 
       username: function username(value) {
@@ -39641,7 +39669,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
    * Debug mode, set to false to supress messages
    * @type {Boolean}
    */
-  debug: true,
+  debug: false,
 
   /**
    * Placeholder for the activeGrid object
@@ -46134,6 +46162,15 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
   }, // end fn
 
   /**
+   * Is the data
+   * @method function
+   * @return {[type]} [description]
+   */
+  isDataEmpty: function isDataEmpty(response) {
+    return typeof response.data === 'undefined' || typeof response.data.length === 'undefined' || response.data.length == 0;
+  }, // end fn
+
+  /**
    * Does the form exist
    * @param  {[type]} key [description]
    * @return {[type]}          [description]
@@ -46262,10 +46299,6 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         return jUtility.DOM.dataErrorHandler();
       }
 
-      if ($.isEmptyObject(response)) {
-        return jUtility.DOM.dataEmptyHandler();
-      }
-
       // init vars
       self = jApp.aG();
 
@@ -46277,11 +46310,14 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       // detect changes in data;
       self.dataGrid.delta = !$.isEmptyObject(self.dataGrid.data) ? jUtility.deltaData(self.dataGrid.data, responseData) : responseData;
 
-      // merge the changes into self.dataGrid.data
-      if (!!self.dataGrid.delta) {
-        self.dataGrid.data = responseData;
-      } else {
-        // abort if no changes in the data
+      self.dataGrid.data = responseData;
+
+      if (jUtility.isDataEmpty(response)) {
+        return jUtility.DOM.dataEmptyHandler();
+      }
+
+      // abort if no changes to the data
+      if (!self.dataGrid.delta) {
         return false;
       }
 
@@ -46533,6 +46569,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
     dataEmptyHandler: function dataEmptyHandler() {
       $('.table-cell.no-data').remove();
+      jApp.aG().$().find('.table-body .table-row').remove();
       $('<div/>', { class: 'table-cell no-data' }).html('<div class="alert alert-warning"> <i class="fa fa-fw fa-warning"></i> I did not find anything matching your query.</div>').appendTo(jApp.tbl().find('#tbl_grid_body'));
       jUtility.DOM.updateColWidths();
     }, // end fn
@@ -63177,6 +63214,14 @@ $(function() {
 		}
 	], fieldset_2__fields = [
 		{
+			name : 'servers',
+			type : 'select',
+			_label : 'What Servers belong to this group?',
+			_labelssource : 'Server.name',
+			_optionssource : 'Server.id',
+			multiple : true,
+		},
+		{
 			name : 'users',
 			type : 'array',
 			_label : 'What Users are in this Group?',
@@ -63219,7 +63264,8 @@ $(function() {
 				"name",
 				"description",
 				"users",
-				"roles"
+				"roles",
+				"servers",
 			],
 
 			headers : [ 				// headers for table
@@ -63227,8 +63273,16 @@ $(function() {
 				"Name",
 				"Description",
 				"Users",
-				"Roles"
+				"Roles",
+				"Servers"
 			],
+
+			templates : {
+				servers : function(arr) {
+					console.log('servers',arr);
+					return _.get('name',arr,'fa-server','Server');
+				}
+			}
 		},
 		[ // colparams
 			{ // fieldset
@@ -63245,6 +63299,71 @@ $(function() {
 	);
 
 })(jApp)
+
+/**
+ * outages.html.js
+ *
+ * outages view definition
+ */
+;(function(jApp) {
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			required : true,
+			_label : 'Enter the name of the Operating System.',
+			'data-validType' : 'Anything'
+		},
+		{
+			name : 'servers',
+      _label : 'What servers have this Operating System?',
+			type : 'select',
+			_optionssource : 'Server.id',
+			_labelssource : 'Server.name',
+      multiple : true
+		},
+	];
+
+	/**
+	 * Add the view
+	 */
+	jApp.addView('admin.operatingSystems',
+		{ // grid definition
+			model : 'OperatingSystem',
+			columnFriendly : 'name',
+			gridHeader : {
+				icon : 'fa-windows',
+				headerTitle : 'Manage Operating Systems',
+				helpText : "<strong>Note:</strong> Manage Operating Systems Here"
+			},
+			columns : [ 				// columns to query
+				"id",
+				"name",
+        "servers",
+			],
+			headers : [ 				// headers for table
+				"ID",
+				"Name",
+        "Servers"
+			],
+			templates : { 				// html template functions
+        servers : function(arr) {
+          return _.get('name',arr,'fa-server','Server')
+        }
+			},
+		},
+		[ // colparams
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-3',
+					fields : fieldset_1__fields
+				},
+		]
+	)
+})(jApp);
 
 /**
  * admin.contacts.html.js
@@ -64350,6 +64469,411 @@ $.extend(true, jApp.views, {
 });
 
 /**
+ * outages.html.js
+ *
+ * outages view definition
+ */
+;(function(jApp) {
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'outage_date',
+			required : true,
+			_label : 'Enter the date of the Outage.',
+			'data-validType' : 'date_gt_2016-01-01'
+		},
+		{
+			name : 'complete_flag',
+      _label : 'Is this Outage complete?',
+			type : 'select',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		},
+	];
+
+	/**
+	 * Add the view
+	 */
+	jApp.addView('outages',
+		{ // grid definition
+			model : 'Outage',
+			columnFriendly : 'name',
+			filter : 'complete_flag = 0',
+			gridHeader : {
+				icon : 'fa-power-off',
+				headerTitle : 'Manage Outages',
+				helpText : "<strong>Note:</strong> Manage Outage Dates Here"
+			},
+			tableBtns : {
+				custom : {
+					toggleInactive : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
+						label : 'Toggle Complete',
+						fn : 'toggleComplete',
+						'data-order' : 100
+					},
+				},
+			},
+			rowBtns : {
+				markSelected : [
+					{ label: 'Flag Selected Outage', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markOutage( { 'complete_flag' : 1} );
+						},
+						label : 'As Complete'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markOutage({ 'complete_flag' : 0})
+						},
+						label : 'As Not Complete'
+					},
+				]
+			},
+			columns : [ 				// columns to query
+				"id",
+				"outage_date",
+        "complete_flag",
+			],
+			headers : [ 				// headers for table
+				"ID",
+				"Outage Date",
+        "Complete?"
+			],
+			templates : { 				// html template functions
+        outage_date : function(val) {
+          return _.nameButton(val,'fa-power-off');
+        },
+
+        complete_flag : function(val) {
+          return _.getFlag(val,'Yes','No');
+        }
+			},
+			fn : {
+				/**
+				 * Mark selected applications as inactive/active
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				markOutage			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction(),
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
+
+				/**
+				 * Update the grid filter with the current values
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				updateGridFilter : function() {
+					var filter = [], temp = jApp.activeGrid.temp;
+
+					if (typeof temp.showComplete === 'undefined' || ! temp.showComplete) {
+						filter.push('complete_flag = 0');
+					}
+
+					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
+
+				}, // end fn
+
+				/**
+				 * Toggle inactive server visibility
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				toggleComplete : function( ) {
+					jApp.activeGrid.temp.showComplete = ( typeof jApp.activeGrid.temp.showComplete === 'undefined')
+						? true : !jApp.activeGrid.temp.showComplete;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+			}
+		},
+		[ // colparams
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-3',
+					fields : fieldset_1__fields
+				},
+		]
+	)
+})(jApp);
+
+/**
+ * outagetasks.html.js
+ *
+ * outage tasks view definition
+ */
+;(function(jApp) {
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			required : true,
+			_label : 'Enter a name for this Outage Task.',
+			'data-validType' : 'Anything'
+		},
+		{
+			name : 'description',
+			type : 'textarea',
+			_label : 'Description',
+		},
+		{
+			name : 'task_type',
+			_label : 'Task Type',
+			type : 'select',
+			_optionssource : [
+				'-Choose-',
+				'Server Task',
+				'Application Task',
+				'Database Task',
+				'Other'
+			],
+			required : true,
+			'data-validType' : 'select'
+		},
+		{
+			name : 'inactive_flag',
+			_label : 'Is this Task inactive?',
+			type : 'select',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		}
+	], fieldset_2__fields = [
+		{
+			name : 'group_id',
+			_label : 'What Group "owns" this Task?',
+			type : 'select',
+			required : true,
+			'data-validType' : 'select',
+			_firstlabel : '-Choose-',
+			_firstoption : -1,
+			_optionssource : 'Group.id',
+			_labelssource : 'Group.name',
+		},
+		{
+			name : 'outages',
+			type : 'select',
+			_label : 'What Outages should this task be assigned to?',
+			_labelssource : 'Outage.outage_date',
+			_optionssource : 'Outage.id',
+			multiple : true
+		},
+	], fieldset_3__fields = [
+		{
+			name : 'people',
+			type : 'select',
+			_label : 'This task may be assigned to these people.',
+			_labelssource : 'Person.name',
+			_optionssource : 'Person.id',
+			multiple : true
+		},
+		{
+			name : 'servers',
+			type : 'select',
+			_label : 'This task may be performed on these servers.',
+			_labelssource : 'Server.name',
+			_optionssource : 'Server.id',
+			multiple : true
+		},
+		{
+			name : 'applications',
+			type : 'select',
+			_label : 'This task may be performed on these applications.',
+			_labelssource : 'Application.name',
+			_optionssource : 'Application.id',
+			multiple : true
+		},
+		{
+			name : 'databases',
+			type : 'select',
+			_label : 'This task may be performed on these databases.',
+			_labelssource : 'Database.name',
+			_optionssource : 'Database.id',
+			multiple : true
+		},
+		{
+			name : 'groups',
+			type : 'select',
+			_label : 'This task may be performed on objects owned by these groups.',
+			_labelssource : 'Group.name',
+			_optionssource : 'Group.id',
+			multiple : true
+		},
+		{
+			name : 'operatingSystems',
+			type : 'select',
+			_label : 'This task may be performed on servers with these operating systems.',
+			_labelssource : 'OperatingSystem.name',
+			_optionssource : 'OperatingSystem.id',
+			multiple : true
+		},
+	];
+
+	/**
+	 * Add the view
+	 */
+	jApp.addView('outageTasks',
+		{ // grid definition
+			model : 'OutageTask',
+			filter : 'inactive_flag = 0',
+			columnFriendly : 'name',
+			gridHeader : {
+				icon : 'fa-tasks',
+				headerTitle : 'Manage Outage Tasks',
+				helpText : "<strong>Note:</strong> Manage Outage Tasks Here"
+			},
+			tableBtns : {
+				custom : {
+					toggleInactive : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
+						label : 'Toggle Inactive',
+						fn : 'toggleInactive',
+						'data-order' : 100
+					},
+				},
+			},
+			rowBtns : {
+				markSelected : [
+					{ label: 'Flag Selected Outage Task', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markOutageTask( { 'inactive_flag' : 1} );
+						},
+						label : 'As Inactive'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markOutageTask({ 'inactive_flag' : 0})
+						},
+						label : 'As Not Inactive'
+					},
+				]
+			},
+			columns : [ 				// columns to query
+				"id",
+				"name",
+        "owner",
+				"task_type",
+				"inactive_flag"
+			],
+			headers : [ 				// headers for table
+				"ID",
+				"Task name",
+        "Owner",
+				"Task Type",
+				"Inactive?"
+			],
+			templates : { 				// html template functions
+
+        inactive_flag : function(val) {
+          return _.getFlag(val,'Yes','No');
+        }
+			},
+			fn : {
+				/**
+				 * Mark selected applications as inactive/active
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				markOutageTask			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction(),
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
+
+				/**
+				 * Update the grid filter with the current values
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				updateGridFilter : function() {
+					var filter = [], temp = jApp.activeGrid.temp;
+
+					if (typeof temp.showInactive === 'undefined' || ! temp.showInactive) {
+						filter.push('inactive_flag = 0');
+					}
+
+					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
+
+				}, // end fn
+
+				/**
+				 * Toggle inactive server visibility
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				toggleInactive : function( ) {
+					jApp.activeGrid.temp.showInactive = ( typeof jApp.activeGrid.temp.showInactive === 'undefined')
+						? true : !jApp.activeGrid.temp.showInactive;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+			}
+		},
+		[ // colparams
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-3',
+					fields : fieldset_1__fields
+				},
+				{ // fieldset
+					label : '',
+					helpText : '',
+					class : 'col-lg-4',
+					fields : fieldset_2__fields
+				},
+				{ // fieldset
+					label : 'Task Scope',
+					helpText : 'You may optionally limit the scope that this task will apply to.',
+					class : 'col-lg-5',
+					fields : fieldset_3__fields
+				},
+		]
+	)
+})(jApp);
+
+/**
  * admin.groups.html.js
  *
  * admin.groups view definition
@@ -64459,228 +64983,399 @@ $.extend(true, jApp.views, {
 
 })(jApp)
 
-// extend the application views
-$.extend( true, jApp.views, {
+/**
+ * servers.html.js
+ *
+ * servers view definition
+ */
+;(function(jApp) {
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			placeholder : 'e.g. msb01sql',
+			required : true,
+			_label : 'Enter the Server hostname',
+			'data-validType' : 'Anything'
+		},
+		{
+			name : 'description',
+			type : 'textarea',
+			_label : 'Description',
+		},
+		{
+			name : 'cname',
+			type : 'textarea',
+			_label : 'Enter any CNAME(s) (aliases) for this server.',
+		},
+		{
+			name : 'ip',
+			_label : 'IP Address',
+			required : true,
+			'data-validType' : 'IPV4'
+		},
 
-	servers : function() {
+	],
 
-		$.extend( true, jApp.oG, {
+	fieldset_2__fields = [
+		{
+			name : 'group_id',
+			_label : 'What Group "owns" this Server?',
+			type : 'select',
+			required : true,
+			'data-validType' : 'select',
+			_firstlabel : '-Choose-',
+			_firstoption : -1,
+			_optionssource : 'Group.id',
+			_labelssource : 'Group.name',
+		},
+		{
+			name : 'inactive_flag',
+			_label : 'Is this server inactive?',
+			type : 'select',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		},
+		{
+			name : 'production_flag',
+			_label : 'Is this a production server?',
+			type : 'select',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		},
+		{
+			name : 'windows_updatable_flag',
+			_label : 'Does this server require Windows Updates?',
+			type : 'select',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		},
+		{
+			name : 'operating_system',
+			_label : 'Operating System',
+			type : 'select',
+			required : true,
+			'data-validType' : 'select',
+			_optionssource : [
+				'-Unspecified-',
+				'Windows Server 2012 R2',
+				'Windows Server 2008 R2',
+				'Windows Server 2003',
+				'Linux',
+				'Other (Non-Windows)'
+			],
+		},
+	],
 
-			servers : new jGrid({
-				table : 'servers',
-				model : 'Server',
-				columnFriendly : 'name',
-				gridHeader : {
-					icon : 'fa-server',
-					headerTitle : 'Manage Servers',
-					helpText : "<strong>Note:</strong> Manage Servers Here"
-				},
-				tableBtns : {
-					custom : {
-						toggleInactive : {
-	            type : 'button',
-	            class : 'btn btn-success active btn-toggle',
-	            icon : 'fa-toggle-on',
-	            label : 'Toggle Inactive',
-							fn : 'toggleInactive',
-							'data-order' : 100
-	          },
-						toggleNonProd: {
-	            type : 'button',
-	            class : 'btn btn-success active btn-toggle',
-	            icon : 'fa-toggle-on',
-	            label : 'Toggle Non-Production',
-							fn : 'toggleNonProd',
-							'data-order' : 101
-	          },
+	fieldset_3__fields = [
+		{
+			name : 'people',
+			type : 'array',
+			_label : 'Server Contacts',
+			fields : [
+				{
+					name : 'people',
+					type : 'select',
+					_label : 'Select Contacts',
+					_labelssource : 'Person.name',
+					_optionssource : 'Person.id',
+					multiple : true
+				}, {
+					name : 'contact_type',
+					type : 'select',
+					_optionssource : [
+						'Primary',
+						'Secondary',
+						'Other',
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'servers',
+			type : 'array',
+			_label : 'Server Applications',
+			fields : [
+				{
+					name : 'applicattions',
+					type : 'select',
+					_label : 'Select Applications',
+					_labelssource : 'Application.name',
+					_optionssource : 'Application.id',
+					multiple : true
+				}, {
+					name : 'server_type',
+					type : 'select',
+					_optionssource : [
+						'-Select Server Type-',
+						'Primary Application Server',
+						'Secondary Application Server',
+						'Primary Database Server',
+						'Secondary Database Server',
+						'Primary Report Server',
+						'Secondary Report Server',
+						'Primary Web Server',
+						'Secondary Web Server',
+						'Primary DR Server',
+						'Secondary DR Server',
+						'Test Application Server',
+						'Test Report Server',
+						'Test Database Server',
+						'Test Web Server',
+						'Other'
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'databases',
+			type : 'array',
+			_label : 'Server Databases',
+			fields : [
+				{
+					name : 'databases',
+					type : 'select',
+					_label : 'Select Databases',
+					_labelssource : 'Database.hostname,name',
+					_optionssource : 'Database.id',
+					multiple : true
+				}, {
+					name : 'server_type',
+					type : 'select',
+					_optionssource : [
+						'-Select Server Type-',
+						'Primary Application Server',
+						'Secondary Application Server',
+						'Primary Database Server',
+						'Secondary Database Server',
+						'Primary Report Server',
+						'Secondary Report Server',
+						'Primary Web Server',
+						'Secondary Web Server',
+						'Primary DR Server',
+						'Secondary DR Server',
+						'Test Application Server',
+						'Test Report Server',
+						'Test Database Server',
+						'Test Web Server',
+						'Other'
+					],
+					'data-no-bsms' : true
+				}
+			]
+		},
+		{
+			name : 'tags[]',
+			multiple : true,
+			type : 'tokens',
+			_label : 'Tags',
+			_labelssource : 'Tag.name',
+			_optionssource : 'Tag.id',
+		}
+	];
+
+	/**
+	 * Add the view
+	 */
+	jApp.addView('servers',
+		{ // grid definition
+			model : 'Server',
+			columnFriendly : 'name',
+			gridHeader : {
+				icon : 'fa-server',
+				headerTitle : 'Manage Servers',
+				helpText : "<strong>Note:</strong> Manage Servers Here"
+			},
+			tableBtns : {
+				custom : {
+					toggleInactive : {
+						type : 'button',
+						class : 'btn btn-success active btn-toggle',
+						icon : 'fa-toggle-on',
+						label : 'Toggle Inactive',
+						fn : 'toggleInactive',
+						'data-order' : 100
+					},
+					toggleProduction : {
+						type : 'button',
+						class : 'btn btn-success active btn-toggle',
+						icon : 'fa-toggle-on',
+						label : 'Toggle Non-Production',
+						fn : 'toggleNonProd',
+						'data-order' : 100
 					},
 				},
-				rowBtns : {
-					markSelected : [
-						{ label: 'Flag Selected Servers', class: 'btn btn-primary', icon : 'fa-check-square-o' },
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
-									e.preventDefault();
-									jApp.activeGrid.fn.markServer( { 'inactive_flag' : 1} );
-							},
-							label : 'As Inactive'
-						},
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
+			},
+			rowBtns : {
+				markSelected : [
+					{ label: 'Flag Selected Servers', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
 								e.preventDefault();
-								jApp.activeGrid.fn.markServer({ 'inactive_flag' : 0})
-							},
-							label : 'As Not Inactive'
+								jApp.activeGrid.fn.markServer( { 'inactive_flag' : 1} );
 						},
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
-								e.preventDefault();
-								jApp.activeGrid.fn.markServer({ 'production_flag' : 1})
-							},
-							label : 'As Production'
+						label : 'As Inactive'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'inactive_flag' : 0})
 						},
-						{
-							'data-multiple' : true,
-							'data-permission' : 'update_enabled',
-							type : 'button',
-							fn : function(e) {
-								e.preventDefault();
-								jApp.activeGrid.fn.markServer({ 'production_flag' : 0})
-							},
-							label : 'As Not Production'
-						}
-					]
+						label : 'As Not Inactive'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'production_flag' : 1})
+						},
+						label : 'As Production'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'production_flag' : 0})
+						},
+						label : 'As Not Production'
+					}
+				]
+			},
+			columns : [ 				// columns to query
+				"id",
+				"serverName",
+				"owner_name",
+				//"description",
+				"people",
+				"applications",
+				"databases",
+				'tags',
+			],
+			headers : [ 				// headers for table
+				"ID",
+				"Name",
+				"Owner",
+				//"Description",
+				"Contacts",
+				"Applications",
+				"Databases",
+				"Tags"
+			],
+			templates : { 				// html template functions
+
+				owner_name : function(val) {
+					var r = jApp.activeGrid.currentRow;
+					return _.get('name', r.owner, 'fa-users','Group');
 				},
-				columns : [ 				// columns to query
-					"id",
-					"name",
-					"description",
-					"ip",
-					"people",
-					"applications",
-					'tags',
-				],
-				hidCols : [					// columns to hide
 
-				],
-				headers : [ 				// headers for table
-					"ID",
-					"Hostname (CNAME)",
-					"Description",
-					"IP Address",
-					"Contacts",
-					"Applications",
-					"Tags"
-				],
-				templates : { 				// html template functions
+				applications : function(arr) {
+					return _.get('name', arr, 'fa-windows', 'Application');
+				},
 
-					"id" : function(value) {
-						return ('0000' + value).slice(-4);
-					},
+				databases : function(arr) {
+					return _.get('name', arr, 'fa-database', 'Database');
+				},
 
-					"production_flag" : function(value) {
-						return ( +value == 1 ) ?
-							'<span style="margin:3px;" class="label label-primary">Production</span>' :
-							'<span style="margin:3px;" class="label label-success">Test/Dev</span>';
-					},
+			},
+			fn : {
+				/**
+				 * Mark selected applications as inactive/active
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				markServer			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction(),
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
 
-					"name" : function(value) {
-						var r = jApp.aG().currentRow, flags = [], cname = '';
+				/**
+				 * Update the grid filter with the current values
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				updateGridFilter : function() {
+					var filter = [], temp = jApp.activeGrid.temp;
 
-						if (r.cname != null && r.cname.trim() != '') {
-							cname = ' (' + r.cname + ')';
-						}
-
-						if ( +r.inactive_flag == 1 ) {
-							flags.push('<div class="label label-danger label-sm" style="margin-right:3px">Inactive</div>');
-						}
-
-						if ( +r.production_flag == 1 ) {
-							flags.push('<div class="label label-primary label-sm" style="margin-right:3px">Prod</div>');
-						}
-
-						return flags.join(' ') + value.toUpperCase().link( window.location.href.trim('/') + '/' + r.id ) + cname;
-					},
-
-					"tags" : function() {
-						var r = jApp.aG().currentRow;
-						return _.pluck( r.tags, 'name').map( function(val) {
-							return '<span style="margin:3px;" class="label label-default">' + val + '</span>';
-						}).join('');
-					},
-
-					"applications" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
-					},
-
-					"people" : function(arr) {
-						return _.pluck(arr, 'name').join(', ');
-					},
-
-					"created_at" : function(value) {
-						return date('Y-m-d', strtotime(value));
-					},
-
-					"updated_at" : function(value) {
-						return date('Y-m-d', strtotime(value));
+					if (typeof temp.hideInactive !== 'undefined' && !!temp.hideInactive) {
+						filter.push('inactive_flag = 0');
 					}
 
+					if (typeof temp.hideNonProd !== 'undefined' && !!temp.hideNonProd) {
+						filter.push('production_flag = 1');
+					}
+
+					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
+
+				}, // end fn
+
+				/**
+				 * Toggle inactive server visibility
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				toggleInactive : function( ) {
+					jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
+						? true : !jApp.activeGrid.temp.hideInactive;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+
+				/**
+				 * Toggle inactive server visibility
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				toggleNonProd : function( ) {
+					jApp.activeGrid.temp.hideNonProd = ( typeof jApp.activeGrid.temp.hideNonProd === 'undefined')
+						? true : !jApp.activeGrid.temp.hideNonProd;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+			}
+		},
+		[ // colparams
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-3',
+					fields : fieldset_1__fields
 				},
-				fn : {
-					/**
-					 * Mark selected servers as inactive
-					 * @method function
-					 * @return {[type]} [description]
-					 */
-					markServer			: function( atts ) {
-						jApp.aG().action = 'withSelectedUpdate';
-						jUtility.withSelected('custom', function(ids) {
-							jUtility.postJSON( {
-                url : jUtility.getCurrentFormAction(),
-                success : jUtility.callback.submitCurrentForm,
-                data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
-              });
-						});
-					}, // end fn
 
-					/**
-					 * Update the grid filter with the current values
-					 * @method function
-					 * @return {[type]} [description]
-					 */
-					updateGridFilter : function() {
-						var filter = [], temp = jApp.activeGrid.temp;
+				{ // fieldset
+					label : ' ',
+					class : 'col-lg-4',
+					fields : fieldset_2__fields
+				},
 
-						if (typeof temp.hideInactive !== 'undefined' && !!temp.hideInactive) {
-							filter.push('inactive_flag = 0');
-						}
-
-						if (typeof temp.hideNonProd !== 'undefined' && !!temp.hideNonProd) {
-							filter.push('production_flag = 1');
-						}
-
-						jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
-
-					}, // end fn
-
-					/**
-					 * Toggle inactive server visibility
-					 * @method function
-					 * @return {[type]} [description]
-					 */
-					toggleInactive : function( ) {
-						jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
-							? true : !jApp.activeGrid.temp.hideInactive;
-						jApp.activeGrid.fn.updateGridFilter();
-						jUtility.executeGridDataRequest();
-						$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
-					}, //end fn
-
-					/**
-					 * Toggle non-production server visibility
-					 * @method function
-					 * @return {[type]} [description]
-					 */
-					toggleNonProd : function( ) {
-						jApp.activeGrid.temp.hideNonProd = ( typeof jApp.activeGrid.temp.hideNonProd === 'undefined')
-							? true : !jApp.activeGrid.temp.hideNonProd;
-						jApp.activeGrid.fn.updateGridFilter();
-						jUtility.executeGridDataRequest();
-						$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
-					}, //end fn
-				}
-			})
-		})
-	}
-});
+				{ // fieldset
+					label : ' ',
+					class : 'col-lg-5',
+					fields : fieldset_3__fields
+				},
+		]
+	)
+})(jApp);
 
 //# sourceMappingURL=all.js.map

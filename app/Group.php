@@ -40,4 +40,14 @@ class Group extends Model
   {
     return $this->belongsToMany('App\Role')->withTimestamps();
   }
+
+  /**
+   * A groups can own many servers
+   * @method servers
+   * @return [type]  [description]
+   */
+  public function servers()
+  {
+    return $this->hasMany('App\Server');
+  }
 }

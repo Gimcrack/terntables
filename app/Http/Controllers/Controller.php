@@ -57,7 +57,7 @@ abstract class Controller extends BaseController
         $attributes = $model->attributesForHumans();
         $history = $this->getHistory($model);
 
-        $name = $model->name ?: $model->username;
+        $name = $model->identifiableName();
 
         return view('pages.inspect', compact('name','model','attributes','history'));
     }

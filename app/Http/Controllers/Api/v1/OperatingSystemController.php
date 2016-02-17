@@ -5,41 +5,29 @@ namespace App\Http\Controllers\Api\v1;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Controllers\Api\v1\ApiController;
+use App\Http\Controllers\Controller;
 use Input;
 
-class GroupController extends ApiController
+class OperatingSystemController extends ApiController
 {
-
   /**
    * The class name of the associated model
    * @var string
    */
-  public $model_class = 'App\Group';
+  public $model_class = 'App\OperatingSystem';
 
   /**
    * [$model_short description]
    * @var string
    */
-  public $model_short = 'Group';
+  public $model_short = 'OperatingSystem';
 
   /**
    * What relationships to grab with the model
    * @var [type]
    */
   public $with = [
-    'users',
-    'roles',
     'servers'
-  ];
-
-  /**
-   * What relationships to save with the model
-   * @var [type]
-   */
-  public $relations = [
-    'users',
-    'roles'
   ];
 
   /**
@@ -50,8 +38,8 @@ class GroupController extends ApiController
     [
       'key' => 'servers',
       'model' => 'App\Server',
-      'foreign_key' => 'group_id',
-      'reset' => [ 'group_id' => null ]
+      'foreign_key' => 'operating_system_id',
+      'reset' => [ 'operating_system_id' => null ]
     ]
   ];
 
@@ -60,8 +48,6 @@ class GroupController extends ApiController
    */
   public function __construct()
   {
-    $this->middleware('auth.admin');
-    $this->checkAccessMiddleware();
+    $this->middleware('auth');
   }
-
 }

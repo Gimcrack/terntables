@@ -38,7 +38,7 @@ class Tag extends BaseModel
    */
   public static function resolveTags($taggable, $tags = [])
   {
-    if (is_string($tags)){
+    if ( is_string($tags) ){
       $tags = explode(",",$tags);
     }
     if ( empty($tags) ) {
@@ -47,7 +47,9 @@ class Tag extends BaseModel
 
     $newTagList = [];
     foreach($tags as $tagName) {
-      $tag = Tag::where('name',$tagName)->first() ?: Tag::create(['name' => $tagName]);
+      if (empty($tagName)) continue;
+      $tagName = trim($tagName);
+      $tag = Tag::where('name', $tagName )->first() ?: Tag::create(['name' => $tagName]);
       $newTagList[] = $tag->id;
     }
 
