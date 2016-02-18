@@ -24,11 +24,14 @@ class OutageTaskController extends ApiController
 
   public $with = [
     'owner',
-    'outages',
-    'servers',
-    'applications',
-    'groups',
-    'people'
+    'scope_to_outages',
+    'assign_to_groups',
+    'assign_to_people',
+    'scope_to_servers',
+    'scope_to_applications',
+    'scope_to_groups',
+    'scope_to_operating_systems',
+    'scope_to_databases',
   ];
 
   /**
@@ -36,13 +39,16 @@ class OutageTaskController extends ApiController
    * @var [type]
    */
   public $relations = [
-    'outages',
-    'servers',
-    'applications',
-    'groups',
-    'people'
+    'scope_to_outages',
+    'assign_to_groups',
+    'assign_to_people',
+    'scope_to_servers',
+    'scope_to_applications',
+    'scope_to_groups',
+    'scope_to_operating_systems',
+    'scope_to_databases'
   ];
-  
+
   /**
    * Spawn a new instance of the controller
    */

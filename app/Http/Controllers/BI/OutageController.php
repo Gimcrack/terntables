@@ -23,6 +23,10 @@ class OutageController extends Controller
    */
   public $model_class = 'App\Outage';
 
+  public $with = [
+    'tasks'
+  ];
+
   /**
    * Spawn a new instance of the controller
    */

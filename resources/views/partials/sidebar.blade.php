@@ -37,7 +37,7 @@
             <a href="{{ url('bi/servers') }}"><i class="fa fa-server fa-fw"></i> Servers</a>
           </li>
           <li>
-            <a href="{{ url('bi/applications') }}"><i class="fa fa-windows fa-fw"></i> Applications</a>
+            <a href="{{ url('bi/applications') }}"><i class="fa fa-cubes fa-fw"></i> Applications</a>
           </li>
           <li>
             <a href="{{ url('bi/databases') }}"><i class="fa fa-database fa-fw"></i> Databases</a>
@@ -46,7 +46,10 @@
             <a href="{{ url('bi/outages') }}"><i class="fa fa-power-off fa-fw"></i> Outages</a>
           </li>
           <li>
-            <a href="{{ url('bi/outageTasks') }}"><i class="fa fa-tasks fa-fw"></i> Outage Tasks</a>
+            <a href="{{ url('bi/outageTasks') }}"><i class="fa fa-tasks fa-fw"></i>Outage Tasks</a>
+          </li>
+          <li>
+            <a href="{{ url('bi/taskTemplates') }}"><i class="fa fa-tasks fa-fw"></i>Task Templates</a>
           </li>
         </ul>
       </li>

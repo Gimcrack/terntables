@@ -22,6 +22,14 @@ class OutageController extends ApiController
    */
   public $model_short = 'Outage';
 
+  public $with = [
+    'tasks'
+  ];
+
+  public $relations = [
+    'tasks'
+  ];
+
   /**
    * Spawn a new instance of the controller
    */

@@ -132,7 +132,7 @@
 			model : 'Application',
 			columnFriendly : 'name',
 			gridHeader : {
-				icon : 'fa-windows',
+				icon : 'fa-cubes',
 				headerTitle : 'Manage Applications',
 				helpText : "<strong>Note:</strong> Manage Applications Here"
 			},
@@ -200,7 +200,7 @@
 						label = '<div class="label-sm label label-warning">Inactive</div> ';
 					}
 
-					return label + _.nameButton( value, 'fa-windows' );
+					return label + _.nameButton( value, 'fa-cubes' );
 				},
 
 				"servers" : function(arr) {

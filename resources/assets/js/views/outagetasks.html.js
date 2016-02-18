@@ -11,7 +11,7 @@
 		{
 			name : 'name',
 			required : true,
-			_label : 'Enter a name for this Outage Task.',
+			_label : 'Enter a name for this Task.',
 			'data-validType' : 'Anything'
 		},
 		{
@@ -34,14 +34,6 @@
 			'data-validType' : 'select'
 		},
 		{
-			name : 'inactive_flag',
-			_label : 'Is this Task inactive?',
-			type : 'select',
-			_optionssource : ['0','1'],
-			_labelssource : ['No','Yes'],
-		}
-	], fieldset_2__fields = [
-		{
 			name : 'group_id',
 			_label : 'What Group "owns" this Task?',
 			type : 'select',
@@ -53,16 +45,23 @@
 			_labelssource : 'Group.name',
 		},
 		{
-			name : 'outages',
+			name : 'inactive_flag',
+			_label : 'Is this Task inactive?',
+			type : 'select',
+			_optionssource : ['0','1'],
+			_labelssource : ['No','Yes'],
+		},
+		{
+			name : 'scope_to_outages',
 			type : 'select',
 			_label : 'What Outages should this task be assigned to?',
 			_labelssource : 'Outage.outage_date',
 			_optionssource : 'Outage.id',
 			multiple : true
-		},
-	], fieldset_3__fields = [
+		}
+	], fieldset_2__fields = [
 		{
-			name : 'people',
+			name : 'assign_to_people',
 			type : 'select',
 			_label : 'This task may be assigned to these people.',
 			_labelssource : 'Person.name',
@@ -70,44 +69,59 @@
 			multiple : true
 		},
 		{
-			name : 'servers',
+			name : 'assign_to_groups',
 			type : 'select',
-			_label : 'This task may be performed on these servers.',
-			_labelssource : 'Server.name',
-			_optionssource : 'Server.id',
-			multiple : true
-		},
-		{
-			name : 'applications',
-			type : 'select',
-			_label : 'This task may be performed on these applications.',
-			_labelssource : 'Application.name',
-			_optionssource : 'Application.id',
-			multiple : true
-		},
-		{
-			name : 'databases',
-			type : 'select',
-			_label : 'This task may be performed on these databases.',
-			_labelssource : 'Database.name',
-			_optionssource : 'Database.id',
-			multiple : true
-		},
-		{
-			name : 'groups',
-			type : 'select',
-			_label : 'This task may be performed on objects owned by these groups.',
+			_label : 'This task may be assigned to members of these groups.',
 			_labelssource : 'Group.name',
 			_optionssource : 'Group.id',
 			multiple : true
 		},
 		{
-			name : 'operatingSystems',
+			name : 'scope_to_servers',
 			type : 'select',
-			_label : 'This task may be performed on servers with these operating systems.',
+			_label : 'This task will be performed on these servers.',
+			_labelssource : 'Server.name',
+			_optionssource : 'Server.id',
+			multiple : true
+		},
+		{
+			name : 'scope_to_applications',
+			type : 'select',
+			_label : 'This task will be performed on these applications.',
+			_labelssource : 'Application.name',
+			_optionssource : 'Application.id',
+			multiple : true
+		},
+		{
+			name : 'scope_to_databases',
+			type : 'select',
+			_label : 'This task will be performed on these databases.',
+			_labelssource : 'Database.name',
+			_optionssource : 'Database.id',
+			multiple : true
+		},
+		{
+			name : 'scope_to_groups',
+			type : 'select',
+			_label : 'This task will be performed on Servers/Applications/Databases owned by these groups.',
+			_labelssource : 'Group.name',
+			_optionssource : 'Group.id',
+			multiple : true
+		},
+		{
+			name : 'scope_to_operating_systems',
+			type : 'select',
+			_label : 'This task will be limited to servers with these operating systems.',
 			_labelssource : 'OperatingSystem.name',
 			_optionssource : 'OperatingSystem.id',
 			multiple : true
+		},
+		{
+			name : 'scope_to_production_servers',
+			type : 'select',
+			_label : 'This task will be limited to the selected server types.',
+			_labelssource : [ '-All-','Production Only','Non-Production Only' ],
+			_optionssource : ['0','1','2'],
 		},
 	];
 
@@ -118,11 +132,15 @@
 		{ // grid definition
 			model : 'OutageTask',
 			filter : 'inactive_flag = 0',
+			toggles : {
+				ellipses : false
+			},
+			model_display : 'Template',
 			columnFriendly : 'name',
 			gridHeader : {
 				icon : 'fa-tasks',
-				headerTitle : 'Manage Outage Tasks',
-				helpText : "<strong>Note:</strong> Manage Outage Tasks Here"
+				headerTitle : 'Manage Outage Tasks Templates',
+				helpText : "<strong>Note:</strong> Manage Outage Task Templates Here"
 			},
 			tableBtns : {
 				custom : {
@@ -166,20 +184,99 @@
 				"name",
         "owner",
 				"task_type",
-				"inactive_flag"
+				"inactive_flag",
+				"scope"
 			],
 			headers : [ 				// headers for table
 				"ID",
-				"Task name",
+				"Task Name",
         "Owner",
 				"Task Type",
-				"Inactive?"
+				"Inactive?",
+				"Scope"
 			],
 			templates : { 				// html template functions
 
         inactive_flag : function(val) {
           return _.getFlag(val,'Yes','No');
-        }
+        },
+
+				owner : function(val) {
+					return _.get('name',val,'fa-users','Group');
+				},
+
+				scope : function() {
+					var r = jApp.activeGrid.currentRow,
+							ret = ['<table class="table-striped">'];
+
+					if ( !! r.assign_to_groups && !!r.assign_to_groups.length ) {
+						ret.push('<tr>');
+						ret.push('<td>Assignable Groups</td>');
+						ret.push('<td>' +  _.get('name',r.assign_to_groups,'fa-users','Group') + '</td>' );
+						ret.push('</tr>');
+					}
+
+					if ( !! r.assign_to_people && !!r.assign_to_people.length ) {
+						ret.push('<tr>');
+						ret.push('<td>Assignable People</td>');
+						ret.push('<td>' +  _.get('name',r.assign_to_people,'fa-male','Person') + '</td>' );
+						ret.push('</tr>');
+					}
+
+					if ( !! r.scope_to_outages && !!r.scope_to_outages.length ) {
+						ret.push('<tr>');
+						ret.push('<td>Outages</td>');
+						ret.push('<td>' +  _.get('outage_date',r.scope_to_outages,'fa-power-off','Outage') + '</td>' );
+						ret.push('</tr>');
+					}
+
+					if ( !! r.scope_to_servers && !!r.scope_to_servers.length ) {
+						ret.push('<tr>');
+						ret.push('<td>Servers</td>');
+						ret.push('<td>' +  _.get('name',r.scope_to_servers,'fa-server','Server') + '</td>' );
+						ret.push('</tr>');
+					}
+
+					if ( !! r.scope_to_applications && !!r.scope_to_applications.length ) {
+						ret.push('<tr>');
+						ret.push('<td>Applications</td>');
+						ret.push('<td>' +  _.get('name',r.scope_to_applications,'fa-cubes','Application') + '</td>' );
+						ret.push('</tr>');
+					}
+
+					if ( !! r.scope_to_databases && !!r.scope_to_databases.length ) {
+						ret.push('<tr>');
+						ret.push('<td>Databases</td>');
+						ret.push('<td>' +  _.get('name',r.scope_to_databases,'fa-database','Database') + '</td>' );
+						ret.push('</tr>');
+					}
+
+					if ( !! r.scope_to_operating_systems && !!r.scope_to_operating_systems.length ) {
+						ret.push('<tr>');
+						ret.push('<td>Operating Systems</td>');
+						ret.push('<td>' +  _.get('name',r.scope_to_operating_systems,'fa-windows','OperatingSystem') + '</td>' );
+						ret.push('</tr>');
+					}
+
+					if ( !! r.scope_to_groups && !!r.scope_to_groups.length ) {
+						ret.push('<tr>');
+						ret.push('<td>Objects Owned By Groups</td>');
+						ret.push('<td>' +  _.get('name',r.scope_to_groups,'fa-users','Group') + '</td>' );
+						ret.push('</tr>');
+					}
+
+					if ( !! r.scope_to_production_servers ) {
+						var tmp = ( r.scope_to_production_servers == '2' ) ? 'Non-Production Only' : 'Production Only'
+						ret.push('<tr>');
+						ret.push('<td>Type</td>');
+						ret.push('<td>' +  tmp + '</td>' );
+						ret.push('</tr>');
+					}
+
+					ret.push('</table>');
+
+					return ret.join(' ');
+				}
 			},
 			fn : {
 				/**
@@ -230,22 +327,16 @@
 		},
 		[ // colparams
 				{ // fieldset
-					label : 'Details',
+					label : 'Task Details',
 					helpText : 'Please fill out the form',
-					class : 'col-lg-3',
-					fields : fieldset_1__fields
-				},
-				{ // fieldset
-					label : '',
-					helpText : '',
 					class : 'col-lg-4',
-					fields : fieldset_2__fields
+					fields : fieldset_1__fields
 				},
 				{ // fieldset
 					label : 'Task Scope',
 					helpText : 'You may optionally limit the scope that this task will apply to.',
-					class : 'col-lg-5',
-					fields : fieldset_3__fields
+					class : 'col-lg-8',
+					fields : fieldset_2__fields
 				},
 		]
 	)

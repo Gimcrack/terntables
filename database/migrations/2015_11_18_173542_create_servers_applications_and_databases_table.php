@@ -178,6 +178,7 @@ class CreateServersApplicationsAndDatabasesTable extends Migration
         Schema::drop('databases');
         Schema::drop('servers');
         Schema::drop('applications');
+        Schema::drop('operating_systems');
     });
 
   }

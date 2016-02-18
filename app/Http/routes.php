@@ -58,6 +58,10 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::patch('OutageTask/_massUpdate',  'Api\v1\OutageTaskController@markOutageTasks');
   Route::resource('OutageTask',           'Api\v1\OutageTaskController');
 
+  Route::delete('OutageTaskDetail',             'Api\v1\OutageTaskDetailController@destroy');
+  Route::patch('OutageTaskDetail/_massUpdate',  'Api\v1\OutageTaskDetailController@markOutageTasks');
+  Route::resource('OutageTaskDetail',           'Api\v1\OutageTaskDetailController');
+
   // gis routes
   Route::delete('Document',                 'Api\v1\DocumentController@destroyMany');
   Route::resource('Document',               'Api\v1\DocumentController');
@@ -123,7 +127,10 @@ Route::group(['prefix' => 'admin'], function(){
    Route::resource('applications',  'BI\ApplicationController', [ 'only' => [ 'index', 'show'] ] );
    Route::resource('databases',     'BI\DatabaseController', [ 'only' => [ 'index', 'show'] ] );
    Route::resource('outages',       'BI\OutageController', [ 'only' => [ 'index', 'show'] ] );
-   Route::resource('outageTasks',   'BI\OutageTaskController', [ 'only' => [ 'index', 'show'] ] );
+   Route::resource('taskTemplates', 'BI\OutageTaskController', [ 'only' => [ 'index', 'show'] ] );
+   Route::get('outageTasks/_generate',   'BI\OutageTaskDetailController@generateTaskDetails');
+   Route::resource('outageTasks',   'BI\OutageTaskDetailController', [ 'only' => [ 'index', 'show'] ] );
+
  });
 
 //misc

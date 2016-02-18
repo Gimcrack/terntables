@@ -29,6 +29,41 @@ class Server extends Model
       'operating_system_id'
   ];
 
+
+
+  /**
+   * Get only active servers
+   * @method scopeActive
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeActive($query)
+  {
+    return $query->where('inactive_flag',0);
+  }
+
+  /**
+   * Get only production servers
+   * @method scopeProduction
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeProduction($query)
+  {
+    return $query->where('production_flag',1);
+  }
+
+  /**
+   * Get only non-production servers
+   * @method scopeNonroduction
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeNonproduction($query)
+  {
+    return $query->where('production_flag',0);
+  }
+
   /**
    * Polymorphic relationship. Second parameter to morphOne/morphMany
    * should be the same as the prefix for the *_id/*_type fields.
@@ -83,7 +118,7 @@ class Server extends Model
    * @method owner
    * @return [type] [description]
    */
-  public function operatingSystem()
+  public function operating_system()
   {
     return $this->belongsTo('App\OperatingSystem','operating_system_id');
   }

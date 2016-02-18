@@ -23,6 +23,17 @@ class Application extends Model
   ];
 
   /**
+   * Get only active applications
+   * @method scopeActive
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeActive($query)
+  {
+    return $query->where('inactive_flag',0);
+  }
+
+  /**
    * Polymorphic relationship. Second parameter to morphOne/morphMany
    * should be the same as the prefix for the *_id/*_type fields.
    */

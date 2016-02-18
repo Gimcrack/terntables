@@ -15,6 +15,11 @@ abstract class Model extends BaseModel
    */
   use RevisionableTrait;
 
+  protected $appends = [
+    'identifiable_name',
+    'updated_at_for_humans'
+  ];
+
   /**
    * Boot the model
    * @return [type] [description]
@@ -31,6 +36,25 @@ abstract class Model extends BaseModel
   public function identifiableName()
   {
       return $this->name;
+  }
+
+  /**
+   * The column that identifies the model
+   * @return [type] [description]
+   */
+  public function getIdentifiableNameAttribute()
+  {
+      return $this->identifiableName();
+  }
+
+  /**
+   * Get the updated at for humans
+   * @method updatedAtForHumans
+   * @return [type]             [description]
+   */
+  public function getUpdatedAtForHumansAttribute()
+  {
+    return $this->updated_at->diffForHumans();
   }
 
   /**
@@ -130,6 +154,7 @@ abstract class Model extends BaseModel
 
     foreach($arr as $key => $value ) {
       if ( $this->shouldIgnoreKey($key) ) continue;
+      if ( !isset($readable_keys[$key]) ) continue;
 
       $return[] = '<tr>';
       $return[] = '<th style="text-align:left">';

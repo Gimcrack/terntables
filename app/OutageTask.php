@@ -3,6 +3,9 @@
 namespace App;
 
 use App\Model;
+use App\Outage;
+use App\OutageTaskDetail;
+use Log;
 
 class OutageTask extends Model
 {
@@ -23,8 +26,21 @@ class OutageTask extends Model
     'description',
     'inactive_flag',
     'group_id',
-    'task_type'
+    'task_type',
+    'scope_to_production_servers'
   ];
+
+  // /**
+  //  * Save the model
+  //  * @method save
+  //  * @return [type] [description]
+  //  */
+  // public function save(array $options = [])
+  // {
+  //   parent::save($options);
+  //
+  //   //Outage::generateAllTaskDetails();
+  // }
 
   /**
    * An Outage Task belongs to one Group
@@ -36,11 +52,13 @@ class OutageTask extends Model
     return $this->belongsTo('App\Group','group_id');
   }
 
+
+
   /**
    * An Outage Task may be assigned to many Outages
    * @method Outages
    */
-  public function outages()
+  public function scope_to_outages()
   {
     return $this->belongsToMany('App\Outage')->withTimestamps();
   }
@@ -50,7 +68,7 @@ class OutageTask extends Model
    * @method servers
    * @return [type]  [description]
    */
-  public function servers()
+  public function scope_to_servers()
   {
     return $this->belongsToMany('App\Server')->withTimestamps();
   }
@@ -60,7 +78,7 @@ class OutageTask extends Model
    * @method applications
    * @return [type]  [description]
    */
-  public function applications()
+  public function scope_to_applications()
   {
     return $this->belongsToMany('App\Application')->withTimestamps();
   }
@@ -70,7 +88,7 @@ class OutageTask extends Model
    * @method applications
    * @return [type]  [description]
    */
-  public function databases()
+  public function scope_to_databases()
   {
     return $this->belongsToMany('App\Database')->withTimestamps();
   }
@@ -80,7 +98,7 @@ class OutageTask extends Model
    * @method applications
    * @return [type]  [description]
    */
-  public function groups()
+  public function assign_to_groups()
   {
     return $this->belongsToMany('App\Group')->withTimestamps();
   }
@@ -90,7 +108,7 @@ class OutageTask extends Model
    * @method applications
    * @return [type]  [description]
    */
-  public function people()
+  public function assign_to_people()
   {
     return $this->belongsToMany('App\Person')->withTimestamps();
   }
@@ -100,9 +118,188 @@ class OutageTask extends Model
    * @method applications
    * @return [type]  [description]
    */
-  public function operatingSystems()
+  public function scope_to_operating_systems()
   {
     return $this->belongsToMany('App\OperatingSystem')->withTimestamps();
   }
+
+  /**
+   * An Outage Task may apply to many groups
+   * @method applications
+   * @return [type]  [description]
+   */
+  public function scope_to_groups()
+  {
+    return $this->belongsToMany('App\Group','group_outage_task_objects','outage_task_id','group_id')->withTimestamps();
+  }
+
+  /**
+   * Generate outage task details
+   * @method generateOutageTaskDetails
+   * @param  [type]                    $outage [description]
+   * @return [type]                            [description]
+   */
+  public function generateOutageTaskDetails(Outage $outage)
+  {
+    if ( !! $this->inactive_flag ) {
+      Log::info( "The task '{$this->name}' is inactive, aborting task detail generation" );
+      return false;
+    }
+
+    if ( !! $this->scope_to_groups->count() )
+    {
+      Log::info( "..Scoping the task {$this->name} to group objects" );
+      return $this->generateOutageTaskDetailsScopedToGroups($outage);
+    }
+
+
+    $this->generateOutageTaskDetailsScopedToServers($outage);
+
+    $this->generateOutageTaskDetailsScopedToApplications($outage);
+
+    $this->generateOutageTaskDetailsScopedToDatabases($outage);
+
+  }
+
+  /**
+   * Generate Outage Task Details scoped to Groups
+   * @method generateOutageTaskDetailsScopedToGroups
+   * @param  Outage                                  $outage [description]
+   * @return [type]                                          [description]
+   */
+  private function generateOutageTaskDetailsScopedToGroups(Outage $outage)
+  {
+    $groups = $this->scope_to_groups->lists('id');
+
+    switch( $this->task_type ) {
+      case 'Server Task' :
+        $servers = \App\Server::active()
+                    ->whereIn('group_id',$groups);
+
+        if ( !! $this->scope_to_operating_systems->count() )
+        {
+          $oses = $this->scope_to_operating_systems->lists('id');
+          $servers = $servers->whereIn('operating_system_id',$oses);
+        }
+
+        if ( $this->scope_to_production_servers == 1 )
+        {
+          $servers = $servers->production();
+        }
+
+        elseif ( $this->scope_to_production_servers == 2 )
+        {
+          $servers = $servers->nonproduction();
+        }
+
+        $servers = $servers->get();
+
+        return $this->generateOutageTaskDetailsScopedToServers($outage, $servers);
+
+      case 'Application Task' :
+        $applications = \App\Application::active()
+                          ->whereIn('group_id',$groups)
+                          ->get();
+        return $this->generateOutageTaskDetailsScopedToApplications($outage, $applications);
+
+      case 'Database Task' :
+        $databases = \App\Database::active()
+                        ->whereIn('group_id',$groups)
+                        ->get();
+
+        if ( $this->scope_to_production_servers == 1 )
+        {
+          $databases = $databases->production();
+        }
+
+        elseif ( $this->scope_to_production_servers == 2 )
+        {
+          $databases = $databases->nonproduction();
+        }
+
+        return $this->generateOutageTaskDetailsScopedToDatabases($outage, $databases);
+    }
+  }
+
+  /**
+   * Generate Outage Task Details scoped to Servers
+   * @method generateOutageTaskDetailsScopedToServers
+   * @param  Outage                                  $outage [description]
+   * @return [type]                                          [description]
+   */
+  private function generateOutageTaskDetailsScopedToServers(Outage $outage, $servers = null)
+  {
+    $servers = $servers ?: $this->scope_to_servers;
+    if (empty($servers)) return false;
+
+    $task_details = $this->getOutageTaskDetailBaseAttributes($outage);
+
+    $servers->each( function($server) use ($task_details) {
+      Log::info( "..Creating the task {$this->name} for server {$server->name}" );
+      $task_details['server_id'] = $server->id;
+      OutageTaskDetail::create($task_details);
+    });
+  }
+
+  /**
+   * Generate Outage Task Details scoped to Applications
+   * @method generateOutageTaskDetailsScopedToApplications
+   * @param  Outage                                  $outage [description]
+   * @return [type]                                          [description]
+   */
+  private function generateOutageTaskDetailsScopedToApplications(Outage $outage, $applications = null)
+  {
+    $applications = $applications ?: $this->scope_to_applications;
+    if (empty($applications)) return false;
+
+    $task_details = $this->getOutageTaskDetailBaseAttributes($outage);
+
+    foreach($applications as $application)
+    {
+      $task_details['application_id'] = $application->id;
+      OutageTaskDetail::create($task_details);
+    }
+  }
+
+  /**
+   * Generate Outage Task Details scoped to Databases
+   * @method generateOutageTaskDetailsScopedToDatabases
+   * @param  Outage                                  $outage [description]
+   * @return [type]                                          [description]
+   */
+  private function generateOutageTaskDetailsScopedToDatabases(Outage $outage, $databases = null)
+  {
+    $databases = $databases ?: $this->scope_to_databases;
+    if (empty($databases)) return false;
+
+    $task_details = $this->getOutageTaskDetailBaseAttributes($outage);
+
+    foreach($databases as $database)
+    {
+      $task_details['database_id'] = $database->id;
+      OutageTaskDetail::create($task_details);
+    }
+  }
+
+  /**
+   * Get the base attributes of the Outage Task Detail
+   * @method getOutageTaskDetailBaseAttributes
+   * @param  Outage                            $outage [description]
+   * @return [type]                                    [description]
+   */
+  private function getOutageTaskDetailBaseAttributes(Outage $outage)
+  {
+    return [
+      'name' => $this->name,
+      'description' => $this->description,
+      'task_type' => $this->task_type,
+      'group_id' => $this->group_id,
+      'outage_task_id' => $this->id,
+      'outage_id' => $outage->id,
+      'status' => 'New'
+    ];
+  }
+
+
 
 }

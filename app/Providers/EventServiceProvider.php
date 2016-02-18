@@ -14,7 +14,11 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         'App\Events\DocumentWasUploaded' => [
-            'App\Listeners\ProcessXMLDocument',
+          'App\Listeners\ProcessXMLDocument',
+        ],
+
+        'App\Events\OutageWasModified' => [
+          'App\Listeners\SyncOutageTasks'
         ],
     ];
 
@@ -31,4 +35,3 @@ class EventServiceProvider extends ServiceProvider
         //
     }
 }
-  

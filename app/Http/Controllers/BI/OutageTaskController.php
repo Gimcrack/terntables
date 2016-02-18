@@ -25,11 +25,14 @@ class OutageTaskController extends Controller
 
   public $with = [
     'owner',
-    'outages',
-    'servers',
-    'applications',
-    'groups',
-    'people'
+    'scope_to_outages',
+    'assign_to_groups',
+    'assign_to_people',
+    'scope_to_servers',
+    'scope_to_applications',
+    'scope_to_groups',
+    'scope_to_operating_systems',
+    'scope_to_databases',
   ];
 
   /**

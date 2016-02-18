@@ -33,7 +33,7 @@ class ServerController extends ApiController
     'people',
     'tags',
     'owner',
-    'operatingSystem'
+    'operating_system'
   ];
 
   /**

@@ -55642,7 +55642,7 @@ $.extend( true, jApp.views, {
 				model : 'Application',
 				columnFriendly : 'name',
 				gridHeader : {
-					icon : 'fa-windows',
+					icon : 'fa-cubes',
 					headerTitle : 'Manage Applications',
 					helpText : "<strong>Note:</strong> Manage Applications Here"
 				},

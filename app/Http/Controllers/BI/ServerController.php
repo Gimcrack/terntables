@@ -35,7 +35,8 @@ class ServerController extends Controller
     'databases',
     'people',
     'tags',
-    'owner'
+    'owner',
+    'operating_system'
   ];
 
   /**

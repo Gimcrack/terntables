@@ -21,6 +21,14 @@
 			_optionssource : ['0','1'],
 			_labelssource : ['No','Yes'],
 		},
+		{
+			name : 'tasks',
+			_label : 'What tasks should be peformed during this Outage?',
+			type : 'select',
+			_optionssource : 'OutageTask.id',
+			_labelssource : 'OutageTask.name',
+			multiple : true,
+		}
 	];
 
 	/**

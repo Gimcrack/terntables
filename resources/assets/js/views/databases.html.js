@@ -344,7 +344,7 @@
 					},
 
 					applications : function(arr) {
-						return _.get('name', arr, 'fa-windows', 'Application' );
+						return _.get('name', arr, 'fa-cubes', 'Application' );
 					},
 
 					servers : function(arr) {

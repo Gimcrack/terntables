@@ -68,19 +68,15 @@
 			_labelssource : ['No','Yes'],
 		},
 		{
-			name : 'operating_system',
+			name : 'operating_system_id',
 			_label : 'Operating System',
 			type : 'select',
 			required : true,
 			'data-validType' : 'select',
-			_optionssource : [
-				'-Unspecified-',
-				'Windows Server 2012 R2',
-				'Windows Server 2008 R2',
-				'Windows Server 2003',
-				'Linux',
-				'Other (Non-Windows)'
-			],
+			_optionssource : 'OperatingSystem.id',
+			_labelssource : 'OperatingSystem.name',
+			_firstlabel : '-Choose-',
+			_firstoption : null
 		},
 	],
 
@@ -274,7 +270,7 @@
 				"id",
 				"serverName",
 				"owner_name",
-				//"description",
+				"os",
 				"people",
 				"applications",
 				"databases",
@@ -284,7 +280,7 @@
 				"ID",
 				"Name",
 				"Owner",
-				//"Description",
+				"OS",
 				"Contacts",
 				"Applications",
 				"Databases",
@@ -298,12 +294,17 @@
 				},
 
 				applications : function(arr) {
-					return _.get('name', arr, 'fa-windows', 'Application');
+					return _.get('name', arr, 'fa-cubes', 'Application');
 				},
 
 				databases : function(arr) {
 					return _.get('name', arr, 'fa-database', 'Database');
 				},
+
+				os : function(val) {
+					var r = jApp.activeGrid.currentRow;
+					return _.get('name', r.operating_system, 'fa-windows','OperatingSystem');
+				}
 
 			},
 			fn : {

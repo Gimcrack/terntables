@@ -82,6 +82,13 @@ class ApiController extends Controller
       $input = Input::all();
       $model_class = $this->model_class;
 
+      if (!empty($input['filter'])) {
+        $search = [':user__person__id:'];
+        $replace = [\Auth::user()->person->id];
+
+        $input['filter'] = str_replace($search,$replace,$input['filter']);
+      }
+
       $results = ( !empty($input['filter']) ) ?
         $model_class::with($this->with)->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
         $model_class::with($this->with)->paginate( $this->limitPerPage );
@@ -125,6 +132,8 @@ class ApiController extends Controller
         'Application' => 'BI\ApplicationController',
         'Database'    => 'BI\DatabaseController',
         'Outage'      => 'BI\OutageController',
+        'OutageTask'  => 'BI\OutageTaskController',
+        'OutageTaskDetail' => 'BI\OutageTaskDetailController',
         'Document'    => 'GIS\DocumentController',
       ];
 
@@ -176,6 +185,8 @@ class ApiController extends Controller
       $model->updateTags();
       $this->handleRelations($model);
     }); // end transaction
+
+    //Event::fire( new Outage )
 
     return $this->operationSuccessful(200);
 
@@ -364,7 +375,6 @@ class ApiController extends Controller
     //   return $this->operationFailed('Mass update failed. Please specify what changes to make and try again.', 406);
     // }
 
-    $table_name = (new $this->model_class)->getTable();
     $models = $class::whereIn('id',$ids);
 
     if ( ! $models->count() ) {
