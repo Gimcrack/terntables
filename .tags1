@@ -4,24 +4,8 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^						fn : function(e) {$/;"	function	line:168
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^							fn : function(e) {$/;"	function	line:179
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^							fn : function(e) {$/;"	function	line:189
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^							fn : function(e) {$/;"	function	line:199
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^							fn : function(e) {$/;"	function	line:209
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^							fn : function(e) {$/;"	function	line:219
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^							fn : function(e) {$/;"	function	line:229
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^							fn : function(e) {$/;"	function	line:239
-inactive_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^        inactive_flag : function(val) {$/;"	function	line:271
-assignee	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				assignee : function(val) {$/;"	function	line:275
-task_template	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				task_template : function(val) {$/;"	function	line:280
-outage_date	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				outage_date : function() {$/;"	function	line:288
-scope	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				scope : function() {$/;"	function	line:293
-status	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				status : function(val) {$/;"	function	line:314
-switch	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^					switch(val) {$/;"	function	line:319
-assignToMe	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				assignToMe			: function( atts ) {$/;"	function	line:352
-markOutageTask	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				markOutageTask			: function( atts ) {$/;"	function	line:368
-updateGridFilter	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				updateGridFilter : function() {$/;"	function	line:384
-showOnlyMine	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				showOnlyMine : function( ) {$/;"	function	line:408
-showOnlyAvailable	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				showOnlyAvailable : function( ) {$/;"	function	line:424
-toggleHidden	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\outageTaskDetails.html.js	/^				toggleHidden : function( ) {$/;"	function	line:440
+ApplicationsSeeder	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^class ApplicationsSeeder extends Seeder$/;"	class	line:8
+srv	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^    public function srv($name) {$/;"	function	line:10
+prs	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^    public function prs($name)$/;"	function	line:22
+make	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^    public function make($atts)$/;"	function	line:37
+run	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^    public function run()$/;"	function	line:67

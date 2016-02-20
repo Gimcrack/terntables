@@ -54,7 +54,14 @@ abstract class Model extends BaseModel
    */
   public function getUpdatedAtForHumansAttribute()
   {
-    return $this->updated_at->diffForHumans();
+    try {
+      return $this->updated_at->diffForHumans();
+    }
+
+    catch(Exception $e) {
+      return null;
+    }
+
   }
 
   /**

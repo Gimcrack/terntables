@@ -27,7 +27,8 @@ class OutageTask extends Model
     'inactive_flag',
     'group_id',
     'task_type',
-    'scope_to_production_servers'
+    'scope_to_production_servers',
+    'criteria_selection'
   ];
 
   // /**
@@ -237,7 +238,7 @@ class OutageTask extends Model
     $servers->each( function($server) use ($task_details) {
       Log::info( "..Creating the task {$this->name} for server {$server->name}" );
       $task_details['server_id'] = $server->id;
-      OutageTaskDetail::create($task_details);
+      $this->generateOutageTaskDetail($task_details);
     });
   }
 
@@ -256,8 +257,9 @@ class OutageTask extends Model
 
     foreach($applications as $application)
     {
+      Log::info( "..Creating the task {$this->name} for application {$application->name}" );
       $task_details['application_id'] = $application->id;
-      OutageTaskDetail::create($task_details);
+      $this->generateOutageTaskDetail($task_details);
     }
   }
 
@@ -276,8 +278,9 @@ class OutageTask extends Model
 
     foreach($databases as $database)
     {
+      Log::info( "..Creating the task {$this->name} for database {$database->name}" );
       $task_details['database_id'] = $database->id;
-      OutageTaskDetail::create($task_details);
+      $this->generateOutageTaskDetail($task_details);
     }
   }
 
@@ -298,6 +301,62 @@ class OutageTask extends Model
       'outage_id' => $outage->id,
       'status' => 'New'
     ];
+  }
+
+
+  /**
+   * Generate Outage Task From specified details
+   * @method generateOutageTask
+   * @param  [type]             $task_details [description]
+   * @return [type]                           [description]
+   */
+  private function generateOutageTaskDetail($task_details)
+  {
+    if ( $this->doesTheTaskDetailExist($task_details) )
+    {
+      return false;
+    }
+    return OutageTaskDetail::create($task_details);
+  }
+
+  /**
+   * Check to see if a task detail has been generated already
+   * @method doesTheTaskDetailExist
+   * @param  [type]                  $task_details [description]
+   * @return [type]                                [description]
+   */
+  private function doesTheTaskDetailExist($task_details)
+  {
+    $warning = "Task task with name {$task_details['name']} already exists for outage with id {$task_details['outage_id']} ";
+
+    $query = OutageTaskDetail::where('outage_id',$task_details['outage_id'])
+            ->where('outage_task_id',$task_details['outage_task_id']);
+
+    switch( $task_details['task_type'] )
+    {
+      case 'Server Task' :
+        $query = $query->where('server_id',$task_details['server_id']);
+        $warning .= "for server {$task_details['server_id']}";
+      break;
+
+      case 'Application Task' :
+        $query = $query->where('application_id',$task_details['application_id']);
+        $warning .= "for application {$task_details['application_id']}";
+      break;
+
+      case 'Database Task' :
+        $query = $query->where('database_id',$task_details['database_id']);
+        $warning .= "for database {$task_details['database_id']}";
+      break;
+    }
+
+    if ( !! $query->count() )
+    {
+      Log::warning($warning);
+      return true;
+    }
+
+    return false;
   }
 
 

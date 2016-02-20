@@ -1,7 +1,7 @@
 /**
- * outages.html.js
+ * admin.operatingSystems.html.js
  *
- * outages view definition
+ * operating systems view definition
  */
 ;(function(jApp) {
 	/**

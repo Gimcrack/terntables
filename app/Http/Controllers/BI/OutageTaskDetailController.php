@@ -52,6 +52,6 @@ class OutageTaskDetailController extends Controller
   {
     Outage::generateAllTaskDetails();
 
-    return redirect('/bi/outageTasks');
+    return redirect('/oit/outageTasks');
   }
 }

@@ -19,7 +19,8 @@ class Application extends Model
   protected $fillable = [
       'name',
       'description',
-      'inactive_flag'
+      'inactive_flag',
+      'group_id'
   ];
 
   /**
@@ -31,6 +32,16 @@ class Application extends Model
   public function scopeActive($query)
   {
     return $query->where('inactive_flag',0);
+  }
+
+  /**
+   * A server is managaed by one group
+   * @method owner
+   * @return [type] [description]
+   */
+  public function owner()
+  {
+    return $this->belongsTo('App\Group','group_id');
   }
 
   /**

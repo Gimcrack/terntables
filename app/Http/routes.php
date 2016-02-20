@@ -37,7 +37,7 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::patch('Profile/resetPassword', 'Api\v1\ProfileController@resetPassword');
   Route::patch('Profile/{id}',          'Api\v1\ProfileController@update');
 
-  // bi routes
+  // oit routes
   Route::delete('Server',           'Api\v1\ServerController@destroy');
   Route::patch('Server/_massUpdate', 'Api\v1\ServerController@markServers');
   Route::resource('Server',         'Api\v1\ServerController');
@@ -63,7 +63,7 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::resource('OutageTaskDetail',           'Api\v1\OutageTaskDetailController');
 
   // gis routes
-  Route::delete('Document',                 'Api\v1\DocumentController@destroyMany');
+  Route::delete('Document',                 'Api\v1\DocumentController@destroy');
   Route::resource('Document',               'Api\v1\DocumentController');
 
   // admin routes
@@ -117,12 +117,14 @@ Route::group(['prefix' => 'admin'], function(){
  */
  Route::group(['prefix' => 'gis'], function(){
    Route::resource('documents',   'GIS\DocumentController' , [ 'only' => [ 'index','show'] ]);
+   Route::get('documents/{id}/pdf',  'GIS\DocumentController@showpdf');
+   Route::get('documents/{id}/raw',  'GIS\DocumentController@showraw');
  });
 
  /**
-  * BI Routes
+  * oit Routes
   */
- Route::group(["prefix" => 'bi'], function(){
+ Route::group(["prefix" => 'oit'], function(){
    Route::resource('servers',       'BI\ServerController', [ 'only' => [ 'index','show'] ] );
    Route::resource('applications',  'BI\ApplicationController', [ 'only' => [ 'index', 'show'] ] );
    Route::resource('databases',     'BI\DatabaseController', [ 'only' => [ 'index', 'show'] ] );

@@ -7,6 +7,64 @@ use App\Server;
 
 class ApplicationsSeeder extends Seeder
 {
+    public function srv($name) {
+      $server = Server::where('name',$name);
+
+      if ( ! $server->count() )
+      {
+        \Log::info("Server with name {$name} does not exist");
+        return null;
+      }
+
+      return $server->first()->id;
+    }
+
+    public function prs($name)
+    {
+      $person = Person::where('name',$name);
+
+      if ( ! $person->count() )
+      {
+        \Log::info("Person with name {$name} does not exist");
+        return null;
+      }
+
+      return $person->first()->id;
+
+    }
+
+
+    public function make($atts)
+    {
+      \Log::info("Creating application with name {$atts['name']}");
+
+      $temp = [
+        'name' => $atts['name'],
+        'description' => @$atts['description'] ?: '',
+        'group_id' => $atts['group_id'],
+      ];
+
+      $app = Application::create($temp);
+
+      if ( !empty($atts['people']) ) {
+        foreach( $atts['people'] as $person => $details ) {
+          if ( $this->prs($person) ) {
+            $person = $this->prs($person);
+            $app->people()->attach([$person => [ 'contact_type' => $details ?: 'Primary']]);
+          }
+        }
+      }
+
+      if ( !empty($atts['servers']) ) {
+        foreach( $atts['servers'] as $server => $details ) {
+          if ( $this->srv($server) ) {
+            $server = $this->srv($server);
+            $app->servers()->attach([$server => [ 'server_type' => $details ?: 'Primary Application Server' ]]);
+          }
+        }
+      }
+    }
+
     /**
      * Run the database seeds.
      *
@@ -14,141 +72,516 @@ class ApplicationsSeeder extends Seeder
      */
     public function run()
     {
-      $app = Application::create(['name' => 'Govern','description' => "Computer-Aided Mass Appraisal system.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Matt Rykaczewski')->first()->id,Person::where('name','Davey Griffith')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id,Person::where('name','Ed Bennett')->first()->id]);
-      $app->servers()->attach([Server::where('name','govsql')->first()->id,Server::where('name','govsqltst')->first()->id,Server::where('name','drgovsql')->first()->id,Server::where('name','govapp')->first()->id]);
 
-      $app = Application::create(['name' => 'Logos','description' => "Financial Management, Human Resources",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Davey Griffith')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','logos7sql')->first()->id,Server::where('name','logos7app')->first()->id,Server::where('name','logos7rpt')->first()->id,Server::where('name','drgovsql')->first()->id,Server::where('name','logosrpttest')->first()->id,Server::where('name','logossqltest')->first()->id,Server::where('name','logostest')->first()->id]);
+      $applications = [
+        [
+          'name' => 'Govern',
+          'group_id' => 6,
+          'description' => "Computer-Aided Mass Appraisal system.",
+          'people' => [
+            'Ed Bennett' => 'Primary',
+            'Jeremy Bloomstrom' => 'Secondary',
+            'Matt Rykaczewski' => 'Secondary',
+            'Elizabeth Grigsby' => 'Secondary',
+            'Davey Griffith' => 'Other',
+          ],
+          'servers' => [
+            'govsql'  =>  'Primary Database Server',
+            'govsqltst'  =>  'Test Database Server',
+            'drgovsql'  =>  'Primary DR Server',
+            'govapp'  =>  'Primary Application Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Trim','description' => "Enterprise Document Management Platform.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Jack Horner')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id,Server::where('name','trim7')->first()->id,Server::where('name','trim7event')->first()->id,Server::where('name','trim7test')->first()->id,Server::where('name','trim7train')->first()->id]);
+        [
+          'name' => 'Logos',
+          'group_id' => 6,
+          'description' => "Financial Management, Human Resources",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary',
+            'Davey Griffith' => 'Other',
+          ],
+          'servers' => [
+            'logos7sql' => 'Primary Database Server',
+            'logos7app' => 'Primary Application Server',
+            'logos7rpt' => 'Primary Report Server',
+            'drgovsql' => 'Primary DR Server',
+            'logosrpttest' => 'Test Report Server',
+            'logossqltest' => 'Test Database Server',
+            'logostest' => 'Test Application Server'
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Abra','description' => "HR Management",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id,Server::where('name','abra')->first()->id,Server::where('name','abra-app')->first()->id]);
+        [
+          'name' => 'Trim',
+          'group_id' => 6,
+          'description' => "Enterprise Document Management Platform.",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary',
+            'Davey Griffith' => 'Other',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'trim7' => 'Primary Application Server',
+            'trim7event' => 'Secondary Application Server',
+            'trim7test' => 'Test Application Server',
+            'trim7train' => 'Test Application Server'
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Microsoft SQL Server','description' => "Generic Entry for MS SQL Server",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Matt Rykaczewski')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id,Person::where('name','Ed Bennett')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id,Server::where('name','govsql')->first()->id,Server::where('name','govsqltst')->first()->id,Server::where('name','logos7sql')->first()->id,Server::where('name','drgovsql')->first()->id,Server::where('name','logossqltest')->first()->id,Server::where('name','drlogos7sql')->first()->id,Server::where('name','drmsb01sql')->first()->id,Server::where('name','msbsqlrpt')->first()->id,Server::where('name','msbsqltst')->first()->id,Server::where('name','sql2012dev')->first()->id,Server::where('name','sqlrpt')->first()->id,Server::where('name','spsql01tst')->first()->id,Server::where('name','spsql02tst')->first()->id]);
+        [
+          'name' => 'HP Records Manager',
+          'group_id' => 6,
+          'description' => "Enterprise Document Management Platform.",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary',
+            'Davey Griffith' => 'Other',
+          ],
+          'servers' => [
+            'msb02sqla' => 'Primary Database Server',
+            'msb02sqlb' => 'Secondary Database Server',
+            'rmapp01' => 'Primary Application Server',
+            'rmapp02' => 'Secondary Application Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Bomgar','description' => "Remote support tool.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Elizabeth Grigsby')->first()->id,Person::where('name','Katie Van Sant')->first()->id]);
-      $app->servers()->attach([Server::where('name','bomgar')->first()->id]);
+        [
+          'name' => 'Abra',
+          'group_id' => 6,
+          'description' => "HR Management Platform.",
+          'people' => [
+            'Elizabeth Grigsby' => 'Primary',
+            'Jeremy Bloomstrom' => 'Secondary',
+            'Davey Griffith' => 'Other',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'abra-app' => 'Primary Application Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Actions','description' => "Search Legislative Actions",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Jack Horner')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id,Server::where('name','actions-app')->first()->id,Server::where('name','actions2')->first()->id]);
+        [
+          'name' => 'Microsoft SQL Server',
+          'group_id' => 6,
+          'description' => "Relational Database Platform.",
+          'people' => [
+            'Elizabeth Grigsby' => 'Primary',
+            'Jeremy Bloomstrom' => 'Primary',
+            'Matt Rykaczewski' => 'Primary',
+            'Ed Bennett' => 'Primary',
+            'Davey Griffith' => 'Other',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'msb02sqla' => 'Primary Database Server',
+            'msb02sqlb' => 'Secondary Database Server',
+            'govsql' => 'Primary Database Server',
+            'govsqltst' => 'Test Database Server',
+            'logos7sql' => 'Primary Database Server',
+            'drgovsql' => 'Primary DR Server',
+            'logossqltest' => 'Test Database Server',
+            'drlogos7sql' => 'Primary DR Server',
+            'drmsb01sql' => 'Primary DR Server',
+            'msbsqlrpt' => 'Primary Report Server',
+            'msbsqltst' => 'Test Database Server',
+            'sql2012dev' => 'Test Database Server',
+            'sqlrpt' => 'Primary Report Server',
+            'spsql01tst' => 'Test Database Server',
+            'spsql02tst' => 'Test Database Server',
+            'spsql01' => 'Primary Database Server',
+            'spsql02' => 'Secondary Database Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'SANs','description' => "SAN Appliances",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Randy Jones')->first()->id,Person::where('name','Rod Hoskinson')->first()->id]);
+        [
+          'name' => 'Bomgar',
+          'group_id' => 6,
+          'description' => "Remote Support Tool.",
+          'people' => [
+            'Elizabeth Grigsby' => 'Primary',
+            'Katie Van Sant' => 'Secondary',
+          ],
+          'servers' => [
+            'bomgar' => 'Primary Application Server',
+          ]
+        ],
 
+        [
+          'name' => 'iSupport',
+          'group_id' => 6,
+          'description' => "Service Desk Ticketing Tool.",
+          'people' => [
+            'Elizabeth Grigsby' => 'Primary',
+            'Katie Van Sant' => 'Secondary',
+            'Jeremy Bloomstrom' => 'Secondary',
+          ],
+          'servers' => [
+            'isupport' => 'Primary Application Server',
+            'msb01sql' => 'Primary Database Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'iSupport','description' => "Service Desk Management application",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','isupport')->first()->id]);
+        [
+          'name' => 'IT Dashboard',
+          'group_id' => 6,
+          'description' => "Web application for Outage and IT Asset Tracking.",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Jack Horner' => 'Primary',
+          ],
+          'servers' => [
+            'webdev' => 'Test Web Server',
+            'webprod' => 'Primary Web Server',
+            'msbsqlrpt' => 'Primary Database Server',
+            'msbsqltst' => 'Test Database Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'IT Dashboard','description' => "Online portal for project time-entry and outage tracking. Created using Bootstrap dashboard template. Uses Apache, PHP, Bootstrap, JQuery, MSSQL, HTML5, CSS3, Ajax and SASS.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id]);
-      $app->servers()->attach([Server::where('name','msbsqlrpt')->first()->id,Server::where('name','webdev')->first()->id]);
+        [
+          'name' => 'Actions',
+          'group_id' => 6,
+          'description' => "Search Legislative Actions.",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Jack Horner' => 'Secondary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'actions-app' => 'Primary Application Server',
+            'actions2' => 'Primary Application Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'eSuite','description' => "Online portal for HR/Payroll information. Part of Logos package.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Davey Griffith')->first()->id]);
-      $app->servers()->attach([Server::where('name','esuite7')->first()->id]);
+        [
+          'name' => 'eSuite',
+          'group_id' => 6,
+          'description' => "Online portal for HR/Payroll information. Part of Logos package.",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Davey Griffith' => 'Secondary',
+          ],
+          'servers' => [
+            'logos7sql' => 'Primary Database Server',
+            'esuite7' => 'Primary Application Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'ArcGIS','description' => "GIS (Mapping) Software",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Matt Rykaczewski')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([]);
+        [
+          'name' => 'ArcGIS',
+          'group_id' => 7,
+          'description' => "GIS Mapping Software",
+          'people' => [
+            'Matt Rykaczewski' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary',
+          ],
+          'servers' => [
+            'gis102ags' => 'Primary Application Server',
+            'gis102agstst' => 'Test Application Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Addressing','description' => "SDE Addressing",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Matt Rykaczewski')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','govsql')->first()->id]);
+        [
+          'name' => 'Addressing',
+          'group_id' => 6,
+          'description' => "SDE Addressing",
+          'people' => [
+            'Matt Rykaczewski' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary',
+          ],
+          'servers' => [
+            'govsql' => 'Primary Database Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Cartegraph','description' => "Road asset management, mapping, etc.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Matt Rykaczewski')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id,Server::where('name','cartegraph')->first()->id]);
+        [
+          'name' => 'Cartegraph',
+          'group_id' => 7,
+          'description' => "Road asset management, mapping, etc.",
+          'people' => [
+            'Matt Rykaczewski' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'cartegraph' => 'Primary Application Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Chameleon','description' => "Animal Care software",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id]);
+        [
+          'name' => 'Chameleon',
+          'group_id' => 6,
+          'description' => "Animal Care Software",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Secondary',
+            'Elizabeth Grigsby' => 'Primary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'DNS','description' => "Domain Names (Linux)",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Jack Horner')->first()->id]);
-      $app->servers()->attach([Server::where('name','dsjns1')->first()->id,Server::where('name','dsjns2')->first()->id]);
+        [
+          'name' => 'DNS',
+          'group_id' => 6,
+          'description' => "Domain Names (Linux)",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Secondary',
+            'Jack Horner' => 'Primary',
+          ],
+          'servers' => [
+            'dsjns1' => 'Other',
+            'dsjns2' => 'Other',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'FTP','description' => "File Transfer (Linux)",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Jack Horner')->first()->id]);
-      $app->servers()->attach([Server::where('name','dsjftp')->first()->id]);
+        [
+          'name' => 'FTP',
+          'group_id' => 6,
+          'description' => "File Transfer (Linux)",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Secondary',
+            'Jack Horner' => 'Primary',
+          ],
+          'servers' => [
+            'dsjftp' => 'Other',
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Geocortex','description' => "Online map viewer",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Matt Rykaczewski')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([]);
+        [
+          'name' => 'Geocortex',
+          'group_id' => 6,
+          'description' => "Online map viewer",
+          'people' => [
+            'Matt Rykaczewski' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary',
+          ],
+        ],
 
-      $app = Application::create(['name' => 'Get Photos','description' => "Parcel Photo Grabber",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Ed Bennett')->first()->id]);
+        [
+          'name' => 'SANs',
+          'group_id' => 9,
+          'description' => "SAN Appliances",
+          'people' => [
+            'Randy Jones' => 'Primary',
+            'Rod Hoskinson' => 'Primary',
+          ],
+        ],
 
+        [
+          'name' => 'Get Photos',
+          'group_id' => 6,
+          'description' => "Parcel Photo Grabber",
+          'people' => [
+            'Ed Bennett' => 'Primary',
+            'Jeremy Bloomstrom' => 'Secondary',
+          ],
+        ],
 
-      $app = Application::create(['name' => 'Joomla','description' => "Website software",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jack Horner')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','msbwww2')->first()->id,Server::where('name','msbwww1')->first()->id]);
+        [
+          'name' => 'Joomla',
+          'group_id' => 6,
+          'description' => "Website CMS software",
+          'people' => [
+            'Jack Horner' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary'
+          ],
+          'servers' => [
+            'msbwww2' => 'Secondary Web Server',
+            'msbwww1' => 'Primary Web Server'
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Land Management Doc Browser','description' => "Land Management Document manager",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Ed Bennett')->first()->id]);
+        [
+          'name' => 'Land Management Doc Browser',
+          'group_id' => 6,
+          'description' => "Land Management Document manager",
+          'people' => [
+            'Ed Bennett' => 'Primary'
+          ]
+        ],
 
+        [
+          'name' => 'MyProperty',
+          'group_id' => 6,
+          'description' => "Web Parcel Information System",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Secondary',
+            'Jack Horner' => 'Primary',
+            'Ed Bennett' => 'Secondary'
+          ],
+          'servers' => [
+            'msbsqlrpt' => 'Primary Database Server',
+            'myPropApp' => 'Primary Application Server'
+          ]
+        ],
 
-      $app = Application::create(['name' => 'MyProperty','description' => "Web Parcel Information System",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Jack Horner')->first()->id,Person::where('name','Ed Bennett')->first()->id]);
-      $app->servers()->attach([Server::where('name','msbsqlrpt')->first()->id,Server::where('name','myPropApp')->first()->id]);
+        [
+          'name' => 'Parcel Build',
+          'group_id' => 7,
+          'description' => "Used to create parcels?",
+          'people' => [
+            'Matt Rykaczewski' => 'Primary'
+          ]
+        ],
 
-      $app = Application::create(['name' => 'Parcel Build','description' => "Used to create parcels?",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Matt Rykaczewski')->first()->id]);
+        [
+          'name' => 'Reverse Proxy',
+          'group_id' => 6,
+          'people' => [
+            'Jack Horner' => 'Primary',
+            'Matt Rykaczewski' => 'Secondary',
+          ]
+        ],
 
+        [
+          'name' => 'WasteWorks',
+          'group_id' => 6,
+          'description' => "Solid waste management & ticketing application",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Elizabeth Grigsby' => 'Secondary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+          ],
+        ],
 
-      $app = Application::create(['name' => 'Reverse Proxy','inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jack Horner')->first()->id,Person::where('name','Matt Rykaczewski')->first()->id]);
+        [
+          'name' => 'Project Board CMS',
+          'group_id' => 6,
+          'description' => "Content Management System used to manage information and updates about MSB projects.",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'webdev' => 'Test Web Server',
+            'webprod' => 'Primary Web Server',
+          ],
+        ],
 
+        [
+          'name' => 'AIMS',
+          'group_id' => 6,
+          'description' => "Ambulance Billing software",
+          'people' => [
+            'Davey Griffith' => 'Primary',
+          ],
+          'servers' => [
+            'aims-app' => 'Primary Application Server',
+            'msb01sql' => 'Primary Database Server'
+          ],
+        ],
 
-      $app = Application::create(['name' => 'WasteWorks','description' => "Solid waste management & ticketing application",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id]);
+        [
+          'name' => 'Maximum Solutions',
+          'group_id' => 6,
+          'description' => "Management software for the ice rink and pools. Software client on each computer connects to the db. No server component.",
+          'people' => [
+            'Elizabeth Grigsby' => 'Primary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+          ],
+        ],
 
-      $app = Application::create(['name' => 'Project Board CMS','description' => "Content Management System used to manage information and updates about MSB projects.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id,Server::where('name','webdev')->first()->id,Server::where('name','webprod')->first()->id]);
+        [
+          'name' => 'PFD Garnishment',
+          'group_id' => 6,
+          'description' => "Annual PFD Garnishment Process. Not really an application, but it's an annual process.",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Matt Rykaczewski' => 'Secondary'
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'webdev' => 'Test Web Server',
+            'msbsqltst' => 'Test Database Server',
+            'webprod' => 'Primary Web Server',
+          ],
+        ],
 
-      $app = Application::create(['name' => 'AIMS','description' => "Ambulance Billing software",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Davey Griffith')->first()->id]);
+        [
+          'name' => 'MPulse',
+          'group_id' => 6,
+          'description' => "Facilities, Fleet, and EMS management/ticketing software",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Secondary',
+            'Elizabeth Grigsby' => 'Primary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'mpulse' => 'Primary Application Server',
+          ],
+        ],
 
+        [
+          'name' => 'Sympro',
+          'group_id' => 6,
+          'description' => "Investments / debt / financial planning software",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server',
+            'sympro' => 'Primary Application Server',
+          ],
+        ],
 
-      $app = Application::create(['name' => 'Maximum Solutions','description' => "Management software for the ice rink and pools. Software client on each computer connects to the db. No server component.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id]);
+        [
+          'name' => 'Solarwinds',
+          'group_id' => 9,
+          'description' => "Enterprise network monitoring application",
+          'people' => [
+            'Randy Jones' => 'Primary',
+            'Rod Hoskinson' => 'Primary',
+          ],
+          'servers' => [
+            'msb01sql' => 'Primary Database Server'
+          ],
+        ],
 
-      $app = Application::create(['name' => 'PFD Garnishment','description' => "Annual PFD Garnishment Process. Not really an application, but it's an annual process.",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Matt Rykaczewski')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id]);
+        [
+          'name' => 'McAfee Enterprise AV',
+          'group_id' => 9,
+          'description' => "Enterprise antivirus security software",
+          'people' => [
+            'Randy Jones' => 'Primary',
+            'Rod Hoskinson' => 'Primary',
+          ],
+        ],
 
-      $app = Application::create(['name' => 'MPulse','description' => "Facilities, Fleet, and EMS management software",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Elizabeth Grigsby')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id,Server::where('name','mpulse')->first()->id]);
+        [
+          'name' => 'Sharepoint',
+          'group_id' => 6,
+          'description' => "Enterprise collaboration, web publishing and content management platform",
+          'people' => [
+            'Jeremy Bloomstrom' => 'Primary',
+            'Jack Horner' => 'Primary',
+            'Davey Griffith' => 'Secondary',
+          ],
+          'servers' => [
+            'spapp01' => 'Primary Application Server',
+            'spowa01' => 'Secondary Application Server',
+            'spsql01' => 'Primary Database Server',
+            'spsql02' => 'Secondary Database Server',
+            'spweb01' => 'Primary Web Server',
+            'spweb02' => 'Secondary Web Server',
+            'spapp01tst' => 'Test Application Server',
+            'spsql01tst' => 'Test Database Server',
+            'spsql02tst' => 'Test Database Server',
+            'spweb01tst' => 'Test Web Server',
+            'spweb02tst' => 'Test Web Server',
+          ],
+        ],
 
-      $app = Application::create(['name' => 'Sympro','description' => "Investments / debt / financial planning software",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id]);
-      $app->servers()->attach([Server::where('name','msb01sql')->first()->id,Server::where('name','sympro')->first()->id]);
+      ]; // end applications
 
-      $app = Application::create(['name' => 'Solarwinds','description' => "Enterprise network monitoring application",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Randy Jones')->first()->id,Person::where('name','Rod Hoskinson')->first()->id]);
-
-
-      $app = Application::create(['name' => 'McAfee Enterprise AV','description' => "Enterprise antivirus security software",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Randy Jones')->first()->id,Person::where('name','Rod Hoskinson')->first()->id]);
-
-
-      $app = Application::create(['name' => 'Sharepoint','description' => "Enterprise collaboration, web publishing and content management platform",'inactive_flag' => 0]);
-      $app->people()->attach([Person::where('name','Jeremy Bloomstrom')->first()->id,Person::where('name','Jack Horner')->first()->id,Person::where('name','Davey Griffith')->first()->id]);
-      $app->servers()->attach([Server::where('name','spapp01')->first()->id,Server::where('name','spowa01')->first()->id,Server::where('name','spsql01')->first()->id,Server::where('name','spsql02')->first()->id,Server::where('name','spweb01')->first()->id,Server::where('name','spweb02')->first()->id,Server::where('name','spapp01tst')->first()->id,Server::where('name','spsql01tst')->first()->id,Server::where('name','spsql02tst')->first()->id,Server::where('name','spweb01tst')->first()->id,Server::where('name','spweb02tst')->first()->id]);
-
+      foreach($applications as $app) {
+        $this->make($app);
+      }
     }
 }

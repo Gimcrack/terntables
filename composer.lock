@@ -903,12 +903,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "b12d67eb88d8aada43eb7343e6c0face2bba9806"
+                "reference": "4fa2c2e596af12ba0d83e0619b6cbdd8643462af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/b12d67eb88d8aada43eb7343e6c0face2bba9806",
-                "reference": "b12d67eb88d8aada43eb7343e6c0face2bba9806",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/4fa2c2e596af12ba0d83e0619b6cbdd8643462af",
+                "reference": "4fa2c2e596af12ba0d83e0619b6cbdd8643462af",
                 "shasum": ""
             },
             "require": {
@@ -932,7 +932,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2016-02-11 21:18:57"
+            "time": "2016-02-18 02:03:05"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -1540,16 +1540,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.1.29",
+            "version": "v5.1.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "7e7ba568ffbc8f3f00778f2e8f41fb92127944fd"
+                "reference": "f00b80d4d33cf67815d1b4aaae8d4b47af2f2a2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/7e7ba568ffbc8f3f00778f2e8f41fb92127944fd",
-                "reference": "7e7ba568ffbc8f3f00778f2e8f41fb92127944fd",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/f00b80d4d33cf67815d1b4aaae8d4b47af2f2a2a",
+                "reference": "f00b80d4d33cf67815d1b4aaae8d4b47af2f2a2a",
                 "shasum": ""
             },
             "require": {
@@ -1664,7 +1664,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2016-02-02 14:56:40"
+            "time": "2016-02-17 18:00:25"
         },
         {
             "name": "league/flysystem",
@@ -3592,12 +3592,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/VentureCraft/revisionable.git",
-                "reference": "dcf9f15f9eacee0d6df730b2155f78e859d19335"
+                "reference": "45a1ac4c7eda70e0862b8adb07344f28772f0ec8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VentureCraft/revisionable/zipball/dcf9f15f9eacee0d6df730b2155f78e859d19335",
-                "reference": "dcf9f15f9eacee0d6df730b2155f78e859d19335",
+                "url": "https://api.github.com/repos/VentureCraft/revisionable/zipball/45a1ac4c7eda70e0862b8adb07344f28772f0ec8",
+                "reference": "45a1ac4c7eda70e0862b8adb07344f28772f0ec8",
                 "shasum": ""
             },
             "require": {
@@ -3632,7 +3632,7 @@
                 "model",
                 "revision"
             ],
-            "time": "2016-02-09 00:15:03"
+            "time": "2016-02-12 00:18:35"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -4426,22 +4426,24 @@
         },
         {
             "name": "phpspec/prophecy",
-            "version": "v1.5.0",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "4745ded9307786b730d7a60df5cb5a6c43cf95f7"
+                "reference": "3c91bdf81797d725b14cb62906f9a4ce44235972"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/4745ded9307786b730d7a60df5cb5a6c43cf95f7",
-                "reference": "4745ded9307786b730d7a60df5cb5a6c43cf95f7",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/3c91bdf81797d725b14cb62906f9a4ce44235972",
+                "reference": "3c91bdf81797d725b14cb62906f9a4ce44235972",
                 "shasum": ""
             },
             "require": {
                 "doctrine/instantiator": "^1.0.2",
+                "php": "^5.3|^7.0",
                 "phpdocumentor/reflection-docblock": "~2.0",
-                "sebastian/comparator": "~1.1"
+                "sebastian/comparator": "~1.1",
+                "sebastian/recursion-context": "~1.0"
             },
             "require-dev": {
                 "phpspec/phpspec": "~2.0"
@@ -4449,7 +4451,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.4.x-dev"
+                    "dev-master": "1.5.x-dev"
                 }
             },
             "autoload": {
@@ -4482,7 +4484,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2015-08-13 10:07:40"
+            "time": "2016-02-15 07:46:21"
         },
         {
             "name": "phpunit/php-code-coverage",

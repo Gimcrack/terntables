@@ -1,29 +1,26 @@
-@extends('app')
+@extends('partial')
 
 @section('content')
   <div class="row">
     <div class="col-lg-12">
-      <div class="panel panel-info" style="margin-top:50px;">
+      <div class="panel panel-info">
         <div class="panel-heading">
           <h1 class="page-header">{{ $document->name }}</h1>
-          @unless( empty($document->description) )
+
           <div class="alert alert-warning alert-dismissible helpText" role="alert">
             <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">×</span>
               <span class="sr-only">Close</span></button>
               {{ $document->description }}
           </div>
-          @endunless
+
           <div class="table-head">
             <div class="table-row">
               <div class="table-header">
                 <div class="btn-group btn-group-sm table-btn-group">
-                  <a class="btn btn-success btn-refresh" href="{{ url('/documents') }}">
-                    <i class="fa fa-fw fa-lg fa-arrow-left"></i><span>Back To Documents</span>
-                  </a>
-                  <a class="btn btn-success btn-refresh" target="_blank" href='{{ url("/documents/{$document->id}/pdf") }}'>
+                  <a class="btn btn-success btn-refresh" target="_blank" href='{{ url("gis/documents/{$document->id}/pdf") }}'>
                     <i class="fa fa-fw fa-lg fa-file-pdf-o"></i><span>Download PDF</span>
                   </a>
-                  <a class="btn btn-success btn-refresh" target="_blank" href='{{ url("/documents/{$document->id}/raw") }}'>
+                  <a class="btn btn-success btn-refresh" target="_blank" href='{{ url("gis/documents/{$document->id}/raw") }}'>
                     <i class="fa fa-fw fa-lg fa-file-code-o"></i><span>Download Raw XML</span>
                   </a>
                 </div>

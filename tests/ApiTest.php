@@ -4,7 +4,6 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-
 abstract class ApiTest extends TestCase
 {
     use DatabaseTransactions;
@@ -68,10 +67,14 @@ abstract class ApiTest extends TestCase
 
     public function setUp() {
       parent::setUp();
+
+
       Auth::loginUsingId(1);
 
       $this->test_dummy = factory($this->model_class)->make();
       $this->test_dummy_attributes = $this->test_dummy->toArray();
+      unset($this->test_dummy_attributes['updated_at_for_humans']);
+      unset($this->test_dummy_attributes['identifiable_name']);
     }
 
 

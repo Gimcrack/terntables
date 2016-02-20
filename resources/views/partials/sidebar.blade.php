@@ -18,42 +18,61 @@
         <a href="{{ url('profile') }}"><i class="fa fa-user fa-fw"></i> My Profile</a>
       </li>
 
-      @if( Auth::user()->checkAccess('Document.read') )
+
       <li>
   			<a href="#"><i class="fa fa-globe fa-fw"></i> GIS <span class="fa arrow"></span></a>
   			<ul class="nav nav-second-level">
+          @if( Auth::user()->checkAccess('Document.read') )
           <li>
-            <a href="{{ url('documents') }}"><i class="fa fa-file-text-o fa-fw"></i> Documents</a>
+            <a href="{{ url('gis/documents') }}"><i class="fa fa-file-text-o fa-fw"></i> Documents</a>
           </li>
+          @endif
         </ul>
       </li>
-      @endif
 
-      @if( Auth::user()->checkAccess('Server.read') )
+
       <li>
-  			<a href="#"><i class="fa fa-database fa-fw"></i> BI <span class="fa arrow"></span></a>
+  			<a href="#"><i class="fa fa-desktop fa-fw"></i> OIT <span class="fa arrow"></span></a>
   			<ul class="nav nav-second-level">
+          @if( Auth::user()->checkAccess('Outage.read') )
           <li>
-            <a href="{{ url('bi/servers') }}"><i class="fa fa-server fa-fw"></i> Servers</a>
+            <a href="{{ url('oit/outages') }}"><i class="fa fa-power-off fa-fw"></i> Outages</a>
           </li>
+          @endif
+
+          @if( Auth::user()->checkAccess('OutageTaskDetail.read') )
           <li>
-            <a href="{{ url('bi/applications') }}"><i class="fa fa-cubes fa-fw"></i> Applications</a>
+            <a href="{{ url('oit/outageTasks') }}"><i class="fa fa-tasks fa-fw"></i> Outage Tasks</a>
           </li>
+          @endif
+
+          @if( Auth::user()->checkAccess('OutageTask.read') )
           <li>
-            <a href="{{ url('bi/databases') }}"><i class="fa fa-database fa-fw"></i> Databases</a>
+            <a href="{{ url('oit/taskTemplates') }}"><i class="fa fa-tasks fa-fw"></i> Outage Templates</a>
           </li>
+          @endif
+
+          @if( Auth::user()->checkAccess('Server.read') )
           <li>
-            <a href="{{ url('bi/outages') }}"><i class="fa fa-power-off fa-fw"></i> Outages</a>
+            <a href="{{ url('oit/servers') }}"><i class="fa fa-server fa-fw"></i> Servers</a>
           </li>
+          @endif
+
+          @if( Auth::user()->checkAccess('Application.read') )
           <li>
-            <a href="{{ url('bi/outageTasks') }}"><i class="fa fa-tasks fa-fw"></i>Outage Tasks</a>
+            <a href="{{ url('oit/applications') }}"><i class="fa fa-cubes fa-fw"></i> Applications</a>
           </li>
+          @endif
+
+          @if( Auth::user()->checkAccess('Database.read') )
           <li>
-            <a href="{{ url('bi/taskTemplates') }}"><i class="fa fa-tasks fa-fw"></i>Task Templates</a>
+            <a href="{{ url('oit/databases') }}"><i class="fa fa-database fa-fw"></i> Databases</a>
           </li>
+          @endif
+
         </ul>
       </li>
-      @endif
+
 
       <li>
         <a href="{{ url('/auth/logout') }}"><i class="fa fa-sign-out fa-fw"></i> Logout </a>

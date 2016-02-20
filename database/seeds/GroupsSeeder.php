@@ -30,6 +30,7 @@ class GroupsSeeder extends Seeder
         Group::create(['name' => 'GIS', 'description' => 'GIS Team']);
         Group::create(['name' => 'SD',  'description' => 'Service Desk Team']);
         Group::create(['name' => 'TI',  'description' => 'Technology Infrastructure Team']);
+        Group::create(['name' => 'Outage Workers',  'description' => 'Users who work outages']);
 
 
         // Group::create(['name' => 'Org Viewers', 'description' => 'Widget Viewers']);

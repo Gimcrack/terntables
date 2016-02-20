@@ -18,20 +18,75 @@ class RolesSeeder extends Seeder
 
 
         Role::create([
-          'name' => 'Org Managers',
-          'model' => 'Org',
-          'description' => 'Can create, update, and delete orgs',
+          'name' => 'Outage Managers',
+          'model' => 'Outage',
+          'description' => 'Can create, update, and delete Outages',
           'create_enabled' => 1,
           'read_enabled' => 1,
           'update_enabled' => 1,
           'delete_enabled' => 1,
-        ])->groups()->attach(5);
+        ])->groups()->attach(10);
 
         Role::create([
-          'name' => 'Org Viewers',
-          'model' => 'Org',
-          'description' => 'Can view orgs',
+          'name' => 'Outage Task Managers',
+          'model' => 'OutageTask',
+          'description' => 'Can create, update, and delete Outage Tasks',
+          'create_enabled' => 1,
           'read_enabled' => 1,
-        ])->groups()->attach(4);
+          'update_enabled' => 1,
+          'delete_enabled' => 1,
+        ])->groups()->attach(10);
+
+        Role::create([
+          'name' => 'Outage Task Detail Managers',
+          'model' => 'OutageTaskDetail',
+          'description' => 'Can create, update, and delete Outage Task Details',
+          'create_enabled' => 1,
+          'read_enabled' => 1,
+          'update_enabled' => 1,
+          'delete_enabled' => 1,
+        ])->groups()->attach(10);
+
+        Role::create([
+          'name' => 'Server Managers',
+          'model' => 'Server',
+          'description' => 'Can create, update, and delete Servers',
+          'create_enabled' => 1,
+          'read_enabled' => 1,
+          'update_enabled' => 1,
+          'delete_enabled' => 1,
+        ])->groups()->attach(6);
+
+        Role::create([
+          'name' => 'Application Managers',
+          'model' => 'Application',
+          'description' => 'Can create, update, and delete Applcations',
+          'create_enabled' => 1,
+          'read_enabled' => 1,
+          'update_enabled' => 1,
+          'delete_enabled' => 1,
+        ])->groups()->attach(6);
+
+        Role::create([
+          'name' => 'Database Managers',
+          'model' => 'Database',
+          'description' => 'Can create, update, and delete Databases',
+          'create_enabled' => 1,
+          'read_enabled' => 1,
+          'update_enabled' => 1,
+          'delete_enabled' => 1,
+        ])->groups()->attach(6);
+
+        Role::create([
+          'name' => 'GIS Document Managers',
+          'model' => 'Document',
+          'description' => 'Can create, update, and delete GIS Documents',
+          'create_enabled' => 1,
+          'read_enabled' => 1,
+          'update_enabled' => 1,
+          'delete_enabled' => 1,
+        ])->groups()->attach(7);
+
+
     }
 }

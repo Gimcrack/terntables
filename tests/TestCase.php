@@ -19,6 +19,13 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
         $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
+        if ( ! \App\User::where('username','jeremy')->count() )
+        {
+          // \App\Group::create([ 'name' => 'Super Administrators']);
+
+          \App\User::create([ 'username' => 'jeremy', 'email' => 'jeremy.bloomstrom@matsugov.us', 'password' => bcrypt('Matanuska1') ])->groups()->attach([1]);
+        }
+
         return $app;
     }
 }

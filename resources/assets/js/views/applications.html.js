@@ -26,7 +26,18 @@
 			_label : 'Is the application inactive?',
 			_optionssource : '0|1',
 			_labelssource : 'No|Yes',
-		}
+		},
+		{
+			name : 'group_id',
+			_label : 'What Group "owns" this Application?',
+			type : 'select',
+			required : true,
+			'data-validType' : 'select',
+			_firstlabel : '-Choose-',
+			_firstoption : -1,
+			_optionssource : 'Group.id',
+			_labelssource : 'Group.name',
+		},
 	], fieldset_2__fields = [
 		{
 			name : 'people',
@@ -178,6 +189,7 @@
 			columns : [ 				// columns to query
 				"id",
 				"name",
+				"owner_name",
 				"description",
 				"people",
 				"servers",
@@ -186,6 +198,7 @@
 			headers : [ 				// headers for table
 				"ID",
 				"Name",
+				"Owner",
 				"Description",
 				"Contacts",
 				"Servers",
@@ -203,7 +216,12 @@
 					return label + _.nameButton( value, 'fa-cubes' );
 				},
 
-				"servers" : function(arr) {
+				owner_name : function(val) {
+					var r = jApp.activeGrid.currentRow;
+					return _.get('name', r.owner || '', 'fa-users','Group');
+				},
+
+				servers : function(arr) {
 					return _.get('name', arr, 'fa-server', 'Server' );
 				},
 			},

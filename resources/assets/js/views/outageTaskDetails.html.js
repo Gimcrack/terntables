@@ -18,20 +18,6 @@
 			_label : 'Description',
 		},
 		{
-			name : 'task_type',
-			_label : 'Task Type',
-			type : 'select',
-			_optionssource : [
-				'-Choose-',
-				'Server Task',
-				'Application Task',
-				'Database Task',
-				'Other'
-			],
-			required : true,
-			'data-validType' : 'select'
-		},
-		{
 			name : 'group_id',
 			_label : 'What Group "owns" this Task?',
 			type : 'select',
@@ -83,6 +69,20 @@
 			type : 'textarea'
 		}
 	], fieldset_2__fields = [
+		{
+			name : 'task_type',
+			_label : 'What type of Task is this?',
+			type : 'select',
+			_optionssource : [
+				'-Choose-',
+				'Server Task',
+				'Application Task',
+				'Database Task',
+				'Other'
+			],
+			required : true,
+			'data-validType' : 'select',
+		},
 		{
 			name : 'server_id',
 			type : 'select',
@@ -138,6 +138,14 @@
 						icon : 'fa-toggle-off',
 						label : 'Show Only My Tasks',
 						fn : 'showOnlyMine',
+						'data-order' : 97
+					},
+					showOnlyMyGroups : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle btn-showOnlyMyGroups',
+						icon : 'fa-toggle-off',
+						label : 'Show Only My Groups\' Tasks',
+						fn : 'showOnlyMyGroups',
 						'data-order' : 98
 					},
 					showOnlyAvailable : {
@@ -345,6 +353,70 @@
 			fn : {
 
 				/**
+				 * Custom form bootup function
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				formBootup : function() {
+					var frm = jUtility.$currentFormWrapper();
+					console.log('running custom bootup function');
+					frm.find('#server_id').closest('.form_element').hide();
+					frm.find('#application_id').closest('.form_element').hide();
+					frm.find('#database_id').closest('.form_element').hide();
+
+					frm.find('#task_type').change( jApp.aG().fn.updateFormFields);
+
+					jApp.aG().fn.updateFormFields();
+				}, // end fn
+
+				/**
+				 * Custom getRowData callback function, runs after the row data is populated
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				getRowDataCallback : function() {
+					console.log('running custom getRowData callback');
+					jApp.aG().fn.updateFormFields();
+				}, // end fn
+
+				/**
+				 * Update what form fields are visible
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				updateFormFields : function() {
+					var frm = jUtility.$currentFormWrapper();
+
+					if ( ! frm ) { return false; }
+
+					switch( frm.find('#task_type').val()  ) {
+						case 'Server Task' :
+							frm.find('#server_id').prop('disabled',false).closest('.form_element').show();
+							frm.find('#application_id').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#database_id').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Application Task' :
+							frm.find('#server_id').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#application_id').prop('disabled',false).closest('.form_element').show();
+							frm.find('#database_id').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Database Task' :
+							frm.find('#server_id').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#application_id').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#database_id').prop('disabled',false).closest('.form_element').show();
+							return true;
+
+						case 'Other' :
+							frm.find('#server_id').prop('disabled',false).closest('.form_element').show();
+							frm.find('#application_id').prop('disabled',false).closest('.form_element').show();
+							frm.find('#database_id').prop('disabled',false).closest('.form_element').show();
+							return true;
+					}
+				}, // end fn
+
+				/**
 				 * Assign the selected tasks to me
 				 * @method function
 				 * @return {[type]} [description]
@@ -389,7 +461,11 @@
 					}
 
 					if (typeof temp.showOnlyAvailable !== 'undefined' && !! temp.showOnlyAvailable) {
-						filter.push("person_id is null");
+						filter.push(":show__only__available:");
+					}
+
+					if (typeof temp.showOnlyMyGroups !== 'undefined' && !! temp.showOnlyMyGroups) {
+						filter.push(":show__only__my__groups:");
 					}
 
 					if (typeof temp.showOnlyMine !== 'undefined' && !! temp.showOnlyMine) {
@@ -410,10 +486,29 @@
 						? true : !jApp.activeGrid.temp.showOnlyMine;
 
 					jApp.activeGrid.temp.showOnlyAvailable = false;
+					jApp.activeGrid.temp.showOnlyMyGroups = false;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
 					$('.btn-showOnlyAvailable').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+					$('.btn-showOnlyMyGroups').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+				}, //end fn
+
+				/**
+				 * Show only my groups' tasks
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				showOnlyMyGroups : function( ) {
+					jApp.activeGrid.temp.showOnlyMyGroups = ( typeof jApp.activeGrid.temp.showOnlyMyGroups === 'undefined')
+						? true : !jApp.activeGrid.temp.showOnlyMyGroups;
+
+					jApp.activeGrid.temp.showOnlyMine = false;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+					$('.btn-showOnlyAvailable').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+					$('.btn-showOnlyMine').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
 				}, //end fn
 
 				/**
@@ -426,10 +521,12 @@
 						? true : !jApp.activeGrid.temp.showOnlyAvailable;
 
 					jApp.activeGrid.temp.showOnlyMine = false;
+					jApp.activeGrid.temp.showOnlyMyGroups = false;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
 					$('.btn-showOnlyMine').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+					$('.btn-showOnlyMyGroups').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
 				}, //end fn
 
 				/**

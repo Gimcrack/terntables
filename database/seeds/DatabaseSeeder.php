@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         Model::unguard();
 
         //$this->call(ColParamSeeder::class);
+        $this->call(OperatingSystemsSeeder::class);
         $this->call(GroupsSeeder::class);
         $this->call(RolesSeeder::class);
         $this->call(PersonSeeder::class);

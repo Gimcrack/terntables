@@ -41201,6 +41201,9 @@ module.exports = function (options) {
     serialize: function serialize() {
       var ret = {};
       _.each(self.oInpts, function (o, i) {
+        // ignore disabled elements
+        if (!!(o.$().prop('disabled') || o.$().hasClass('disabled'))) return false;
+
         ret[i] = o.fn.serialize();
       });
       return ret;
@@ -41968,6 +41971,11 @@ module.exports = function (options) {
 
       // iterate through each row and the the corresponding input value
       _.each(response, self.fn.setInputValue);
+
+      // if there is a custom callback, then call it.
+      if (typeof jApp.aG().fn.getRowDataCallback === 'function') {
+        jApp.aG().fn.getRowDataCallback();
+      }
 
       //self.DOM.$frm.find('.bsms').multiselect('refresh').change();
       $('.panel-overlay').hide();
@@ -45512,6 +45520,13 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     }
   },
 
+  "input[type=file]": {
+    change: function change(e) {
+      e.preventDefault();
+      jUtility.uploadFile(this);
+    }
+  },
+
   "#confirmation": {
     keyup: function keyup() {
       if ($(this).val().toString().toLowerCase() === 'yes') {
@@ -46832,7 +46847,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
       //col
       $col = jApp.tbl().find('.table-body .table-row .table-cell:nth-child(' + colNum + ')').map(function (i, elm) {
-        return [[$(elm).clone().find('button').remove().end().text().toLowerCase(), $(elm).parent()]];
+        return [[$(elm).clone().text().toLowerCase(), $(elm).parent()]];
       }).sort(function (a, b) {
 
         if ($.isNumeric(a[0]) && $.isNumeric(b[0])) {
@@ -47992,6 +48007,10 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
    * @return {[type]} [description]
    */
   formBootup: function formBootup() {
+    if (typeof jApp.aG().fn.formBootup === 'function') {
+      jApp.aG().fn.formBootup();
+    }
+
     jUtility.$currentFormWrapper()
     //reset validation stuff
     .find('.has-error').removeClass('has-error').end().find('.has-success').removeClass('has-success').end().find('.help-block').hide().end().find('.form-control-feedback').hide().end()
@@ -48186,6 +48205,39 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     jApp.opts().closeOnSave = true;
     jUtility.submitCurrentForm($(this));
     //jUtility.toggleRowMenu;
+  }, // end fn
+
+  /**
+   * Upload the file
+   * @method function
+   * @param  {[type]} $inpt [description]
+   * @return {[type]}       [description]
+   */
+  uploadFile: function uploadFile(inpt) {
+    var formData = new FormData(),
+        $btn,
+        requestOptions;
+
+    _.each(inpt.files, function (file, index) {
+      formData.append(inpt.name, file, file.name);
+    });
+
+    console.log('formData', formData);
+
+    $btn = jUtility.$currentFormWrapper().find('.btn-go');
+
+    requestOptions = {
+      url: jUtility.getCurrentFormAction(),
+      data: formData,
+      //fail : console.warn,
+      always: function always() {
+        jUtility.toggleButton($btn);
+      }
+    };
+
+    jUtility.postJSONfile(requestOptions);
+
+    jUtility.toggleButton($btn);
   }, // end fn
 
   /**
@@ -49542,9 +49594,40 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       success: opts.success,
       type: 'POST',
       dataType: 'json'
-    }). //processData : false,
-    //contentType : false
-    fail(opts.fail).always(opts.always).complete(opts.complete);
+    }).fail(opts.fail).always(opts.always).complete(opts.complete);
+  }, // end fn
+
+  /**
+   * post JSON to upload a file
+   * @method function
+   * @param  {[type]} requestOptions [description]
+   * @return {[type]}                [description]
+   */
+  postJSONfile: function postJSONfile(requestOptions) {
+
+    // if ( typeof requestOptions.data.append !== 'function' ) {
+    //   requestOptions.data = jUtility.prepareFormData( requestOptions.data || {} );
+    // }
+
+    var opts = $.extend(true, {
+      url: null,
+      data: {},
+      success: function success() {},
+      fail: function fail() {},
+      always: jUtility.callback.displayResponseErrors,
+      complete: function complete() {}
+    }, requestOptions);
+
+    return $.ajax({
+      url: opts.url,
+      data: opts.data,
+      success: opts.success,
+      type: 'POST',
+      dataType: 'json',
+      processData: false,
+      contentType: false,
+      cache: false
+    }).fail(opts.fail).always(opts.always).complete(opts.complete);
   }, // end fn
 
   /**
@@ -63308,9 +63391,9 @@ $(function() {
 })(jApp)
 
 /**
- * outages.html.js
+ * admin.operatingSystems.html.js
  *
- * outages view definition
+ * operating systems view definition
  */
 ;(function(jApp) {
 	/**
@@ -63684,7 +63767,18 @@ $(function() {
 			_label : 'Is the application inactive?',
 			_optionssource : '0|1',
 			_labelssource : 'No|Yes',
-		}
+		},
+		{
+			name : 'group_id',
+			_label : 'What Group "owns" this Application?',
+			type : 'select',
+			required : true,
+			'data-validType' : 'select',
+			_firstlabel : '-Choose-',
+			_firstoption : -1,
+			_optionssource : 'Group.id',
+			_labelssource : 'Group.name',
+		},
 	], fieldset_2__fields = [
 		{
 			name : 'people',
@@ -63836,6 +63930,7 @@ $(function() {
 			columns : [ 				// columns to query
 				"id",
 				"name",
+				"owner_name",
 				"description",
 				"people",
 				"servers",
@@ -63844,6 +63939,7 @@ $(function() {
 			headers : [ 				// headers for table
 				"ID",
 				"Name",
+				"Owner",
 				"Description",
 				"Contacts",
 				"Servers",
@@ -63861,7 +63957,12 @@ $(function() {
 					return label + _.nameButton( value, 'fa-cubes' );
 				},
 
-				"servers" : function(arr) {
+				owner_name : function(val) {
+					var r = jApp.activeGrid.currentRow;
+					return _.get('name', r.owner || '', 'fa-users','Group');
+				},
+
+				servers : function(arr) {
 					return _.get('name', arr, 'fa-server', 'Server' );
 				},
 			},
@@ -64259,7 +64360,9 @@ $(function() {
 				templates : { 				// html template functions
 
 					host_name : function(value) {
-						return _.get('host.name','fa-server');
+						var r = jApp.aG().currentRow;
+
+						return _.get('name',r.host || '','fa-server','Server');
 					},
 
 					rpo : function(value) {
@@ -64387,93 +64490,124 @@ $(function() {
 
 })(jApp);
 
-// extend the application views
-$.extend(true, jApp.views, {
+/**
+ * admin.operatingSystems.html.js
+ *
+ * operating systems view definition
+ */
+;(function(jApp) {
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			placeholder : 'A unique name',
+			required : true,
+			_label : 'Enter the name of the Document.',
+			'data-validType' : 'Anything'
+		},
+		{
+			name : 'description',
+			type : 'textarea',
+			_label : 'Description',
+		},
+		{
+			name : 'original_file',
+			type : 'file',
+			_label : 'Upload XML File',
+		},
+		{
+			name : 'person_id',
+			type : 'select',
+			_label : 'Document Owner',
+			_firstlabel : '-Choose-',
+			_firstoption : null,
+			_labelssource : 'Person.name',
+			_optionssource : 'Person.id',
+			required : true,
+			'data-validType' : 'select'
+		},
+		{
+			name : 'tags',
+      _label : 'Tags',
+			type : 'tokens',
+			_optionssource : 'Tag.id',
+			_labelssource : 'Tag.name',
+      multiple : true
+		},
+	];
 
-	documents : function() {
+	/**
+	 * Add the view
+	 */
+	jApp.addView('documents',
+	{
+		model : 'Document',
+		columnFriendly : 'name',
+		gridHeader : {
+			icon : 'fa-file-text-o',
+			headerTitle : 'GIS Documents',
+			helpText : 'Note: Create, Update, and Manage GIS documents here.'
+		},
+		toggles : {
+			ellipses : false
+		},
+		columns : [ 				// columns to query
+			"id",
+			"name",
+			"description",
+			"raw_file_path",
+			"parsed_file_path",
+			"owner",
+			"status",
+			"tags"
+		],
+		headers : [ 				// headers for table
+			"ID",
+			"Title",
+			"Description",
+			"Original File",
+			"Parsed File",
+			"Owner",
+			"Status",
+			"Tags"
+		],
+		templates : { 				// html template functions
 
-		$.extend(true, jApp.oG, {
+			"owner" : function(value) {
+				var r = jApp.aG().currentRow;
+				return _.get('name',r.owner,'fa-male','Person');
+			},
 
-			documents : new jGrid({
-				table : 'documents',
-				model : 'Document',
-				columnFriendly : 'name',
-				gridHeader : {
-					icon : 'fa-file-text-o',
-					headerTitle : 'GIS Documents',
-					helpText : 'Note: Create, Update, and Manage GIS documents here.'
+			"raw_file_path" : function(value) {
+				var r = jApp.aG().currentRow, v;
+				if (value.length > 30) {
+					v = value.substring(0,30) + '...';
+				}
+				return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/raw\" target=\"_blank\">" + v + '</a>';
+			},
+
+			"parsed_file_path" : function(value) {
+				var r = jApp.aG().currentRow, v;
+				if (value.length > 30) {
+					v = value.substring(0,30) + '...';
+				}
+				return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/pdf\" target=\"_blank\">" + v + '</a>';
+			},
+
+		},
+	},
+		[ // colparams
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-3',
+					fields : fieldset_1__fields
 				},
-				toggles : {
-					ellipses : false
-				},
-				columns : [ 				// columns to query
-					"id",
-					"name",
-					"description",
-					"raw_file_path",
-					"parsed_file_path",
-					"owner",
-					"status",
-					"tags"
-				],
-				hidCols : [					// columns to hide
-
-				],
-				headers : [ 				// headers for table
-					"ID",
-					"Title",
-					"Description",
-					"Original File",
-					"Parsed File",
-					"Owner",
-					"Status",
-					"Tags"
-				],
-				templates : { 				// html template functions
-
-					"id" : function(value) {
-						var temp = '0000' + value;
-						return temp.slice(-4);
-					},
-
-					"owner" : function(value) {
-						var r = jApp.aG().currentRow;
-						return ( r.owner != null ) ? r.owner.name : '';
-					},
-
-					"name" : function(value) {
-						var r = jApp.aG().currentRow;
-						return  "<a href=\"documents/" + r.id + "\" >" + value + '</a>';
-					},
-
-					"raw_file_path" : function(value) {
-						var r = jApp.aG().currentRow, v;
-						if (value.length > 30) {
-							v = value.substring(0,30) + '...';
-						}
-						return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/raw\" target=\"_blank\">" + v + '</a>';
-					},
-
-					"parsed_file_path" : function(value) {
-						var r = jApp.aG().currentRow, v;
-						if (value.length > 30) {
-							v = value.substring(0,30) + '...';
-						}
-						return  "<a title=\"" + value + "\" href=\"documents/" + r.id + "/pdf\" target=\"_blank\">" + v + '</a>';
-					},
-
-					"tags" : function() {
-						var r = jApp.aG().currentRow;
-						return _.pluck( r.tags, 'name').map( function(val) {
-							return '<span style="margin:3px;" class="label label-default">' + val + '</span>';
-						}).join('');
-					}
-
-				},
-			})
-		})
-	}
-});
+		]
+	)
+})(jApp);
 
 /**
  * outages.html.js
@@ -64655,20 +64789,6 @@ $.extend(true, jApp.views, {
 			_label : 'Description',
 		},
 		{
-			name : 'task_type',
-			_label : 'Task Type',
-			type : 'select',
-			_optionssource : [
-				'-Choose-',
-				'Server Task',
-				'Application Task',
-				'Database Task',
-				'Other'
-			],
-			required : true,
-			'data-validType' : 'select'
-		},
-		{
 			name : 'group_id',
 			_label : 'What Group "owns" this Task?',
 			type : 'select',
@@ -64720,6 +64840,20 @@ $.extend(true, jApp.views, {
 			type : 'textarea'
 		}
 	], fieldset_2__fields = [
+		{
+			name : 'task_type',
+			_label : 'What type of Task is this?',
+			type : 'select',
+			_optionssource : [
+				'-Choose-',
+				'Server Task',
+				'Application Task',
+				'Database Task',
+				'Other'
+			],
+			required : true,
+			'data-validType' : 'select',
+		},
 		{
 			name : 'server_id',
 			type : 'select',
@@ -64775,6 +64909,14 @@ $.extend(true, jApp.views, {
 						icon : 'fa-toggle-off',
 						label : 'Show Only My Tasks',
 						fn : 'showOnlyMine',
+						'data-order' : 97
+					},
+					showOnlyMyGroups : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle btn-showOnlyMyGroups',
+						icon : 'fa-toggle-off',
+						label : 'Show Only My Groups\' Tasks',
+						fn : 'showOnlyMyGroups',
 						'data-order' : 98
 					},
 					showOnlyAvailable : {
@@ -64982,6 +65124,70 @@ $.extend(true, jApp.views, {
 			fn : {
 
 				/**
+				 * Custom form bootup function
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				formBootup : function() {
+					var frm = jUtility.$currentFormWrapper();
+					console.log('running custom bootup function');
+					frm.find('#server_id').closest('.form_element').hide();
+					frm.find('#application_id').closest('.form_element').hide();
+					frm.find('#database_id').closest('.form_element').hide();
+
+					frm.find('#task_type').change( jApp.aG().fn.updateFormFields);
+
+					jApp.aG().fn.updateFormFields();
+				}, // end fn
+
+				/**
+				 * Custom getRowData callback function, runs after the row data is populated
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				getRowDataCallback : function() {
+					console.log('running custom getRowData callback');
+					jApp.aG().fn.updateFormFields();
+				}, // end fn
+
+				/**
+				 * Update what form fields are visible
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				updateFormFields : function() {
+					var frm = jUtility.$currentFormWrapper();
+
+					if ( ! frm ) { return false; }
+
+					switch( frm.find('#task_type').val()  ) {
+						case 'Server Task' :
+							frm.find('#server_id').prop('disabled',false).closest('.form_element').show();
+							frm.find('#application_id').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#database_id').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Application Task' :
+							frm.find('#server_id').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#application_id').prop('disabled',false).closest('.form_element').show();
+							frm.find('#database_id').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Database Task' :
+							frm.find('#server_id').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#application_id').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#database_id').prop('disabled',false).closest('.form_element').show();
+							return true;
+
+						case 'Other' :
+							frm.find('#server_id').prop('disabled',false).closest('.form_element').show();
+							frm.find('#application_id').prop('disabled',false).closest('.form_element').show();
+							frm.find('#database_id').prop('disabled',false).closest('.form_element').show();
+							return true;
+					}
+				}, // end fn
+
+				/**
 				 * Assign the selected tasks to me
 				 * @method function
 				 * @return {[type]} [description]
@@ -65026,7 +65232,11 @@ $.extend(true, jApp.views, {
 					}
 
 					if (typeof temp.showOnlyAvailable !== 'undefined' && !! temp.showOnlyAvailable) {
-						filter.push("person_id is null");
+						filter.push(":show__only__available:");
+					}
+
+					if (typeof temp.showOnlyMyGroups !== 'undefined' && !! temp.showOnlyMyGroups) {
+						filter.push(":show__only__my__groups:");
 					}
 
 					if (typeof temp.showOnlyMine !== 'undefined' && !! temp.showOnlyMine) {
@@ -65047,10 +65257,29 @@ $.extend(true, jApp.views, {
 						? true : !jApp.activeGrid.temp.showOnlyMine;
 
 					jApp.activeGrid.temp.showOnlyAvailable = false;
+					jApp.activeGrid.temp.showOnlyMyGroups = false;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
 					$('.btn-showOnlyAvailable').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+					$('.btn-showOnlyMyGroups').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+				}, //end fn
+
+				/**
+				 * Show only my groups' tasks
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				showOnlyMyGroups : function( ) {
+					jApp.activeGrid.temp.showOnlyMyGroups = ( typeof jApp.activeGrid.temp.showOnlyMyGroups === 'undefined')
+						? true : !jApp.activeGrid.temp.showOnlyMyGroups;
+
+					jApp.activeGrid.temp.showOnlyMine = false;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+					$('.btn-showOnlyAvailable').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+					$('.btn-showOnlyMine').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
 				}, //end fn
 
 				/**
@@ -65063,10 +65292,12 @@ $.extend(true, jApp.views, {
 						? true : !jApp.activeGrid.temp.showOnlyAvailable;
 
 					jApp.activeGrid.temp.showOnlyMine = false;
+					jApp.activeGrid.temp.showOnlyMyGroups = false;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
 					$('.btn-showOnlyMine').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+					$('.btn-showOnlyMyGroups').removeClass('active').find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
 				}, //end fn
 
 				/**
@@ -65122,22 +65353,8 @@ $.extend(true, jApp.views, {
 			_label : 'Description',
 		},
 		{
-			name : 'task_type',
-			_label : 'Task Type',
-			type : 'select',
-			_optionssource : [
-				'-Choose-',
-				'Server Task',
-				'Application Task',
-				'Database Task',
-				'Other'
-			],
-			required : true,
-			'data-validType' : 'select'
-		},
-		{
 			name : 'group_id',
-			_label : 'What Group "owns" this Task?',
+			_label : 'What Group "owns" this Task? A member of this group will perform the task.',
 			type : 'select',
 			required : true,
 			'data-validType' : 'select',
@@ -65163,20 +65380,31 @@ $.extend(true, jApp.views, {
 		}
 	], fieldset_2__fields = [
 		{
-			name : 'assign_to_people',
+			name : 'task_type',
+			_label : 'What type of Task is this?',
 			type : 'select',
-			_label : 'This task may be assigned to these people.',
-			_labelssource : 'Person.name',
-			_optionssource : 'Person.id',
-			multiple : true
+			_optionssource : [
+				'-Choose-',
+				'Server Task',
+				'Application Task',
+				'Database Task',
+				'Other'
+			],
+			required : true,
+			'data-validType' : 'select'
 		},
 		{
-			name : 'assign_to_groups',
+			name : 'criteria_selection',
+			_label : 'How do you want to specify the scope of this task?',
 			type : 'select',
-			_label : 'This task may be assigned to members of these groups.',
-			_labelssource : 'Group.name',
-			_optionssource : 'Group.id',
-			multiple : true
+			_labelssource : [
+				'Automatically, based on specified criteria',
+				'Manually',
+			],
+			_optionssource : [
+				'Automatic',
+				'Manual',
+			]
 		},
 		{
 			name : 'scope_to_servers',
@@ -65367,7 +65595,7 @@ $.extend(true, jApp.views, {
 						ret.push('</tr>');
 					}
 
-					if ( !! r.scope_to_production_servers ) {
+					if ( !! +r.scope_to_production_servers ) {
 						var tmp = ( r.scope_to_production_servers == '2' ) ? 'Non-Production Only' : 'Production Only'
 						ret.push('<tr>');
 						ret.push('<td>Type</td>');
@@ -65381,6 +65609,94 @@ $.extend(true, jApp.views, {
 				}
 			},
 			fn : {
+
+				/**
+				 * Custom form bootup function
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				formBootup : function() {
+					var frm = jUtility.$currentFormWrapper();
+					console.log('running custom bootup function');
+
+					frm.find('#scope_to_servers').closest('.form_element').hide();
+					frm.find('#scope_to_applications').closest('.form_element').hide();
+					frm.find('#scope_to_databases').closest('.form_element').hide();
+
+					frm.find('#task_type').change( jApp.aG().fn.updateFormFields);
+					frm.find('#criteria_selection').change( jApp.aG().fn.updateFormFields);
+
+					jApp.aG().fn.updateFormFields();
+				}, // end fn
+
+				/**
+				 * Custom getRowData callback function, runs after the row data is populated
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				getRowDataCallback : function() {
+					console.log('running custom getRowData callback');
+					jApp.aG().fn.updateFormFields();
+				}, // end fn
+
+				/**
+				 * Update what form fields are visible
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				updateFormFields : function() {
+					var frm = jUtility.$currentFormWrapper();
+
+					if ( ! frm ) { return false; }
+
+					switch( frm.find('#task_type').val() + ' ' + frm.find('#criteria_selection').val()  ) {
+						case 'Server Task Manual' :
+							frm.find('#scope_to_servers').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_applications').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_databases').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_groups').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_operating_systems').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_production_servers').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Application Task Manual' :
+							frm.find('#scope_to_servers').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_applications').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_databases').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_groups').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_operating_systems').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_production_servers').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Database Task Manual' :
+							frm.find('#scope_to_servers').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_applications').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_databases').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_groups').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_operating_systems').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_production_servers').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Other Manual' :
+							frm.find('#scope_to_servers').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_applications').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_databases').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_groups').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_operating_systems').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_production_servers').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						default :
+							frm.find('#scope_to_servers').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_applications').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_databases').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_groups').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_operating_systems').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_production_servers').prop('disabled',false).closest('.form_element').show();
+							return true;
+					}
+				}, // end fn
+
 				/**
 				 * Mark selected applications as inactive/active
 				 * @method function
@@ -65436,7 +65752,7 @@ $.extend(true, jApp.views, {
 				},
 				{ // fieldset
 					label : 'Task Scope',
-					helpText : 'You may optionally limit the scope that this task will apply to.',
+					helpText : 'You may manually specify the scope of the task (i.e. what servers/applications/databases the task will be performed on), or specify criteria that will set the scope automatically.',
 					class : 'col-lg-8',
 					fields : fieldset_2__fields
 				},

@@ -30,7 +30,8 @@ class ApplicationController extends ApiController
     'databases',
     'servers',
     'people',
-    'tags'
+    'tags',
+    'owner'
   ];
 
   /**

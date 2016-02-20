@@ -89,7 +89,10 @@ class Outage extends Model
      */
     public function resetTaskDetails()
     {
-      OutageTaskDetail::where('outage_id',$this->id)->delete();
+      OutageTaskDetail::where('outage_id',$this->id)
+        ->whereNull('person_id')
+        ->where('status','New')
+        ->delete();
     }
 
     /**

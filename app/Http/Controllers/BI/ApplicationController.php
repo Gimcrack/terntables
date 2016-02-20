@@ -28,7 +28,8 @@ class ApplicationController extends Controller
     'databases',
     'servers',
     'people',
-    'tags'
+    'tags',
+    'owner'
   ];
 
   /**

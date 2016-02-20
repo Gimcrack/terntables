@@ -48,7 +48,7 @@ class Document extends Model
       , 'description'
       , 'raw_file_path'
       , 'parsed_file_path'
-      , 'people_id'
+      , 'person_id'
       , 'status'
     ];
 
@@ -68,7 +68,7 @@ class Document extends Model
      */
     public function owner()
     {
-        return $this->belongsTo('App\Person','people_id');
+        return $this->belongsTo('App\Person','person_id');
     }
 
     /**
@@ -115,7 +115,7 @@ class Document extends Model
       $replace = Document::$replace;
       $this->update(['status' => 'processed']);
 
-      $pdf = PDF::loadView('documents.showpdf', compact('document', 'params', 'replace')  );
+      $pdf = PDF::loadView('gis.documents.showpdf', compact('document', 'params', 'replace')  );
       return $pdf->save( storage_path('documents') . DIRECTORY_SEPARATOR . $this->parsed_file_path );
     }
 

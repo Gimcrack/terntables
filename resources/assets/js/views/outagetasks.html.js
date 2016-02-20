@@ -20,22 +20,8 @@
 			_label : 'Description',
 		},
 		{
-			name : 'task_type',
-			_label : 'Task Type',
-			type : 'select',
-			_optionssource : [
-				'-Choose-',
-				'Server Task',
-				'Application Task',
-				'Database Task',
-				'Other'
-			],
-			required : true,
-			'data-validType' : 'select'
-		},
-		{
 			name : 'group_id',
-			_label : 'What Group "owns" this Task?',
+			_label : 'What Group "owns" this Task? A member of this group will perform the task.',
 			type : 'select',
 			required : true,
 			'data-validType' : 'select',
@@ -61,20 +47,31 @@
 		}
 	], fieldset_2__fields = [
 		{
-			name : 'assign_to_people',
+			name : 'task_type',
+			_label : 'What type of Task is this?',
 			type : 'select',
-			_label : 'This task may be assigned to these people.',
-			_labelssource : 'Person.name',
-			_optionssource : 'Person.id',
-			multiple : true
+			_optionssource : [
+				'-Choose-',
+				'Server Task',
+				'Application Task',
+				'Database Task',
+				'Other'
+			],
+			required : true,
+			'data-validType' : 'select'
 		},
 		{
-			name : 'assign_to_groups',
+			name : 'criteria_selection',
+			_label : 'How do you want to specify the scope of this task?',
 			type : 'select',
-			_label : 'This task may be assigned to members of these groups.',
-			_labelssource : 'Group.name',
-			_optionssource : 'Group.id',
-			multiple : true
+			_labelssource : [
+				'Automatically, based on specified criteria',
+				'Manually',
+			],
+			_optionssource : [
+				'Automatic',
+				'Manual',
+			]
 		},
 		{
 			name : 'scope_to_servers',
@@ -265,7 +262,7 @@
 						ret.push('</tr>');
 					}
 
-					if ( !! r.scope_to_production_servers ) {
+					if ( !! +r.scope_to_production_servers ) {
 						var tmp = ( r.scope_to_production_servers == '2' ) ? 'Non-Production Only' : 'Production Only'
 						ret.push('<tr>');
 						ret.push('<td>Type</td>');
@@ -279,6 +276,94 @@
 				}
 			},
 			fn : {
+
+				/**
+				 * Custom form bootup function
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				formBootup : function() {
+					var frm = jUtility.$currentFormWrapper();
+					console.log('running custom bootup function');
+
+					frm.find('#scope_to_servers').closest('.form_element').hide();
+					frm.find('#scope_to_applications').closest('.form_element').hide();
+					frm.find('#scope_to_databases').closest('.form_element').hide();
+
+					frm.find('#task_type').change( jApp.aG().fn.updateFormFields);
+					frm.find('#criteria_selection').change( jApp.aG().fn.updateFormFields);
+
+					jApp.aG().fn.updateFormFields();
+				}, // end fn
+
+				/**
+				 * Custom getRowData callback function, runs after the row data is populated
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				getRowDataCallback : function() {
+					console.log('running custom getRowData callback');
+					jApp.aG().fn.updateFormFields();
+				}, // end fn
+
+				/**
+				 * Update what form fields are visible
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				updateFormFields : function() {
+					var frm = jUtility.$currentFormWrapper();
+
+					if ( ! frm ) { return false; }
+
+					switch( frm.find('#task_type').val() + ' ' + frm.find('#criteria_selection').val()  ) {
+						case 'Server Task Manual' :
+							frm.find('#scope_to_servers').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_applications').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_databases').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_groups').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_operating_systems').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_production_servers').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Application Task Manual' :
+							frm.find('#scope_to_servers').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_applications').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_databases').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_groups').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_operating_systems').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_production_servers').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Database Task Manual' :
+							frm.find('#scope_to_servers').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_applications').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_databases').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_groups').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_operating_systems').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_production_servers').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						case 'Other Manual' :
+							frm.find('#scope_to_servers').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_applications').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_databases').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_groups').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_operating_systems').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_production_servers').prop('disabled',true).closest('.form_element').hide();
+							return true;
+
+						default :
+							frm.find('#scope_to_servers').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_applications').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_databases').prop('disabled',true).closest('.form_element').hide();
+							frm.find('#scope_to_groups').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_operating_systems').prop('disabled',false).closest('.form_element').show();
+							frm.find('#scope_to_production_servers').prop('disabled',false).closest('.form_element').show();
+							return true;
+					}
+				}, // end fn
+
 				/**
 				 * Mark selected applications as inactive/active
 				 * @method function
@@ -334,7 +419,7 @@
 				},
 				{ // fieldset
 					label : 'Task Scope',
-					helpText : 'You may optionally limit the scope that this task will apply to.',
+					helpText : 'You may manually specify the scope of the task (i.e. what servers/applications/databases the task will be performed on), or specify criteria that will set the scope automatically.',
 					class : 'col-lg-8',
 					fields : fieldset_2__fields
 				},

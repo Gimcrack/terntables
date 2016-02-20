@@ -64,7 +64,7 @@
     				<a href="{{ url('admin/operatingSystems')}}" ><i class="fa fa-windows fa-fw"></i> Manage Operating Systems</a>
     			</li>
     			<li>
-    				<a href="{{ url('bi/outageTasks/_generate')}}" ><i class="fa fa-tasks fa-fw"></i> Auto-Generate Outage Tasks</a>
+    				<a href="{{ url('oit/outageTasks/_generate')}}" ><i class="fa fa-tasks fa-fw"></i> Auto-Generate Outage Tasks</a>
     			</li>
   			@endif
 

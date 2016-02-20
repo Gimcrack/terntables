@@ -328,7 +328,9 @@
 				templates : { 				// html template functions
 
 					host_name : function(value) {
-						return _.get('host.name','fa-server');
+						var r = jApp.aG().currentRow;
+
+						return _.get('name',r.host || '','fa-server','Server');
 					},
 
 					rpo : function(value) {

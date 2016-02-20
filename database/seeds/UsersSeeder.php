@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\User;
+use App\Person;
 
 class UsersSeeder extends Seeder
 {
@@ -61,9 +62,9 @@ class UsersSeeder extends Seeder
         User::create(['people_id' => 17, 'username' => 'margaretadmin', 'email' => 'Margaret.Cosmah@matsugov.us', 'password' => bcrypt('Matanuska1')])
           ->groups()->attach($bi_groups);
         User::create(['people_id' => 19, 'username' => 'mattadmin', 'email' => 'matt.rykaczewski@matsugov.us', 'password' => bcrypt('Matanuska1')])
-          ->groups()->attach($bi_groups);
+          ->groups()->attach(array_merge($bi_groups,[7]));
         User::create(['people_id' => 19, 'username' => 'mr06156', 'email' => 'matt.rykaczewski@matsugov.us', 'password' => bcrypt('Matanuska1')])
-          ->groups()->attach($bi_groups);
+          ->groups()->attach(array_merge($bi_groups,[7]));
         User::create(['people_id' => 13, 'username' => 'jasonadmin', 'email' => 'jason.bailey@matsugov.us', 'password' => bcrypt('Matanuska1')])
           ->groups()->attach($bi_groups);
         User::create(['people_id' => 13, 'username' => 'jb30554', 'email' => 'jason.bailey@matsugov.us', 'password' => bcrypt('Matanuska1')])
@@ -75,9 +76,9 @@ class UsersSeeder extends Seeder
         User::create(['people_id' => 10, 'username' => 'ericadmin2', 'email' => 'Eric.Wyatt@matsugov.us', 'password' => bcrypt('Matanuska1')])
           ->groups()->attach([3,4,5]);
         User::create(['people_id' => 4, 'username' => 'daveyadmin', 'email' => 'davey.griffith@matsugov.us', 'password' => bcrypt('Matanuska1')])
-          ->groups()->attach([3,4,5,6]);
+          ->groups()->attach($superadmin_groups);
         User::create(['people_id' => 4, 'username' => 'dg05265', 'email' => 'davey.griffith@matsugov.us', 'password' => bcrypt('Matanuska1')])
-          ->groups()->attach([3,4,5,6]);
+          ->groups()->attach($superadmin_groups);
         User::create(['people_id' => 22, 'username' => 'sh05042', 'email' => 'Susan.Howard@matsugov.us', 'password' => bcrypt('Matanuska1')])
           ->groups()->attach([3,4,5,7]);
         User::create(['people_id' => 22, 'username' => 'susanadmin', 'email' => 'Susan.Howard@matsugov.us', 'password' => bcrypt('Matanuska1')])
@@ -149,6 +150,21 @@ class UsersSeeder extends Seeder
           ->groups()->attach($ti_groups);
         User::create(['people_id' => 21, 'username' => 'rh03728', 'email' => 'Rod.Hoskinson@matsugov.us', 'password' => bcrypt('Matanuska1')])
           ->groups()->attach($ti_groups);
+
+        $outageWorkers = [
+          'Jeremy Bloomstrom',
+          'Matt Rykaczewski',
+          'Jack Horner',
+          'Rod Hoskinson',
+          'Randy Jones',
+          'Davey Griffith'
+        ];
+
+        Person::whereIn('name',$outageWorkers)->get()->each( function($person) {
+          $person->users->each(function($user) {
+            $user->groups()->attach(10);
+          });
+        });
 
     }
 }

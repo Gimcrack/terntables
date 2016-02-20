@@ -40,6 +40,8 @@ class CreateServersApplicationsAndDatabasesTable extends Migration
           $table->increments('id');
           $table->string('name')->unique();
           $table->text('description')->nullable();
+          $table->unsignedInteger('group_id')->nullable();
+          $table->foreign('group_id')->references('id')->on('groups')->onDelete('SET NULL');
           $table->boolean('inactive_flag')->default(0);
           $table->timestamps();
         });
@@ -48,6 +50,8 @@ class CreateServersApplicationsAndDatabasesTable extends Migration
           $table->increments('id');
           $table->string('name');
           $table->text('description')->nullable();
+          $table->unsignedInteger('group_id')->nullable();
+          $table->foreign('group_id')->references('id')->on('groups')->onDelete('SET NULL');
           $table->string('rpo')->nullable();
           $table->string('rto')->nullable();
           $table->text('dr_strategy')->nullable();
@@ -136,6 +140,14 @@ class CreateServersApplicationsAndDatabasesTable extends Migration
         Schema::table('servers', function(Blueprint $table) {
           $table->dropForeign('servers_group_id_foreign');
           $table->dropForeign('servers_operating_system_id_foreign');
+        });
+
+        Schema::table('applications', function(Blueprint $table) {
+          $table->dropForeign('applications_group_id_foreign');
+        });
+
+        Schema::table('databases', function(Blueprint $table) {
+          $table->dropForeign('databases_group_id_foreign');
         });
 
         Schema::table('person_server', function(Blueprint $table) {

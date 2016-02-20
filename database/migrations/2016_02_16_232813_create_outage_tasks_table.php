@@ -16,6 +16,7 @@ class CreateOutageTasksTable extends Migration
         Schema::create('outage_tasks', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
+            $table->string('criteria_selection');
             $table->text('description')->nullable();
             $table->text('task_type')->default('Server Task');
             $table->boolean('inactive_flag')->default(0);

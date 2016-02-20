@@ -140,7 +140,7 @@ class User extends Model implements AuthenticatableContract,
         on group_user.group_id = group_role.group_id
         inner join roles on
         roles.id = group_role.role_id
-        where name = '{$model}'
+        where model = '{$model}'
         and {$permission}_enabled = 1
         and group_user.user_id = {$this->id}";
 
@@ -183,7 +183,7 @@ class User extends Model implements AuthenticatableContract,
         on group_user.group_id = group_role.group_id
         inner join roles on
         roles.id = group_role.role_id
-        where name = '{$model}'
+        where model = '{$model}'
         and group_user.user_id = {$this->id}";
 
       $access = DB::select( DB::raw("$select" ) );

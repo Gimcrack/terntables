@@ -82,18 +82,30 @@ class ApiController extends Controller
       $input = Input::all();
       $model_class = $this->model_class;
 
-      if (!empty($input['filter'])) {
-        $search = [':user__person__id:'];
-        $replace = [\Auth::user()->person->id];
-
-        $input['filter'] = str_replace($search,$replace,$input['filter']);
-      }
+      $input['filter'] = $this->parseSearchFilter();
 
       $results = ( !empty($input['filter']) ) ?
         $model_class::with($this->with)->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
         $model_class::with($this->with)->paginate( $this->limitPerPage );
 
       return response()->json( $results );
+  }
+
+  /**
+   * Parse the search filter
+   * @method parseSearchFilter
+   * @return [type]            [description]
+   */
+  public function parseSearchFilter()
+  {
+    $filter = Input::get('filter',null);
+
+    $search = [':user__person__id:'];
+    $replace = [\Auth::user()->person->id];
+
+    $filter = str_replace($search,$replace,$filter);
+
+    return $filter;
   }
 
   /**
@@ -268,6 +280,8 @@ class ApiController extends Controller
     // remove existing attachments
     $tmp_model_class::where( $relation['foreign_key'], $model->id )
       ->update( $relation['reset'] ?: [] );
+
+    if ( empty($ids) ) return false;
 
     foreach( $ids as $index => $value) {
       $find = ( is_numeric($value) ) ? $value : $index;
