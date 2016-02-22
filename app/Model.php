@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 use Input;
 use App\Tag;
 use App\Exceptions\OperationRequiresCheckoutException;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use \Venturecraft\Revisionable\RevisionableTrait as RevisionableTrait;
+use Carbon\Carbon;
 
 abstract class Model extends BaseModel
 {
@@ -14,6 +16,11 @@ abstract class Model extends BaseModel
    * Make the model track revision changes
    */
   use RevisionableTrait;
+
+  protected $dates = [
+    'updated_at',
+    'created_at'
+  ];
 
   protected $appends = [
     'identifiable_name',
@@ -55,12 +62,21 @@ abstract class Model extends BaseModel
   public function getUpdatedAtForHumansAttribute()
   {
     try {
-      return $this->updated_at->diffForHumans();
+      if (is_object($this->updated_at)) {
+        return $this->updated_at->diffForHumans();
+      } elseif ( !empty($this->updated_at) ) {
+        return Carbon::createFromFormat('Y-m-d G:i:s.000', $this->updated_at )->diffForHumans();
+
+      }
+
+      return null;
+
     }
 
     catch(Exception $e) {
       return null;
     }
+
 
   }
 
