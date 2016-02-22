@@ -46202,6 +46202,24 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
   }, // end fn
 
   /**
+   * Is a form container maximized
+   * @method function
+   * @return {[type]} [description]
+   */
+  isFormOpen: function isFormOpen() {
+    return !!jApp.aG().$().find('.div-form-panel-wrapper.max').length;
+  }, // end fn
+
+  /**
+   * Is row menu open
+   * @method function
+   * @return {[type]} [description]
+   */
+  isRowMenuOpen: function isRowMenuOpen() {
+    return !!$('.table-rowMenu-row:visible').length;
+  }, // end fn
+
+  /**
    * Check permission on the button parameters
    * @method function
    * @param  {[type]} params [description]
@@ -48333,15 +48351,6 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
   },
 
   /**
-   * Is a form container maximized
-   * @method function
-   * @return {[type]} [description]
-   */
-  isFormOpen: function isFormOpen() {
-    return !!jApp.aG().$().find('.div-form-panel-wrapper.max').length;
-  }, // end fn
-
-  /**
    * formFactory
    *
    * build a new form for the model
@@ -48685,7 +48694,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
    * @return {[type]} [description]
    */
   updateCountdown: function updateCountdown() {
-    if (jUtility.isFormOpen()) {
+    if (jUtility.isFormOpen() || jUtility.isRowMenuOpen()) {
       return false;
     }
 
@@ -64889,7 +64898,7 @@ $(function() {
 	jApp.addView('outageTaskDetails',
 		{ // grid definition
 			model : 'OutageTaskDetail',
-			filter : "status not in ('Complete','Skipped')",
+			filter : "status not in ('Complete','Skipped') and :show__only__my__groups:",
 			refreshInterval : 12000,
 			model_display : 'Task',
 			columnFriendly : 'name',
@@ -64913,8 +64922,8 @@ $(function() {
 					},
 					showOnlyMyGroups : {
 						type : 'button',
-						class : 'btn btn-success btn-toggle btn-showOnlyMyGroups',
-						icon : 'fa-toggle-off',
+						class : 'btn btn-success active btn-toggle btn-showOnlyMyGroups',
+						icon : 'fa-toggle-on',
 						label : 'Show Only My Groups\' Tasks',
 						fn : 'showOnlyMyGroups',
 						'data-order' : 98
@@ -65272,9 +65281,10 @@ $(function() {
 				 */
 				showOnlyMyGroups : function( ) {
 					jApp.activeGrid.temp.showOnlyMyGroups = ( typeof jApp.activeGrid.temp.showOnlyMyGroups === 'undefined')
-						? true : !jApp.activeGrid.temp.showOnlyMyGroups;
+						? false : !jApp.activeGrid.temp.showOnlyMyGroups;
 
 					jApp.activeGrid.temp.showOnlyMine = false;
+					jApp.activeGrid.temp.showOnlyAvailable = false;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');

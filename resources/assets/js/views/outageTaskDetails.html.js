@@ -118,7 +118,7 @@
 	jApp.addView('outageTaskDetails',
 		{ // grid definition
 			model : 'OutageTaskDetail',
-			filter : "status not in ('Complete','Skipped')",
+			filter : "status not in ('Complete','Skipped') and :show__only__my__groups:",
 			refreshInterval : 12000,
 			model_display : 'Task',
 			columnFriendly : 'name',
@@ -142,8 +142,8 @@
 					},
 					showOnlyMyGroups : {
 						type : 'button',
-						class : 'btn btn-success btn-toggle btn-showOnlyMyGroups',
-						icon : 'fa-toggle-off',
+						class : 'btn btn-success active btn-toggle btn-showOnlyMyGroups',
+						icon : 'fa-toggle-on',
 						label : 'Show Only My Groups\' Tasks',
 						fn : 'showOnlyMyGroups',
 						'data-order' : 98
@@ -501,9 +501,10 @@
 				 */
 				showOnlyMyGroups : function( ) {
 					jApp.activeGrid.temp.showOnlyMyGroups = ( typeof jApp.activeGrid.temp.showOnlyMyGroups === 'undefined')
-						? true : !jApp.activeGrid.temp.showOnlyMyGroups;
+						? false : !jApp.activeGrid.temp.showOnlyMyGroups;
 
 					jApp.activeGrid.temp.showOnlyMine = false;
+					jApp.activeGrid.temp.showOnlyAvailable = false;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
