@@ -1,6 +1,6 @@
 @if ( !empty(\App\User::aduser() ) )
 <div class="panel panel-info">
-  <div class="panel-heading">AD Login</div>
+  <div class="panel-heading">Login with Windows Account</div>
   <div class="panel-body">
     <form class="form-horizontal" role="form" method="GET" action="{{ url('/auth/adlogin') }}/{{ csrf_token() }}">
 

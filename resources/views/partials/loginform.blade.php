@@ -1,3 +1,6 @@
+<div class="panel panel-info">
+  <div class="panel-heading">Login With Username</div>
+  <div class="panel-body">
 
     @if (count($errors) > 0)
       <div class="alert alert-danger">
@@ -45,3 +48,5 @@
         </div>
       </div>
     </form>
+  </div>
+</div>
