@@ -8,7 +8,10 @@
     <link rel="stylesheet" href="/css/all.css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu:400,300,700" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="/js/prereqs.js"> </script>
+    <script type="text/javascript" src="/js/async-grid.js"> </script>
     <script type="text/javascript" src="/js/all.js"> </script>
+
   </head>
   <body class="{{ env('CSS_CLASS','dev') }}">
     <div id="wrapper" class="{{ env('CSS_CLASS','dev') }}">

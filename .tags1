@@ -4,8 +4,5 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-ApplicationsSeeder	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^class ApplicationsSeeder extends Seeder$/;"	class	line:8
-srv	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^    public function srv($name) {$/;"	function	line:10
-prs	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^    public function prs($name)$/;"	function	line:22
-make	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^    public function make($atts)$/;"	function	line:37
-run	\\webdev\Apache24\htdocs\dashboard-dev\database\seeds\ApplicationsSeeder.php	/^    public function run()$/;"	function	line:67
+elixir	\\webdev\Apache24\htdocs\dashboard-dev\gulpfile.js	/^var elixir = require('laravel-elixir');$/;"	variable	line:1
+elixir	\\webdev\Apache24\htdocs\dashboard-dev\gulpfile.js	/^elixir(function(mix) {$/;"	function	line:16
