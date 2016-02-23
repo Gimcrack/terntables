@@ -75,7 +75,7 @@ elixir(function(mix) {
   //   jsPaths.asyncGrid + '/jGrid.class.js',
   // ];
 
-  var jsScripts = [
+  var preReqs = [
     jsPaths.jquery + '/jquery.js',
     jsPaths.jquery + '/jquery-migrate.js',
     jsPaths.jqueryui + '/jquery-ui.js',
@@ -85,7 +85,10 @@ elixir(function(mix) {
     jsPaths.bootbox + '/bootbox.js',
     jsPaths.modernizr + '/modernizr.js',
     jsPaths.underscore + '/underscore.js',
-    jsPaths.asyncGrid + '/async-grid.js',
+  ];
+
+  var jsScripts = [
+    //jsPaths.asyncGrid + '/async-grid.js',
     jsPaths.jqueryValidator + '/jquery.psiblings.js',
     jsPaths.tokenField + '/bootstrap-tokenfield.js',
     jsPaths.jqueryValidator + '/jquery.validator.js',
@@ -118,7 +121,8 @@ elixir(function(mix) {
     //scripts
     mix
       //.babel(babelScripts, 'resources/assets/js/async-grid.js')
-      .scripts(jsScripts);
+      .scripts(jsScripts)
+      .scripts(preReqs,'public/js/prereqs.js');
 
     //styles
     mix.sass('app.scss',

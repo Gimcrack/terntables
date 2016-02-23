@@ -100,8 +100,10 @@ class ApiController extends Controller
   {
     $filter = Input::get('filter',null);
 
+    $id = ( is_object(\Auth::user()->person) ) ? \Auth::user()->person->id : null;
+
     $search = [':user__person__id:'];
-    $replace = [\Auth::user()->person->id];
+    $replace = [$id];
 
     $filter = str_replace($search,$replace,$filter);
 

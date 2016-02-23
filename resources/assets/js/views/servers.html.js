@@ -106,12 +106,12 @@
 			]
 		},
 		{
-			name : 'servers',
+			name : 'applications',
 			type : 'array',
 			_label : 'Server Applications',
 			fields : [
 				{
-					name : 'applicattions',
+					name : 'applications',
 					type : 'select',
 					_label : 'Select Applications',
 					_labelssource : 'Application.name',
@@ -271,20 +271,22 @@
 				"serverName",
 				"owner_name",
 				"os",
+				"ip",
 				"people",
 				"applications",
 				"databases",
-				'tags',
+				//'tags',
 			],
 			headers : [ 				// headers for table
 				"ID",
 				"Name",
 				"Owner",
 				"OS",
+				"IP",
 				"Contacts",
-				"Applications",
+				"Apps",
 				"Databases",
-				"Tags"
+				//"Tags"
 			],
 			templates : { 				// html template functions
 
