@@ -4,5 +4,18 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-elixir	\\webdev\Apache24\htdocs\dashboard-dev\gulpfile.js	/^var elixir = require('laravel-elixir');$/;"	variable	line:1
-elixir	\\webdev\Apache24\htdocs\dashboard-dev\gulpfile.js	/^elixir(function(mix) {$/;"	function	line:16
+fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^						fn : function(e) {$/;"	function	line:70
+fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^						fn : function(e) {$/;"	function	line:80
+fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^						fn : function(e) {$/;"	function	line:90
+fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^						fn : function(e) {$/;"	function	line:100
+status	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				status : function() {$/;"	function	line:132
+kb_article	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				kb_article : function(val) {$/;"	function	line:144
+approved_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				approved_flag : function(val) {$/;"	function	line:150
+installed_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				installed_flag : function(val) {$/;"	function	line:154
+downloaded_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				downloaded_flag : function(val) {$/;"	function	line:158
+hidden_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				hidden_flag : function(val) {$/;"	function	line:162
+markUpdate	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				markUpdate			: function( atts ) {$/;"	function	line:174
+updateGridFilter	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				updateGridFilter : function() {$/;"	function	line:190
+toggleApproved	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				toggleApproved : function( ) {$/;"	function	line:209
+toggleHidden	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				toggleHidden : function( ) {$/;"	function	line:217
+toggleInstalled	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				toggleInstalled : function( ) {$/;"	function	line:225

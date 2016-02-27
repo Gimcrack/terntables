@@ -62,7 +62,27 @@ class ServerController extends ApiController
    */
   public function markServers()
   {
-    $fillable = ['production_flag', 'inactive_flag'];
+    $fillable = ['production_flag', 'inactive_flag', 'status'];
     return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
+  }
+
+  public function windowsUpdateServerIndex()
+  {
+    $input = Input::all();
+    $model_class = $this->model_class;
+
+    $input['filter'] = $this->parseSearchFilter();
+
+    $results = ( !empty($input['filter']) ) ?
+      $model_class::with(['owner','operating_system','updates' => function($q) {
+        $q->where('installed_flag',0)->where('approved_flag',1);
+      }])
+        ->windows()->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
+      $model_class::with(['owner','operating_system','updates' => function($q) {
+        $q->where('installed_flag',0)->where('approved_flag',1);
+      }])
+        ->windows()->paginate( $this->limitPerPage );
+
+    return response()->json( $results );
   }
 }

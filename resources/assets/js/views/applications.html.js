@@ -222,7 +222,7 @@
 				},
 
 				servers : function(arr) {
-					return _.get('name', arr, 'fa-server', 'Server' );
+					return _.get('name', arr, 'fa-building-o', 'Server' );
 				},
 			},
 			fn : {

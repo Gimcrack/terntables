@@ -26,10 +26,36 @@ class Server extends Model
       'windows_updatable_flag',
       'last_windows_update',
       'group_id',
-      'operating_system_id'
+      'operating_system_id',
+      'status'
   ];
 
 
+  /**
+   * Get only windows servers
+   * @method scopeWindows
+   * @param  [type]       $query [description]
+   * @return [type]              [description]
+   */
+  public function scopeWindows($query)
+  {
+    return $query->whereHas('operating_system', function($q) {
+      $q->where('name','like','%windows%');
+    });
+  }
+
+  /**
+   * Get only windows updatable servers
+   * @method scopeUpdatable
+   * @param  [type]         $query [description]
+   * @return [type]                [description]
+   */
+  public function scopeUpdatable($query)
+  {
+    return $query->whereHas('updates',function($q) {
+      $q->where('approved_flag',1)->where('installed_flag',0);
+    });
+  }
 
   /**
    * Get only active servers
@@ -121,5 +147,15 @@ class Server extends Model
   public function operating_system()
   {
     return $this->belongsTo('App\OperatingSystem','operating_system_id');
+  }
+
+  /**
+   * A server can have many updates
+   * @method updates
+   * @return [type]  [description]
+   */
+  public function updates()
+  {
+    return $this->hasMany('App\UpdateDetail','server_id');
   }
 }

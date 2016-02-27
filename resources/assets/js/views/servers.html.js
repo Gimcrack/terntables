@@ -197,7 +197,7 @@
 			model : 'Server',
 			columnFriendly : 'name',
 			gridHeader : {
-				icon : 'fa-server',
+				icon : 'fa-building-o',
 				headerTitle : 'Manage Servers',
 				helpText : "<strong>Note:</strong> Manage Servers Here"
 			},
@@ -306,6 +306,10 @@
 				os : function(val) {
 					var r = jApp.activeGrid.currentRow;
 					return _.get('name', r.operating_system, 'fa-windows','OperatingSystem');
+				},
+
+				ip : function( val ) {
+					return _.map( val.split('.'), function(part) { return ('000' + part).slice(-3) }).join('.');
 				}
 
 			},

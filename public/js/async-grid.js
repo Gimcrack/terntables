@@ -6386,7 +6386,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       },
 
       hostname: function hostname(value) {
-        return _.nameButton(value, 'fa-server');
+        return _.nameButton(value, 'fa-building-o');
       },
 
       databaseName: function databaseName(value) {
@@ -6425,7 +6425,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
           flags.push('<div class="label label-primary label-sm" style="margin:0 3px">Prod</div>');
         }
 
-        return _.nameButton(r.name.toUpperCase(), 'fa-server') + cname + flags.join(' ');
+        return _.nameButton(r.name.toUpperCase(), 'fa-building-o') + cname + flags.join(' ');
       },
 
       username: function username(value) {
@@ -8565,8 +8565,8 @@ module.exports = function (options) {
         btnFooter.append(inpt.clone());
       });
 
-      //self.DOM.$Inpts.append([btnPanel, btnFooter]);
-      self.DOM.$Inpts.append(btnFooter);
+      self.DOM.$Inpts.append([btnPanel, btnFooter]);
+      //self.DOM.$Inpts.append(btnFooter);
     }, //end fn
 
     /**
@@ -12598,10 +12598,6 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     },
 
     boot: jUtility.DOM.applyHeaderFilters
-  },
-
-  "button.close, .btn-cancel": {
-    click: jUtility.exitCurrentForm
   },
 
   ".tbl-sort": {

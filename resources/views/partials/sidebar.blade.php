@@ -42,19 +42,19 @@
 
           @if( Auth::user()->checkAccess('OutageTaskDetail.read') )
           <li>
-            <a href="{{ url('oit/outageTasks') }}"><i class="fa fa-tasks fa-fw"></i> Outage Tasks</a>
+            <a href="{{ url('oit/outageTasks') }}"><i class="fa fa-check-square-o fa-fw"></i> Outage Tasks</a>
           </li>
           @endif
 
           @if( Auth::user()->checkAccess('OutageTask.read') )
           <li>
-            <a href="{{ url('oit/taskTemplates') }}"><i class="fa fa-tasks fa-fw"></i> Outage Templates</a>
+            <a href="{{ url('oit/taskTemplates') }}"><i class="fa fa-file-text-o fa-fw"></i> Outage Templates</a>
           </li>
           @endif
 
           @if( Auth::user()->checkAccess('Server.read') )
           <li>
-            <a href="{{ url('oit/servers') }}"><i class="fa fa-server fa-fw"></i> Servers</a>
+            <a href="{{ url('oit/servers') }}"><i class="fa fa-building-o fa-fw"></i> Servers</a>
           </li>
           @endif
 
@@ -67,6 +67,15 @@
           @if( Auth::user()->checkAccess('Database.read') )
           <li>
             <a href="{{ url('oit/databases') }}"><i class="fa fa-database fa-fw"></i> Databases</a>
+          </li>
+          @endif
+
+          @if( Auth::user()->checkAccess('Server.read') )
+          <li>
+            <a href="{{ url('oit/approveUpdates') }}"><i class="fa fa-windows fa-fw"></i> Approve Updates</a>
+          </li>
+          <li>
+            <a href="{{ url('oit/updates') }}"><i class="fa fa-windows fa-fw"></i> Install Updates</a>
           </li>
           @endif
 

@@ -58,7 +58,7 @@ class ApiController extends Controller
    * The max rows to grab at one time
    * @var integer
    */
-  public $limitPerPage = 100;
+  public $limitPerPage = 500;
 
   /**
    * Load the checkaccess middleware for the controller
@@ -84,9 +84,11 @@ class ApiController extends Controller
 
       $input['filter'] = $this->parseSearchFilter();
 
+      $with = Input::get('with',$this->with);
+
       $results = ( !empty($input['filter']) ) ?
-        $model_class::with($this->with)->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
-        $model_class::with($this->with)->paginate( $this->limitPerPage );
+        $model_class::with($with ?: [])->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
+        $model_class::with($with ?: [])->paginate( $this->limitPerPage );
 
       return response()->json( $results );
   }
@@ -118,8 +120,10 @@ class ApiController extends Controller
    */
   public function show($id)
   {
+      $with = Input::get('with',$this->with);
+
       $model_class = $this->model_class;
-      $model = $model_class::with( $this->with, 'RevisionHistory' )->findOrFail($id);
+      $model = $model_class::with( $with ?: [], 'RevisionHistory' )->findOrFail($id);
 
       $return = $model->toArray();
       $return['readable_history'] = $this->getHistory($model);

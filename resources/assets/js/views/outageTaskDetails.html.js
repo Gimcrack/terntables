@@ -126,7 +126,7 @@
 				ellipses : false
 			},
 			gridHeader : {
-				icon : 'fa-tasks',
+				icon : 'fa-check-square-o',
 				headerTitle : 'Manage Outage Tasks',
 				helpText : "<strong>Note:</strong> Manage Outage Task Here"
 			},
@@ -290,7 +290,7 @@
 
 					if ( r.outage_task == null ) return '';
 
-					return _.get('name',r.outage_task,'fa-tasks','OutageTask');
+					return _.get('name',r.outage_task,'fa-file-text-o','OutageTask');
 				},
 
 				outage_date : function() {
@@ -303,7 +303,7 @@
 							ret = [];
 
 					if ( !! r.server ) {
-						ret.push(_.get('name',r.server,'fa-server','Server'));
+						ret.push(_.get('name',r.server,'fa-building-o','Server'));
 					}
 
 					if ( !! r.application ) {
