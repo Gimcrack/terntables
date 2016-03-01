@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e7175a0d96bcf776f40fa7a14aac9237",
-    "content-hash": "bd666eee40b7b008473fd377a0ea7361",
+    "hash": "9bf0b33fdc9a09481d25b41207856b31",
+    "content-hash": "3b5fcc6438833fa16c18a53b0900cf59",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -907,7 +907,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/4fa2c2e596af12ba0d83e0619b6cbdd8643462af",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/d699c0e5653c2ef82fd2bfb6e68b859a212fe022",
                 "reference": "4fa2c2e596af12ba0d83e0619b6cbdd8643462af",
                 "shasum": ""
             },
@@ -2239,7 +2239,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/onokumus/metisMenu/zipball/8504d52b5f411b19806d848100cbcc34b1a7610a",
+                "url": "https://api.github.com/repos/onokumus/metisMenu/zipball/e45e2def82d9075e1a53303d53f23cf20d2f9a67",
                 "reference": "8504d52b5f411b19806d848100cbcc34b1a7610a",
                 "shasum": ""
             },
@@ -2608,6 +2608,108 @@
                 "slider"
             ],
             "time": "2015-06-20 05:46:33"
+        },
+        {
+            "name": "sofa/eloquence",
+            "version": "v5.1.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jarektkaczyk/eloquence.git",
+                "reference": "3bf20e2b6320489d209d10c6bb67d9ba9588660e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jarektkaczyk/eloquence/zipball/3bf20e2b6320489d209d10c6bb67d9ba9588660e",
+                "reference": "3bf20e2b6320489d209d10c6bb67d9ba9588660e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "5.1.*",
+                "php": ">=5.5.9",
+                "sofa/hookable": "5.1.*"
+            },
+            "require-dev": {
+                "mockery/mockery": "0.9.4",
+                "phpunit/phpunit": "4.5.0",
+                "squizlabs/php_codesniffer": "2.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sofa\\Eloquence\\": "src"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jarek Tkaczyk",
+                    "email": "jarek@softonsofa.com",
+                    "homepage": "http://softonsofa.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Flexible Searchable, Mappable, Metable, Validation and more extensions for Laravel Eloquent ORM.",
+            "keywords": [
+                "eloquent",
+                "laravel",
+                "mappable",
+                "metable",
+                "mutable",
+                "searchable"
+            ],
+            "time": "2016-01-14 21:28:29"
+        },
+        {
+            "name": "sofa/hookable",
+            "version": "v5.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jarektkaczyk/hookable.git",
+                "reference": "65bdc811b1a81f6b33a9e6fa0fa360b72004b81e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jarektkaczyk/hookable/zipball/65bdc811b1a81f6b33a9e6fa0fa360b72004b81e",
+                "reference": "65bdc811b1a81f6b33a9e6fa0fa360b72004b81e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "5.1.*",
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "crysalead/kahlan": "~1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sofa\\Hookable\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jarek Tkaczyk",
+                    "email": "jarek@softonsofa.com",
+                    "homepage": "http://softonsofa.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel Eloquent hooks system.",
+            "keywords": [
+                "eloquent",
+                "laravel"
+            ],
+            "time": "2016-01-14 21:12:03"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -5352,7 +5454,8 @@
         "ingenious/bootstrap-tokenfield": 20,
         "ingenious/jstorage": 20,
         "components/jqueryui": 20,
-        "neomerx/cors-illuminate": 20
+        "neomerx/cors-illuminate": 20,
+        "sofa/eloquence": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

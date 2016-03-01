@@ -21,6 +21,17 @@ class Group extends Model
     , 'description'
   ];
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'description' => 20,
+    'users.username' => 20,
+    'roles.name' => 10,
+    'roles.model' => 10,
+    'servers.name' => 10,
+    'applications.name' => 10,
+    'databases.name' => 10
+  ];
+
   /**
    * A group is comprised of many users
    *
@@ -49,5 +60,25 @@ class Group extends Model
   public function servers()
   {
     return $this->hasMany('App\Server');
+  }
+
+  /**
+   * A groups can own many applications
+   * @method servers
+   * @return [type]  [description]
+   */
+  public function applications()
+  {
+    return $this->hasMany('App\Application');
+  }
+
+  /**
+   * A groups can own many databases
+   * @method servers
+   * @return [type]  [description]
+   */
+  public function databases()
+  {
+    return $this->hasMany('App\Database');
   }
 }

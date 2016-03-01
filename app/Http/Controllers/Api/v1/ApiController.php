@@ -58,7 +58,7 @@ class ApiController extends Controller
    * The max rows to grab at one time
    * @var integer
    */
-  public $limitPerPage = 500;
+  public $limitPerPage = 100;
 
   /**
    * Load the checkaccess middleware for the controller
@@ -86,9 +86,16 @@ class ApiController extends Controller
 
       $with = Input::get('with',$this->with);
 
-      $results = ( !empty($input['filter']) ) ?
-        $model_class::with($with ?: [])->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
-        $model_class::with($with ?: [])->paginate( $this->limitPerPage );
+      if ( !empty( $q = Input::get('q',null) ) ) {
+        $results = ( !empty($input['filter']) ) ?
+           $model_class::search( $q )->with($with ?: [])->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
+           $model_class::search( $q )->with($with ?: [])->paginate( $this->limitPerPage );
+      } else {
+        $results = ( !empty($input['filter']) ) ?
+          $model_class::with($with ?: [])->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
+          $model_class::with($with ?: [])->paginate( $this->limitPerPage );
+      }
+
 
       return response()->json( $results );
   }

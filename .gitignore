@@ -6,3 +6,4 @@ Homestead.json
 components/
 public/js/async-grid/
 storage/temp/
+.htaccess

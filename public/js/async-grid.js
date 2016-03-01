@@ -12230,6 +12230,15 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
       },
 
+      search: {
+        type: 'text',
+        id: 'search',
+        name: 'search',
+        icon: 'fa-search',
+        placeholder: 'Search...',
+        'data-order': 9998
+      },
+
       /**
        * Table status
        * @type {Object}
@@ -12628,6 +12637,49 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
       // perform the sort on the table rows
       jUtility.DOM.sortByCol($btnIndex, $desc);
+    }
+  },
+
+  ".btn-clear-search": {
+    click: function click() {
+      var $search = $(this).closest('div').find('#search');
+
+      $search.val('').keyup();
+    }
+  },
+
+  "#search": {
+
+    blur: function blur() {
+      var val = $(this).val();
+
+      if (!!val.length) {
+        $(this).closest('div').find('.btn-clear-search').show();
+      } else {
+        $(this).animate({ width: 100 }, 'slow').closest('div').find('.btn-clear-search').hide();
+      }
+    },
+
+    keyup: function keyup(e) {
+      var delay = e.which === 13 ? 70 : 700,
+          val = $(this).val();
+
+      jApp.activeGrid.dataGrid.requestOptions.data['q'] = val;
+
+      if (!!val.length) {
+        $(this).animate({ width: 300 }, 'slow').closest('div').find('.btn-clear-search').show();
+      } else {
+        $(this).animate({ width: 100 }, 'slow').closest('div').find('.btn-clear-search').hide();
+      }
+
+      jUtility.timeout({
+        key: 'updateGridSearch',
+        delay: delay,
+        fn: function fn() {
+          $(this).focus();
+          jUtility.executeGridDataRequest(true);
+        }
+      });
     }
   },
 
@@ -13287,6 +13339,14 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
       // detect changes in data;
       self.dataGrid.delta = !$.isEmptyObject(self.dataGrid.data) ? jUtility.deltaData(self.dataGrid.data, responseData) : responseData;
+
+      self.dataGrid.from = response.from;
+      self.dataGrid.to = response.to;
+      self.dataGrid.total = response.total;
+      self.dataGrid.current_page = response.current_page;
+      self.dataGrid.last_page = response.last_page;
+
+      jUtility.DOM.updateGridFooter();
 
       self.dataGrid.data = responseData;
 
@@ -14323,6 +14383,29 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     },
 
     /**
+     * Update the grid footer message
+     * @method function
+     * @return {[type]} [description]
+     */
+    updateGridFooter: function updateGridFooter() {
+      var target = $('.data-footer-message'),
+          self = jApp.activeGrid,
+          data = self.dataGrid,
+          message = '<div style="padding:6px;" class="alert-warning"><i class="fa fa-fw fa-info"></i> Records ' + data.from + ' - ' + data.to + ' of ' + data.total + ' total</div>';
+
+      target.html(message);
+    }, // end fn
+
+    /**
+     * Clear the grid footer
+     * @method function
+     * @return {[type]} [description]
+     */
+    clearGridFooter: function clearGridFooter() {
+      $('.data-footer-message').html('');
+    }, // end fn
+
+    /**
      * Clear the menus so they can be rebuilt
      * @method function
      * @return {[type]} [description]
@@ -14390,7 +14473,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
       //sort buttons by data-order
       if (!!order) {
-        var btns = target.find('.btn');
+        var btns = target.find('[data-order]');
 
         btns.detach().sort(function (a, b) {
           var an = +a.getAttribute('data-order'),
@@ -14417,6 +14500,25 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
      */
     buildLnkMenu: function buildLnkMenu(collection, target, order) {
       jUtility.DOM.buildMenu(collection, target, 'links', order);
+    }, // end fn
+
+    /**
+     * Create a text input for a menu
+     * @method function
+     * @param  {[type]} o [description]
+     * @return {[type]}   [description]
+     */
+    createMenuText: function createMenuText(o) {
+      var $input,
+          $div = $('<div/>', { style: 'position:relative', 'data-order': o['data-order'] }).html('<button style="display:none;" class="btn btn-link btn-clear-search btn-toggle">Reset</button>');
+
+      $input = $('<input/>', _.omit(o, 'data-order'));
+
+      $div.prepend($input);
+
+      o.ignore = true;
+
+      return $div;
     }, // end fn
 
     /**
@@ -14484,6 +14586,10 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
      */
     createMenuButton: function createMenuButton(params) {
       var $btn, $btn_a, $btn_choice, $ul;
+
+      if (!!params.type && params.type == 'text') {
+        return jUtility.DOM.createMenuText(params);
+      }
 
       if (_typeof(params[0]) === 'object') {
         // determine if button is a dropdown menu
@@ -14812,17 +14918,17 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     var template,
         templateFunctions = $.extend(true, {}, jApp.cellTemplates, jApp.opts().templates);
 
+    if (typeof templateFunctions[column] === 'function') {
+      template = templateFunctions[column];
+      value = template(value);
+    }
+
     if (value == null) {
       value = '';
     }
 
     if (value.toString().toLowerCase() === 'null') {
       return '';
-    }
-
-    if (typeof templateFunctions[column] === 'function') {
-      template = templateFunctions[column];
-      value = template(value);
     }
 
     if (value.toString().trim() === '') {
@@ -16592,21 +16698,26 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
    * @method function
    * @return {[type]} [description]
    */
-  executeGridDataRequest: function executeGridDataRequest() {
+  executeGridDataRequest: function executeGridDataRequest(search) {
     jApp.log('6.3 Setting up options for the data request');
     var params = $.extend(true, jApp.aG().dataGrid.requestOptions, {
       success: jUtility.callback.update,
       fail: jUtility.gridDataRequestCallback.fail,
-      always: jUtility.gridDataRequestCallback.always,
+      always: !!search ? jUtility.gridDataRequestCallback.search : jUtility.gridDataRequestCallback.always,
       complete: jUtility.gridDataRequestCallback.complete
     }),
         r = jApp.aG().dataGrid.requests;
+
+    jUtility.DOM.clearGridFooter();
 
     // show the preloader
     jUtility.DOM.activityPreloader('show');
 
     // execute the request
     jApp.log('6.4 Executing ajax request');
+
+    jUtility.killPendingRequest('gridData');
+
     r.gridData = jUtility.getJSON(params);
   }, //end fn
 
@@ -16666,7 +16777,22 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         jApp.aG().store.set('data_' + jApp.opts().table, response);
       }
       jUtility.DOM.togglePreloader(true);
-      jUtility.buildMenus();
+    }, // end fn
+
+    /**
+     * Execute after grid data search request
+     * @method function
+     * @param  {[type]} response [description]
+     * @return {[type]}          [description]
+     */
+    search: function search(response) {
+      jUtility.callback.displayResponseErrors(response);
+      if (jUtility.isCaching()) {
+        jApp.aG().store.set('data_' + jApp.opts().table, response);
+      }
+      jUtility.DOM.togglePreloader(true);
+
+      $('#search').focus().val($('#search').val());
     }, // end fn
 
     /**
@@ -16690,7 +16816,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 ;module.exports = {
 
   // main grid body
-  tmpMainGridBody: "<div class=\"row\">\n                      <div class=\"col-lg-12\">\n                        <div class=\"panel panel-info panel-grid panel-grid1\">\n                          <div class=\"panel-heading\">\n                            <h1 class=\"page-header\"><i class=\"fa {@icon} fa-fw\"></i><span class=\"header-title\"> {@headerTitle} </span></h1>\n                            <div class=\"alert alert-warning alert-dismissible helpText\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\"><span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span></button> {@helpText} </div>\n                          </div>\n                          <div class=\"panel-body grid-panel-body\">\n                            <div class=\"table-responsive\">\n                              <div class=\"table table-bordered table-grid\">\n                                <div class=\"table-head\">\n                                  <div class=\"table-row table-menu-row\">\n                                    <div class=\"table-header table-menu-header\" style=\"width:100%\">\n                                      <div class=\"btn-group btn-group-sm table-btn-group\">  </div>\n                                    </div>\n                                  </div>\n                                  <div style=\"display:none\" class=\"table-row table-rowMenu-row\"></div>\n                                  <div style=\"display:none\" class=\"table-row table-otherMenu-row\"></div>\n                                  <div class=\"table-row tfilters\" style=\"display:none\">\n                                    <div style=\"width:10px;\" class=\"table-header\">&nbsp;</div>\n                                    <div style=\"width:175px;\" class=\"table-header\" align=\"right\"> <span class=\"label label-info filter-showing\"></span> </div>\n                                  </div>\n                                </div>\n                                <div class=\"table-body\" id=\"tbl_grid_body\">\n                                  <!--{$tbody}-->\n                                </div>\n                                <div class=\"table-foot\">\n                                  <div class=\"row\">\n                                    <div class=\"col-md-3\">\n                                      <div style=\"display:none\" class=\"ajax-activity-preloader pull-left\"></div>\n                                      <div class=\"divRowsPerPage pull-right\">\n                                        <select style=\"width:180px;display:inline-block\" type=\"select\" name=\"RowsPerPage\" id=\"RowsPerPage\" class=\"form-control\">\n                                          <option value=\"10\">10</option>\n                                          <option value=\"15\">15</option>\n                                          <option value=\"25\">25</option>\n                                          <option value=\"50\">50</option>\n                                          <option value=\"100\">100</option>\n                                          <option value=\"10000\">All</option>\n                                        </select>\n                                      </div>\n                                    </div>\n                                    <div class=\"col-md-9\">\n                                      <div class=\"paging\"></div>\n                                    </div>\n                                  </div>\n                                </div>\n                                <!-- /. table-foot -->\n                              </div>\n                            </div>\n                            <!-- /.table-responsive -->\n                          </div>\n                          <!-- /.panel-body -->\n                        </div>\n                        <!-- /.panel -->\n                      </div>\n                      <!-- /.col-lg-12 -->\n                    </div>\n                    <!-- /.row -->\n                    <div id=\"div_inspect\" class=\"div-btn-edit min div-form-panel-wrapper\">\n                      <div class=\"frm_wrapper\">\n                        <form>\n                          <div class=\"panel panel-info\">\n                            <div class=\"panel-heading\"> <button type=\"button\" class=\"close\" aria-hidden=\"true\" data-original-title=\"\" title=\"\">×</button> <i class=\"fa fa-info fa-fw\"></i> <span class=\"spn_editFriendlyName\">{@Name}</span> [Inspecting] </div>\n                            <div class=\"panel-overlay\" style=\"display:none\"></div>\n                            <div class=\"panel-body\">\n                                <div class=\"target\"></div>\n                            </div>\n                            <div class=\"panel-btns footer\">\n                              <button type=\"button\" class=\"btn btn-primary btn-formMenu\" id=\"btn_form_menu_heading\"><i class=\"fa fa-fw fa-bars\"></i></button>\n                              <button type=\"button\" class=\"btn btn-primary btn-cancel\" id=\"btn_cancel\"><i class=\"fa fa-fw fa-times\"></i> Close</button>\n                            </div>\n                          </div>\n                        </form>\n                      </div>\n                    </div>",
+  tmpMainGridBody: "<div class=\"row\">\n                      <div class=\"col-lg-12\">\n                        <div class=\"panel panel-info panel-grid panel-grid1\">\n                          <div class=\"panel-heading\">\n                            <h1 class=\"page-header\"><i class=\"fa {@icon} fa-fw\"></i><span class=\"header-title\"> {@headerTitle} </span></h1>\n                            <div class=\"alert alert-warning alert-dismissible helpText\" role=\"alert\"> <button type=\"button\" class=\"close\" data-dismiss=\"alert\"><span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">Close</span></button> {@helpText} </div>\n                          </div>\n                          <div class=\"panel-body grid-panel-body\">\n                            <div class=\"table-responsive\">\n                              <div class=\"table table-bordered table-grid\">\n                                <div class=\"table-head\">\n                                  <div class=\"table-row table-menu-row\">\n                                    <div class=\"table-header table-menu-header\" style=\"width:100%\">\n                                      <div class=\"btn-group btn-group-sm table-btn-group\">  </div>\n                                    </div>\n                                  </div>\n                                  <div style=\"display:none\" class=\"table-row table-rowMenu-row\"></div>\n                                  <div style=\"display:none\" class=\"table-row table-otherMenu-row\"></div>\n                                  <div class=\"table-row tfilters\" style=\"display:none\">\n                                    <div style=\"width:10px;\" class=\"table-header\">&nbsp;</div>\n                                    <div style=\"width:175px;\" class=\"table-header\" align=\"right\"> <span class=\"label label-info filter-showing\"></span> </div>\n                                  </div>\n                                </div>\n                                <div class=\"table-body\" id=\"tbl_grid_body\">\n                                  <!--{$tbody}-->\n                                </div>\n                                <div class=\"table-foot\">\n                                  <div class=\"row\">\n                                    <div class=\"col-md-3\">\n                                      <div class=\"data-footer-message pull-left\"></div>\n                                      <div style=\"display:none\" class=\"ajax-activity-preloader pull-left\"></div>\n                                      <div class=\"divRowsPerPage pull-right\">\n                                        <select style=\"width:180px;display:inline-block\" type=\"select\" name=\"RowsPerPage\" id=\"RowsPerPage\" class=\"form-control\">\n                                          <option value=\"10\">10</option>\n                                          <option value=\"15\">15</option>\n                                          <option value=\"25\">25</option>\n                                          <option value=\"50\">50</option>\n                                          <option value=\"100\">100</option>\n                                          <option value=\"10000\">All</option>\n                                        </select>\n                                      </div>\n                                    </div>\n                                    <div class=\"col-md-9\">\n\n                                      <div class=\"paging\"></div>\n\n                                    </div>\n                                  </div>\n                                </div>\n                                <!-- /. table-foot -->\n                              </div>\n                            </div>\n                            <!-- /.table-responsive -->\n                          </div>\n                          <!-- /.panel-body -->\n                        </div>\n                        <!-- /.panel -->\n                      </div>\n                      <!-- /.col-lg-12 -->\n                    </div>\n                    <!-- /.row -->\n                    <div id=\"div_inspect\" class=\"div-btn-edit min div-form-panel-wrapper\">\n                      <div class=\"frm_wrapper\">\n                        <form>\n                          <div class=\"panel panel-info\">\n                            <div class=\"panel-heading\"> <button type=\"button\" class=\"close\" aria-hidden=\"true\" data-original-title=\"\" title=\"\">×</button> <i class=\"fa fa-info fa-fw\"></i> <span class=\"spn_editFriendlyName\">{@Name}</span> [Inspecting] </div>\n                            <div class=\"panel-overlay\" style=\"display:none\"></div>\n                            <div class=\"panel-body\">\n                                <div class=\"target\"></div>\n                            </div>\n                            <div class=\"panel-btns footer\">\n                              <button type=\"button\" class=\"btn btn-primary btn-formMenu\" id=\"btn_form_menu_heading\"><i class=\"fa fa-fw fa-bars\"></i></button>\n                              <button type=\"button\" class=\"btn btn-primary btn-cancel\" id=\"btn_cancel\"><i class=\"fa fa-fw fa-times\"></i> Close</button>\n                            </div>\n                          </div>\n                        </form>\n                      </div>\n                    </div>",
 
   // check all checkbox template
   tmpCheckAll: "<label for=\"chk_all\" class=\"btn btn-default pull-right\"> <input id=\"chk_all\" type=\"checkbox\" class=\"chk_all\" name=\"chk_all\"> </label>",

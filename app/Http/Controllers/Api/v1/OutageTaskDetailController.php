@@ -102,4 +102,25 @@ class OutageTaskDetailController extends ApiController
     }
     return $this->massUpdate( $this->getInputIds(), $atts );
   }
+
+  /**
+   * Mark the selected Servers
+   * @method markOutageTasks
+   * @return [type]          [description]
+   */
+  public function markServers()
+  {
+    $fillable = ['status'];
+
+    $atts = array_intersect_key( Input::all() , array_flip( $fillable ) );
+
+    $models = \App\Server::whereIn('id', \App\OutageTaskDetail::whereIn('id',$this->getInputIds() )->has('server')->lists('server_id') );
+
+    if ( ! $models->count() ) {
+      throw new ModelNotFoundException();
+    }
+
+    $models->update($atts);
+    return $this->operationSuccessful();
+  }
 }

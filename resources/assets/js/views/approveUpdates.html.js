@@ -111,6 +111,7 @@
 				"title",
 				"kb_article",
 				"status",
+				"updated_at_for_humans"
 				// "approved_flag",
 				// "installed_flag",
 				// "downloaded_flag",
@@ -122,6 +123,7 @@
 				"Title",
 				"KB Article",
 				"Status",
+				"Last Modified"
 				// "Approved?",
 				// "Installed?",
 				// "Downloaded?",

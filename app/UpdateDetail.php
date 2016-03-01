@@ -20,6 +20,12 @@ class UpdateDetail extends Model
     'kb_article'
   ];
 
+  protected $searchableColumns = [
+    'server.name',
+    'header.title',
+    'header.kb_article',
+  ];
+
   /**
    * The mass assignable fields
    *

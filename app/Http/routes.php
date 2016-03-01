@@ -67,6 +67,7 @@ Route::group(['prefix' => 'api/v1'], function() {
 
   Route::delete('OutageTaskDetail',             'Api\v1\OutageTaskDetailController@destroy');
   Route::patch('OutageTaskDetail/_massUpdate',  'Api\v1\OutageTaskDetailController@markOutageTasks');
+  Route::patch('OutageTaskDetail/_massUpdateServers',  'Api\v1\OutageTaskDetailController@markServers');
   Route::resource('OutageTaskDetail',           'Api\v1\OutageTaskDetailController');
 
   // gis routes

@@ -20,6 +20,12 @@ class WindowsUpdate extends Model
       return $this->title;
   }
 
+  protected $searchableColumns = [
+    'title' => 80,
+    'description' => 20,
+    'kb_article' => 30,
+  ];
+
   /**
    * The mass assignable fields
    *

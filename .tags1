@@ -4,18 +4,16 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^						fn : function(e) {$/;"	function	line:70
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^						fn : function(e) {$/;"	function	line:80
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^						fn : function(e) {$/;"	function	line:90
-fn	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^						fn : function(e) {$/;"	function	line:100
-status	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				status : function() {$/;"	function	line:132
-kb_article	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				kb_article : function(val) {$/;"	function	line:144
-approved_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				approved_flag : function(val) {$/;"	function	line:150
-installed_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				installed_flag : function(val) {$/;"	function	line:154
-downloaded_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				downloaded_flag : function(val) {$/;"	function	line:158
-hidden_flag	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				hidden_flag : function(val) {$/;"	function	line:162
-markUpdate	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				markUpdate			: function( atts ) {$/;"	function	line:174
-updateGridFilter	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				updateGridFilter : function() {$/;"	function	line:190
-toggleApproved	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				toggleApproved : function( ) {$/;"	function	line:209
-toggleHidden	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				toggleHidden : function( ) {$/;"	function	line:217
-toggleInstalled	\\webdev\Apache24\htdocs\dashboard-dev\resources\assets\js\views\approveUpdates.html.js	/^				toggleInstalled : function( ) {$/;"	function	line:225
+Server	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^class Server extends Model$/;"	class	line:5
+scopeWindows	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function scopeWindows($query)$/;"	function	line:53
+scopeUpdatable	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function scopeUpdatable($query)$/;"	function	line:66
+scopeActive	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function scopeActive($query)$/;"	function	line:79
+scopeProduction	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function scopeProduction($query)$/;"	function	line:90
+scopeNonproduction	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function scopeNonproduction($query)$/;"	function	line:101
+tags	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function tags()$/;"	function	line:110
+people	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function people()$/;"	function	line:120
+applications	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function applications()$/;"	function	line:130
+databases	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function databases()$/;"	function	line:140
+owner	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function owner()$/;"	function	line:150
+operating_system	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function operating_system()$/;"	function	line:160
+updates	\\webdev\Apache24\htdocs\dashboard-dev\app\Server.php	/^  public function updates()$/;"	function	line:170

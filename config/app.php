@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY', 'SomeRandomString'),
+    'key' => env('APP_KEY', 'xlhF31NeOlibJcoOW9tvZg7TkHcAZI3a'),
 
     'cipher' => 'AES-256-CBC',
 
@@ -154,7 +154,9 @@ return [
 
         Neomerx\CorsIlluminate\Providers\LaravelServiceProvider::class,
 
-        Adldap\Laravel\AdldapServiceProvider::class
+        Adldap\Laravel\AdldapServiceProvider::class,
+
+        Sofa\Eloquence\ServiceProvider::class
 
     ],
 

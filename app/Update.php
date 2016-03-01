@@ -19,6 +19,12 @@ class Update extends Model
   protected $fillable = [
   ];
 
+  protected $searchableColumns = [
+    'title' => 80,
+    'kb_article' => 30,
+    'description' => 20,
+  ];
+
   /**
    * An update detail belongs to one server
    * @method updates

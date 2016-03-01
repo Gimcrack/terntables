@@ -30,6 +30,19 @@ class Server extends Model
       'status'
   ];
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'cname' => 50,
+    'description' => 20,
+    'ip' => 30,
+    'owner.name' => 20,
+    'tags.name' => 20,
+    'people.name' => 20,
+    'databases.name' => 20,
+    'applications.name' => 20,
+    'operating_system.name' => 20,
+  ];
+
 
   /**
    * Get only windows servers
