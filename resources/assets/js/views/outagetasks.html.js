@@ -135,7 +135,7 @@
 			model_display : 'Template',
 			columnFriendly : 'name',
 			gridHeader : {
-				icon : 'fa-tasks',
+				icon : 'fa-file-text-o',
 				headerTitle : 'Manage Outage Tasks Templates',
 				helpText : "<strong>Note:</strong> Manage Outage Task Templates Here"
 			},
@@ -230,7 +230,7 @@
 					if ( !! r.scope_to_servers && !!r.scope_to_servers.length ) {
 						ret.push('<tr>');
 						ret.push('<td>Servers</td>');
-						ret.push('<td>' +  _.get('name',r.scope_to_servers,'fa-server','Server') + '</td>' );
+						ret.push('<td>' +  _.get('name',r.scope_to_servers,'fa-building-o','Server') + '</td>' );
 						ret.push('</tr>');
 					}
 

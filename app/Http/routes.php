@@ -42,6 +42,13 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::patch('Server/_massUpdate', 'Api\v1\ServerController@markServers');
   Route::resource('Server',         'Api\v1\ServerController');
 
+  Route::patch('WindowsUpdateServer/_massUpdate', 'Api\v1\ServerController@markServers');
+  Route::get('WindowsUpdateServer',               'Api\v1\ServerController@windowsUpdateServerIndex');
+
+  Route::patch('UpdateDetail/_massUpdate',  'Api\v1\UpdateDetailController@markUpdates');
+  Route::get('UpdateDetail',                'Api\v1\UpdateDetailController@index');
+
+
   Route::delete('Database',           'Api\v1\DatabaseController@destroy');
   Route::patch('Database/_massUpdate', 'Api\v1\DatabaseController@markDatabases');
   Route::resource('Database',         'Api\v1\DatabaseController');
@@ -60,6 +67,7 @@ Route::group(['prefix' => 'api/v1'], function() {
 
   Route::delete('OutageTaskDetail',             'Api\v1\OutageTaskDetailController@destroy');
   Route::patch('OutageTaskDetail/_massUpdate',  'Api\v1\OutageTaskDetailController@markOutageTasks');
+  Route::patch('OutageTaskDetail/_massUpdateServers',  'Api\v1\OutageTaskDetailController@markServers');
   Route::resource('OutageTaskDetail',           'Api\v1\OutageTaskDetailController');
 
   // gis routes
@@ -132,6 +140,8 @@ Route::group(['prefix' => 'admin'], function(){
    Route::resource('taskTemplates', 'BI\OutageTaskController', [ 'only' => [ 'index', 'show'] ] );
    Route::get('outageTasks/_generate',   'BI\OutageTaskDetailController@generateTaskDetails');
    Route::resource('outageTasks',   'BI\OutageTaskDetailController', [ 'only' => [ 'index', 'show'] ] );
+   Route::resource('updates',       'BI\UpdateController', [ 'only' => [ 'index', 'show'] ] );
+   Route::resource('approveUpdates','BI\UpdateDetailController', [ 'only' => [ 'index', 'show'] ] );
 
  });
 

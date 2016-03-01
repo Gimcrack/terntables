@@ -38,6 +38,10 @@ class Outage extends Model
         return $this->outage_date;
     }
 
+    protected $searchableColumns = [
+      'outage_date' => 80,
+    ];
+
     // /**
     //  * Save the model
     //  * @method save

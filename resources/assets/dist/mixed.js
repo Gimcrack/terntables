@@ -56292,7 +56292,7 @@ $.extend( true, jApp.views, {
 				model : 'Server',
 				columnFriendly : 'name',
 				gridHeader : {
-					icon : 'fa-server',
+					icon : 'fa-building-o',
 					headerTitle : 'Manage Servers',
 					helpText : "<strong>Note:</strong> Manage Servers Here"
 				},

@@ -11,6 +11,16 @@ class Database extends Model
    */
   protected $table = 'databases';
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'description' => 20,
+    'owner.name' => 20,
+    'tags.name' => 10,
+    'people.name' => 10,
+    'servers.name' => 10,
+    'applications.name' => 10
+  ];
+
   /**
    * The mass assignable fields
    *
@@ -70,6 +80,16 @@ class Database extends Model
   public function recordLock()
   {
       return $this->morphOne('App\RecordLock', 'lockable');
+  }
+
+  /**
+   * A database is managaed by one group
+   * @method owner
+   * @return [type] [description]
+   */
+  public function owner()
+  {
+    return $this->belongsTo('App\Group','group_id');
   }
 
   /**

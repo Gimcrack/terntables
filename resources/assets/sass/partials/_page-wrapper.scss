@@ -32,6 +32,60 @@
 	.table-rowMenu-row {
 		border:none !important;
 
+		input#search {
+			border:1px solid lighten($success,10%);
+			background:lighten($success,30%);
+			color:$success;
+			padding-left:6px;
+			width:100px;
+			height:40px;
+			margin-right:6px;
+		}
+
+		::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+				color:    darken($success,10%) !important;
+				&::before {
+					content:'\f002  ';
+					color: darken($success,20%);
+					font-family: fontAwesome;
+				}
+		}
+		:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+			 color:    darken($success,10%) !important;
+			 opacity:  1;
+			 &::before {
+				 content:'\f002  ';
+				 color: darken($success,20%);
+				 font-family: fontAwesome;
+			 }
+		}
+		::-moz-placeholder { /* Mozilla Firefox 19+ */
+			 color:    darken($success,10%) !important;
+			 opacity:  1;
+			 &::before {
+				 content:'\f002  ';
+				 color: darken($success,20%);
+				 font-family: fontAwesome;
+			 }
+		}
+		:-ms-input-placeholder { /* Internet Explorer 10-11 */
+			 color:    darken($success,10%) !important;
+			 &::before {
+				 content:'\f002  ';
+				 color: darken($success,20%);
+				 font-family: fontAwesome;
+			 }
+		}
+		:placeholder-shown { /* Standard (https://drafts.csswg.org/selectors-4/#placeholder) */
+			color:    darken($success,10%) !important;
+			&::before {
+				content:'\f002  ';
+				color: darken($success,20%);
+				font-family: fontAwesome;
+			}
+		}
+
+
 		.table-header {
 			padding: 0px !important;
 
@@ -40,6 +94,10 @@
 
 				.btn  {
 					padding: 10px !important;
+				}
+
+				.btn-clear-search {
+					padding: 0 !important;
 				}
 
 				.btn-rowMenu {

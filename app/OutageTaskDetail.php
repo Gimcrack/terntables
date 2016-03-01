@@ -33,6 +33,19 @@ class OutageTaskDetail extends Model
     'notes'
   ];
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'status' => 30,
+    'description' => 30,
+    'task_type' => 30,
+    'owner.name' => 30,
+    'assignee.name' => 40,
+    'server.name' => 50,
+    'server.status' => 50,
+    'application.name' => 50,
+    'database.name' => 50
+  ];
+
   /**
    * Set the group_id attribute
    * @method setGroupIdAttribute

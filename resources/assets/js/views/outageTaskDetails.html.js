@@ -126,9 +126,9 @@
 				ellipses : false
 			},
 			gridHeader : {
-				icon : 'fa-tasks',
+				icon : 'fa-check-square-o',
 				headerTitle : 'Manage Outage Tasks',
-				helpText : "<strong>Note:</strong> Manage Outage Task Here"
+				helpText : "<strong>Note:</strong> Only approved updates will be installed. <a href='oit/approveUpdates'>Approve Updates</a>"
 			},
 			tableBtns : {
 				custom : {
@@ -178,6 +178,60 @@
 								jApp.activeGrid.fn.assignToMe( { 'person_id' : ':user__person__id:'} );
 						},
 					},
+
+					markServers : [
+						{ label: 'Set Selected Servers Status...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+						{
+							'data-multiple' : true,
+							'data-permission' : 'update_enabled',
+							type : 'button',
+							fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markServer({ 'status' : 'Look For Updates'})
+							},
+							label : 'As Look For Updates'
+						},
+						{
+							'data-multiple' : true,
+							'data-permission' : 'update_enabled',
+							type : 'button',
+							fn : function(e) {
+									e.preventDefault();
+									bootbox.confirm('Are you sure you want to begin installing updates on these servers?', function(response) {
+					          if (!!response) {
+					            jApp.activeGrid.fn.markServer( { 'status' : 'Ready For Updates'} );
+					          }
+					        });
+
+							},
+							label : 'As Ready For Updates'
+						},
+						{
+							'data-multiple' : true,
+							'data-permission' : 'update_enabled',
+							type : 'button',
+							fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markServer({ 'status' : 'Idle'})
+							},
+							label : 'As Not Ready For Updates'
+						},
+						{
+							'data-multiple' : true,
+							'data-permission' : 'update_enabled',
+							type : 'button',
+							fn : function(e) {
+								e.preventDefault();
+								bootbox.confirm('Are you sure you want reboot these servers?', function(response) {
+									if (!!response) {
+										jApp.activeGrid.fn.markServer( { 'status' : 'Ready For Reboot'} );
+									}
+								});
+							},
+							label : 'As Ready For Reboot'
+						},
+					],
+
 					markSelected : [
 						{ label: 'Set Selected Tasks Status...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
 						{
@@ -261,8 +315,11 @@
 				"outage_date",
 				"task_template",
 				"assignee",
+				"server_updated",
+				"server_status",
 				"updated_at_for_humans",
 				"status",
+
 			],
 			headers : [ 				// headers for table
 				"ID",
@@ -271,12 +328,16 @@
 				"Outage Date",
 				"Task Template",
         "Assignee",
-				"Updated",
-				"Status",
+				"Server Modified",
+				"Server Status",
+				"Task Modified",
+				"Task Status",
 			],
 			templates : { 				// html template functions
 
-        inactive_flag : function(val) {
+
+
+				inactive_flag : function(val) {
           return _.getFlag(val,'Yes','No');
         },
 
@@ -290,7 +351,7 @@
 
 					if ( r.outage_task == null ) return '';
 
-					return _.get('name',r.outage_task,'fa-tasks','OutageTask');
+					return _.get('name',r.outage_task,'fa-file-text-o','OutageTask');
 				},
 
 				outage_date : function() {
@@ -303,7 +364,7 @@
 							ret = [];
 
 					if ( !! r.server ) {
-						ret.push(_.get('name',r.server,'fa-server','Server'));
+						ret.push(_.get('name',r.server,'fa-building-o','Server'));
 					}
 
 					if ( !! r.application ) {
@@ -348,7 +409,25 @@
 
 					}
 					return _.getLabel(label,'default');
-				}
+				},
+
+				server_status : function(val) {
+					var r = jApp.activeGrid.currentRow,
+							server = r.server,
+							status = ( server != null ) ? server.status : ' ';
+
+					return status || '';
+				},
+
+				server_updated : function(val) {
+					var r = jApp.activeGrid.currentRow,
+							server = r.server,
+							updated = ( server != null ) ? server.updated_at_for_humans : ' ';
+
+					return updated || '';
+				},
+
+
 			},
 			fn : {
 
@@ -432,16 +511,22 @@
 					});
 				}, // end fn
 
-				/**
-				 * Mark selected applications as inactive/active
-				 * @method function
-				 * @return {[type]} [description]
-				 */
 				markOutageTask			: function( atts ) {
 					jApp.aG().action = 'withSelectedUpdate';
 					jUtility.withSelected('custom', function(ids) {
 						jUtility.postJSON( {
 							url : jUtility.getCurrentFormAction(),
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
+
+				markServer			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction() + 'Servers',
 							success : jUtility.callback.submitCurrentForm,
 							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
 						});

@@ -31,6 +31,17 @@ class OutageTask extends Model
     'criteria_selection'
   ];
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'description' => 30,
+    'task_type' => 10,
+    'owner.name' => 30,
+    'scope_to_servers.name' => 20,
+    'scope_to_applications.name' => 20,
+    'scope_to_databases.name' => 20,
+    'scope_to_operating_systems.name' => 20,
+  ];
+
   // /**
   //  * Save the model
   //  * @method save

@@ -12,4 +12,8 @@ class Profile extends User
      * @var array
      */
     protected $fillable = ['username', 'email'];
+
+    protected $searchableColumns = [
+      'username' => 80,
+    ];
 }

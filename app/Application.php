@@ -23,6 +23,16 @@ class Application extends Model
       'group_id'
   ];
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'description' => 20,
+    'owner.name' => 20,
+    'tags.name' => 10,
+    'people.name' => 10,
+    'servers.name' => 10,
+    'databases.name' => 10
+  ];
+
   /**
    * Get only active applications
    * @method scopeActive
@@ -35,7 +45,7 @@ class Application extends Model
   }
 
   /**
-   * A server is managaed by one group
+   * An application is managaed by one group
    * @method owner
    * @return [type] [description]
    */

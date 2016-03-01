@@ -84,9 +84,18 @@ class ApiController extends Controller
 
       $input['filter'] = $this->parseSearchFilter();
 
-      $results = ( !empty($input['filter']) ) ?
-        $model_class::with($this->with)->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
-        $model_class::with($this->with)->paginate( $this->limitPerPage );
+      $with = Input::get('with',$this->with);
+
+      if ( !empty( $q = Input::get('q',null) ) ) {
+        $results = ( !empty($input['filter']) ) ?
+           $model_class::search( $q )->with($with ?: [])->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
+           $model_class::search( $q )->with($with ?: [])->paginate( $this->limitPerPage );
+      } else {
+        $results = ( !empty($input['filter']) ) ?
+          $model_class::with($with ?: [])->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
+          $model_class::with($with ?: [])->paginate( $this->limitPerPage );
+      }
+
 
       return response()->json( $results );
   }
@@ -118,8 +127,10 @@ class ApiController extends Controller
    */
   public function show($id)
   {
+      $with = Input::get('with',$this->with);
+
       $model_class = $this->model_class;
-      $model = $model_class::with( $this->with, 'RevisionHistory' )->findOrFail($id);
+      $model = $model_class::with( $with ?: [], 'RevisionHistory' )->findOrFail($id);
 
       $return = $model->toArray();
       $return['readable_history'] = $this->getHistory($model);

@@ -102,7 +102,7 @@ abstract class ApiTest extends TestCase
 
         $class = $this->model_class;
 
-        $count = $class::count();
+        $count = (int)$class::count();
 
         $this->get("/{$this->model_short}", $this->headers)
              ->seeJsonContains(["to" => $count])
@@ -389,7 +389,7 @@ abstract class ApiTest extends TestCase
 
       $this->delete("/{$this->model_short}", [ 'ids' => [1,3,5] ], $this->headers )
            ->seeJsonSuccess()
-           ->seeJsonContains(['count' => 3])
+           ->seeJsonContains(['count' => "3"])
            ->seeStatusCode(200);
     }
 

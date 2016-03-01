@@ -9,13 +9,14 @@ use App\Exceptions\OperationRequiresCheckoutException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use \Venturecraft\Revisionable\RevisionableTrait as RevisionableTrait;
 use Carbon\Carbon;
+use Sofa\Eloquence\Eloquence;
 
 abstract class Model extends BaseModel
 {
   /**
    * Make the model track revision changes
    */
-  use RevisionableTrait;
+  use RevisionableTrait, Eloquence;
 
   protected $dates = [
     'updated_at',
@@ -117,6 +118,23 @@ abstract class Model extends BaseModel
     }
 
     return $this->recordLock->isSameUser();
+  }
+
+
+  /**
+   * [getColumns description]
+   * @method getColumns
+   * @return [type]     [description]
+   */
+  public static function getColumns()
+  {
+    $model = static::first();
+    $ret = [];
+    $table = $model->getTable();
+    foreach ( array_keys($model->getAttributes()) as $key ) {
+      $ret[] = $table . "." .$key;
+    }
+    return $ret;
   }
 
   /**

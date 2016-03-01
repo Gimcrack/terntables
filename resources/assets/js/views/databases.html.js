@@ -330,7 +330,7 @@
 					host_name : function(value) {
 						var r = jApp.aG().currentRow;
 
-						return _.get('name',r.host || '','fa-server','Server');
+						return _.get('name',r.host || '','fa-building-o','Server');
 					},
 
 					rpo : function(value) {
@@ -350,7 +350,7 @@
 					},
 
 					servers : function(arr) {
-						return _.get('name', arr, 'fa-server', 'Server' );
+						return _.get('name', arr, 'fa-building-o', 'Server' );
 					},
 
 				},
