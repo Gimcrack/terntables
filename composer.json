@@ -27,6 +27,7 @@
         "ingenious/jquery-md5" : "dev-master",
         "ingenious/perfect-scrollbar" : "dev-master",
         "ingenious/jquery-validator" : "dev-master",
+        "ingenious/eloquence": "~5.1@dev",
 
         "seiyria/bootstrap-slider" : "dev-master",
         "needim/noty" : "dev-master",
@@ -43,8 +44,8 @@
         "ingenious/jstorage": "dev-master",
         "components/jqueryui": "dev-master",
         "neomerx/cors-illuminate": "dev-master",
-        "adldap2/adldap2-laravel": "1.3.*",
-        "sofa/eloquence": "~5.1@dev"
+        "adldap2/adldap2-laravel": "1.3.*"
+
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
