@@ -51,5 +51,5 @@ class UpdateDetailController extends ApiController
     $fillable = ['approved_flag', 'hidden_flag'];
     return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
   }
-  
+
 }

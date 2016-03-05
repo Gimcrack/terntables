@@ -128,7 +128,7 @@
 			gridHeader : {
 				icon : 'fa-check-square-o',
 				headerTitle : 'Manage Outage Tasks',
-				helpText : "<strong>Note:</strong> Only approved updates will be installed. <a href='oit/approveUpdates'>Approve Updates</a>"
+				helpText : "<strong>Note:</strong> Only approved updates will be installed. <a href='approveUpdates'>Approve Updates</a>"
 			},
 			tableBtns : {
 				custom : {

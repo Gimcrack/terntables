@@ -35,7 +35,7 @@ class Server extends Model
     'cname' => 50,
     'description' => 20,
     'ip' => 30,
-    'owner.name' => 20,
+    'owner.name' => 40,
     'tags.name' => 20,
     'people.name' => 20,
     'databases.name' => 20,
@@ -53,7 +53,7 @@ class Server extends Model
   public function scopeWindows($query)
   {
     return $query->whereHas('operating_system', function($q) {
-      $q->where('name','like','%windows%');
+      $q->where('name','like','%windows%')->where('name','not like','%2003');
     });
   }
 
@@ -65,9 +65,7 @@ class Server extends Model
    */
   public function scopeUpdatable($query)
   {
-    return $query->whereHas('updates',function($q) {
-      $q->where('approved_flag',1)->where('installed_flag',0);
-    });
+    return $query->where('windows_updatable_flag',1);
   }
 
   /**

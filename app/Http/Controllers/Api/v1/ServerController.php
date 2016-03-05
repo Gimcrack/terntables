@@ -23,6 +23,9 @@ class ServerController extends ApiController
    */
   public $model_short = 'Server';
 
+
+  public $limitPerPage = 200;
+
   /**
    * What relationships to grab with the model
    * @var [type]
@@ -68,20 +71,35 @@ class ServerController extends ApiController
 
   public function windowsUpdateServerIndex()
   {
+
     $input = Input::all();
     $model_class = $this->model_class;
 
-    $input['filter'] = $this->parseSearchFilter();
+    $filter = $this->parseSearchFilter();
 
-    $results = ( !empty($input['filter']) ) ?
-      $model_class::with(['owner','operating_system','updates' => function($q) {
-        $q->where('installed_flag',0)->where('approved_flag',1);
-      }])
-        ->windows()->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
-      $model_class::with(['owner','operating_system','updates' => function($q) {
-        $q->where('installed_flag',0)->where('approved_flag',1);
-      }])
-        ->windows()->paginate( $this->limitPerPage );
+    $with = ['owner','operating_system','updates' => function($q) {
+      $q->where('installed_flag',0)->where('approved_flag',1);
+    }];
+
+    $q = Input::get('q',null);
+    $scope = Input::get('scope','all');
+
+    if ( !! $q ) {
+      $results = $model_class::search( $q )
+                  ->with($with)
+                  ->windows()
+                  ->updatable()
+                  ->$scope()
+                  ->whereRaw($filter)
+                  ->paginate( $this->limitPerPage );
+    } else {
+      $results = $model_class::with($with)
+                  ->windows()
+                  ->updatable()
+                  ->$scope()
+                  ->whereRaw($filter)
+                  ->paginate( $this->limitPerPage );
+    }
 
     return response()->json( $results );
   }

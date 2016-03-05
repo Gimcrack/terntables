@@ -11,10 +11,11 @@
 		{ // grid definition
 			model : 'WindowsUpdateServer',
 			columnFriendly : 'name',
+			filter : 'inactive_flag = 0',
 			gridHeader : {
 				icon : 'fa-building-o',
 				headerTitle : 'Install Windows Updates',
-				helpText : "<strong>Note:</strong> Only approved updates will be installed. <a href='oit/approveUpdates'>Approve Updates</a>"
+				helpText : "<strong>Note:</strong> Only approved updates will be installed. <a href='approveUpdates'>Approve Updates</a>"
 			},
 			toggles : {
 				new : false,
@@ -24,21 +25,21 @@
 			refreshInterval : 17000,
 			tableBtns : {
 				custom : {
-					toggleInactive : {
-						type : 'button',
-						class : 'btn btn-success active btn-toggle',
-						icon : 'fa-toggle-on',
-						label : 'Toggle Inactive',
-						fn : 'toggleInactive',
-						'data-order' : 100
-					},
 					toggleProduction : {
 						type : 'button',
 						class : 'btn btn-success active btn-toggle',
 						icon : 'fa-toggle-on',
+						label : 'Toggle Production',
+						fn : 'toggleProduction',
+						'data-order' : 101
+					},
+					toggleNonProduction : {
+						type : 'button',
+						class : 'btn btn-success active btn-toggle',
+						icon : 'fa-toggle-on',
 						label : 'Toggle Non-Production',
-						fn : 'toggleNonProd',
-						'data-order' : 100
+						fn : 'toggleNonProduction',
+						'data-order' : 102
 					},
 				},
 			},
@@ -162,41 +163,48 @@
 				 * @return {[type]} [description]
 				 */
 				updateGridFilter : function() {
-					var filter = [], temp = jApp.activeGrid.temp;
+					var filter = [], temp = jApp.activeGrid.temp, scope = 'all';
 
-					if (typeof temp.hideInactive !== 'undefined' && !!temp.hideInactive) {
-						filter.push('inactive_flag = 0');
-					}
 
-					if (typeof temp.hideNonProd !== 'undefined' && !!temp.hideNonProd) {
-						filter.push('production_flag = 1');
+					filter.push('inactive_flag = 0');
+
+
+					switch( true ) {
+						case ( ! temp.hideProduction && ! temp.hideNonProduction ) :
+							scope = 'all';
+						break;
+
+						case ( ! temp.hideProduction && !! temp.hideNonProduction ) :
+							scope = 'production';
+						break;
+
+						case ( !! temp.hideProduction && ! temp.hideNonProduction ) :
+							scope = 'nonproduction';
+						break;
+
+						case ( !! temp.hideProduction && !! temp.hideNonProduction ) :
+							scope = 'none';
+						break;
 					}
 
 					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
+					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope;
 
 				}, // end fn
 
-				/**
-				 * Toggle inactive server visibility
-				 * @method function
-				 * @return {[type]} [description]
-				 */
-				toggleInactive : function( ) {
-					jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
-						? true : !jApp.activeGrid.temp.hideInactive;
+				toggleProduction : function( ) {
+					var temp = jApp.activeGrid.temp;
+
+					temp.hideProduction = ( !!! temp.hideProduction );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
 				}, //end fn
 
-				/**
-				 * Toggle inactive server visibility
-				 * @method function
-				 * @return {[type]} [description]
-				 */
-				toggleNonProd : function( ) {
-					jApp.activeGrid.temp.hideNonProd = ( typeof jApp.activeGrid.temp.hideNonProd === 'undefined')
-						? true : !jApp.activeGrid.temp.hideNonProd;
+				toggleNonProduction : function( ) {
+					var temp = jApp.activeGrid.temp;
+
+					temp.hideNonProduction = ( !!! temp.hideNonProduction );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');

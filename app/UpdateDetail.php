@@ -35,6 +35,20 @@ class UpdateDetail extends Model
       'approved_flag'
   ];
 
+  public function scopeProduction($query)
+  {
+    return $query->whereHas('server', function($q) {
+      return $q->where('production_flag',1);
+    });
+  }
+
+  public function scopeNonproduction($query)
+  {
+    return $query->whereHas('server', function($q) {
+      return $q->where('production_flag',0);
+    });
+  }
+
   public function identifiableName()
   {
     return $this->header->title;

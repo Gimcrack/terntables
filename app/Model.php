@@ -38,6 +38,26 @@ abstract class Model extends BaseModel
   }
 
   /**
+   * Scope All
+   * @method scopeAll
+   * @return [type]   [description]
+   */
+  public function scopeAll($query)
+  {
+    return $query->whereRaw('1=1');
+  }
+
+  /**
+   * Scope None
+   * @method scopeAll
+   * @return [type]   [description]
+   */
+  public function scopeNone($query)
+  {
+    return $query->whereRaw('1=0');
+  }
+
+  /**
    * The column that identifies the model
    * @return [type] [description]
    */

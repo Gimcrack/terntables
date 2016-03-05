@@ -82,20 +82,25 @@ class ApiController extends Controller
       $input = Input::all();
       $model_class = $this->model_class;
 
-      $input['filter'] = $this->parseSearchFilter();
+      $filter = $this->parseSearchFilter();
 
-      $with = Input::get('with',$this->with);
+      $with = Input::get('with',$this->with) ?: [];
 
-      if ( !empty( $q = Input::get('q',null) ) ) {
-        $results = ( !empty($input['filter']) ) ?
-           $model_class::search( $q )->with($with ?: [])->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
-           $model_class::search( $q )->with($with ?: [])->paginate( $this->limitPerPage );
+      $q = Input::get('q',null);
+      $scope = Input::get('scope','all');
+
+      if ( !! $q ) {
+        $results = $model_class::search( $q )
+                    ->with($with)
+                    ->$scope()
+                    ->whereRaw($filter)
+                    ->paginate( $this->limitPerPage );
       } else {
-        $results = ( !empty($input['filter']) ) ?
-          $model_class::with($with ?: [])->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
-          $model_class::with($with ?: [])->paginate( $this->limitPerPage );
+        $results = $model_class::with($with)
+                    ->$scope()
+                    ->whereRaw($filter)
+                    ->paginate( $this->limitPerPage );
       }
-
 
       return response()->json( $results );
   }
@@ -108,6 +113,10 @@ class ApiController extends Controller
   public function parseSearchFilter()
   {
     $filter = Input::get('filter',null);
+
+    if (empty($filter)) {
+      return '1=1';
+    }
 
     $id = ( is_object(\Auth::user()->person) ) ? \Auth::user()->person->id : null;
 
