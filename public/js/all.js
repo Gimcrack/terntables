@@ -13109,6 +13109,173 @@ $(function() {
 })(jApp)
 
 /**
+ * admin.contacts.html.js
+ *
+ * admin.contacts view definition
+ */
+;(function(jApp) {
+
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'name',
+			required : true,
+			_label : 'Service Name',
+			'data-validType' : 'Anything',
+			placeholder : 'e.g. Windows Update'
+		},
+		{
+			name : 'server_name',
+			type : 'select',
+			_optionssource : 'Server.name',
+			_labelssource : 'Server.name',
+			_firstlabel : "-All-",
+			_firstoption : "All",
+			_label : 'Server',
+		},
+	];
+
+	/**
+	 * Add the view
+	 */
+	jApp.addView('admin.notificationExemptions',
+	{
+		model : 'NotificationExemption',
+		columnFriendly : 'name',
+		toggles : {
+			ellipses : false
+		},
+		gridHeader : {
+			icon : 'fa-bell-slash-o',
+			headerTitle : 'Notification Exceptions',
+			helpText : "<strong>Note:</strong> Notifications will not be sent for these services on the specified servers."
+		},
+		columns : [ 				// columns to query
+			"id",
+			"name",
+			"server_name",
+		],
+		headers : [ 				// headers for table
+			"ID",
+			"Service",
+			"Server",
+		],
+	},
+		[ // colparams
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-4',
+					fields : fieldset_1__fields
+				},
+		]
+	)
+
+})(jApp);
+
+/**
+ * admin.contacts.html.js
+ *
+ * admin.contacts view definition
+ */
+;(function(jApp) {
+
+	/**
+	 * Setup the form fields
+	 */
+	var fieldset_1__fields = [
+		{
+			name : 'person_id',
+			type : 'select',
+			required : true,
+			_labelssource : 'Person.name',
+			_optionssource : 'Person.id',
+			_firstoption : null,
+			_firstlabel : '-Choose-',
+			_label : 'Contact Name',
+			'data-validType' : 'select'
+		},
+		{
+			name : 'notifications_enabled',
+			type : 'select',
+			_optionssource : [
+				"None",
+				"Email",
+				"Text",
+				"Both"
+			],
+			_firstlabel : "-Choose-",
+			_firstoption : null,
+			required : true,
+			_label : 'Notifications Enabled',
+			'data-validType' : 'select'
+		},
+		{
+			name : 'email',
+			type : 'textarea',
+			_label : 'Enter Email Address, One Per Line',
+		},
+		{
+			name : 'phone_number',
+			type : 'textarea',
+			_label : 'Enter Mobile Numbers, One Per Line',
+		},
+	];
+
+	/**
+	 * Add the view
+	 */
+	jApp.addView('admin.notifications',
+	{
+		model : 'Notification',
+		columnFriendly : 'name',
+		toggles : {
+			ellipses : false
+		},
+		gridHeader : {
+			icon : 'fa-bell-o',
+			headerTitle : 'Manage Notifications',
+			helpText : "<strong>Note:</strong> Set up who will receive notifications."
+		},
+		columns : [ 				// columns to query
+			"id",
+			"person",
+			"notifications_enabled",
+			"email",
+			"phone_number",
+		],
+		headers : [ 				// headers for table
+			"ID",
+			"Person",
+			"Notifications",
+			"Email",
+			"Phone",
+		],
+		templates : {
+			person : function() {
+				var r = jApp.activeGrid.currentRow;
+				return _.get('name',r.person,'fa-male','Person');
+			},
+			email : function( val ) {
+				return val;
+			}
+		}
+	},
+		[ // colparams
+				{ // fieldset
+					label : 'Details',
+					helpText : 'Please fill out the form',
+					class : 'col-lg-4',
+					fields : fieldset_1__fields
+				},
+		]
+	)
+
+})(jApp);
+
+/**
  * admin.operatingSystems.html.js
  *
  * operating systems view definition
@@ -13874,6 +14041,7 @@ $(function() {
 			columns : [ 				// columns to query
 				"id",
 				"hostname",
+				"owner_name",
 				"title",
 				"kb_article",
 				"status",
@@ -13886,7 +14054,8 @@ $(function() {
 			headers : [ 				// headers for table
 				"ID",
 				"Server",
-				"Title",
+				"Owner",
+				"Update Title",
 				"KB Article",
 				"Status",
 				"Last Modified"
@@ -16248,7 +16417,8 @@ $(function() {
 				"people",
 				"applications",
 				"databases",
-				//'tags',
+				'tags',
+				"software_version"
 			],
 			headers : [ 				// headers for table
 				"ID",
@@ -16259,7 +16429,8 @@ $(function() {
 				"Contacts",
 				"Apps",
 				"Databases",
-				//"Tags"
+				"Tags",
+				"Agent"
 			],
 			templates : { 				// html template functions
 

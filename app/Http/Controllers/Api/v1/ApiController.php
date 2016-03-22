@@ -169,6 +169,8 @@ class ApiController extends Controller
         'OutageTask'  => 'BI\OutageTaskController',
         'OutageTaskDetail' => 'BI\OutageTaskDetailController',
         'Document'    => 'GIS\DocumentController',
+        'Notification' => 'Admin\NotificationController',
+        'NotificationExemption' => 'Admin\NotificationExemptionController',
       ];
 
       $class = 'App\Http\Controllers' . "\\" . $classControllers[$model];

@@ -17,13 +17,15 @@ class UpdateDetail extends Model
     'title',
     'description',
     'hostname',
-    'kb_article'
+    'kb_article',
+    'owner_name'
   ];
 
   protected $searchableColumns = [
-    'server.name',
-    'header.title',
-    'header.kb_article',
+    'server.owner.name' => 100,
+    'server.name' => 80,
+    'header.title' => 80,
+    'header.kb_article' => 50,
   ];
 
   /**
@@ -47,6 +49,16 @@ class UpdateDetail extends Model
     return $query->whereHas('server', function($q) {
       return $q->where('production_flag',0);
     });
+  }
+
+  /**
+   * Get the owner name
+   * @method getOwnerNameAttribute
+   * @return [type]                [description]
+   */
+  public function getOwnerNameAttribute()
+  {
+    return $this->server->owner->name;
   }
 
   public function identifiableName()

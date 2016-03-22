@@ -43,8 +43,10 @@
 .navbar-top-links .dropdown-tasks,
 .navbar-top-links .dropdown-alerts,
 .navbar-top-links .dropdown-notifications {
-    width: 310px;
+    width: 550px;
     min-width: 0;
+		height:400px;
+		overflow: auto;
 }
 
 .navbar-top-links .dropdown-notifications {

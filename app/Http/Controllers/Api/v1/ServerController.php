@@ -54,7 +54,7 @@ class ServerController extends ApiController
    */
   public function __construct()
   {
-    $this->middleware('auth');
+    $this->middleware('auth', [ 'except' => 'healthServers']);
     $this->checkAccessMiddleware();
   }
 
@@ -67,6 +67,26 @@ class ServerController extends ApiController
   {
     $fillable = ['production_flag', 'inactive_flag', 'status'];
     return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
+  }
+
+  /**
+   * Get servers with active alerts
+   * @method alertServers
+   * @return [type]       [description]
+   */
+  public function alertServers()
+  {
+    return response()->json(\App\Server::active()->whereNotNull('alert')->where('alert','!=','')->get());
+  }
+
+  /**
+   * Get all the servers for a health check
+   * @method healthServers
+   * @return [type]        [description]
+   */
+  public function healthServers()
+  {
+    return response()->json(\App\Server::active()->windows()->orderBy('alert','desc')->get());
   }
 
   public function windowsUpdateServerIndex()

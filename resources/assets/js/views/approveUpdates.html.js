@@ -124,6 +124,7 @@
 			columns : [ 				// columns to query
 				"id",
 				"hostname",
+				"owner_name",
 				"title",
 				"kb_article",
 				"status",
@@ -136,7 +137,8 @@
 			headers : [ 				// headers for table
 				"ID",
 				"Server",
-				"Title",
+				"Owner",
+				"Update Title",
 				"KB Article",
 				"Status",
 				"Last Modified"

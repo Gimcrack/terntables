@@ -275,7 +275,8 @@
 				"people",
 				"applications",
 				"databases",
-				//'tags',
+				'tags',
+				"software_version"
 			],
 			headers : [ 				// headers for table
 				"ID",
@@ -286,7 +287,8 @@
 				"Contacts",
 				"Apps",
 				"Databases",
-				//"Tags"
+				"Tags",
+				"Agent"
 			],
 			templates : { 				// html template functions
 

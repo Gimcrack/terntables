@@ -20,7 +20,7 @@ class PagesController extends Controller
      */
     public function __construct()
     {
-      $this->middleware('auth', ['except' => 'home']);
+      $this->middleware('auth', ['except' => ['home','sharepoint']]);
     }
 
     /**
@@ -31,6 +31,16 @@ class PagesController extends Controller
     public function home()
     {
       return view('pages.home');
+    }
+
+    /**
+     * SharePoint helper view
+     * @method sharepoint
+     * @return [type]     [description]
+     */
+    public function sharepoint()
+    {
+      return view('pages.sharepoint');
     }
 
 }

@@ -33,6 +33,12 @@ class UpdateDetailController extends ApiController
   ];
 
   /**
+   * The max rows to grab at one time
+   * @var integer
+   */
+  public $limitPerPage = 500;
+
+  /**
    * Spawn a new instance of the controller
    */
   public function __construct()

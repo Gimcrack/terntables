@@ -12,25 +12,16 @@
     <script type="text/javascript" src="/js/async-grid.js"> </script>
     <script type="text/javascript" src="/js/all.js"> </script>
     <script type="text/javascript" src="/js/sharepoint.html.js"> </script>
-
   </head>
+
   <body class="{{ env('CSS_CLASS','dev') }}">
     <div id="wrapper" class="{{ env('CSS_CLASS','dev') }}">
-      @include('partials.topbar')
 
       <div id="page-wrapper" class="">
         @yield('content')
 
       </div><!-- /#page-wrapper -->
-
-      @include('partials.modalOverlays')
-
     </div><!-- /#wrapper -->
 
-    <div class="flash-message">
-      @include('flash::message')
-    </div>
-
-    @include('bi.servers.alerts');
   </body>
 </html>
