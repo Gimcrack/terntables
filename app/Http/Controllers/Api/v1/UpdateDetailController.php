@@ -28,8 +28,15 @@ class UpdateDetailController extends ApiController
    * @var [type]
    */
   public $with = [
-    'header',
-    'server',
+    //'header',
+    //'server',
+  ];
+
+  public $select = [
+    'id',
+    'title',
+    'hostname',
+    'owner_name',
   ];
 
   /**

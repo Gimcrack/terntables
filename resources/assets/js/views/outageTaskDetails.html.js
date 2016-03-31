@@ -180,7 +180,17 @@
 					},
 
 					markServers : [
-						{ label: 'Set Selected Servers Status...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+						{ label: 'Set Selected Server Status...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+						{
+							'data-multiple' : true,
+							'data-permission' : 'update_enabled',
+							type : 'button',
+							fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markServer({ 'status' : 'Update Software'})
+							},
+							label : 'Update Agent Software'
+						},
 						{
 							'data-multiple' : true,
 							'data-permission' : 'update_enabled',
@@ -229,6 +239,16 @@
 								});
 							},
 							label : 'As Ready For Reboot'
+						},
+						{
+							'data-multiple' : true,
+							'data-permission' : 'update_enabled',
+							type : 'button',
+							fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markServer( { 'status' : 'Abort Reboot'} );
+							},
+							label : 'As Cancel Reboot',
 						},
 					],
 

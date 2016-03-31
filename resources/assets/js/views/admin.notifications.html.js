@@ -84,6 +84,70 @@
 			email : function( val ) {
 				return val;
 			}
+		},
+		fn : {
+			/**
+			 * Mark selected applications as inactive/active
+			 * @method function
+			 * @return {[type]} [description]
+			 */
+			markNotification			: function( atts ) {
+				jApp.aG().action = 'withSelectedUpdate';
+				jUtility.withSelected('custom', function(ids) {
+					jUtility.postJSON( {
+						url : jUtility.getCurrentFormAction(),
+						success : jUtility.callback.submitCurrentForm,
+						data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+					});
+				});
+			}, // end fn
+		},
+
+		rowBtns : {
+			markSelected : [
+				{ label: 'Enabled Notifications...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+				{
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markNotification({ 'notifications_enabled' : 'Both'})
+					},
+					label : 'Email &amp; Text'
+				},
+				{
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markNotification({ 'notifications_enabled' : 'Email'})
+					},
+					label : 'Email Only'
+				},
+				{
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markNotification({ 'notifications_enabled' : 'Text'})
+					},
+					label : 'Text Only'
+				},
+				{
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markNotification({ 'notifications_enabled' : 'None'})
+					},
+					label : 'None'
+				},
+
+			]
 		}
 	},
 		[ // colparams

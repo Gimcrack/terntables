@@ -39,4 +39,15 @@ class NotificationController extends ApiController
     $this->middleware('auth.admin');
     $this->checkAccessMiddleware();
   }
+
+  /**
+   * Mark notifications enabled
+   * @method markServers
+   * @return [type]      [description]
+   */
+  public function markNotifications()
+  {
+    $fillable = ['notifications_enabled'];
+    return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
+  }
 }

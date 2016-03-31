@@ -8082,7 +8082,7 @@ return window.noty;
 
 });
 /*
- * metismenu - v2.4.0
+ * metismenu - v2.4.3
  * A jQuery menu plugin
  * https://github.com/onokumus/metisMenu#readme
  *
@@ -8231,7 +8231,7 @@ return window.noty;
         }
 
         if($this.options.onTransitionStart) {
-          $this.options.onTransitionStart();
+          $this.options.onTransitionStart(e);
         }
 
         //Do we need to enable the double tap
@@ -8380,7 +8380,7 @@ return window.noty;
 }));
 
 //! moment.js
-//! version : 2.11.2
+//! version : 2.12.0
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
 //! license : MIT
 //! momentjs.com
@@ -8404,7 +8404,7 @@ return window.noty;
     }
 
     function isArray(input) {
-        return Object.prototype.toString.call(input) === '[object Array]';
+        return input instanceof Array || Object.prototype.toString.call(input) === '[object Array]';
     }
 
     function isDate(input) {
@@ -8610,7 +8610,82 @@ return window.noty;
         return diffs + lengthDiff;
     }
 
-    function Locale() {
+    function warn(msg) {
+        if (utils_hooks__hooks.suppressDeprecationWarnings === false &&
+                (typeof console !==  'undefined') && console.warn) {
+            console.warn('Deprecation warning: ' + msg);
+        }
+    }
+
+    function deprecate(msg, fn) {
+        var firstTime = true;
+
+        return extend(function () {
+            if (firstTime) {
+                warn(msg + '\nArguments: ' + Array.prototype.slice.call(arguments).join(', ') + '\n' + (new Error()).stack);
+                firstTime = false;
+            }
+            return fn.apply(this, arguments);
+        }, fn);
+    }
+
+    var deprecations = {};
+
+    function deprecateSimple(name, msg) {
+        if (!deprecations[name]) {
+            warn(msg);
+            deprecations[name] = true;
+        }
+    }
+
+    utils_hooks__hooks.suppressDeprecationWarnings = false;
+
+    function isFunction(input) {
+        return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
+    }
+
+    function isObject(input) {
+        return Object.prototype.toString.call(input) === '[object Object]';
+    }
+
+    function locale_set__set (config) {
+        var prop, i;
+        for (i in config) {
+            prop = config[i];
+            if (isFunction(prop)) {
+                this[i] = prop;
+            } else {
+                this['_' + i] = prop;
+            }
+        }
+        this._config = config;
+        // Lenient ordinal parsing accepts just a number in addition to
+        // number + (possibly) stuff coming from _ordinalParseLenient.
+        this._ordinalParseLenient = new RegExp(this._ordinalParse.source + '|' + (/\d{1,2}/).source);
+    }
+
+    function mergeConfigs(parentConfig, childConfig) {
+        var res = extend({}, parentConfig), prop;
+        for (prop in childConfig) {
+            if (hasOwnProp(childConfig, prop)) {
+                if (isObject(parentConfig[prop]) && isObject(childConfig[prop])) {
+                    res[prop] = {};
+                    extend(res[prop], parentConfig[prop]);
+                    extend(res[prop], childConfig[prop]);
+                } else if (childConfig[prop] != null) {
+                    res[prop] = childConfig[prop];
+                } else {
+                    delete res[prop];
+                }
+            }
+        }
+        return res;
+    }
+
+    function Locale(config) {
+        if (config != null) {
+            this.set(config);
+        }
     }
 
     // internal storage for locale config files
@@ -8686,11 +8761,25 @@ return window.noty;
         return globalLocale._abbr;
     }
 
-    function defineLocale (name, values) {
-        if (values !== null) {
-            values.abbr = name;
-            locales[name] = locales[name] || new Locale();
-            locales[name].set(values);
+    function defineLocale (name, config) {
+        if (config !== null) {
+            config.abbr = name;
+            if (locales[name] != null) {
+                deprecateSimple('defineLocaleOverride',
+                        'use moment.updateLocale(localeName, config) to change ' +
+                        'an existing locale. moment.defineLocale(localeName, ' +
+                        'config) should only be used for creating a new locale');
+                config = mergeConfigs(locales[name]._config, config);
+            } else if (config.parentLocale != null) {
+                if (locales[config.parentLocale] != null) {
+                    config = mergeConfigs(locales[config.parentLocale]._config, config);
+                } else {
+                    // treat as if there is no base config
+                    deprecateSimple('parentLocaleUndefined',
+                            'specified parentLocale is not defined yet');
+                }
+            }
+            locales[name] = new Locale(config);
 
             // backwards compat for now: also set the locale
             locale_locales__getSetGlobalLocale(name);
@@ -8701,6 +8790,31 @@ return window.noty;
             delete locales[name];
             return null;
         }
+    }
+
+    function updateLocale(name, config) {
+        if (config != null) {
+            var locale;
+            if (locales[name] != null) {
+                config = mergeConfigs(locales[name]._config, config);
+            }
+            locale = new Locale(config);
+            locale.parentLocale = locales[name];
+            locales[name] = locale;
+
+            // backwards compat for now: also set the locale
+            locale_locales__getSetGlobalLocale(name);
+        } else {
+            // pass null for config to unupdate, useful for tests
+            if (locales[name] != null) {
+                if (locales[name].parentLocale != null) {
+                    locales[name] = locales[name].parentLocale;
+                } else if (locales[name] != null) {
+                    delete locales[name];
+                }
+            }
+        }
+        return locales[name];
     }
 
     // returns locale data
@@ -8725,6 +8839,10 @@ return window.noty;
         }
 
         return chooseLocale(key);
+    }
+
+    function locale_locales__listLocales() {
+        return Object.keys(locales);
     }
 
     var aliases = {};
@@ -8753,10 +8871,6 @@ return window.noty;
         }
 
         return normalizedInput;
-    }
-
-    function isFunction(input) {
-        return input instanceof Function || Object.prototype.toString.call(input) === '[object Function]';
     }
 
     function makeGetSet (unit, keepTime) {
@@ -9092,12 +9206,15 @@ return window.noty;
             return mom;
         }
 
-        // TODO: Move this out of here!
         if (typeof value === 'string') {
-            value = mom.localeData().monthsParse(value);
-            // TODO: Another silent failure?
-            if (typeof value !== 'number') {
-                return mom;
+            if (/^\d+$/.test(value)) {
+                value = toInt(value);
+            } else {
+                value = mom.localeData().monthsParse(value);
+                // TODO: Another silent failure?
+                if (typeof value !== 'number') {
+                    return mom;
+                }
             }
         }
 
@@ -9215,36 +9332,6 @@ return window.noty;
 
         return m;
     }
-
-    function warn(msg) {
-        if (utils_hooks__hooks.suppressDeprecationWarnings === false &&
-                (typeof console !==  'undefined') && console.warn) {
-            console.warn('Deprecation warning: ' + msg);
-        }
-    }
-
-    function deprecate(msg, fn) {
-        var firstTime = true;
-
-        return extend(function () {
-            if (firstTime) {
-                warn(msg + '\nArguments: ' + Array.prototype.slice.call(arguments).join(', ') + '\n' + (new Error()).stack);
-                firstTime = false;
-            }
-            return fn.apply(this, arguments);
-        }, fn);
-    }
-
-    var deprecations = {};
-
-    function deprecateSimple(name, msg) {
-        if (!deprecations[name]) {
-            warn(msg);
-            deprecations[name] = true;
-        }
-    }
-
-    utils_hooks__hooks.suppressDeprecationWarnings = false;
 
     // iso 8601 regex
     // 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
@@ -9891,7 +9978,7 @@ return window.noty;
     }
 
     var prototypeMin = deprecate(
-         'moment().min is deprecated, use moment.min instead. https://github.com/moment/moment/issues/1548',
+         'moment().min is deprecated, use moment.max instead. https://github.com/moment/moment/issues/1548',
          function () {
              var other = local__createLocal.apply(null, arguments);
              if (this.isValid() && other.isValid()) {
@@ -9903,7 +9990,7 @@ return window.noty;
      );
 
     var prototypeMax = deprecate(
-        'moment().max is deprecated, use moment.max instead. https://github.com/moment/moment/issues/1548',
+        'moment().max is deprecated, use moment.min instead. https://github.com/moment/moment/issues/1548',
         function () {
             var other = local__createLocal.apply(null, arguments);
             if (this.isValid() && other.isValid()) {
@@ -10201,7 +10288,8 @@ return window.noty;
 
     // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
     // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
-    var isoRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/;
+    // and further modified to allow for strings containing both week and day
+    var isoRegex = /^(-)?P(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)W)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?$/;
 
     function create__createDuration (input, key) {
         var duration = input,
@@ -10239,11 +10327,11 @@ return window.noty;
             duration = {
                 y : parseIso(match[2], sign),
                 M : parseIso(match[3], sign),
-                d : parseIso(match[4], sign),
-                h : parseIso(match[5], sign),
-                m : parseIso(match[6], sign),
-                s : parseIso(match[7], sign),
-                w : parseIso(match[8], sign)
+                w : parseIso(match[4], sign),
+                d : parseIso(match[5], sign),
+                h : parseIso(match[6], sign),
+                m : parseIso(match[7], sign),
+                s : parseIso(match[8], sign)
             };
         } else if (duration == null) {// checks for null or undefined
             duration = {};
@@ -10307,6 +10395,14 @@ return window.noty;
         return res;
     }
 
+    function absRound (number) {
+        if (number < 0) {
+            return Math.round(-1 * number) * -1;
+        } else {
+            return Math.round(number);
+        }
+    }
+
     // TODO: remove 'name' arg after deprecation is removed
     function createAdder(direction, name) {
         return function (val, period) {
@@ -10326,8 +10422,8 @@ return window.noty;
 
     function add_subtract__addSubtract (mom, duration, isAdding, updateOffset) {
         var milliseconds = duration._milliseconds,
-            days = duration._days,
-            months = duration._months;
+            days = absRound(duration._days),
+            months = absRound(duration._months);
 
         if (!mom.isValid()) {
             // No op
@@ -10653,8 +10749,8 @@ return window.noty;
     }
 
     function toJSON () {
-        // JSON.stringify(new Date(NaN)) === 'null'
-        return this.isValid() ? this.toISOString() : 'null';
+        // new Date(NaN).toJSON() === null
+        return this.isValid() ? this.toISOString() : null;
     }
 
     function moment_valid__isValid () {
@@ -10764,7 +10860,6 @@ return window.noty;
         var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy),
             date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
 
-        // console.log("got", weekYear, week, weekday, "set", date.toISOString());
         this.year(date.getUTCFullYear());
         this.month(date.getUTCMonth());
         this.date(date.getUTCDate());
@@ -11474,21 +11569,6 @@ return window.noty;
         return isFunction(format) ? format(output) : format.replace(/%s/i, output);
     }
 
-    function locale_set__set (config) {
-        var prop, i;
-        for (i in config) {
-            prop = config[i];
-            if (isFunction(prop)) {
-                this[i] = prop;
-            } else {
-                this['_' + i] = prop;
-            }
-        }
-        // Lenient ordinal parsing accepts just a number in addition to
-        // number + (possibly) stuff coming from _ordinalParseLenient.
-        this._ordinalParseLenient = new RegExp(this._ordinalParse.source + '|' + (/\d{1,2}/).source);
-    }
-
     var prototype__proto = Locale.prototype;
 
     prototype__proto._calendar       = defaultCalendar;
@@ -11952,7 +12032,7 @@ return window.noty;
     // Side effect imports
 
 
-    utils_hooks__hooks.version = '2.11.2';
+    utils_hooks__hooks.version = '2.12.0';
 
     setHookCallback(local__createLocal);
 
@@ -11975,6 +12055,8 @@ return window.noty;
     utils_hooks__hooks.monthsShort           = lists__listMonthsShort;
     utils_hooks__hooks.weekdaysMin           = lists__listWeekdaysMin;
     utils_hooks__hooks.defineLocale          = defineLocale;
+    utils_hooks__hooks.updateLocale          = updateLocale;
+    utils_hooks__hooks.locales               = locale_locales__listLocales;
     utils_hooks__hooks.weekdaysShort         = lists__listWeekdaysShort;
     utils_hooks__hooks.normalizeUnits        = normalizeUnits;
     utils_hooks__hooks.relativeTimeThreshold = duration_humanize__getSetRelativeTimeThreshold;
@@ -13261,6 +13343,70 @@ $(function() {
 			email : function( val ) {
 				return val;
 			}
+		},
+		fn : {
+			/**
+			 * Mark selected applications as inactive/active
+			 * @method function
+			 * @return {[type]} [description]
+			 */
+			markNotification			: function( atts ) {
+				jApp.aG().action = 'withSelectedUpdate';
+				jUtility.withSelected('custom', function(ids) {
+					jUtility.postJSON( {
+						url : jUtility.getCurrentFormAction(),
+						success : jUtility.callback.submitCurrentForm,
+						data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+					});
+				});
+			}, // end fn
+		},
+
+		rowBtns : {
+			markSelected : [
+				{ label: 'Enabled Notifications...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+				{
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markNotification({ 'notifications_enabled' : 'Both'})
+					},
+					label : 'Email &amp; Text'
+				},
+				{
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markNotification({ 'notifications_enabled' : 'Email'})
+					},
+					label : 'Email Only'
+				},
+				{
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markNotification({ 'notifications_enabled' : 'Text'})
+					},
+					label : 'Text Only'
+				},
+				{
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markNotification({ 'notifications_enabled' : 'None'})
+					},
+					label : 'None'
+				},
+
+			]
 		}
 	},
 		[ // colparams
@@ -13927,7 +14073,8 @@ $(function() {
 	jApp.addView('approveUpdates',
 		{ // grid definition
 			model : 'UpdateDetail',
-			filter : 'installed_flag = 0 and hidden_flag = 0',
+			filter : 'installed_flag = 0 and hidden_flag = 0 and approved_flag = 0',
+			scope : 'myGroups',
 			columnFriendly : 'name',
 			gridHeader : {
 				icon : 'fa-windows',
@@ -13943,6 +14090,14 @@ $(function() {
 			refreshInterval : 62000,
 			tableBtns : {
 				custom : {
+					showOnlyMyGroups : {
+						type : 'button',
+						class : 'btn btn-success active btn-toggle btn-showOnlyMyGroups',
+						icon : 'fa-toggle-on',
+						label : 'Show Only My Groups\'',
+						fn : 'showOnlyMyGroups',
+						'data-order' : 98
+					},
 					toggleProduction : {
 						type : 'button',
 						class : 'btn btn-success active btn-toggle',
@@ -13961,8 +14116,8 @@ $(function() {
 					},
 					toggleApproved : {
 						type : 'button',
-						class : 'btn btn-success active btn-toggle',
-						icon : 'fa-toggle-on',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
 						label : 'Toggle Approved',
 						fn : 'toggleApproved',
 						'data-order' : 100
@@ -14125,9 +14280,9 @@ $(function() {
 				 * @return {[type]} [description]
 				 */
 				updateGridFilter : function() {
-					var filter = [], temp = jApp.activeGrid.temp, scope = 'all';
+					var filter = [], temp = jApp.activeGrid.temp, scope = [];
 
-					if (typeof temp.hideApproved !== 'undefined' && !!temp.hideApproved) {
+					if (typeof temp.hideApproved === 'undefined' || !!temp.hideApproved) {
 						filter.push('approved_flag = 0');
 					}
 
@@ -14139,26 +14294,31 @@ $(function() {
 						filter.push('installed_flag = 0');
 					}
 
+					if (typeof temp.showOnlyMyGroups === 'undefined' || !! temp.showOnlyMyGroups )
+					{
+						scope.push('myGroups');
+					}
+
 					switch( true ) {
 						case ( ! temp.hideProduction && ! temp.hideNonProduction ) :
-							scope = 'all';
+							scope.push('all');
 						break;
 
 						case ( ! temp.hideProduction && !! temp.hideNonProduction ) :
-							scope = 'production';
+							scope.push('production');
 						break;
 
 						case ( !! temp.hideProduction && ! temp.hideNonProduction ) :
-							scope = 'nonproduction';
+							scope.push('nonproduction');
 						break;
 
 						case ( !! temp.hideProduction && !! temp.hideNonProduction ) :
-							scope = 'none';
+							scope.push('none');
 						break;
 					}
 
 					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
-					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope;
+					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope.join('_');
 
 				}, // end fn
 
@@ -14182,7 +14342,7 @@ $(function() {
 
 				toggleApproved : function( ) {
 					jApp.activeGrid.temp.hideApproved = ( typeof jApp.activeGrid.temp.hideApproved === 'undefined')
-						? true : !jApp.activeGrid.temp.hideApproved;
+						? false : !jApp.activeGrid.temp.hideApproved;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
@@ -14199,6 +14359,22 @@ $(function() {
 				toggleInstalled : function( ) {
 					jApp.activeGrid.temp.hideInstalled = ( typeof jApp.activeGrid.temp.hideInstalled === 'undefined')
 						? false : !jApp.activeGrid.temp.hideInstalled;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+
+				/**
+				 * Show only my groups' tasks
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				showOnlyMyGroups : function( ) {
+					var temp = jApp.activeGrid.temp;
+
+					temp.showOnlyMyGroups = ( typeof temp.showOnlyMyGroups === 'undefined' )
+						? false : ! temp.showOnlyMyGroups;
+
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
@@ -15129,7 +15305,17 @@ $(function() {
 					},
 
 					markServers : [
-						{ label: 'Set Selected Servers Status...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+						{ label: 'Set Selected Server Status...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+						{
+							'data-multiple' : true,
+							'data-permission' : 'update_enabled',
+							type : 'button',
+							fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markServer({ 'status' : 'Update Software'})
+							},
+							label : 'Update Agent Software'
+						},
 						{
 							'data-multiple' : true,
 							'data-permission' : 'update_enabled',
@@ -15178,6 +15364,16 @@ $(function() {
 								});
 							},
 							label : 'As Ready For Reboot'
+						},
+						{
+							'data-multiple' : true,
+							'data-permission' : 'update_enabled',
+							type : 'button',
+							fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markServer( { 'status' : 'Abort Reboot'} );
+							},
+							label : 'As Cancel Reboot',
 						},
 					],
 
@@ -16557,7 +16753,7 @@ $(function() {
 		{ // grid definition
 			model : 'WindowsUpdateServer',
 			columnFriendly : 'name',
-			filter : 'inactive_flag = 0',
+			filter : 'inactive_flag = 0 and :show__only__my__groups:',
 			gridHeader : {
 				icon : 'fa-building-o',
 				headerTitle : 'Install Windows Updates',
@@ -16571,6 +16767,14 @@ $(function() {
 			refreshInterval : 17000,
 			tableBtns : {
 				custom : {
+					showOnlyMyGroups : {
+						type : 'button',
+						class : 'btn btn-success active btn-toggle btn-showOnlyMyGroups',
+						icon : 'fa-toggle-on',
+						label : 'Show Only My Groups\' Servers',
+						fn : 'showOnlyMyGroups',
+						'data-order' : 98
+					},
 					toggleProduction : {
 						type : 'button',
 						class : 'btn btn-success active btn-toggle',
@@ -16587,11 +16791,22 @@ $(function() {
 						fn : 'toggleNonProduction',
 						'data-order' : 102
 					},
+
 				},
 			},
 			rowBtns : {
 				markSelected : [
 					{ label: 'Set Selected Server Status...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Update Software'})
+						},
+						label : 'Update Agent Software'
+					},
 					{
 						'data-multiple' : true,
 						'data-permission' : 'update_enabled',
@@ -16641,6 +16856,16 @@ $(function() {
 						},
 						label : 'As Ready For Reboot'
 					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer( { 'status' : 'Abort Reboot'} );
+						},
+						label : 'As Cancel Reboot',
+					},
 				]
 			},
 			columns : [ 				// columns to query
@@ -16650,7 +16875,9 @@ $(function() {
 				"os",
 				"ip",
 				"status",
-				"pending_updates",
+				"approved_updates",
+				"new_updates",
+				"software_version",
 				"updated_at_for_humans"
 				//'tags',
 			],
@@ -16661,7 +16888,9 @@ $(function() {
 				"OS",
 				"IP",
 				"Status",
-				"Pending Updates",
+				"Approved Updates",
+				"New Updates",
+				"Agent Version",
 				"Updated"
 			],
 			templates : { 				// html template functions
@@ -16669,11 +16898,6 @@ $(function() {
 				owner_name : function(val) {
 					var r = jApp.activeGrid.currentRow;
 					return _.get('name', r.owner, 'fa-users','Group');
-				},
-
-				pending_updates : function(val) {
-					var r = jApp.activeGrid.currentRow;
-					return _.get('title', r.updates);
 				},
 
 				os : function(val) {
@@ -16733,6 +16957,11 @@ $(function() {
 						break;
 					}
 
+					if ( typeof temp.showOnlyMyGroups === 'undefined' || !! temp.showOnlyMyGroups )
+					{
+						filter.push(':show__only__my__groups:');
+					}
+
 					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
 					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope;
 
@@ -16751,6 +16980,25 @@ $(function() {
 					var temp = jApp.activeGrid.temp;
 
 					temp.hideNonProduction = ( !!! temp.hideNonProduction );
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+
+				/**
+				 * Show only my groups' tasks
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				showOnlyMyGroups : function( ) {
+					var temp = jApp.activeGrid.temp;
+
+					if ( typeof temp.showOnlyMyGroups === 'undefined' )
+					{
+						temp.showOnlyMyGroups = true;
+					}
+
+					temp.showOnlyMyGroups = ( !!! temp.showOnlyMyGroups );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');

@@ -43,6 +43,64 @@ class Server extends Model
     'operating_system.name' => 20,
   ];
 
+  protected $appends = [
+    'identifiable_name',
+    'updated_at_for_humans',
+    'approved_updates',
+    'new_updates'
+  ];
+
+  /**
+   * Number of updates that have been approved
+   * @return [type] [description]
+   */
+  public function getApprovedUpdatesAttribute()
+  {
+      return UpdateDetail::where('installed_flag',0)
+          ->where('approved_flag',1)
+          ->where('hidden_flag',0)
+          ->where('superseded_flag',0)
+          ->where('server_id',$this->id)
+          ->count();
+  }
+
+  /**
+   * Number of updates that have been not approved
+   * @return [type] [description]
+   */
+  public function getNewUpdatesAttribute()
+  {
+      return UpdateDetail::where('installed_flag',0)
+              ->where('approved_flag',0)
+              ->where('server_id',$this->id)
+              ->where('superseded_flag',0)
+              ->where('hidden_flag',0)
+              ->count();
+  }
+
+  /**
+   * Get only servers with new or approved updates
+   * @method scopeHasUpdates
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeHasUpdates($query)
+  {
+    return $query->whereHas('updates', function($q) {
+      return $q->where('installed_flag',0)->where('hidden_flag',0);
+    });
+  }
+
+  /**
+   * Get servers which are late checking in
+   * @method scopeLateCheckingIn
+   * @param  [type]              $query [description]
+   * @return [type]                     [description]
+   */
+  public function scopeLateCheckingIn($query)
+  {
+    return $query->whereNotNull('software_version')->where('updated_at','<', date('Y-m-d H:i:s', strtotime("15 minutes ago") ) );
+  }
 
   /**
    * Get only windows servers
@@ -168,5 +226,15 @@ class Server extends Model
   public function updates()
   {
     return $this->hasMany('App\UpdateDetail','server_id');
+  }
+
+  /**
+   * A server can have many update batches
+   * @method update_batches
+   * @return [type]         [description]
+   */
+  public function update_batches()
+  {
+    return $this->hasMany('App\UpdateBatch','server_id');
   }
 }

@@ -86,6 +86,7 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::resource('Group',                'Api\v1\GroupController');
 
   Route::delete('Notification',                  'Api\v1\NotificationController@destroy');
+  Route::patch('Notification/_massUpdate',       'Api\v1\NotificationController@markNotifications');
   Route::resource('Notification',                'Api\v1\NotificationController');
 
   Route::delete('NotificationExemption',                  'Api\v1\NotificationExemptionController@destroy');

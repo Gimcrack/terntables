@@ -10,7 +10,8 @@
 	jApp.addView('approveUpdates',
 		{ // grid definition
 			model : 'UpdateDetail',
-			filter : 'installed_flag = 0 and hidden_flag = 0',
+			filter : 'installed_flag = 0 and hidden_flag = 0 and approved_flag = 0',
+			scope : 'myGroups',
 			columnFriendly : 'name',
 			gridHeader : {
 				icon : 'fa-windows',
@@ -26,6 +27,14 @@
 			refreshInterval : 62000,
 			tableBtns : {
 				custom : {
+					showOnlyMyGroups : {
+						type : 'button',
+						class : 'btn btn-success active btn-toggle btn-showOnlyMyGroups',
+						icon : 'fa-toggle-on',
+						label : 'Show Only My Groups\'',
+						fn : 'showOnlyMyGroups',
+						'data-order' : 98
+					},
 					toggleProduction : {
 						type : 'button',
 						class : 'btn btn-success active btn-toggle',
@@ -44,8 +53,8 @@
 					},
 					toggleApproved : {
 						type : 'button',
-						class : 'btn btn-success active btn-toggle',
-						icon : 'fa-toggle-on',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
 						label : 'Toggle Approved',
 						fn : 'toggleApproved',
 						'data-order' : 100
@@ -208,9 +217,9 @@
 				 * @return {[type]} [description]
 				 */
 				updateGridFilter : function() {
-					var filter = [], temp = jApp.activeGrid.temp, scope = 'all';
+					var filter = [], temp = jApp.activeGrid.temp, scope = [];
 
-					if (typeof temp.hideApproved !== 'undefined' && !!temp.hideApproved) {
+					if (typeof temp.hideApproved === 'undefined' || !!temp.hideApproved) {
 						filter.push('approved_flag = 0');
 					}
 
@@ -222,26 +231,31 @@
 						filter.push('installed_flag = 0');
 					}
 
+					if (typeof temp.showOnlyMyGroups === 'undefined' || !! temp.showOnlyMyGroups )
+					{
+						scope.push('myGroups');
+					}
+
 					switch( true ) {
 						case ( ! temp.hideProduction && ! temp.hideNonProduction ) :
-							scope = 'all';
+							scope.push('all');
 						break;
 
 						case ( ! temp.hideProduction && !! temp.hideNonProduction ) :
-							scope = 'production';
+							scope.push('production');
 						break;
 
 						case ( !! temp.hideProduction && ! temp.hideNonProduction ) :
-							scope = 'nonproduction';
+							scope.push('nonproduction');
 						break;
 
 						case ( !! temp.hideProduction && !! temp.hideNonProduction ) :
-							scope = 'none';
+							scope.push('none');
 						break;
 					}
 
 					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
-					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope;
+					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope.join('_');
 
 				}, // end fn
 
@@ -265,7 +279,7 @@
 
 				toggleApproved : function( ) {
 					jApp.activeGrid.temp.hideApproved = ( typeof jApp.activeGrid.temp.hideApproved === 'undefined')
-						? true : !jApp.activeGrid.temp.hideApproved;
+						? false : !jApp.activeGrid.temp.hideApproved;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
@@ -282,6 +296,22 @@
 				toggleInstalled : function( ) {
 					jApp.activeGrid.temp.hideInstalled = ( typeof jApp.activeGrid.temp.hideInstalled === 'undefined')
 						? false : !jApp.activeGrid.temp.hideInstalled;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+
+				/**
+				 * Show only my groups' tasks
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				showOnlyMyGroups : function( ) {
+					var temp = jApp.activeGrid.temp;
+
+					temp.showOnlyMyGroups = ( typeof temp.showOnlyMyGroups === 'undefined' )
+						? false : ! temp.showOnlyMyGroups;
+
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');

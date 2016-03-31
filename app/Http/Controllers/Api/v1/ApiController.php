@@ -61,6 +61,12 @@ class ApiController extends Controller
   public $limitPerPage = 100;
 
   /**
+   * The columns to select in the query;
+   * @var [type]
+   */
+  public $select = [];
+
+  /**
    * Load the checkaccess middleware for the controller
    * @return [type] [description]
    */
@@ -88,19 +94,17 @@ class ApiController extends Controller
 
       $q = Input::get('q',null);
       $scope = Input::get('scope','all');
+      $select = ( !empty( $this->select ) ) ? $this->select : null;
 
-      if ( !! $q ) {
-        $results = $model_class::search( $q )
-                    ->with($with)
-                    ->$scope()
-                    ->whereRaw($filter)
-                    ->paginate( $this->limitPerPage );
-      } else {
-        $results = $model_class::with($with)
-                    ->$scope()
-                    ->whereRaw($filter)
-                    ->paginate( $this->limitPerPage );
-      }
+      $models = ( !! $q ) ? $model_class::search( $q )->with($with) : $model_class::with($with);
+
+      $results = $models
+                  ->$scope()
+                  ->whereRaw($filter);
+
+      //$results = ( !! $select ) ? $models->get($select) : $results;
+
+      $results = $results->paginate( $this->limitPerPage );
 
       return response()->json( $results );
   }
@@ -163,6 +167,7 @@ class ApiController extends Controller
         'Group'   => 'Admin\GroupController',
         'Role'    => 'Admin\RoleController',
         'Server'  => 'BI\ServerController',
+        'WindowsUpdateServer' => 'BI\ServerController',
         'Application' => 'BI\ApplicationController',
         'Database'    => 'BI\DatabaseController',
         'Outage'      => 'BI\OutageController',
@@ -171,6 +176,7 @@ class ApiController extends Controller
         'Document'    => 'GIS\DocumentController',
         'Notification' => 'Admin\NotificationController',
         'NotificationExemption' => 'Admin\NotificationExemptionController',
+
       ];
 
       $class = 'App\Http\Controllers' . "\\" . $classControllers[$model];

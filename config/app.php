@@ -156,7 +156,21 @@ return [
 
         Adldap\Laravel\AdldapServiceProvider::class,
 
-        Sofa\Eloquence\ServiceProvider::class
+        Sofa\Eloquence\ServiceProvider::class,
+
+        Aloha\Twilio\Support\Laravel\ServiceProvider::class,
+
+        /**
+         * Laravel-FTP
+         */
+        Anchu\Ftp\FtpServiceProvider::class,
+
+        /**
+         * Flysystem
+         */
+         GrahamCampbell\Flysystem\FlysystemServiceProvider::class,
+
+
 
     ],
 
@@ -211,7 +225,12 @@ return [
         'Parser'    => Nathanmac\Utilities\Parser\Facades\Parser::class,
         'Flash'     => Laracasts\Flash\Flash::class,
         'PDF'       => Barryvdh\DomPDF\Facade::class,
-        'Adldap'    => Adldap\Laravel\Facades\Adldap::class
+        'Adldap'    => Adldap\Laravel\Facades\Adldap::class,
+        'Twilio'    => Aloha\Twilio\Support\Laravel\Facade::class,
+        'FTP'       => Anchu\Ftp\Facades\Ftp::class,
+        'SSH'       => Collective\Remote\RemoteFacade::class,
+        'Flysystem' => GrahamCampbell\Flysystem\Facades\Flysystem::class,
+        'SFTP'      => League\Flysystem\Sftp\SftpAdapter::class,
     ],
 
 ];

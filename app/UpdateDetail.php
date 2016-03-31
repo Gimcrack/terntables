@@ -18,7 +18,13 @@ class UpdateDetail extends Model
     'description',
     'hostname',
     'kb_article',
-    'owner_name'
+    'owner_name',
+  ];
+
+  protected $dates = [
+    'created_at',
+    'updated_at',
+    'installed_at'
   ];
 
   protected $searchableColumns = [
@@ -50,6 +56,67 @@ class UpdateDetail extends Model
       return $q->where('production_flag',0);
     });
   }
+
+  /**
+   * My groups
+   * @method scopeMyGroups
+   * @param  [type]        $query [description]
+   * @return [type]               [description]
+   */
+  public function scopeMyGroups($query)
+  {
+    $my_groups = \Auth::user()->groups()->lists('id')->toArray();
+
+    return $query->whereHas('server', function($q) use ($my_groups) {
+      return $q->whereIn('group_id', $my_groups);
+    });
+  }
+
+  /**
+   * Get my groups production servers
+   * @method scopeMyGroups_Production
+   * @param  [type]                   $query [description]
+   * @return [type]                          [description]
+   */
+  public function scopeMyGroups_Production($query)
+  {
+    return $query->myGroups()->production();
+  }
+
+  /**
+   * Get my groups non-production servers
+   * @method scopeMyGroups_Production
+   * @param  [type]                   $query [description]
+   * @return [type]                          [description]
+   */
+  public function scopeMyGroups_Nonproduction($query)
+  {
+    return $query->myGroups()->nonproduction();
+  }
+
+  /**
+   * Get my groups servers
+   * @method scopeMyGroups_Production
+   * @param  [type]                   $query [description]
+   * @return [type]                          [description]
+   */
+  public function scopeMyGroups_All($query)
+  {
+    return $query->myGroups();
+  }
+
+  /**
+   * Get my groups production servers
+   * @method scopeMyGroups_Production
+   * @param  [type]                   $query [description]
+   * @return [type]                          [description]
+   */
+  public function scopeMyGroups_None($query)
+  {
+    return $query->none();
+  }
+
+
 
   /**
    * Get the owner name

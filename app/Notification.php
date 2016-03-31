@@ -43,4 +43,62 @@ class Notification extends Model
   {
     return $this->belongsTo('App\Person');
   }
+
+  /**
+   * Get notification records with emails
+   * @method scopeEmail
+   * @param  [type]     $query [description]
+   * @return [type]            [description]
+   */
+  public function scopeEmail($query)
+  {
+    return $query->whereNotNull('email')->where('email','<>','')->whereIn('notifications_enabled',['Email','Both']);
+  }
+
+  /**
+   * Get notification records with phone numbers
+   * @method scopeEmail
+   * @param  [type]     $query [description]
+   * @return [type]            [description]
+   */
+  public function scopePhone($query)
+  {
+    return $query->whereNotNull('phone_number')->where('phone_number','<>','')->whereIn('notifications_enabled',['Text','Both']);
+  }
+
+  /**
+   * Get a list of email addresses
+   * @method getemails
+   * @return [type]    [description]
+   */
+  public static function getemails()
+  {
+    $raw = static::email()->get()->lists('email');
+    $parsed = [];
+
+    foreach( $raw as $emails )
+    {
+      $parsed = array_merge($parsed, explode("\n",$emails));
+    }
+
+    return $parsed;
+  }
+
+  /**
+   * Get a list of phone numbers
+   * @method getemails
+   * @return [type]    [description]
+   */
+  public static function getphones()
+  {
+    $raw = static::phone()->get()->lists('phone_number');
+    $parsed = [];
+
+    foreach( $raw as $phones )
+    {
+      $parsed = array_merge($parsed, explode("\n",$phones));
+    }
+
+    return $parsed;
+  }
 }

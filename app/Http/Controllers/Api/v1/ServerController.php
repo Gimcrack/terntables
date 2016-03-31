@@ -36,7 +36,8 @@ class ServerController extends ApiController
     'people',
     'tags',
     'owner',
-    'operating_system'
+    'operating_system',
+    'update_batches'
   ];
 
   /**
@@ -48,6 +49,39 @@ class ServerController extends ApiController
     'applications',
     'databases'
   ];
+
+  /**
+   * Parse the search filter
+   * @method parseSearchFilter
+   * @return [type]            [description]
+   */
+  public function parseSearchFilter()
+  {
+    $filter = Input::get('filter',null);
+
+    if (empty($filter))
+    {
+      return '1=1';
+    }
+
+    $search = [':show__only__my__groups:'];
+    $replace = [$this->showOnlyMyGroupsCriteria()];
+
+    $filter = str_replace($search,$replace,$filter);
+
+    return $filter;
+  }
+
+  /**
+   * Get the criteria for my groups tasks
+   * @method showOnlyAvailableCriteria
+   * @return [type]                    [description]
+   */
+  private function showOnlyMyGroupsCriteria()
+  {
+    $my_groups = implode(",",\Auth::user()->groups()->lists('id')->toArray() );
+    return "group_id in ({$my_groups})";
+  }
 
   /**
    * Spawn a new instance of the controller
@@ -97,9 +131,7 @@ class ServerController extends ApiController
 
     $filter = $this->parseSearchFilter();
 
-    $with = ['owner','operating_system','updates' => function($q) {
-      $q->where('installed_flag',0)->where('approved_flag',1);
-    }];
+    $with = ['owner','operating_system'];
 
     $q = Input::get('q',null);
     $scope = Input::get('scope','all');
@@ -109,6 +141,7 @@ class ServerController extends ApiController
                   ->with($with)
                   ->windows()
                   ->updatable()
+                  ->hasUpdates()
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
@@ -116,6 +149,7 @@ class ServerController extends ApiController
       $results = $model_class::with($with)
                   ->windows()
                   ->updatable()
+                  ->hasUpdates()
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );

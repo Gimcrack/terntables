@@ -11,7 +11,7 @@
 		{ // grid definition
 			model : 'WindowsUpdateServer',
 			columnFriendly : 'name',
-			filter : 'inactive_flag = 0',
+			filter : 'inactive_flag = 0 and :show__only__my__groups:',
 			gridHeader : {
 				icon : 'fa-building-o',
 				headerTitle : 'Install Windows Updates',
@@ -25,6 +25,14 @@
 			refreshInterval : 17000,
 			tableBtns : {
 				custom : {
+					showOnlyMyGroups : {
+						type : 'button',
+						class : 'btn btn-success active btn-toggle btn-showOnlyMyGroups',
+						icon : 'fa-toggle-on',
+						label : 'Show Only My Groups\' Servers',
+						fn : 'showOnlyMyGroups',
+						'data-order' : 98
+					},
 					toggleProduction : {
 						type : 'button',
 						class : 'btn btn-success active btn-toggle',
@@ -41,11 +49,22 @@
 						fn : 'toggleNonProduction',
 						'data-order' : 102
 					},
+
 				},
 			},
 			rowBtns : {
 				markSelected : [
 					{ label: 'Set Selected Server Status...', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Update Software'})
+						},
+						label : 'Update Agent Software'
+					},
 					{
 						'data-multiple' : true,
 						'data-permission' : 'update_enabled',
@@ -95,6 +114,16 @@
 						},
 						label : 'As Ready For Reboot'
 					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer( { 'status' : 'Abort Reboot'} );
+						},
+						label : 'As Cancel Reboot',
+					},
 				]
 			},
 			columns : [ 				// columns to query
@@ -104,7 +133,9 @@
 				"os",
 				"ip",
 				"status",
-				"pending_updates",
+				"approved_updates",
+				"new_updates",
+				"software_version",
 				"updated_at_for_humans"
 				//'tags',
 			],
@@ -115,7 +146,9 @@
 				"OS",
 				"IP",
 				"Status",
-				"Pending Updates",
+				"Approved Updates",
+				"New Updates",
+				"Agent Version",
 				"Updated"
 			],
 			templates : { 				// html template functions
@@ -123,11 +156,6 @@
 				owner_name : function(val) {
 					var r = jApp.activeGrid.currentRow;
 					return _.get('name', r.owner, 'fa-users','Group');
-				},
-
-				pending_updates : function(val) {
-					var r = jApp.activeGrid.currentRow;
-					return _.get('title', r.updates);
 				},
 
 				os : function(val) {
@@ -187,6 +215,11 @@
 						break;
 					}
 
+					if ( typeof temp.showOnlyMyGroups === 'undefined' || !! temp.showOnlyMyGroups )
+					{
+						filter.push(':show__only__my__groups:');
+					}
+
 					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
 					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope;
 
@@ -205,6 +238,25 @@
 					var temp = jApp.activeGrid.temp;
 
 					temp.hideNonProduction = ( !!! temp.hideNonProduction );
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+
+				/**
+				 * Show only my groups' tasks
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				showOnlyMyGroups : function( ) {
+					var temp = jApp.activeGrid.temp;
+
+					if ( typeof temp.showOnlyMyGroups === 'undefined' )
+					{
+						temp.showOnlyMyGroups = true;
+					}
+
+					temp.showOnlyMyGroups = ( !!! temp.showOnlyMyGroups );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
