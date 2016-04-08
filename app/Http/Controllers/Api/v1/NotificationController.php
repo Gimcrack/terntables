@@ -28,7 +28,8 @@ class NotificationController extends ApiController
    * @var [type]
    */
   public $with = [
-    'person'
+    'person',
+    'group'
   ];
 
   /**

@@ -21,6 +21,17 @@
 			'data-validType' : 'select'
 		},
 		{
+			name : 'group_id',
+			type : 'select',
+			required : true,
+			_labelssource : 'Group.name',
+			_optionssource : 'Group.id',
+			_firstoption : null,
+			_firstlabel : '-Choose-',
+			_label : 'Limit to notifications of Group:',
+			'data-validType' : 'select'
+		},
+		{
 			name : 'notifications_enabled',
 			type : 'select',
 			_optionssource : [
@@ -65,6 +76,7 @@
 		columns : [ 				// columns to query
 			"id",
 			"person",
+			"group",
 			"notifications_enabled",
 			"email",
 			"phone_number",
@@ -72,6 +84,7 @@
 		headers : [ 				// headers for table
 			"ID",
 			"Person",
+			"Group",
 			"Notifications",
 			"Email",
 			"Phone",
@@ -80,6 +93,10 @@
 			person : function() {
 				var r = jApp.activeGrid.currentRow;
 				return _.get('name',r.person,'fa-male','Person');
+			},
+			group : function() {
+				var r = jApp.activeGrid.currentRow;
+				return _.get('name',r.group,'fa-users','Group');
 			},
 			email : function( val ) {
 				return val;

@@ -4,9 +4,11 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Server;
+use App\Alert;
 use App\Notification;
 use App\Dashboard\Notifier;
 use Illuminate\Database\Eloquent\Collection;
+use Log;
 
 class DashboardServerHealth extends Command
 {
@@ -41,13 +43,67 @@ class DashboardServerHealth extends Command
      */
     public function handle()
     {
-        $late_servers = Server::lateCheckingIn()->get();
+      $this->checkServerAlerts();
 
-        if ( $late_servers->count() )
+      $this->checkLateServers();
+    }
+
+
+    /**
+     * Check servers that are late checking in.
+     * @method checkLateServers
+     * @return [type]           [description]
+     */
+    public function checkLateServers()
+    {
+      $late_servers = Server::lateCheckingIn()->get();
+
+      if ( $late_servers->count() )
+      {
+        $this->sendLateServerNotifications($late_servers);
+      }
+
+    }
+
+    /**
+     * Check if there are any unreported server alerts and process
+     * @method checkServerAlerts
+     * @return [type]            [description]
+     */
+    public function checkServerAlerts()
+    {
+      $alerts = Alert::with(['alertable'])->serverAlerts()->unnotified()->get();
+
+      foreach($alerts as $alert)
+      {
+        $server = $alert->alertable;
+        $notifications = $server->notifications();
+        $body = $alert->message;
+
+        foreach( $notifications as $notification)
         {
-          $this->sendNotifications($late_servers);
-        }
 
+          if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Email' )
+          {
+            Notifier::mail('emails.offlineServiceNotification'
+              , compact('body')
+              , $notification->email
+              , "Service Error on {$server->name}"
+            );
+          }
+
+          if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Text' )
+          {
+            Notifier::text($notification->phone_number, $body);
+          }
+        } // end foreach
+
+        Log::warning($alert->message);
+
+        $alert->notification_sent_flag = 1;
+        $alert->save();
+
+      } // end foreach
     }
 
     /**
@@ -56,15 +112,22 @@ class DashboardServerHealth extends Command
      * @param  Collection        $servers [description]
      * @return [type]                     [description]
      */
-    public function sendNotifications(Collection $servers)
+    public function sendLateServerNotifications(Collection $servers)
     {
       $body = $this->getLateServerNotification($servers);
 
-      // send a text message to the system admin
-      Notifier::text( env('ADMIN_PHONE'), $body );
+      // make sure it's not quiet hours
+      if ( ! Notifier::isQuietHours() )
+      {
+        // send a text message to the system admin
+        Notifier::text( env('ADMIN_PHONE'), $body );
 
-      // send an email message to the system admin
-      Notifier::mail( 'emails.lateServerNotification', compact('servers') );
+        // send an email message to the system admin
+        Notifier::mail( 'emails.lateServerNotification', compact('servers') );
+      } else {
+        // just log a warning instead
+        Log::warning($body);
+      }
     }
 
 
@@ -81,6 +144,14 @@ class DashboardServerHealth extends Command
 
       foreach($servers as $server)
       {
+        // create the alert
+        Alert::create([
+          'message' => "Server {$server->name} last checked in: {$server->updated_at_for_humans}.",
+          'alertable_id' => $server->id,
+          'alertable_type' => 'App\Server',
+          'notification_sent_flag' => 1
+        ]);
+
         $server_names[] = $server->name . " (" . $server->updated_at_for_humans . ")";
       }
 

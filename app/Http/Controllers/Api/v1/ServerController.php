@@ -140,8 +140,8 @@ class ServerController extends ApiController
       $results = $model_class::search( $q )
                   ->with($with)
                   ->windows()
-                  ->updatable()
-                  ->hasUpdates()
+                  ->updatable( )
+                  ->hasUpdates( Input::get('showUnupdatable',false) )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
@@ -149,7 +149,7 @@ class ServerController extends ApiController
       $results = $model_class::with($with)
                   ->windows()
                   ->updatable()
-                  ->hasUpdates()
+                  ->hasUpdates( Input::get('showUnupdatable',false) )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );

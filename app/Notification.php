@@ -18,6 +18,7 @@ class Notification extends Model
    */
   protected $fillable = [
       'person_id'
+    , 'group_id'
     , 'notifications_enabled'
     , 'email'
     , 'phone_number'
@@ -42,6 +43,16 @@ class Notification extends Model
   public function person()
   {
     return $this->belongsTo('App\Person');
+  }
+
+  /**
+   * A notification belongs to one group
+   * @method groups
+   * @return [type]  [description]
+   */
+  public function group()
+  {
+    return $this->belongsTo('App\Group');
   }
 
   /**

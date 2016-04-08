@@ -13280,6 +13280,17 @@ $(function() {
 			'data-validType' : 'select'
 		},
 		{
+			name : 'group_id',
+			type : 'select',
+			required : true,
+			_labelssource : 'Group.name',
+			_optionssource : 'Group.id',
+			_firstoption : null,
+			_firstlabel : '-Choose-',
+			_label : 'Limit to notifications of Group:',
+			'data-validType' : 'select'
+		},
+		{
 			name : 'notifications_enabled',
 			type : 'select',
 			_optionssource : [
@@ -13324,6 +13335,7 @@ $(function() {
 		columns : [ 				// columns to query
 			"id",
 			"person",
+			"group",
 			"notifications_enabled",
 			"email",
 			"phone_number",
@@ -13331,6 +13343,7 @@ $(function() {
 		headers : [ 				// headers for table
 			"ID",
 			"Person",
+			"Group",
 			"Notifications",
 			"Email",
 			"Phone",
@@ -13339,6 +13352,10 @@ $(function() {
 			person : function() {
 				var r = jApp.activeGrid.currentRow;
 				return _.get('name',r.person,'fa-male','Person');
+			},
+			group : function() {
+				var r = jApp.activeGrid.currentRow;
+				return _.get('name',r.group,'fa-users','Group');
 			},
 			email : function( val ) {
 				return val;
@@ -16775,6 +16792,14 @@ $(function() {
 						fn : 'showOnlyMyGroups',
 						'data-order' : 98
 					},
+					toggleUnupdatable : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
+						label : 'Toggle Servers With No Updates',
+						fn : 'toggleUnupdatable',
+						'data-order' : 99
+					},
 					toggleProduction : {
 						type : 'button',
 						class : 'btn btn-success active btn-toggle',
@@ -16933,7 +16958,7 @@ $(function() {
 				 * @return {[type]} [description]
 				 */
 				updateGridFilter : function() {
-					var filter = [], temp = jApp.activeGrid.temp, scope = 'all';
+					var filter = [], temp = jApp.activeGrid.temp, scope = 'all', data = jApp.activeGrid.dataGrid.requestOptions.data;
 
 
 					filter.push('inactive_flag = 0');
@@ -16962,8 +16987,9 @@ $(function() {
 						filter.push(':show__only__my__groups:');
 					}
 
-					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
-					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope;
+					data.filter = filter.join(' AND ');
+					data.scope = scope;
+					data.showUnupdatable = ( !! temp.showUnupdatable ) ? 1 : 0;
 
 				}, // end fn
 
@@ -16980,6 +17006,14 @@ $(function() {
 					var temp = jApp.activeGrid.temp;
 
 					temp.hideNonProduction = ( !!! temp.hideNonProduction );
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+
+				toggleUnupdatable : function( ) {
+					var temp = jApp.activeGrid.temp;
+					temp.showUnupdatable = ( !!! temp.showUnupdatable );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
