@@ -2,9 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model as BaseModel;
-
-class Alert extends BaseModel
+class Alert extends Model
 {
   /**
    * The database table that the model references
@@ -21,6 +19,11 @@ class Alert extends BaseModel
     'acknowledged_flag'
   ];
 
+  protected $appends = [
+    'updated_at_for_humans',
+    'name'
+  ];
+
   /**
    * Polymorphic relationship
    * @method alertable
@@ -29,6 +32,53 @@ class Alert extends BaseModel
   public function alertable()
   {
     return $this->morphTo();
+  }
+
+  /**
+   * Get name attribute
+   * @method getNameAttribute
+   * @return [type]           [description]
+   */
+  public function getNameAttribute()
+  {
+    return $this->alertable->identifiableName;
+  }
+
+  /**
+   * Get the updated at for humans
+   * @method updatedAtForHumans
+   * @return [type]             [description]
+   */
+  public function getUpdatedAtForHumansAttribute()
+  {
+    try {
+      if (is_object($this->updated_at)) {
+        return $this->updated_at->diffForHumans();
+      } elseif ( !empty($this->updated_at) ) {
+        return Carbon::createFromFormat('Y-m-d G:i:s.000', $this->updated_at )->diffForHumans();
+
+      }
+
+      return null;
+
+    }
+
+    catch(Exception $e) {
+      return null;
+    }
+
+
+  }
+
+  /**
+   * Get recent alerts from the last hour
+   * @method scopeRecent
+   * @param  [type]      $query [description]
+   * @return [type]             [description]
+   */
+  public function scopeRecent($query)
+  {
+    return $query->where('created_at','>=', date('Y-m-d H:i:s', strtotime("1 hour ago")) );
   }
 
   /**
@@ -69,7 +119,7 @@ class Alert extends BaseModel
    * @method scopeUnacknowleged
    * @return [type]             [description]
    */
-  public function scopeUnacknowleged()
+  public function scopeUnacknowledged($query)
   {
     return $query->where('acknowledged_flag',0);
   }

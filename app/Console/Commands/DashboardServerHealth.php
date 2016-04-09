@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Server;
 use App\Alert;
 use App\Notification;
+use App\ServerDisk;
 use App\Dashboard\Notifier;
 use Illuminate\Database\Eloquent\Collection;
 use Log;
@@ -43,11 +44,35 @@ class DashboardServerHealth extends Command
      */
     public function handle()
     {
+      $this->checkDiskSpace();
+
       $this->checkServerAlerts();
 
       $this->checkLateServers();
     }
 
+
+    /**
+     * Check free disk space
+     * @method checkDiskSpace
+     * @return [type]         [description]
+     */
+    public function checkDiskSpace()
+    {
+      $disks = ServerDisk::with(['server'])->almostFull()->get();
+
+      foreach($disks as $disk)
+      {
+        if ( ! $disk->server->inactive_flag )
+        {
+          Alert::create([
+            'message' => "[{$disk->server->name}] Less than 10% free space on {$disk->name}",
+            'alertable_type' => 'App\Server',
+            'alertable_id' => $disk->server->id
+          ]);
+        }
+      }
+    }
 
     /**
      * Check servers that are late checking in.
@@ -74,29 +99,34 @@ class DashboardServerHealth extends Command
     {
       $alerts = Alert::with(['alertable'])->serverAlerts()->unnotified()->get();
 
+
       foreach($alerts as $alert)
       {
         $server = $alert->alertable;
         $notifications = $server->notifications();
-        $body = $alert->message;
+        $body = str_replace( "\n", "<br/>", $alert->message );
 
-        foreach( $notifications as $notification)
+        if ( $this->shouldSendAlert($alert) )
         {
-
-          if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Email' )
+          foreach( $notifications as $notification )
           {
-            Notifier::mail('emails.offlineServiceNotification'
-              , compact('body')
-              , $notification->email
-              , "Service Error on {$server->name}"
-            );
-          }
+            if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Email' )
+            {
+              Log::info("Sending Email Notification to {$notification->email}");
+              Notifier::mail('emails.offlineServiceNotification'
+                , compact('body')
+                , $notification->email
+                , "Service Error on {$server->name}"
+              );
+            }
 
-          if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Text' )
-          {
-            Notifier::text($notification->phone_number, $body);
-          }
-        } // end foreach
+            if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Text' )
+            {
+              Log::info("Sending Text Notification to {$notification->phone_number}");
+              Notifier::text($notification->phone_number, $alert->message);
+            }
+          } // end foreach
+        }
 
         Log::warning($alert->message);
 
@@ -104,6 +134,48 @@ class DashboardServerHealth extends Command
         $alert->save();
 
       } // end foreach
+    }
+
+    /**
+     * Should the alert be sent?
+     * @method shouldSendAlert
+     * @return [type]          [description]
+     */
+    public function shouldSendAlert(Alert $alert)
+    {
+      $server = $alert->alertable;
+      $quiet = Notifier::isQuietHours( $server->production_flag );
+      $outage = Notifier::isOutage();
+
+      if ( !! $server->inactive_flag )
+      {
+        Log::info("Alert suppressed for inactive server");
+        return false;
+      }
+
+      if ( !! $outage ) {
+        Log::info("Alert suppressed due to: outage window");
+        return false;
+      }
+
+      if ( ! $quiet ) return true;
+
+      // quiet hours, don't send alerts for nonprod servers
+      if ( ! $server->production_flag ) {
+        Log::info("Alert suppressed for test server due to: quiet hours enforced");
+        return false;
+      }
+
+      // quiet hours, production server - send if there have been more than the threshold in the past hour
+      if ( $server->alerts()->recent()->count() >= config('alerts.production_alert_threshold') )
+      {
+        Log::info("Alert allowed for production server due to: threshold reached during quiet hours");
+        return true;
+      }
+
+      Log::info("Alert suppressed for production server due to: quiet hours enforced");
+      return false;
+
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Dashboard;
 
 use Twilio;
 use Mail;
+use Log;
 
 class Notifier {
 
@@ -43,12 +44,26 @@ class Notifier {
      * @method isQuietHours
      * @return boolean      [description]
      */
-    public static function isQuietHours()
+    public static function isQuietHours( $prod = true )
     {
+      $env = ( !! $prod ) ? 'prod' : 'test';
+
       $config = ( date('N') < 6  ) ?
-          config('alerts.quiet_hours.weekday') :
-          config('alerts.quiet_hours.weekend');
-      return ( date('H') < $config['before'] || date('H') > $config['after'] );
+          config("alerts.quiet_hours.{$env}") :
+          config("alerts.quiet_hours.weekend");
+
+      return ( date('H') < $config['before'] || date('H') >= $config['after'] );
+    }
+
+    /**
+     * Is there an outage happening?
+     * @method isOutage
+     * @return boolean  [description]
+     */
+    public static function isOutage()
+    {
+      $config = config('alerts.quiet_hours.outage');
+      return ( !! \App\Outage::active()->count() && date('H') >= $config['after'] );
     }
 
 
@@ -62,7 +77,7 @@ class Notifier {
     {
       switch( true )
       {
-        case strlen($number == 7) :
+        case strlen($number) == 7 :
           return "+1907" . $number;
 
         case strlen($number) == 10 :
@@ -70,6 +85,9 @@ class Notifier {
 
         case strlen($number) == 11 :
           return "+" . $number;
+
+        case strlen($number) == 12;
+          return $number;
       }
 
       return Log::error("{$number} is not a valid phone number");

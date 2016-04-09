@@ -40,9 +40,13 @@ Route::group(['prefix' => 'api/v1'], function() {
   // oit routes
   Route::delete('Server',           'Api\v1\ServerController@destroy');
   Route::patch('Server/_massUpdate', 'Api\v1\ServerController@markServers');
-  Route::get('Server/_alerts',      'Api\v1\ServerController@alertServers');
   Route::get('Server/_health',      'Api\v1\ServerController@healthServers');
   Route::resource('Server',         'Api\v1\ServerController');
+
+  Route::get('Alert/_acknowledge',      'Api\v1\AlertController@acknowledge_all');
+  Route::get('Alert/{id}/_acknowledge', 'Api\v1\AlertController@acknowledge');
+  Route::get('Alert/_server',          'Api\v1\AlertController@serverAlerts');
+  Route::resource('Alert',              'Api\v1\AlertController', [ 'except' => 'delete']);
 
 
   Route::patch('WindowsUpdateServer/_massUpdate', 'Api\v1\ServerController@markServers');

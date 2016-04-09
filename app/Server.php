@@ -165,6 +165,16 @@ class Server extends Model
   }
 
   /**
+   * A Server can have many disks
+   * @method disks
+   * @return [type] [description]
+   */
+  public function disks()
+  {
+    return $this->hasMany('App\ServerDisk');
+  }
+
+  /**
    * Get the alerts for the server
    * @method alerts
    * @return [type] [description]

@@ -3,7 +3,7 @@
 </h1>
 
 <p>
-  {{ $body }}
+  {!! $body !!}
 </p>
 
 <small>Reported at {{ date('Y-m-d H:i:s') }}</small>
