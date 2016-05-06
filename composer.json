@@ -1,6 +1,6 @@
 {
-    "name": "laravel/laravel",
-    "description": "The Laravel Framework.",
+    "name": "ingenious/terntables",
+    "description": "AJAX CRUD Framework",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "type": "project",

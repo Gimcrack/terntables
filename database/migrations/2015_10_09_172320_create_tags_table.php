@@ -33,11 +33,6 @@ class CreateTagsTable extends Migration
      */
     public function down()
     {
-      DB::statement('EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT all"');
-        // Schema::table('taggables', function(Blueprint $table) {
-        //     $table->dropForeign('taggables_tag_id_foreign');
-        // });
-
         Schema::drop('taggables');
 
         Schema::drop('tags');

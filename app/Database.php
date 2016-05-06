@@ -150,4 +150,14 @@ class Database extends Model
   {
     return $this->host->name;
   }
+
+  /**
+   * Get the alerts for the server
+   * @method alerts
+   * @return [type] [description]
+   */
+  public function alerts()
+  {
+    return $this->morphMany('App\Alert','alertable');
+  }
 }

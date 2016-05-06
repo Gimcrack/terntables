@@ -42,20 +42,6 @@ class Outage extends Model
       'outage_date' => 80,
     ];
 
-    // /**
-    //  * Save the model
-    //  * @method save
-    //  * @return [type] [description]
-    //  */
-    // public function save(array $options = [])
-    // {
-    //   parent::save($options);
-    //
-    //   if ( ! $this->complete_flag ) {
-    //     $this->generateTaskDetails();
-    //   }
-    // }
-
     /**
      * Get pending outages (i.e. not complete)
      * @method scopePending
@@ -65,6 +51,17 @@ class Outage extends Model
     public function scopePending($query)
     {
       return $query->where('complete_flag',0);
+    }
+
+    /**
+     * Get pending outage from today
+     * @method scopeActive
+     * @param  [type]      $query [description]
+     * @return [type]             [description]
+     */
+    public function scopeActive($query)
+    {
+      return $query->pending()->where('outage_date', date('Y-m-d'));
     }
 
     /**

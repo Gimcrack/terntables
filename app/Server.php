@@ -84,11 +84,16 @@ class Server extends Model
    * @param  [type]          $query [description]
    * @return [type]                 [description]
    */
-  public function scopeHasUpdates($query)
+  public function scopeHasUpdates($query, $filter)
   {
-    return $query->whereHas('updates', function($q) {
-      return $q->where('installed_flag',0)->where('hidden_flag',0);
-    });
+    if ( ! $filter )
+    {
+      return $query->whereHas('updates', function($q) {
+        return $q->where('installed_flag',0)->where('hidden_flag',0);
+      });
+    }
+
+    return $query->whereRaw('1=1');
   }
 
   /**
@@ -99,7 +104,7 @@ class Server extends Model
    */
   public function scopeLateCheckingIn($query)
   {
-    return $query->whereNotNull('software_version')->where('updated_at','<', date('Y-m-d H:i:s', strtotime("15 minutes ago") ) );
+    return $query->active()->whereNotNull('software_version')->where('updated_at','<', date('Y-m-d H:i:s', strtotime("15 minutes ago") ) );
   }
 
   /**
@@ -157,6 +162,26 @@ class Server extends Model
   public function scopeNonproduction($query)
   {
     return $query->where('production_flag',0);
+  }
+
+  /**
+   * A Server can have many disks
+   * @method disks
+   * @return [type] [description]
+   */
+  public function disks()
+  {
+    return $this->hasMany('App\ServerDisk');
+  }
+
+  /**
+   * Get the alerts for the server
+   * @method alerts
+   * @return [type] [description]
+   */
+  public function alerts()
+  {
+    return $this->morphMany('App\Alert','alertable');
   }
 
   /**
@@ -236,5 +261,17 @@ class Server extends Model
   public function update_batches()
   {
     return $this->hasMany('App\UpdateBatch','server_id');
+  }
+
+  /**
+   * A server can have multiple notifications
+   * @method notifications
+   * @return [type]        [description]
+   */
+  public function notifications()
+  {
+    return Notification::where('group_id', $this->owner->id )
+      ->where('notifications_enabled','<>','None')
+      ->get();
   }
 }

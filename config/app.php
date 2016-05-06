@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'url' => 'http://itdashboard-dev',
+    'url' => 'http://itdashboard',
 
     /*
     |--------------------------------------------------------------------------
@@ -171,6 +171,7 @@ return [
          GrahamCampbell\Flysystem\FlysystemServiceProvider::class,
 
 
+        App\Providers\DashboardServiceProvider::class,
 
     ],
 

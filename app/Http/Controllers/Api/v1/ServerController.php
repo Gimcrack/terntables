@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
+use App\Server;
 use Input;
 
 class ServerController extends ApiController
@@ -104,23 +105,19 @@ class ServerController extends ApiController
   }
 
   /**
-   * Get servers with active alerts
-   * @method alertServers
-   * @return [type]       [description]
-   */
-  public function alertServers()
-  {
-    return response()->json(\App\Server::active()->whereNotNull('alert')->where('alert','!=','')->get());
-  }
-
-  /**
    * Get all the servers for a health check
    * @method healthServers
    * @return [type]        [description]
    */
   public function healthServers()
   {
-    return response()->json(\App\Server::active()->windows()->orderBy('alert','desc')->get());
+    $data = Server::with(['alerts' => function($query) {
+      $query->unacknowledged();
+    }])
+      ->active()
+      ->windows()
+      ->get();
+    return response()->json($data);
   }
 
   public function windowsUpdateServerIndex()
@@ -140,8 +137,8 @@ class ServerController extends ApiController
       $results = $model_class::search( $q )
                   ->with($with)
                   ->windows()
-                  ->updatable()
-                  ->hasUpdates()
+                  ->updatable( )
+                  ->hasUpdates( Input::get('showUnupdatable',false) )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
@@ -149,7 +146,7 @@ class ServerController extends ApiController
       $results = $model_class::with($with)
                   ->windows()
                   ->updatable()
-                  ->hasUpdates()
+                  ->hasUpdates( Input::get('showUnupdatable',false) )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
