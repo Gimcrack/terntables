@@ -122,7 +122,9 @@ elixir(function(mix) {
     mix
       //.babel(babelScripts, 'resources/assets/js/async-grid.js')
       .scripts(jsScripts)
-      .scripts(preReqs,'public/js/prereqs.js');
+      .scripts(preReqs,'public/js/prereqs.js')
+      .copy('./vendor/ingenious/async-grid/build/async-grid.js','./public/js/async-grid.js');
+
 
     //styles
     mix.sass('app.scss',

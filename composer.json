@@ -20,7 +20,7 @@
         "components/modernizr" : "dev-master",
 
         "ingenious/underscore" : "dev-master",
-        "ingenious/async-grid" : "dev-master",
+        "ingenious/terntables.js" : "2.2.*",
         "ingenious/bootstrap-multiselect" : "dev-master",
         "ingenious/classie": "dev-master",
         "ingenious/jquery-bootpag" : "dev-master",

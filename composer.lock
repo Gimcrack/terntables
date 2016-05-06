@@ -1223,12 +1223,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/jasync-grid.git",
-                "reference": "3c46e63148014fc94adc5854183b368955932141"
+                "reference": "bb6cadeb14a98b51dd4a81917cac2ea4ceaeabfc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/3c46e63148014fc94adc5854183b368955932141",
-                "reference": "3c46e63148014fc94adc5854183b368955932141",
+                "url": "https://api.github.com/repos/Gimcrack/jasync-grid/zipball/bb6cadeb14a98b51dd4a81917cac2ea4ceaeabfc",
+                "reference": "bb6cadeb14a98b51dd4a81917cac2ea4ceaeabfc",
                 "shasum": ""
             },
             "require": {
@@ -1252,7 +1252,7 @@
                 }
             ],
             "description": "Asynchronous JS Data Grids",
-            "time": "2016-03-30 18:43:19"
+            "time": "2016-03-31 15:55:00"
         },
         {
             "name": "ingenious/bootstrap-multiselect",
@@ -2660,12 +2660,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/onokumus/metisMenu.git",
-                "reference": "1d16ad3ba817a18824e6516007e8ab7fd71fe886"
+                "reference": "7ed5bee519523de002d4bb036f4ea5ea604a3e7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/onokumus/metisMenu/zipball/1d16ad3ba817a18824e6516007e8ab7fd71fe886",
-                "reference": "1d16ad3ba817a18824e6516007e8ab7fd71fe886",
+                "url": "https://api.github.com/repos/onokumus/metisMenu/zipball/7ed5bee519523de002d4bb036f4ea5ea604a3e7e",
+                "reference": "7ed5bee519523de002d4bb036f4ea5ea604a3e7e",
                 "shasum": ""
             },
             "suggest": {
@@ -2694,7 +2694,7 @@
                 "plugin",
                 "web"
             ],
-            "time": "2016-03-11 15:32:09"
+            "time": "2016-03-30 21:47:45"
         },
         {
             "name": "paragonie/random_compat",

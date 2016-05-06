@@ -110,6 +110,16 @@ class User extends Model implements AuthenticatableContract,
       return (Boolean) ( $this->groups()->where('name','Super Administrators')->count() );
     }
 
+    /**
+     * Does the user have a particular group
+     * @method hasGroup
+     * @param  [type]   $group [description]
+     * @return boolean         [description]
+     */
+    public function hasGroup($group)
+    {
+      return (Boolean) ( $this->groups()->where('name',$group)->count() || $this->isAdmin() );
+    }
 
     /**
      * Is user an AD user

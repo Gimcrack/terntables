@@ -95,7 +95,7 @@ return [
     |
     */
 
-    'log' => 'single',
+    'log' => 'daily',
 
     /*
     |--------------------------------------------------------------------------
@@ -230,7 +230,8 @@ return [
         'FTP'       => Anchu\Ftp\Facades\Ftp::class,
         'SSH'       => Collective\Remote\RemoteFacade::class,
         'Flysystem' => GrahamCampbell\Flysystem\Facades\Flysystem::class,
-        'SFTP'      => League\Flysystem\Sftp\SftpAdapter::class,
+        'SFTP'      => App\Dashboard\SFTP::class,
+
     ],
 
 ];

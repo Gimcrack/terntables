@@ -14263,6 +14263,9 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
           tr = $('<div/>', { 'class': 'table-row', 'data-identifier': oRow[jApp.opts().pkey], 'data-jsonkey': i });
           appendTR = true;
 
+          // add the data to the row
+          tr.data('rowData', jApp.aG().dataGrid.data[i]);
+
           if (jUtility.isEditable()) {
 
             var td_chk = $('<div/>', { 'class': 'table-cell', "nowrap": "nowrap", "style": "position:relative;" });
@@ -16215,6 +16218,23 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     return $('.table-grid').find(selector).map(function (i, elm) {
       return $(elm).closest('.table-row').attr('data-identifier');
     }).get();
+  }, // end fn
+
+  /**
+   * Get the data objects of the checked items
+   * @method function
+   * @param  {[type]} includeHidden [description]
+   * @return {[type]}               [description]
+   */
+  getCheckedObjects: function getCheckedObjects(includeHidden) {
+    var items = jUtility.getChecedItems(includeHidden),
+        ret = [];
+
+    _.each(items, function (val) {
+      ret.push(_.findWhere(jApp.activeGrid.dataGrid.data, { id: val }));
+    });
+
+    return ret;
   }, // end fn
 
   /**
