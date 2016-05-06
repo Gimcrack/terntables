@@ -34,7 +34,15 @@ class Notifier {
       $numbers = explode("\n",$number);
       foreach($numbers as $num)
       {
-        Twilio::message( static::formatPhone($num) , $message);
+        try {
+          Twilio::message( static::formatPhone($num) , $message);
+        }
+
+        catch( \Exception $e )
+        {
+          Log::error($e->getMessage());
+        }
+
       }
 
     }

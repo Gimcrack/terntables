@@ -48,6 +48,8 @@ Route::group(['prefix' => 'api/v1'], function() {
   Route::get('Alert/_server',          'Api\v1\AlertController@serverAlerts');
   Route::resource('Alert',              'Api\v1\AlertController', [ 'except' => 'delete']);
 
+  Route::resource('LogEntry', 'Api\v1\LogEntryController');
+
 
   Route::patch('WindowsUpdateServer/_massUpdate', 'Api\v1\ServerController@markServers');
   Route::get('WindowsUpdateServer',               'Api\v1\ServerController@windowsUpdateServerIndex');

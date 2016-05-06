@@ -37,14 +37,17 @@ class ServerDisk extends Model
 
 
   /**
-   * Get disks with less than 10% free space
+   * Get disks with <20GB and <10% free space
    * @method scopeAlmostFull
    * @param  [type]          $query [description]
    * @return [type]                 [description]
    */
   public function scopeAlmostFull($query)
   {
-    return $query->whereRaw('free_gb / size_gb < 0.1');
+    return $query
+      ->where('free_gb','<',20)
+      ->where('size_gb','>',0)
+      ->whereRaw('free_gb / size_gb < 0.05');
   }
 
 }

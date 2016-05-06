@@ -28,6 +28,16 @@ class DashboardServerHealth extends Command
     protected $description = 'Queries the servers table and sends notifications of any alerts.';
 
     /**
+     * Ignore these servers when doing disk space checks.
+     * @var [type]
+     */
+    protected $ignored_servers_disk_space = [
+      'DSJCOMM1',
+      'webdev'
+    ];
+
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -63,10 +73,10 @@ class DashboardServerHealth extends Command
 
       foreach($disks as $disk)
       {
-        if ( ! $disk->server->inactive_flag )
+        if ( ! $disk->server->inactive_flag && ! in_array( $disk->server->name, $this->ignored_servers_disk_space ) )
         {
           Alert::create([
-            'message' => "[{$disk->server->name}] Less than 10% free space on {$disk->name}",
+            'message' => "[{$disk->server->name}] Less than 5% free space on {$disk->name}",
             'alertable_type' => 'App\Server',
             'alertable_id' => $disk->server->id
           ]);
@@ -110,17 +120,17 @@ class DashboardServerHealth extends Command
         {
           foreach( $notifications as $notification )
           {
-            if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Email' )
+            if ( $notification->notifications_enabled == 'Both' || $notification->notifications_enabled == 'Email' )
             {
               Log::info("Sending Email Notification to {$notification->email}");
               Notifier::mail('emails.offlineServiceNotification'
                 , compact('body')
                 , $notification->email
-                , "Service Error on {$server->name}"
+                , "Error on {$server->name}"
               );
             }
 
-            if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Text' )
+            if ( $notification->notifications_enabled == 'Both' || $notification->notifications_enabled == 'Text' )
             {
               Log::info("Sending Text Notification to {$notification->phone_number}");
               Notifier::text($notification->phone_number, $alert->message);

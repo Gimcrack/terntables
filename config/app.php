@@ -171,6 +171,7 @@ return [
          GrahamCampbell\Flysystem\FlysystemServiceProvider::class,
 
 
+        App\Providers\DashboardServiceProvider::class,
 
     ],
 
