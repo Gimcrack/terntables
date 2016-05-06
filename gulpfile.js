@@ -120,10 +120,9 @@ elixir(function(mix) {
 
     //scripts
     mix
-      //.babel(babelScripts, 'resources/assets/js/async-grid.js')
       .scripts(jsScripts)
       .scripts(preReqs,'public/js/prereqs.js')
-      .copy('./vendor/ingenious/async-grid/build/async-grid.js','./public/js/async-grid.js');
+      .copy('./vendor/ingenious/terntables.js/build/terntables.js','./public/js/terntables.js');
 
 
     //styles

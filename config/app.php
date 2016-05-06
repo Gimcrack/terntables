@@ -15,6 +15,8 @@ return [
 
     'debug' => env('APP_DEBUG', false),
 
+    'env' => env('APP_ENV', 'production'),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL
@@ -80,7 +82,7 @@ return [
 
     'key' => env('APP_KEY', 'xlhF31NeOlibJcoOW9tvZg7TkHcAZI3a'),
 
-    'cipher' => 'AES-256-CBC',
+    'cipher' => 'AES-256-CBC', 
 
     /*
     |--------------------------------------------------------------------------
@@ -95,7 +97,7 @@ return [
     |
     */
 
-    'log' => 'daily',
+    'log' => 'daily', 
 
     /*
     |--------------------------------------------------------------------------
@@ -187,7 +189,7 @@ return [
     */
 
     'aliases' => [
-
+        'Log'       => Illuminate\Support\Facades\Log::class,
         'App'       => Illuminate\Support\Facades\App::class,
         'Artisan'   => Illuminate\Support\Facades\Artisan::class,
         'Auth'      => Illuminate\Support\Facades\Auth::class,
@@ -206,7 +208,6 @@ return [
         'Input'     => Illuminate\Support\Facades\Input::class,
         'Inspiring' => Illuminate\Foundation\Inspiring::class,
         'Lang'      => Illuminate\Support\Facades\Lang::class,
-        'Log'       => Illuminate\Support\Facades\Log::class,
         'Mail'      => Illuminate\Support\Facades\Mail::class,
         'Password'  => Illuminate\Support\Facades\Password::class,
         'Queue'     => Illuminate\Support\Facades\Queue::class,
@@ -220,8 +221,8 @@ return [
         'Storage'   => Illuminate\Support\Facades\Storage::class,
         'URL'       => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
-        'Form'      => Illuminate\Html\FormFacade::class,
-        'Html'      => Illuminate\Html\HtmlFacade::class,
+        //'Form'      => Illuminate\Html\FormFacade::class,
+        //'Html'      => Illuminate\Html\HtmlFacade::class,
         'View'      => Illuminate\Support\Facades\View::class,
         'Parser'    => Nathanmac\Utilities\Parser\Facades\Parser::class,
         'Flash'     => Laracasts\Flash\Flash::class,
@@ -231,7 +232,7 @@ return [
         'FTP'       => Anchu\Ftp\Facades\Ftp::class,
         'SSH'       => Collective\Remote\RemoteFacade::class,
         'Flysystem' => GrahamCampbell\Flysystem\Facades\Flysystem::class,
-        'SFTP'      => App\Dashboard\SFTP::class,
+        'SFTP'      => App\Dashboard\SFTP::class
 
     ],
 

@@ -1,16 +1,21 @@
 <?php
 
-use \Neomerx\CorsIlluminate\Settings\Settings;
+use \Neomerx\CorsIlluminate\Settings\Settings as S;
 
 return [
+
+    /**
+     * If CORS handling should be logged. Debugging feature.
+     */
+    S::KEY_LOGS_ENABLED  => false,
 
     /**
      * Could be string or array. If specified as array (recommended for better performance) it should
      * be in parse_url() result format.
      */
-    Settings::KEY_SERVER_ORIGIN => [
+    S::KEY_SERVER_ORIGIN => [
         'scheme' => 'http',
-        'host'   => 'itdashboard-dev',
+        'host'   => env('HTTP_HOST'),
         'port'   => 80,
     ],
 
@@ -20,11 +25,11 @@ return [
      * If value is not on the list it is considered as not allowed.
      * Environment variables could be used for enabling/disabling certain hosts.
      */
-    Settings::KEY_ALLOWED_ORIGINS => [
-        'http://itdashboard'         => true,
-        'http://itdashboard-dev'     => true,
-        'http://portal-tst.msb.matsugov.lan' => true,
-        //'*' => true
+    S::KEY_ALLOWED_ORIGINS => [
+        'http://localhost'         => true,
+        'http://some.disabled.com' => null,
+        // Enabling all origins might be insecure. Consider before using in production.
+        S::VALUE_ALLOW_ORIGIN_ALL  => true,
     ],
 
     /**
@@ -40,7 +45,7 @@ return [
      *
      * You can read more on 'simple' methods at http://www.w3.org/TR/cors/#simple-method
      */
-    Settings::KEY_ALLOWED_METHODS => [
+    S::KEY_ALLOWED_METHODS => [
         'GET'    => true,
         'PATCH'  => true,
         'POST'   => true,
@@ -61,10 +66,11 @@ return [
      *
      * You can read more on 'simple' headers at http://www.w3.org/TR/cors/#simple-header
      */
-    Settings::KEY_ALLOWED_HEADERS => [
-        'content-type'            => null,
-        'x-custom-request-header' => null,
-        //'Access-Control-Allow-Origin' => true
+    S::KEY_ALLOWED_HEADERS => [
+        'content-type'             => null,
+        'x-custom-request-header'  => null,
+        // Enabling all headers might be insecure. Not recommended to use in production.
+        S::VALUE_ALLOW_ALL_HEADERS => true,
     ],
 
     /**
@@ -80,7 +86,7 @@ return [
      *     'x-custom-response-header' => null,
      * ];
      */
-    Settings::KEY_EXPOSED_HEADERS => [
+    S::KEY_EXPOSED_HEADERS => [
         'content-type'             => null,
         'x-custom-response-header' => null,
     ],
@@ -88,11 +94,27 @@ return [
     /**
      * If access with credentials is supported by the resource.
      */
-    Settings::KEY_IS_USING_CREDENTIALS => true,
+    S::KEY_IS_USING_CREDENTIALS => false,
 
     /**
      * Pre-flight response cache max period in seconds.
      */
-    Settings::KEY_PRE_FLIGHT_MAX_AGE => 10,
+    S::KEY_FLIGHT_CACHE_MAX_AGE => 0,
+
+    /**
+     * If allowed methods should be added to pre-flight response when 'simple' method is requested.
+     */
+    S::KEY_IS_FORCE_ADD_METHODS => false,
+
+    /**
+     * If allowed headers should be added when request headers are 'simple' and
+     * non of them is 'Content-Type'.
+     */
+    S::KEY_IS_FORCE_ADD_HEADERS => false,
+
+    /**
+     * If request 'Host' header should be checked against server's origin.
+     */
+    S::KEY_IS_CHECK_HOST => false,
 
 ];
