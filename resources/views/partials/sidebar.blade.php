@@ -79,6 +79,12 @@
           </li>
           @endif
 
+          @if( Auth::user()->checkAccess('LogEntry.read') )
+          <li>
+            <a href="{{ url('oit/logs') }}"><i class="fa fa-list-alt fa-fw"></i> Read Logs</a>
+          </li>
+          @endif
+
         </ul>
       </li>
 

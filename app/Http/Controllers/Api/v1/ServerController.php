@@ -80,17 +80,8 @@ class ServerController extends ApiController
    */
   private function showOnlyMyGroupsCriteria()
   {
-    $my_groups = implode(",",\Auth::user()->groups()->lists('id')->toArray() );
+    $my_groups = implode(",",$this->user->groups()->lists('id')->toArray() );
     return "group_id in ({$my_groups})";
-  }
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth', [ 'except' => 'healthServers']);
-    $this->checkAccessMiddleware();
   }
 
   /**

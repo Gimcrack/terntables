@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1;
+namespace App\Http\Controllers\Api\v1\Admin;
 
 use Illuminate\Http\Request;
 
@@ -39,12 +39,4 @@ class RoleController extends ApiController
     'groups'
   ];
 
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth.admin');
-    $this->checkAccessMiddleware();
-  }
 }

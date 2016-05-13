@@ -10,14 +10,18 @@ use Response;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\RecordLock;
-use App\User;
 use Input;
-use Auth;
 use DB;
 
 
 class ApiController extends Controller
 {
+
+  /**
+   * The Authenticated user
+   */
+  public $user;
+
   /**
    * The class name of the associated model e.g. App\Tag
    * @var [type]
@@ -65,6 +69,14 @@ class ApiController extends Controller
    * @var [type]
    */
   public $select = [];
+
+  /**
+   * Create a new controller
+   */
+  public function __construct()
+  {
+    $this->user = \Auth::guard('api')->user();
+  }
 
   /**
    * Load the checkaccess middleware for the controller
@@ -122,7 +134,7 @@ class ApiController extends Controller
       return '1=1';
     }
 
-    $id = ( is_object(\Auth::user()->person) ) ? \Auth::user()->person->id : null;
+    $id = ( is_object($this->user->person) ) ? $this->user->person->id : null;
 
     $search = [':user__person__id:'];
     $replace = [$id];
@@ -176,7 +188,7 @@ class ApiController extends Controller
         'Document'    => 'GIS\DocumentController',
         'Notification' => 'Admin\NotificationController',
         'NotificationExemption' => 'Admin\NotificationExemptionController',
-
+        'LogEntry' => 'BI\LogEntryController',
       ];
 
       $class = 'App\Http\Controllers' . "\\" . $classControllers[$model];
@@ -493,7 +505,7 @@ class ApiController extends Controller
    */
   public function getPermissions($model)
   {
-    return Auth::user()->getPermissions($model);
+    return $this->user->getPermissions($model);
   }
 
   /**
@@ -530,7 +542,7 @@ class ApiController extends Controller
   public function checkAccess($role)
   {
     return [
-      'has_access' => Auth::user()->checkAccess($role)
+      'has_access' => $this->user->checkAccess($role)
     ];
   }
 
@@ -543,7 +555,7 @@ class ApiController extends Controller
   public function getCheckedOutRecords($model)
   {
     $class = "App\\{$model}";
-    $id = Auth::id();
+    $id = $this->user->id;
     return response()->json(RecordLock::with(['user.person'])->ofType($class)->notOfUser($id)->get());//->where('user_id','!=',$id);
   }
 
@@ -557,7 +569,7 @@ class ApiController extends Controller
   public function checkout($model,$id)
   {
     // make sure the user is allowed to checkout the record.
-    if( Auth::guest() || !Auth::user()->checkAccess( "{$model}.update" ) ) {
+    if( \Auth::guard('api')->guest() || !$this->user->checkAccess( "{$model}.update" ) ) {
       return $this->notAllowed( "Error checking out {$model} record. You must be logged in as a user with {$model} update permissions to do that." );
     }
 
@@ -602,7 +614,7 @@ class ApiController extends Controller
     $class = ( !! $model ) ? "App\\{$model}" : null;
 
     // get checked out models
-    $models = Auth::user()->getCheckedOutRecords($class);
+    $models = $this->user->getCheckedOutRecords($class);
     $count = $models->count();
 
     // make sure there is something to be checked in

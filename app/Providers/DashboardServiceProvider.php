@@ -17,7 +17,11 @@ class DashboardServiceProvider extends ServiceProvider
     public function boot()
     {
         $handler = new DashboardHandler();
-        //app('log')->getMonolog()->pushHandler($handler);
+        if ( app('env') == 'production' )
+        {
+            app('log')->getMonolog()->pushHandler($handler);    
+        } 
+        
     }
 
     /**

@@ -37,7 +37,16 @@ class Database extends Model
       'dr_strategy',
       'ha_strategy',
       'upgrade_readiness',
-      'server_id'
+      'server_id',
+      'group_id'
+  ];
+
+  protected $casts = [
+    'group_id' => 'int',
+    'ignore_flag' => 'int',
+    'production_flag' => 'int',
+    'inactive_flag' => 'int',
+    'server_id' => 'int'
   ];
 
   /**

@@ -40,13 +40,6 @@ class ProfileController extends ApiController
     'groups',
   ];
 
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-  }
 
   /**
    * Display a listing of the resource in JSON format.
@@ -59,7 +52,7 @@ class ProfileController extends ApiController
     $model_class = $this->model_class;
 
     $results = $model_class::with($this->with)->whereHas('person', function($query) {
-      $query->where('id', \Auth::user()->person->id );
+      $query->where('id', $this->user->person->id );
     })->paginate( $this->limitPerPage );
 
     return response()->json( $results );
@@ -79,7 +72,7 @@ class ProfileController extends ApiController
     $model_class = $this->model_class;
 
     $model = $model_class::with($this->with)->whereHas('person', function($query) {
-      $query->where('id', \Auth::user()->person->id );
+      $query->where('id', $this->user->person->id );
     })->where('id', $ids)->first();
 
     if ( ! $model->count() ) {
@@ -99,7 +92,7 @@ class ProfileController extends ApiController
   public function resetPassword()
   {
     $input = Input::all();
-    $user = Auth::user();
+    $user = $this->user;
     $user->update(['password' => bcrypt($input['Password1'])]);
 
     /**

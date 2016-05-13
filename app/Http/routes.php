@@ -12,107 +12,9 @@
 */
 
 /**
- * API Routes
- */
-Route::group(['prefix' => 'api/v1'], function() {
-  //helper routes
-  Route::get('{model}/_selectOptions/{options}_{labels}', 'Api\v1\ApiController@getSelectOptions');
-  Route::get('{model}/_tokenOptions/{options}_{labels}',  'Api\v1\ApiController@getTokensOptions');
-  Route::get('{model}/_getPermissions', 'Api\v1\ApiController@getPermissions');
-  Route::get('{model}/_checkedOut',     'Api\v1\ApiController@getCheckedOutRecords');
-  Route::get('{model}/_checkinAll',     'Api\v1\ApiController@checkinAll');
-  Route::get('{model}/{id}/_checkout',  'Api\v1\ApiController@checkout');
-  Route::get('{model}/{id}/_checkin',   'Api\v1\ApiController@checkin');
-  Route::get('{model}/{id}/_inspect',   'Api\v1\ApiController@inspect');
-
-  Route::get('_checkinAll',             'Api\v1\ApiController@checkinAll');
-  Route::get('_checkAccess/{role}',     'Api\v1\ApiController@checkAccess');
-
-  Route::get('AD/User', 'Api\v1\ActiveDirectoryController@index');
-  Route::get('AD/User/{id}', 'Api\v1\ActiveDirectoryController@show');
-
-  //user routes
-  Route::get('Profile',                 'Api\v1\ProfileController@index');
-  Route::get('Profile/{id}',            'Api\v1\ProfileController@show');
-  Route::patch('Profile/resetPassword', 'Api\v1\ProfileController@resetPassword');
-  Route::patch('Profile/{id}',          'Api\v1\ProfileController@update');
-
-  // oit routes
-  Route::delete('Server',           'Api\v1\ServerController@destroy');
-  Route::patch('Server/_massUpdate', 'Api\v1\ServerController@markServers');
-  Route::get('Server/_health',      'Api\v1\ServerController@healthServers');
-  Route::resource('Server',         'Api\v1\ServerController');
-
-  Route::get('Alert/_acknowledge',      'Api\v1\AlertController@acknowledge_all');
-  Route::get('Alert/{id}/_acknowledge', 'Api\v1\AlertController@acknowledge');
-  Route::get('Alert/_server',          'Api\v1\AlertController@serverAlerts');
-  Route::resource('Alert',              'Api\v1\AlertController', [ 'except' => 'delete']);
-
-  Route::resource('LogEntry', 'Api\v1\LogEntryController');
-
-
-  Route::patch('WindowsUpdateServer/_massUpdate', 'Api\v1\ServerController@markServers');
-  Route::get('WindowsUpdateServer',               'Api\v1\ServerController@windowsUpdateServerIndex');
-
-  Route::patch('UpdateDetail/_massUpdate',  'Api\v1\UpdateDetailController@markUpdates');
-  Route::get('UpdateDetail',                'Api\v1\UpdateDetailController@index');
-
-
-  Route::delete('Database',           'Api\v1\DatabaseController@destroy');
-  Route::patch('Database/_massUpdate', 'Api\v1\DatabaseController@markDatabases');
-  Route::resource('Database',         'Api\v1\DatabaseController');
-
-  Route::delete('Application',           'Api\v1\ApplicationController@destroy');
-  Route::patch('Application/_massUpdate', 'Api\v1\ApplicationController@markApplications');
-  Route::resource('Application',          'Api\v1\ApplicationController');
-
-  Route::delete('Outage',           'Api\v1\OutageController@destroy');
-  Route::patch('Outage/_massUpdate', 'Api\v1\OutageController@markOutages');
-  Route::resource('Outage',          'Api\v1\OutageController');
-
-  Route::delete('OutageTask',             'Api\v1\OutageTaskController@destroy');
-  Route::patch('OutageTask/_massUpdate',  'Api\v1\OutageTaskController@markOutageTasks');
-  Route::resource('OutageTask',           'Api\v1\OutageTaskController');
-
-  Route::delete('OutageTaskDetail',             'Api\v1\OutageTaskDetailController@destroy');
-  Route::patch('OutageTaskDetail/_massUpdate',  'Api\v1\OutageTaskDetailController@markOutageTasks');
-  Route::patch('OutageTaskDetail/_massUpdateServers',  'Api\v1\OutageTaskDetailController@markServers');
-  Route::resource('OutageTaskDetail',           'Api\v1\OutageTaskDetailController');
-
-  // gis routes
-  Route::delete('Document',                 'Api\v1\DocumentController@destroy');
-  Route::resource('Document',               'Api\v1\DocumentController');
-
-  // admin routes
-  Route::patch('User/{id}/resetPassword/','Api\v1\UserController@resetPassword');
-  Route::delete('User',                   'Api\v1\UserController@destroy');
-  Route::resource('User',                 'Api\v1\UserController');
-
-  Route::delete('Group',                  'Api\v1\GroupController@destroy');
-  Route::resource('Group',                'Api\v1\GroupController');
-
-  Route::delete('Notification',                  'Api\v1\NotificationController@destroy');
-  Route::patch('Notification/_massUpdate',       'Api\v1\NotificationController@markNotifications');
-  Route::resource('Notification',                'Api\v1\NotificationController');
-
-  Route::delete('NotificationExemption',                  'Api\v1\NotificationExemptionController@destroy');
-  Route::resource('NotificationExemption',                'Api\v1\NotificationExemptionController');
-
-  Route::patch('Person/_massUpdate',      'Api\v1\PersonController@massUpdate');
-  Route::delete('Person',                 'Api\v1\PersonController@destroy');
-  Route::resource('Person',               'Api\v1\PersonController');
-
-  Route::delete('Role',                 'Api\v1\RoleController@destroy');
-  Route::resource('Role',               'Api\v1\RoleController');
-
-  Route::delete('OperatingSystem',                 'Api\v1\OperatingSystemController@destroy');
-  Route::resource('OperatingSystem',               'Api\v1\OperatingSystemController');
-});
-
-/**
  * Admin Routes
  */
-Route::group(['prefix' => 'admin'], function(){
+Route::group(['prefix' => 'admin', 'middleware' => 'auth_admin'], function(){
   Route::resource('people', 'Admin\PersonController', [ 'only' => [ 'index','show'] ]);
   Route::resource('users',  'Admin\UserController', [ 'only' => [ 'index','show'] ]);
   Route::resource('groups', 'Admin\GroupController', [ 'only' => [ 'index','show'] ]);
@@ -150,7 +52,7 @@ Route::group(['prefix' => 'admin'], function(){
  /**
   * oit Routes
   */
- Route::group(["prefix" => 'oit'], function(){
+ Route::group(["prefix" => 'oit', 'middleware' => 'auth'], function(){
    Route::get('servers/health',     'BI\ServerController@healthServers', [ 'only' => [ 'index','show'] ] );
    Route::resource('servers',       'BI\ServerController', [ 'only' => [ 'index','show'] ] );
    Route::resource('applications',  'BI\ApplicationController', [ 'only' => [ 'index', 'show'] ] );
@@ -161,6 +63,8 @@ Route::group(['prefix' => 'admin'], function(){
    Route::resource('outageTasks',   'BI\OutageTaskDetailController', [ 'only' => [ 'index', 'show'] ] );
    Route::resource('updates',       'BI\UpdateController', [ 'only' => [ 'index', 'show'] ] );
    Route::resource('approveUpdates','BI\UpdateDetailController', [ 'only' => [ 'index', 'show'] ] );
+
+   Route::resource('logs','BI\LogEntryController', [ 'only' => [ 'index', 'show'] ] );
 
    Route::get('sharepoint', 'PagesController@sharepoint');
  });

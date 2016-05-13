@@ -16,9 +16,9 @@ class UserController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'admin.users.index'
-  );
+  ];
 
   /**
    * The class of the model
@@ -34,17 +34,4 @@ class UserController extends Controller
     'groups.roles',
     'person'
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth.admin');
-    //$this->checkAccessMiddleware();
-  }
-
-
-
 }

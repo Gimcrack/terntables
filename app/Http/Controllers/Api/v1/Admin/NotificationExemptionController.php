@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1;
+namespace App\Http\Controllers\Api\v1\Admin;
 
 use Illuminate\Http\Request;
 
@@ -23,12 +23,4 @@ class NotificationExemptionController extends ApiController
    */
   public $model_short = 'NotificationExemption';
 
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth.admin');
-    $this->checkAccessMiddleware();
-  }
 }

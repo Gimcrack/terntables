@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1;
+namespace App\Http\Controllers\Api\v1\Admin;
 
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
 use Input;
+use Faker\Factory;
 
 class UserController extends ApiController
 {
@@ -45,17 +46,8 @@ class UserController extends ApiController
    * @var [type]
    */
   public $defaults = [
-    'password' => "$2y$10$2JEOr5ARXCNyVdGBurIZoOxejH9V5JF6oe3pqp8ID0G8daZrHipcq"
+    'password' => "$2y$10$2JEOr5ARXCNyVdGBurIZoOxejH9V5JF6oe3pqp8ID0G8daZrHipcq",
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth.admin');
-    $this->checkAccessMiddleware();
-  }
 
   /**
    * Reset password of user with id $id
@@ -73,4 +65,26 @@ class UserController extends ApiController
 
     return $this->operationSuccessful();
   }
+
+  /**
+   * Store a newly created resource in storage.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\Response
+   */
+  public function store(Request $request)
+  {
+    $model_class = $this->model_class;
+    $faker = Factory::create();
+    $input = array_merge($this->defaults, Input::all(), ['api_token' => $faker->unique()->regexify('[A-Za-z0-9]{60}')] );
+
+    \DB::transaction( function() use ($model_class, $input)
+    {
+      $model = $model_class::create($input)->updateTags();
+      $this->handleRelations($model);
+    }); // end transaction
+
+    return $this->operationSuccessful(201);
+  }
 }
+

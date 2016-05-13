@@ -10,6 +10,7 @@ use Input;
 
 class OutageTaskDetailController extends ApiController
 {
+
   /**
    * The class name of the associated model
    * @var string
@@ -43,7 +44,7 @@ class OutageTaskDetailController extends ApiController
     $filter = Input::get('filter',null);
 
     $search = [':user__person__id:',':show__only__available:',':show__only__my__groups:'];
-    $replace = [\Auth::user()->person->id, $this->showOnlyAvailableCriteria(), $this->showOnlyMyGroupsCriteria()];
+    $replace = [$this->user->person->id, $this->showOnlyAvailableCriteria(), $this->showOnlyMyGroupsCriteria()];
 
     $filter = str_replace($search,$replace,$filter);
 
@@ -57,7 +58,7 @@ class OutageTaskDetailController extends ApiController
    */
   private function showOnlyAvailableCriteria()
   {
-    $my_groups = implode(",",\Auth::user()->groups()->lists('id')->toArray() );
+    $my_groups = implode(",",$this->user->groups()->lists('id')->toArray() );
 
     $ret = [];
     $ret[] = 'person_id is null';
@@ -73,17 +74,10 @@ class OutageTaskDetailController extends ApiController
    */
   private function showOnlyMyGroupsCriteria()
   {
-    $my_groups = implode(",",\Auth::user()->groups()->lists('id')->toArray() );
+    $my_groups = implode(",",$this->user->groups()->lists('id')->toArray() );
     return "group_id in ({$my_groups})";
   }
 
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-  }
 
   /**
    * Mark the selected outage tasks
@@ -98,7 +92,7 @@ class OutageTaskDetailController extends ApiController
 
     if (isset( $atts['person_id'] )) {
       $atts['person_id'] = ( $atts['person_id'] === ':user__person__id:' ) ?
-        \Auth::user()->person->id : $atts['person_id'] ;
+        $this->user->person->id : $atts['person_id'] ;
     }
     return $this->massUpdate( $this->getInputIds(), $atts );
   }

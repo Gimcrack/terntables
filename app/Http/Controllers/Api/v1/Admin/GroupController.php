@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v1;
+namespace App\Http\Controllers\Api\v1\Admin;
 
 use Illuminate\Http\Request;
 
@@ -54,14 +54,4 @@ class GroupController extends ApiController
       'reset' => [ 'group_id' => null ]
     ]
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth.admin');
-    $this->checkAccessMiddleware();
-  }
-
 }

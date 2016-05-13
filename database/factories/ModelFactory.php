@@ -17,6 +17,7 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'email' => $faker->email,
         'password' => bcrypt(str_random(10)),
         'remember_token' => str_random(10),
+        'api_token' => str_random(60)
     ];
 });
 
@@ -39,3 +40,57 @@ $factory->define(App\Role::class, function (Faker\Generator $faker) {
         'description' => $faker->sentence
     ];
 });
+
+$factory->define(App\Server::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name,
+        'description' => $faker->sentence,
+        'cname' => $faker->name,
+        'ip' => $faker->localIpv4,
+        'inactive_flag' => $faker->boolean,
+        'production_flag' => $faker->boolean,
+        'windows_updatable_flag' => $faker->boolean,
+        'last_windows_update' => $faker->date(),
+        'group_id' => 1,
+        'operating_system_id' => 1,
+        'status' => $faker->sentence
+    ];
+});
+
+$factory->define(App\Application::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name,
+        'description' => $faker->sentence,
+        'inactive_flag' => $faker->boolean,
+        'group_id' => 1,
+    ];
+});
+
+$factory->define(App\Database::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->name,
+        'description' => $faker->sentence,
+        'inactive_flag' => $faker->boolean,
+        'group_id' => 1,
+        'rpo' => $faker->name,
+        'rto' => $faker->name,
+        'dr_strategy' => $faker->sentence,
+        'ha_strategy' => $faker->sentence,
+        'inactive_flag' => $faker->boolean,
+        'ignore_flag' => $faker->boolean,
+        'production_flag' => $faker->boolean,
+        'server_id' => 1
+    ];
+});
+
+$factory->define(App\Alert::class, function (Faker\Generator $faker) {
+    return [
+        'message' => $faker->sentence,
+        'alertable_type' => 'App\Server',
+        'alertable_id' => 1,
+        'notification_sent_flag' => 0,
+        'acknowledged_flag' => 0,
+    ];
+});
+
+

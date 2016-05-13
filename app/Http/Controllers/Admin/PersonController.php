@@ -16,9 +16,9 @@ class PersonController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'admin.contacts.index'
-  );
+  ];
 
   /**
    * The class of the model
@@ -34,14 +34,5 @@ class PersonController extends Controller
     'users.groups',
     'servers',
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth.admin');
-  }
 
 }

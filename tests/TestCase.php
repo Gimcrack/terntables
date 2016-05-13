@@ -19,11 +19,19 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
         $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
+
         if ( ! \App\User::where('username','jeremy')->count() )
         {
-          // \App\Group::create([ 'name' => 'Super Administrators']);
+          \App\Group::create([ 'name' => 'Super Administrators']);
 
-          \App\User::create([ 'username' => 'jeremy', 'email' => 'jeremy.bloomstrom@matsugov.us', 'password' => bcrypt('Matanuska1') ])->groups()->attach([1]);
+          \App\User::create(
+            [ 
+                'username' => 'jeremy', 
+                'email' => 'jeremy.bloomstrom@matsugov.us', 
+                'password' => bcrypt('Matanuska1'),
+                'api_token' => 'JRq1WSlKwtlLGb5iM1CugmS0qGIGAIddHvcPPxVz2fQBV2XO6e0XSDeN3YVw'
+            ]                
+          )->groups()->attach([1]);
         }
 
         return $app;

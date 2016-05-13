@@ -30,6 +30,14 @@ class Server extends Model
       'status'
   ];
 
+  protected $casts = [
+    'group_id' => 'int',
+    'inactive_flag' => 'int',
+    'production_flag' => 'int',
+    'windows_updatable_flag' => 'int',
+    'operating_system_id' => 'int' 
+  ];
+
   protected $searchableColumns = [
     'name' => 80,
     'cname' => 50,

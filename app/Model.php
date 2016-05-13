@@ -67,6 +67,14 @@ abstract class Model extends BaseModel
   }
 
   /**
+   * Return the original attributes
+   */
+  public function getBaseAtts()
+  {
+    return array_intersect_key($this->toArray(), array_flip($this->fillable));  
+  }
+
+  /**
    * The column that identifies the model
    * @return [type] [description]
    */
@@ -416,9 +424,9 @@ abstract class Model extends BaseModel
    * @method checkoutToMe
    * @return [type]       [description]
    */
-  public function checkoutToMe()
+  public function checkoutToMe( $guard = 'api' )
   {
-    return $this->checkoutToId( \Auth::id() );
+    return $this->checkoutToId( \Auth::guard($guard)->user()->id );
   }
 
   /**

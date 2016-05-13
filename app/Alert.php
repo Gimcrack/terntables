@@ -24,6 +24,12 @@ class Alert extends Model
     'name'
   ];
 
+  protected $casts = [
+    'alertable_id' => 'int',
+    'notification_sent_flag' => 'int',
+    'acknowledged_flag' => 'int'
+  ];
+
   /**
    * Polymorphic relationship
    * @method alertable
@@ -41,7 +47,11 @@ class Alert extends Model
    */
   public function getNameAttribute()
   {
-    return $this->alertable->identifiableName;
+    if ( ! is_null( $this->alertable ) )
+    {
+      return $this->alertable->identifiableName;  
+    } 
+    return '';
   }
 
   /**

@@ -2,9 +2,7 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model as BaseModel;
-
-class LogEntry extends BaseModel
+class LogEntry extends Model
 {	
 	/**
 	 * The table

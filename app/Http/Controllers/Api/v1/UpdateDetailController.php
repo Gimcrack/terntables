@@ -46,15 +46,6 @@ class UpdateDetailController extends ApiController
   public $limitPerPage = 500;
 
   /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-    $this->checkAccessMiddleware();
-  }
-
-  /**
    * Mark servers as prod/not prod/inactive/not inactive
    * @method markServers
    * @return [type]      [description]

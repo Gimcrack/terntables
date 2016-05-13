@@ -33,15 +33,6 @@ class AlertController extends ApiController
   ];
 
   /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-    $this->checkAccessMiddleware();
-  }
-
-  /**
    * [acknowledge description]
    * @method acknowledge
    * @param  string      $id [description]
@@ -67,7 +58,7 @@ class AlertController extends ApiController
    */
   public function serverAlerts()
   {
-    $my_groups = \Auth::user()->groups()->lists('id');
+    $my_groups = \Auth::guard('api')->user()->groups()->lists('id');
     $my_servers = \App\Server::whereIn('group_id', $my_groups)->lists('id');
 
     $alerts = Alert::with('alertable')

@@ -16,9 +16,9 @@ class ServerController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'bi.servers.index'
-  );
+  ];
 
   /**
    * The class of the model
@@ -39,15 +39,6 @@ class ServerController extends Controller
     'operating_system',
     'update_batches'
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth', [ 'except' => 'healthServers']);
-  }
 
   /**
    * Server health check view

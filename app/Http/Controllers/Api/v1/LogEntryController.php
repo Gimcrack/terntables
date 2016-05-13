@@ -32,13 +32,5 @@ class LogEntryController extends ApiController
     'loggable'
   ];
 
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-    $this->checkAccessMiddleware();
-  }
 
 }

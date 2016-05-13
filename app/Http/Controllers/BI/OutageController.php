@@ -13,9 +13,9 @@ class OutageController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'bi.outages.index'
-  );
+  ];
 
   /**
    * The class of the model
@@ -26,13 +26,4 @@ class OutageController extends Controller
   public $with = [
     'tasks'
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth');
-  }
 }
