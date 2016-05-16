@@ -27,7 +27,7 @@
         "ingenious/jquery-md5" : "dev-master",
         "ingenious/perfect-scrollbar" : "dev-master",
         "ingenious/jquery-validator" : "dev-master",
-        "ingenious/eloquence": "~5.1@dev",
+        "ingenious/eloquence": "dev-ingenious",
 
         "seiyria/bootstrap-slider" : "dev-master",
         "needim/noty" : "dev-master",

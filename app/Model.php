@@ -9,7 +9,7 @@ use App\Exceptions\OperationRequiresCheckoutException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use \Venturecraft\Revisionable\RevisionableTrait as RevisionableTrait;
 use Carbon\Carbon;
-use Sofa\Eloquence\Eloquence;
+use Ingenious\Eloquence\Eloquence;
 
 abstract class Model extends BaseModel
 {

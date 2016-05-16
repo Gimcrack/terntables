@@ -44,16 +44,16 @@ $factory->define(App\Role::class, function (Faker\Generator $faker) {
 $factory->define(App\Server::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
-        'description' => $faker->sentence,
+        'description' => 'Lorem Ipsum',
         'cname' => $faker->name,
-        'ip' => $faker->localIpv4,
-        'inactive_flag' => $faker->boolean,
-        'production_flag' => $faker->boolean,
-        'windows_updatable_flag' => $faker->boolean,
-        'last_windows_update' => $faker->date(),
+        'ip' => '10.0.100.' . $faker->unique()->numberBetween(1,254),
+        'inactive_flag' => 1, //$faker->boolean,
+        'production_flag' => 1, //$faker->boolean,
+        'windows_updatable_flag' => 1, //$faker->boolean,
+        'last_windows_update' => '2016-04-01',
         'group_id' => 1,
         'operating_system_id' => 1,
-        'status' => $faker->sentence
+        'status' => 'Nominal'
     ];
 });
 

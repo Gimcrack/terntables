@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6af35eb1a0eab6a9ab0f1d4f22ecc880",
-    "content-hash": "d223e87704ddaab06f8557cfba7c8e08",
+    "hash": "3ee5e8fccda2ef7c0ab8234216d3b0c9",
+    "content-hash": "78befc3b9e7514eda3fc45946bfc1278",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -1257,16 +1257,16 @@
         },
         {
             "name": "ingenious/eloquence",
-            "version": "v5.2.1",
+            "version": "dev-ingenious",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/eloquence.git",
-                "reference": "fcc6415b21f099cca18eb6311aa6817328597a60"
+                "reference": "7f6f42502196eb3c30e31448d69cba23ec721bea"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/eloquence/zipball/fcc6415b21f099cca18eb6311aa6817328597a60",
-                "reference": "fcc6415b21f099cca18eb6311aa6817328597a60",
+                "url": "https://api.github.com/repos/Gimcrack/eloquence/zipball/7f6f42502196eb3c30e31448d69cba23ec721bea",
+                "reference": "7f6f42502196eb3c30e31448d69cba23ec721bea",
                 "shasum": ""
             },
             "require": {
@@ -1282,7 +1282,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Sofa\\Eloquence\\": "src"
+                    "Ingenious\\Eloquence\\": "src/"
                 },
                 "files": [
                     "src/helpers.php"
@@ -1309,7 +1309,7 @@
                 "mutable",
                 "searchable"
             ],
-            "time": "2016-01-14 23:12:48"
+            "time": "2016-05-16 23:25:31"
         },
         {
             "name": "ingenious/history.js",

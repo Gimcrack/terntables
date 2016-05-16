@@ -157,7 +157,7 @@ return [
         Barryvdh\DomPDF\ServiceProvider::class,
         Neomerx\CorsIlluminate\Providers\LaravelServiceProvider::class,
         Adldap\Laravel\AdldapServiceProvider::class,
-        Sofa\Eloquence\ServiceProvider::class,
+        Ingenious\Eloquence\ServiceProvider::class,
         Aloha\Twilio\Support\Laravel\ServiceProvider::class,
         Anchu\Ftp\FtpServiceProvider::class,
         GrahamCampbell\Flysystem\FlysystemServiceProvider::class,

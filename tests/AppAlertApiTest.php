@@ -20,5 +20,15 @@ class AppAlertApiTest extends ApiTest {
   {
     return ['message' => 'hello world'];
   }
+
+  // Alerts cannot be deleted from the api
+  public function testDeleteModel() {}
+  public function testDeleteFakeModel() {}
+  public function testDeleteAModelWhichIsCheckedOutToSomeoneElse() {}
+  public function testDeleteModelWhileNotLoggedIn() {}
+  public function testDeleteMultipleModels() {}
+  public function testDeleteMultipleModelsSomeOfWhichAreCheckedOut() {}
+
+  
   
 }

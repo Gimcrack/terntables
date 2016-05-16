@@ -29,6 +29,11 @@ class LogEntry extends Model
     	'loggable_type',
     ];
 
+    protected $searchableColumns = [
+        'message',
+        'loggable_type',
+    ];
+
     
     /**
      * Polymorphic relationship
