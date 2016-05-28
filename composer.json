@@ -6,6 +6,12 @@
     "type": "project",
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "https://github.com/akmatsu/simple-sms"
+        }
+    ],
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.2.*",
@@ -45,11 +51,12 @@
         "components/jqueryui": "dev-master",
         "neomerx/cors-illuminate": "dev-master",
         "adldap2/adldap2-laravel": "1.3.*",
-        "guzzlehttp/guzzle" : "~4.0",
+        "guzzlehttp/guzzle" : "~6.0",
         "aloha/twilio" : "dev-master",
         "rikless/laravel-ftp" : "dev-master",
         "graham-campbell/flysystem": "^3.0",
-        "league/flysystem-sftp": "~1.0"
+        "league/flysystem-sftp": "~1.0",
+        "simplesoftwareio/simple-sms" : "dev-msb"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

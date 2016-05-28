@@ -28,16 +28,6 @@ class DashboardServerHealth extends Command
     protected $description = 'Queries the servers table and sends notifications of any alerts.';
 
     /**
-     * Ignore these servers when doing disk space checks.
-     * @var [type]
-     */
-    protected $ignored_servers_disk_space = [
-      'DSJCOMM1',
-      'webdev'
-    ];
-
-
-    /**
      * Create a new command instance.
      *
      * @return void
@@ -54,34 +44,9 @@ class DashboardServerHealth extends Command
      */
     public function handle()
     {
-      $this->checkDiskSpace();
-
       $this->checkServerAlerts();
 
       $this->checkLateServers();
-    }
-
-
-    /**
-     * Check free disk space
-     * @method checkDiskSpace
-     * @return [type]         [description]
-     */
-    public function checkDiskSpace()
-    {
-      $disks = ServerDisk::with(['server'])->almostFull()->get();
-
-      foreach($disks as $disk)
-      {
-        if ( ! $disk->server->inactive_flag && ! in_array( $disk->server->name, $this->ignored_servers_disk_space ) )
-        {
-          Alert::create([
-            'message' => "[{$disk->server->name}] Less than 5% free space on {$disk->name}",
-            'alertable_type' => 'App\Server',
-            'alertable_id' => $disk->server->id
-          ]);
-        }
-      }
     }
 
     /**
@@ -108,7 +73,6 @@ class DashboardServerHealth extends Command
     public function checkServerAlerts()
     {
       $alerts = Alert::with(['alertable'])->serverAlerts()->unnotified()->get();
-
 
       foreach($alerts as $alert)
       {

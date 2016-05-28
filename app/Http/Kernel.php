@@ -32,17 +32,17 @@ class Kernel extends HttpKernel
         ],
         
         'api' => [
-            'throttle:60,1',
+            //'throttle:300,1',
             'auth:api',
         ],
 
         'api.admin' => [
-            'throttle:60,1',
+            //'throttle:300,1',
             'auth_admin:api',
         ],
 
         'api.superadmin' => [
-            'throttle:60,1',
+            //'throttle:300,1',
             'auth_superadmin:api',
         ],
     ];

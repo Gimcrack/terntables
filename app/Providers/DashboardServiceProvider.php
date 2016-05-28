@@ -16,12 +16,11 @@ class DashboardServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $handler = new DashboardHandler();
         if ( app('env') == 'production' )
         {
+            $handler = new DashboardHandler();
             app('log')->getMonolog()->pushHandler($handler);    
         } 
-        
     }
 
     /**
@@ -31,6 +30,6 @@ class DashboardServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
     }
 }

@@ -14,7 +14,9 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Inspire::class,
-        \App\Console\Commands\DashboardServerHealth::class
+        \App\Console\Commands\DashboardServerHealth::class,
+        \App\Console\Commands\DashboardServerCheckDisks::class,
+        \App\Console\Commands\DashboardServerServices::class
     ];
 
     /**

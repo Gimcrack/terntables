@@ -26,6 +26,16 @@ class ServerDisk extends Model
   ];
 
   /**
+   * Gets the percent free attribute.
+   * 
+   * @return float
+   */
+  public function getPercentFreeAttribute()
+  {
+    return $this->free_gb / $this->used_gb;
+  }
+
+  /**
    * A disk belongs to one server
    * @method server
    * @return [type] [description]
@@ -37,7 +47,7 @@ class ServerDisk extends Model
 
 
   /**
-   * Get disks with <20GB and <10% free space
+   * Get disks with <20GB and <5% free space
    * @method scopeAlmostFull
    * @param  [type]          $query [description]
    * @return [type]                 [description]
@@ -48,6 +58,20 @@ class ServerDisk extends Model
       ->where('free_gb','<',20)
       ->where('size_gb','>',0)
       ->whereRaw('free_gb / size_gb < 0.05');
+  }
+
+  /**
+   * Get disks with <20GB and <10% free space
+   * @method scopeAlmostFull
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeGettingFull($query)
+  {
+    return $query
+      ->where('free_gb','<',50)
+      ->where('size_gb','>',0)
+      ->whereRaw('free_gb / size_gb < 0.20');
   }
 
 }

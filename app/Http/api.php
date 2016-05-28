@@ -74,6 +74,7 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
 
   Route::resource('LogEntry', 'LogEntryController');
 
+  Route::resource('ServerService', 'ServerServiceController');
 
   Route::patch('WindowsUpdateServer/_massUpdate', 'ServerController@markServers');
   Route::get('WindowsUpdateServer',               'ServerController@windowsUpdateServerIndex');

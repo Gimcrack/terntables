@@ -158,7 +158,7 @@ return [
         Neomerx\CorsIlluminate\Providers\LaravelServiceProvider::class,
         Adldap\Laravel\AdldapServiceProvider::class,
         Ingenious\Eloquence\ServiceProvider::class,
-        Aloha\Twilio\Support\Laravel\ServiceProvider::class,
+        SimpleSoftwareIO\SMS\SMSServiceProvider::class,
         Anchu\Ftp\FtpServiceProvider::class,
         GrahamCampbell\Flysystem\FlysystemServiceProvider::class,
     ],
@@ -213,11 +213,13 @@ return [
         'Flash'     => Laracasts\Flash\Flash::class,
         'PDF'       => Barryvdh\DomPDF\Facade::class,
         'Adldap'    => Adldap\Laravel\Facades\Adldap::class,
-        'Twilio'    => Aloha\Twilio\Support\Laravel\Facade::class,
+        'SMS'       => SimpleSoftwareIO\SMS\Facades\SMS::class,
         'FTP'       => Anchu\Ftp\Facades\Ftp::class,
         'SSH'       => Collective\Remote\RemoteFacade::class,
         'Flysystem' => GrahamCampbell\Flysystem\Facades\Flysystem::class,
-        'SFTP'      => App\Dashboard\SFTP::class
+        'SFTP'      => App\Dashboard\SFTP::class,
+        'Notifier'  => App\Dashboard\Notifier::class,
+        'Logger'    => App\Dashboard\Logger::class,
 
     ],
 

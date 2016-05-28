@@ -57,6 +57,21 @@ $factory->define(App\Server::class, function (Faker\Generator $faker) {
     ];
 });
 
+$factory->define(App\ServerDisk::class, function(Faker\Generator $faker) {
+    $size = 500;
+    $used = $faker->numberBetween(400,499);
+    $free = $size-$used;
+
+    return [
+        'name' => ucfirst( $faker->randomElement( ['c','d','e','f','g'] ) ) . ':\\',
+        'server_id' => $faker->numberBetween(1,30),
+        'label' => $faker->word,
+        'size_gb' => $size,
+        'used_gb' => $used,
+        'free_gb' => $free
+    ];
+});
+
 $factory->define(App\Application::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,

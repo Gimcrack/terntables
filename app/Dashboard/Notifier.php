@@ -2,16 +2,25 @@
 
 namespace App\Dashboard;
 
-use Twilio;
+use SMS;
 use Mail;
 use Log;
 
 class Notifier {
 
-    public static function mail( $view, $data = [], $to = null, $subject = null, $from = "itdashboard@msb.matsugov.lan" )
+    /**
+     * Send a mail notification
+     *
+     * @param      string  $view     The view
+     * @param      array   $data     The data
+     * @param      string  $to       The to address
+     * @param      string  $subject  The subject
+     * @param      string  $from     The from address
+     */
+    public static function mail( $view, $data = [], $to = null, $subject = null, $from = "itdashboard@notifications.matsugov.us" )
     {
-      $to = $to ? explode("\n",$to ) : explode(";",env('ADMIN_EMAIL'));
-      $subject = $subject ?: env('SITE_TITLE') . " Alert";
+      $to = static::to( $to );
+      $subject = static::subject( $subject );
 
       foreach( $to as $recipient )
       {
@@ -23,28 +32,34 @@ class Notifier {
     }
 
     /**
-     * Send a text message
-     * @method text
-     * @param  [type] $number  [description]
-     * @param  [type] $message [description]
-     * @return [type]          [description]
+     * Send a text message notification
+     *
+     * @param      string  $number   The number
+     * @param      string  $message  The message
      */
-    public static function text( $number, $message )
+    public static function text( $number, $body )
     {
-      $numbers = explode("\n",$number);
-      foreach($numbers as $num)
+      $numbers = ( ! is_array($number) ) ? explode("\n", $number) : $number;
+      
+      $formatted = array_map( "Notifier::formatPhone", $numbers );
+
+      foreach($formatted as $number)
       {
-        try {
-          Twilio::message( static::formatPhone($num) , $message);
-        }
-
-        catch( \Exception $e )
-        {
-          Log::error($e->getMessage());
-        }
-
+        static::sendSMS( $number, $body );  
       }
+    }
 
+    /**
+     * Send the text message
+     *
+     * @param      <type>  $number  The number
+     * @param      <type>  $body    The body
+     */
+    private static function sendSMS( $number, $body, $from = null )
+    {
+      SMS::send('sms.generic', compact('body'), function($sms) use ($number, $from) {
+        $sms->to($number)->from( $from ?: env('SMS_FROM') );
+      });
     }
 
     /**
@@ -86,19 +101,56 @@ class Notifier {
       switch( true )
       {
         case strlen($number) == 7 :
-          return "+1907" . $number;
+          $number = "+1907" . $number;
+        break;
 
         case strlen($number) == 10 :
-          return "+1" . $number;
+          $number =  "+1" . $number;
+        break;
 
         case strlen($number) == 11 :
-          return "+" . $number;
+          $number = "+" . $number;
+        break;
 
-        case strlen($number) == 12;
-          return $number;
+        case strlen($number) == 12 :
+        break;
+
+        default :
+          return Log::error("{$number} is not a valid phone number");
+
       }
 
-      return Log::error("{$number} is not a valid phone number");
+      switch( env('SMS_DRIVER') )
+      {
+        case 'eztexting' :
+        case 'email' :
+          return substr($number,3);
+      }
+      
+      return $number;
+    }
 
+    /**
+     * Format the to address
+     *
+     * @param      <string>  $email  The email
+     * 
+     * @return     <array>   The formatted emails
+     */
+    public static function to( $email )
+    {
+      return $email ? explode("\n",$email ) : explode(";",env('ADMIN_EMAIL'));
+    }
+
+    /**
+     * Format the subject
+     *
+     * @param      <string>  $subject  The subject
+     *
+     * @return     <string>  The formatted subject
+     */
+    public static function subject( $subject )
+    {
+      return $subject ?: env('SITE_TITLE') . " Alert";
     }
 }

@@ -228,7 +228,7 @@ class ApiController extends Controller
     $model = $model_class::findOrFail($ids);
 
     // make sure I have the model checked out before attempting the update
-    if ( ! $model->isCheckedOutToMe() ) {
+    if ( ! $model->isCheckedOutToMe() && ! \Auth::guard('api')->user()->isAdmin() ) {
       throw new OperationRequiresCheckoutException( $model, 'update' );
     }
 
