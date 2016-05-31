@@ -111,25 +111,25 @@ class ServerController extends ApiController
     return response()->json($data);
   }
 
-  public function windowsUpdateServerIndex()
+  public function windowsUpdateServerIndex(Request $request)
   {
 
-    $input = Input::all();
+    $input = $request->all();
     $model_class = $this->model_class;
 
     $filter = $this->parseSearchFilter();
 
     $with = ['owner','operating_system'];
 
-    $q = Input::get('q',null);
-    $scope = Input::get('scope','all');
+    $q = $input['q'] ?: null;
+    $scope = $input['scope'] ?: 'all';
 
     if ( !! $q ) {
       $results = $model_class::search( $q )
                   ->with($with)
                   ->windows()
                   ->updatable( )
-                  ->hasUpdates( Input::get('showUnupdatable',false) )
+                  ->hasUpdates( $input['showUnupdatable'] ?: false )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
@@ -137,7 +137,7 @@ class ServerController extends ApiController
       $results = $model_class::with($with)
                   ->windows()
                   ->updatable()
-                  ->hasUpdates( Input::get('showUnupdatable',false) )
+                  ->hasUpdates( $input['showUnupdatable'] ?: false )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
