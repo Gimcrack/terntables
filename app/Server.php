@@ -92,7 +92,7 @@ class Server extends Model
    * @param  [type]          $query [description]
    * @return [type]                 [description]
    */
-  public function scopeHasUpdates($query, $filter)
+  public function scopeHasUpdates($query, $filter = false)
   {
     if ( ! $filter )
     {

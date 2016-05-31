@@ -229,6 +229,16 @@
 						'data-permission' : 'update_enabled',
 						type : 'button',
 						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Update Software'})
+						},
+						label : 'Update Agent Software',
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
 								e.preventDefault();
 								jApp.activeGrid.fn.markServer( { 'inactive_flag' : 1} );
 						},
