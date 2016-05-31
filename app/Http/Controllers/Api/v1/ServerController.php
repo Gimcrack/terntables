@@ -121,15 +121,15 @@ class ServerController extends ApiController
 
     $with = ['owner','operating_system'];
 
-    $q = $input['q'] ?: null;
-    $scope = $input['scope'] ?: 'all';
+    $q = $request->input('q',null);
+    $scope = $request->input('scope','all');
 
     if ( !! $q ) {
       $results = $model_class::search( $q )
                   ->with($with)
                   ->windows()
                   ->updatable( )
-                  ->hasUpdates( $input['showUnupdatable'] ?: false )
+                  ->hasUpdates( $request->input('showUnupdatable',false) )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
@@ -137,7 +137,7 @@ class ServerController extends ApiController
       $results = $model_class::with($with)
                   ->windows()
                   ->updatable()
-                  ->hasUpdates( $input['showUnupdatable'] ?: false )
+                  ->hasUpdates( $request->input('showUnupdatable',false) )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
