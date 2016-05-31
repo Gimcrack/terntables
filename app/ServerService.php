@@ -38,7 +38,19 @@ class ServerService extends Model
      */
     public function scopeOffline($query)
     {
-        return $query->where('status','offline');
+        return $query->where('status','Stopped');
+    }
+
+    /**
+     * Get automatic services
+     *
+     * @param      <type>  $query  The query
+     *
+     * @return     <type>  ( description_of_the_return_value )
+     */
+    public function scopeAutomatic($query)
+    {
+        return $query->where('start_mode','auto');
     }
 
 }

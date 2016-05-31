@@ -40,6 +40,29 @@ class DashboardServerServices extends Command
             '*'
         ],
 
+        'Remote Registry' => [
+            '*'
+        ],
+
+        'Software Protection' => [
+            '*'
+        ],
+
+        'Google Update' => [
+            '*'
+        ], 
+
+        'Windows Licensing' => [
+            '*'
+        ],
+
+        'MBAMService' => [
+            '*'
+        ],
+
+        'Microsoft Exchange Server Extension for Windows Server Backup' => [
+            '*'
+        ],
 
     ];
 
@@ -69,6 +92,7 @@ class DashboardServerServices extends Command
     public function handle()
     {
         ServerService::with(['server'])
+            ->automatic()
             ->offline()
             ->get()
             ->reject( function($service) {
@@ -86,6 +110,7 @@ class DashboardServerServices extends Command
      */
     private function ignore( ServerService $service )
     {   
+        if ( ! $service->server ) return true;
         if ( !! $service->server->inactive_flag ) return true;
 
         return !! $this->ignored->filter( function($servers, $svc) use ($service) {
@@ -132,10 +157,12 @@ class DashboardServerServices extends Command
     {
         if ( ! $service->server->production_flag ) return static::TESTING_LEVEL;
 
-        if ( is_array( $this->levels[$service->name] ) ) {
-            return $this->levels[$service->name][$service->server->name] ?: static::PRODUCTION_LEVEL;
-        }
+        if ( ! isset($this->levels[$service->name]) ) return static::PRODUCTION_LEVEL;
 
-        return $this->levels[$service->name] ?: static::PRODUCTION_LEVEL;
+        if ( ! is_array( $this->levels[$service->name] ) ) return $this->levels[$service->name];
+
+        if ( ! isset($this->levels[$service->name][$service->server->name]) ) return static::PRODUCTION_LEVEL;
+
+        return $this->levels[$service->name][$service->server->name];
     }
 }
