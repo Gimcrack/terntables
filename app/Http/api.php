@@ -65,7 +65,9 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::delete('Server',           'ServerController@destroy');
   Route::patch('Server/_massUpdate', 'ServerController@markServers');
   Route::get('Server/_health',      'ServerController@healthServers');
+  Route::any('Server/{id}/Services', 'ServerServiceController@updateAll');
   Route::resource('Server',         'ServerController');
+
 
   Route::get('Alert/_acknowledge',      'AlertController@acknowledge_all');
   Route::get('Alert/{id}/_acknowledge', 'AlertController@acknowledge');
