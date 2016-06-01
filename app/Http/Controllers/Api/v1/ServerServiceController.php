@@ -39,7 +39,7 @@ class ServerServiceController extends ApiController
    */
   public function updateAll($id, Request $request)
   {
-    DB::transaction( function() use ($request, $id)  {
+    //DB::transaction( function() use ($request, $id)  {
       $services = $request->all();
       
       foreach( $services as $service )
@@ -59,7 +59,7 @@ class ServerServiceController extends ApiController
 
       }
 
-    });
+    //});
     
     return $this->operationSuccessful();
     

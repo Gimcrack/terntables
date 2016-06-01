@@ -9,7 +9,7 @@ use App\Notification;
 use App\ServerDisk;
 use App\Dashboard\Notifier;
 use Illuminate\Database\Eloquent\Collection;
-use Log;
+use Logger;
 
 class DashboardServerHealth extends Command
 {
@@ -44,8 +44,6 @@ class DashboardServerHealth extends Command
      */
     public function handle()
     {
-      $this->checkServerAlerts();
-
       $this->checkLateServers();
     }
 
@@ -56,13 +54,11 @@ class DashboardServerHealth extends Command
      */
     public function checkLateServers()
     {
-      $late_servers = Server::lateCheckingIn()->get();
-
-      if ( $late_servers->count() )
+      $late_servers = Server::lateCheckingIn()->get()->each(function($server)
       {
-        $this->sendLateServerNotifications($late_servers);
-      }
-
+        $message = "Late checking in.";
+        Logger::warning($message, 'App\Server', $server->id);
+      });
     }
 
     /**

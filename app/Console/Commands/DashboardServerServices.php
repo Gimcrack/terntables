@@ -144,7 +144,7 @@ class DashboardServerServices extends Command
      */
     private function getMessage( ServerService $service )
     {
-        return "[{$service->server->name}] {$service->name} - Service offline";
+        return "{$service->name} - Service offline";
     }
 
     /**

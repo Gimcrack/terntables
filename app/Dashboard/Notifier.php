@@ -124,7 +124,7 @@ class Notifier {
       {
         case 'eztexting' :
         case 'email' :
-          return substr($number,3);
+          return substr($number,2);
       }
       
       return $number;
