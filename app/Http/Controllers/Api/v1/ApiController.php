@@ -228,7 +228,7 @@ class ApiController extends Controller
     $model = $model_class::findOrFail($ids);
 
     // make sure I have the model checked out before attempting the update
-    if ( ! $model->isCheckedOutToMe() && ! \Auth::guard('api')->user()->isAdmin() ) {
+    if ( $this->modelRequiresCheckout( $model ) ) {
       throw new OperationRequiresCheckoutException( $model, 'update' );
     }
 
@@ -448,7 +448,7 @@ class ApiController extends Controller
    * @param  [type] $labels  [description]
    * @return [type]          [description]
    */
-  public function getSelectOptions($model,$options,$labels = [])
+  public function getSelectOptions($model,$options,$labels = [], $scope='all')
   {
     $class = "\\App\\{$model}";
     if (empty($labels)) { $labels = $options; }
@@ -456,7 +456,7 @@ class ApiController extends Controller
     $select = explode(",",$labels);
 
     $ret = [];
-    foreach( $class::all() as $o ) {
+    foreach( $class::all()->$scope() as $o ) {
       $ret2 = [];
       $ret2['label'] = [];
       $ret2['option'] = $o->$options;
@@ -557,6 +557,24 @@ class ApiController extends Controller
     $class = "App\\{$model}";
     $id = $this->user->id;
     return response()->json(RecordLock::with(['user.person'])->ofType($class)->notOfUser($id)->get());//->where('user_id','!=',$id);
+  }
+
+  /**
+   * Does the model require checkout?
+   *
+   * @param      <type>  $model  The model
+   */
+  private function modelRequiresCheckout( $model )
+  {
+    switch( app()->environment() )
+    {
+      case 'testing' :
+        return ( ! $model->isCheckedOutToMe() );
+
+    }
+
+    return ( ! $model->isCheckedOutToMe()  ) &&
+           ( ! \Auth::guard('api')->user()->isAdmin() );
   }
 
   /**

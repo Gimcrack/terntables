@@ -173,6 +173,16 @@ class Server extends Model
   }
 
   /**
+   * A Server can have many services
+   *
+   * @return     <type>  ( description_of_the_return_value )
+   */
+  public function services()
+  {
+    return $this->belongsToMany('App\Service')->withTimestamps()->withPivot(['status', 'start_mode', 'level']);
+  }
+
+  /**
    * A Server can have many disks
    * @method disks
    * @return [type] [description]

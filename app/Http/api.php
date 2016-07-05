@@ -7,7 +7,9 @@
  */
 Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   //helper routes
+  Route::get('{model}/_selectOptions/{options}_{labels}_{filter}', 'ApiController@getSelectOptions');
   Route::get('{model}/_selectOptions/{options}_{labels}', 'ApiController@getSelectOptions');
+  
   Route::get('{model}/_tokenOptions/{options}_{labels}',  'ApiController@getTokensOptions');
   Route::get('{model}/_getPermissions', 'ApiController@getPermissions');
   Route::get('{model}/_checkedOut',     'ApiController@getCheckedOutRecords');
@@ -65,7 +67,7 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::delete('Server',           'ServerController@destroy');
   Route::patch('Server/_massUpdate', 'ServerController@markServers');
   Route::get('Server/_health',      'ServerController@healthServers');
-  Route::any('Server/{id}/Services', 'ServerServiceController@updateAll');
+  Route::any('Server/{id}/Services', 'ServerController@updateServices');
   Route::resource('Server',         'ServerController');
 
 
@@ -75,8 +77,8 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::resource('Alert',              'AlertController', [ 'except' => 'delete']);
 
   Route::resource('LogEntry', 'LogEntryController');
-
-  Route::resource('ServerService', 'ServerServiceController');
+  
+  Route::resource('Service', 'ServiceController');
 
   Route::patch('WindowsUpdateServer/_massUpdate', 'ServerController@markServers');
   Route::get('WindowsUpdateServer',               'ServerController@windowsUpdateServerIndex');

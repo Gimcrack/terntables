@@ -65,7 +65,7 @@ class UpdateDetail extends Model
    */
   public function scopeMyGroups($query)
   {
-    $my_groups = \Auth::user()->groups()->lists('id')->toArray();
+    $my_groups = \Auth::guard('api')->user()->groups()->lists('id')->toArray();
 
     return $query->whereHas('server', function($q) use ($my_groups) {
       return $q->whereIn('group_id', $my_groups);

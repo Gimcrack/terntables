@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
 use App\Server;
+use App\Service;
 use Input;
 
 class ServerController extends ApiController
@@ -144,5 +145,44 @@ class ServerController extends ApiController
     }
 
     return response()->json( $results );
+  }
+
+  /**
+   * Update the services for the selected server
+   */
+  public function updateServices($server_id, Request $request)
+  {
+    $server = Server::findOrFail($server_id);
+
+    $services = collect( $request->all() ) // iterate through the services
+      
+      ->filter( function( $service ) {
+        return isset($service['name']);
+      })
+
+      ->map( function($service) {
+        $service['service_id'] = $this->getServiceByName( $service['name'] )->id;
+        unset($service['name']);
+        return $service;
+      })
+
+      ->keyBy('service_id')
+      ->toArray();
+      
+    $server->services()->sync( $services );
+      
+    return $this->operationSuccessful();
+  }
+
+  /**
+   * Get the Service by name
+   *
+   * @param      <type>  $name   The name
+   * 
+   * @return     App\Service
+   */
+  private function getServiceByName( $name )
+  {
+    return Service::firstOrCreate(['name' => $name]);
   }
 }
