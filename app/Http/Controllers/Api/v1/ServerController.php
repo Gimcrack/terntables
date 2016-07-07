@@ -157,7 +157,7 @@ class ServerController extends ApiController
     $services = collect( $request->all() ) // iterate through the services
       
       ->filter( function( $service ) {
-        return isset($service['name']);
+        return  ! empty($service['name']);
       })
 
       ->map( function($service) {
