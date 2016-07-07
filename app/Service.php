@@ -24,11 +24,11 @@ class Service extends Model
     /**
      * Set up a new model
      */
-    public function __construct()
+    public function boot()
     {
         array_push($this->appends, 'count');
 
-        parent::__construct();
+        parent::boot();
     }
 
     /**
