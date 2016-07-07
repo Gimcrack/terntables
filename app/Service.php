@@ -24,7 +24,7 @@ class Service extends Model
     /**
      * Set up a new model
      */
-    public function boot()
+    public static function boot()
     {
         array_push($this->appends, 'count');
 
