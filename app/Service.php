@@ -21,15 +21,11 @@ class Service extends Model
         'level'
     ];
 
-    /**
-     * Set up a new model
-     */
-    public static function boot()
-    {
-        array_push($this->appends, 'count');
-
-        parent::boot();
-    }
+    protected $appends = [
+        'identifiable_name',
+        'updated_at_for_humans',
+        'appends'
+    ];
 
     /**
      * A service can have many servers
