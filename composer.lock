@@ -1213,6 +1213,7 @@
                     "email": "taylorotwell@gmail.com"
                 }
             ],
+            "abandoned": "laravelcollective/html",
             "time": "2015-01-01 16:31:18"
         },
         {
@@ -1566,12 +1567,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/terntables.js.git",
-                "reference": "32a6a6664b8ecbeff34701b203ecc106b0c9ec10"
+                "reference": "54ff5d0baf419f25ef0697ca4e05595f41cfb59d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/terntables.js/zipball/32a6a6664b8ecbeff34701b203ecc106b0c9ec10",
-                "reference": "32a6a6664b8ecbeff34701b203ecc106b0c9ec10",
+                "url": "https://api.github.com/repos/Gimcrack/terntables.js/zipball/54ff5d0baf419f25ef0697ca4e05595f41cfb59d",
+                "reference": "54ff5d0baf419f25ef0697ca4e05595f41cfb59d",
                 "shasum": ""
             },
             "require": {
@@ -1595,7 +1596,7 @@
                 }
             ],
             "description": "AJAX CRUD framework http://terntables.com",
-            "time": "2016-05-12 18:04:55"
+            "time": "2016-07-12 00:36:42"
         },
         {
             "name": "ingenious/underscore",

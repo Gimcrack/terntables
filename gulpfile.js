@@ -1,5 +1,12 @@
 var elixir = require('laravel-elixir');
 
+elixir.config.js.browserify.watchify = {
+    enabled: true,
+    options: {
+        poll: true
+    }
+}
+
 require('laravel-elixir-livereload');
 
 /*
@@ -12,6 +19,8 @@ require('laravel-elixir-livereload');
  | file for our application, as well as publishing vendor resources.
  |
  */
+
+
 
 elixir(function(mix) {
 
@@ -129,7 +138,14 @@ elixir(function(mix) {
     mix.sass('app.scss',
       'public/css/all.css', {
         includePaths : cssPaths
-    }).livereload().phpUnit();
+    });
+
+    mix.livereload();
+    
+    //mix.phpUnit();
 
     //mix.phpUnit();
-});
+})
+
+ elixir.Task.find('sass').watch('resources/assets/sass/**/*.scss',['sass']);
+ elixir.Task.find('scripts').watch('resources/assets/js/**/*.js',['scripts']);

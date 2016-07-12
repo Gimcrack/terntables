@@ -16877,7 +16877,7 @@ $(function() {
 		{
 			name : 'ip',
 			_label : 'IP Address',
-			required : true,
+			//required : true,
 			'data-validType' : 'IPV4'
 		},
 
@@ -17132,9 +17132,10 @@ $(function() {
 				"os",
 				"ip",
 				"people",
-				"applications",
-				"databases",
+				//"applications",
+				//"databases",
 				'tags',
+				'status',
 				"software_version"
 			],
 			headers : [ 				// headers for table
@@ -17144,9 +17145,10 @@ $(function() {
 				"OS",
 				"IP",
 				"Contacts",
-				"Apps",
-				"Databases",
+				//"Apps",
+				//"Databases",
 				"Tags",
+				"Status",
 				"Agent"
 			],
 			templates : { 				// html template functions
@@ -17170,7 +17172,8 @@ $(function() {
 				},
 
 				ip : function( val ) {
-					return _.map( val.split('.'), function(part) { return ('000' + part).slice(-3) }).join('.');
+					var ip = _.map( val.split('.'), function(part) { return ('   ' + part).slice(-3) }).join('.');
+					return  `<div class="pull-right">${ip}</div>`;
 				}
 
 			},
