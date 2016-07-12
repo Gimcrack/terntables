@@ -323,7 +323,14 @@
 				},
 
 				ip : function( val ) {
+					
+					if ( ! val.length )
+					{
+						return '';
+					}
+
 					var ip = _.map( val.split('.'), function(part) { return ('   ' + part).slice(-3) }).join('.');
+					
 					return  `<div class="pull-right">${ip}</div>`;
 				}
 
