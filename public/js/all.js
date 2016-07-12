@@ -17173,7 +17173,7 @@ $(function() {
 
 				ip : function( val ) {
 					
-					if ( ! val.length )
+					if ( val == null || ! val.length )
 					{
 						return '';
 					}
