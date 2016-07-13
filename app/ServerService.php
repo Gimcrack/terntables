@@ -24,6 +24,14 @@ class ServerService extends Model
     ];
 
     /**
+     * Gets the name attribute.
+     */
+    public function getNameAttribute()
+    {
+        return $this->service->name;
+    }
+
+    /**
      * Creates a ServerService record or updates an existing record.
      */
     public function createOrUpdate( $atts )

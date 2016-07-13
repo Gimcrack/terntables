@@ -112,7 +112,21 @@ class Server extends Model
    */
   public function scopeLateCheckingIn($query)
   {
-    return $query->active()->whereNotNull('software_version')->where('updated_at','<', date('Y-m-d H:i:s', strtotime("15 minutes ago") ) );
+    return $query
+      ->active()
+      ->hasAgent()
+      ->where('last_checkin','<', date('Y-m-d H:i:s', strtotime("15 minutes ago") ) );
+  }
+
+  /**
+   * Get servers which have the agent installed
+   *
+   * @param      <type>  $query  The query
+   * @return     <type>  ( description_of_the_return_value )
+   */
+  public function scopeHasAgent($query)
+  {
+    return $query->whereNotNull('software_version');
   }
 
   /**

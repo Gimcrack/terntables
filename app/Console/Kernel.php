@@ -16,7 +16,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Inspire::class,
         \App\Console\Commands\DashboardServerHealth::class,
         \App\Console\Commands\DashboardServerCheckDisks::class,
-        \App\Console\Commands\DashboardServerServices::class
+        \App\Console\Commands\DashboardServerServices::class,
+        \App\Console\Commands\DashboardNotifications::class
     ];
 
     /**
@@ -27,11 +28,29 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('inspire')
-                 ->hourly();
+        if ( app()->environment() !== 'production' ) return false;
 
         $schedule->command('dashboard:serverHealth')
                  ->everyFiveMinutes();
 
+        $schedule->command('dashboard:serverServices')
+                 ->everyFiveMinutes();
+
+        $schedule->command('dashboard:serverDisks')
+                 ->everyThirtyMinutes();
+
+        $schedule->command('dashboard:notifications fifteen')
+                 ->weekdays()
+                 ->everyTenMinutes()
+                 ->skip( function() {
+                    return Notifier::isQuietHours();
+                 });
+
+        $schedule->command('dashboard:notifications daily')
+                 ->weekdays()
+                 ->dailyAt('08:00');
+
+        $schedule->command('dashboard:notifications weekly')
+                 ->weekly();
     }
 }

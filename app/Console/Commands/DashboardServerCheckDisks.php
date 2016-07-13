@@ -4,19 +4,23 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\ServerDisk;
+use App\Server;
 use Logger;
 
 class DashboardServerCheckDisks extends Command
 {
+    const TESTING_LEVEL = 'notice';
+
     /**
      *  The free space thresholds 
      */
     const NOTICE      = 0.20;  // 20%
     const WARNING     = 0.10;  // 10%
     const ERROR       = 0.05;  //  5%
-    const CRITICAL    = 0.005; // .5%
-    const EMERGENCY   = 0.001; // .1%
-
+    const CRITICAL    = 0.02;  //  2%
+    const ALERT       = 0.01;  //  1%
+    const EMERGENCY   = 0.005; // .5%
+                                
     /**
      * The name and signature of the console command.
      *
@@ -36,8 +40,8 @@ class DashboardServerCheckDisks extends Command
      * @var [type]
      */
     protected $ignored = [
-      'DSJCOMM1',
-      'webdev'
+      'DSJCOMM1' => '*',
+      'webdev' => '*',
     ];
 
     /**
@@ -64,16 +68,16 @@ class DashboardServerCheckDisks extends Command
                 return $this->ignore($disk);
             })
             ->each( function($disk) {
-                return $this->check($disk); 
+                return $this->log($disk); 
             });
     }
 
     /**
-     * Check the disk free space
+     * Log the disk that's getting full
      *
      * @param      ServerDisk  $disk   The disk
      */
-    private function check( ServerDisk $disk )
+    private function log( ServerDisk $disk )
     {
         $level = $this->getLevel( $disk );
         $message = $this->getMessage( $disk );
@@ -88,7 +92,17 @@ class DashboardServerCheckDisks extends Command
      */
     private function ignore( ServerDisk $disk )
     {
-        return ( !! $disk->server->inactive_flag || in_array( $disk->server->name, $this->ignored ) );
+        return ( ! $disk->server || !! $disk->server->inactive_flag || $this->is_ignored_server($disk->server) );
+    }
+
+    /**
+     * Determines if ignored server.
+     *
+     * @param      Server  $server  The server
+     */
+    private function is_ignored_server( Server $server )
+    {
+        return isset( $this->ignored[$server->name] );
     }
 
     /**
@@ -100,7 +114,12 @@ class DashboardServerCheckDisks extends Command
      */
     private function getMessage( ServerDisk $disk )
     {
-        return "[{$disk->server->name}] Disk {$disk->name} ($disk->label) has {$disk->free_gb}/{$disk->size_gb} GB free space.";
+        return sprintf( "{$disk->name} [$disk->label] has %s/%s GB (%s%%) free space as of %s.",
+            number_format($disk->free_gb,0),
+            number_format($disk->size_gb,0),
+            number_format($disk->percent_free*100,2),
+            $disk->updated_at->diffForHumans()
+        );
     }
 
     /**
@@ -110,15 +129,22 @@ class DashboardServerCheckDisks extends Command
      */
     private function getLevel( ServerDisk $disk )
     {
-        $level = 'debug';
+        if ( ! $disk->server->production_flag )
+        {
+            return static::TESTING_LEVEL;
+        }
 
-        if ( $disk->percent_free < static::NOTICE )    $level = 'notice';
-        if ( $disk->percent_free < static::WARNING )   $level = 'warning';
-        if ( $disk->percent_free < static::ERROR )     $level = 'error';
-        if ( $disk->percent_free < static::CRITICAL )  $level = 'critical';
-        if ( $disk->percent_free < static::EMERGENCY ) $level = 'emergency';
-
-        return $level;
+        $percent_free = $disk->percent_free;
+        switch(true)
+        {
+            case $percent_free < static::EMERGENCY    : return 'emergency';
+            case $percent_free < static::ALERT        : return 'alert';
+            case $percent_free < static::CRITICAL     : return 'critical';
+            case $percent_free < static::ERROR        : return 'error';
+            case $percent_free < static::WARNING      : return 'warning';
+            case $percent_free < static::NOTICE       : return 'notice';
+        }
+        return 'info';
     }
 
 }

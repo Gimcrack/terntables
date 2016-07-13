@@ -14,14 +14,14 @@ class DashboardServerServices extends Command
      *
      * @var        string
      */
-    const PRODUCTION_LEVEL = 'warning';
+    const PRODUCTION_LEVEL = 'error';
 
     /**
      * The default log level for testing servers
      *
      * @var        string
      */
-    const TESTING_LEVEL = 'notice';
+    const TESTING_LEVEL = 'warning';
 
     /**
      * The name and signature of the console command.
@@ -65,6 +65,18 @@ class DashboardServerServices extends Command
 
         'Windows Licensing' => [
             '*'
+        ], 
+
+        'Windows Update' => [
+            '*'
+        ], 
+
+        'Shell Hardware Detection' => [
+            '*'
+        ], 
+
+        'Virtual Disk' => [
+            '*'
         ],
 
         'MBAMService' => [
@@ -82,36 +94,36 @@ class DashboardServerServices extends Command
      */
     protected $levels = [
         // SQL Server
-        'SQL Server (MSSQLSERVER)' => 'error',
-        'SQL Server (COMMVAULT)' => 'error',
-        'SQL Server (SQLEXPRESS)' => 'error',
-        'SQL Server (PRNX_SQLEXP)' => 'error',
-        'SQL Server (ISUITE2)' => 'error',
-        'SQL Server (SPSQL)' => 'error',
-        'SQL Server Agent (COMMVAULT)' => 'error',
-        'SQL Server Agent (MSSQLSERVER)' => 'error',
-        'SQL Server Agent (SPSQL)' => 'error',
-        'SQL Server Analysis Services (MSSQLSERVER)' => 'error',
-        'SQL Server Analysis Services (POWERPIVOT)' => 'error',
-        'SQL Server Analysis Services (SPSQL)' => 'error',
-        'SQL Server Browser' => 'error',
-        'SQL Server Integration Services 10.0' => 'error',
-        'SQL Server Integration Services 11.0' => 'error',
-        'SQL Server Reporting Services (MSSQLSERVER)' => 'error',
-        'SQL Server Reporting Services (SPSQL)' => 'error',
-        'SQL Server VSS Writer' => 'error',
+        'SQL Server (MSSQLSERVER)' => 'alert',
+        'SQL Server (COMMVAULT)' => 'alert',
+        'SQL Server (SQLEXPRESS)' => 'alert',
+        'SQL Server (PRNX_SQLEXP)' => 'alert',
+        'SQL Server (ISUITE2)' => 'alert',
+        'SQL Server (SPSQL)' => 'alert',
+        'SQL Server Agent (COMMVAULT)' => 'alert',
+        'SQL Server Agent (MSSQLSERVER)' => 'alert',
+        'SQL Server Agent (SPSQL)' => 'alert',
+        'SQL Server Analysis Services (MSSQLSERVER)' => 'alert',
+        'SQL Server Analysis Services (POWERPIVOT)' => 'alert',
+        'SQL Server Analysis Services (SPSQL)' => 'alert',
+        'SQL Server Browser' => 'alert',
+        'SQL Server Integration Services 10.0' => 'alert',
+        'SQL Server Integration Services 11.0' => 'alert',
+        'SQL Server Reporting Services (MSSQLSERVER)' => 'alert',
+        'SQL Server Reporting Services (SPSQL)' => 'alert',
+        'SQL Server VSS Writer' => 'alert',
 
         // New World ERP
-        'New World File Storage Service' => 'error',
-        'New World Logos Approval Service' => 'error',
-        'New World Logos Auditing Service' => 'error',
-        'New World Logos Caching' => 'error',
-        'New World Logos Discovery Proxy' => 'error',
-        'New World Logos NeoGov Applicant Import' => 'error',
-        'New World Logos Notification Service' => 'error',
-        'New World Logos PDF Conversion' => 'error',
-        'New World Logos Revenue Collection' => 'error',
-        'NWSAppService' => 'error',
+        'New World File Storage Service' => 'alert',
+        'New World Logos Approval Service' => 'alert',
+        'New World Logos Auditing Service' => 'alert',
+        'New World Logos Caching' => 'alert',
+        'New World Logos Discovery Proxy' => 'alert',
+        'New World Logos NeoGov Applicant Import' => 'alert',
+        'New World Logos Notification Service' => 'alert',
+        'New World Logos PDF Conversion' => 'alert',
+        'New World Logos Revenue Collection' => 'alert',
+        'NWSAppService' => 'alert',
         
     ];
 
@@ -133,7 +145,7 @@ class DashboardServerServices extends Command
      */
     public function handle()
     {
-        ServerService::with(['server'])
+        ServerService::with(['server','service'])
             ->automatic()
             ->offline()
             ->get()
@@ -186,7 +198,10 @@ class DashboardServerServices extends Command
      */
     private function getMessage( ServerService $service )
     {
-        return "{$service->name} - Service offline";
+        return sprintf("Service Offline - %s - as of %s",
+            $service->name,
+            $service->updated_at->diffForHumans()
+        );
     }
 
     /**

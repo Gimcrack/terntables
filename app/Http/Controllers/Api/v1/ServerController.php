@@ -33,8 +33,8 @@ class ServerController extends ApiController
    * @var [type]
    */
   public $with = [
-    'applications',
-    'databases',
+    //'applications',
+    //'databases',
     'people',
     'tags',
     'owner',

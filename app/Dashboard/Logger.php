@@ -3,6 +3,8 @@
 namespace App\Dashboard;
 
 use App\LogEntry;
+use App\Events\ImportantEventLogged;
+use Event;
 
 class Logger {
 
@@ -147,7 +149,9 @@ class Logger {
      */
     public static function critical($message, $loggable_type = null, $loggable_id = null, $context = [])
     {
-        return static::log( static::CRITICAL, $message, $loggable_type, $loggable_id, $context );
+        $entry = static::log( static::CRITICAL, $message, $loggable_type, $loggable_id, $context );
+        Event::fire( new ImportantEventLogged($entry) );
+        return $entry;
     }
 
     /**
@@ -160,7 +164,10 @@ class Logger {
      */
     public static function alert($message, $loggable_type = null, $loggable_id = null, $context = [])
     {
-        return static::log( static::ALERT, $message, $loggable_type, $loggable_id, $context );
+        $entry = static::log( static::ALERT, $message, $loggable_type, $loggable_id, $context );
+        Event::fire( new ImportantEventLogged($entry) );
+        return $entry;
+
     }
 
     /**
@@ -173,16 +180,18 @@ class Logger {
      */
     public static function emergency($message, $loggable_type = null, $loggable_id = null, $context = [])
     {
-        return static::log( static::EMERGENCY, $message, $loggable_type, $loggable_id, $context );
+        $entry = static::log( static::EMERGENCY, $message, $loggable_type, $loggable_id, $context );
+        Event::fire( new ImportantEventLogged($entry) );
+        return $entry;
     }
 
 
     /**
      * Log a message
      *
-     * @param      <type>  $level    The level
-     * @param      <type>  $message  The message
-     * @param      <type>  $context  The context
+     * @param      string  $level    The level
+     * @param      string  $message  The message
+     * @param      array   $context  The context
      * 
      * @return     LogEntry The created Log Entry
      */

@@ -5,6 +5,8 @@ namespace App\Dashboard;
 use SMS;
 use Mail;
 use Log;
+use App\LogEntry;
+
 
 class Notifier {
 
@@ -87,6 +89,49 @@ class Notifier {
     {
       $config = config('alerts.quiet_hours.outage');
       return ( !! \App\Outage::active()->count() && date('H') >= $config['after'] );
+    }
+
+    /**
+     * Should notifications be sent now?
+     * 
+     * @return boolean
+     */
+    public static function shouldNotify(LogEntry $logEntry)
+    {
+      switch (true) {
+        // don't notify if the server | database | etc. is inactive.
+        case $logEntry->loggable->inactive_flag :
+
+        // don't notify if there is an outage happening.
+        case static::isOutage() :
+
+        // don't notify if it is quiet hours, unless a production 
+        //  server exceeds the threshold for logged events
+        case static::isQuietHours( $logEntry->loggable->production_flag ) 
+        && ! static::exceedsProductionThreshold($logEntry->loggable) :
+          return false;
+      }
+
+      return true;
+    }
+
+    /**
+     * Have the number of recent important unnotified events
+     *  exceeded the threshold?
+     *
+     * @param      <type>  $loggable  The loggable
+     *
+     * @return     bool
+     */
+    public static function exceedsProductionThreshold($loggable)  
+    {
+      if ( ! $loggable->production_flag ) return false;
+
+      return !! LogEntry::where('loggable_id',$loggable->loggable_id)
+        ->unnotified()
+        ->important()
+        ->recent()
+        ->count() >= config('alerts.production_alert_threshold');
     }
 
 

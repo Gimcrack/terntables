@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Carbon;
+
 class LogEntry extends Model
 {	
 	/**
@@ -27,6 +29,7 @@ class LogEntry extends Model
     	'reported_at',
     	'loggable_id',
     	'loggable_type',
+        'notified_at',
     ];
 
     protected $searchableColumns = [
@@ -54,4 +57,105 @@ class LogEntry extends Model
 	{
 		return $query->whereRaw('1=1')->orderBy('created_at','DESC');
 	}
+
+    /**
+     * Get the recently reported events
+     *
+     * @param      <type>  $query  The query
+     *
+     * @return     <type>  ( description_of_the_return_value )
+     */
+    public function scopeRecent($query)
+    {
+        return $query->where('reported_at','>',date('Y-m-d H:i:s', strtotime("-48 hours")));
+    }
+
+    /**
+     * Get notifications that are not about the dashboard
+     *
+     * @param      <type>  $query  The query
+     *
+     * @return     <type>  ( description_of_the_return_value )
+     */
+    public function scopeNotDashboard($query)
+    {
+        return $query
+            ->where('loggable_type','<>','App\Application')
+            ->where('loggable_id','<>',9);
+    }
+
+    /**
+     * Get important log entries
+     *
+     * @param      <type>  $query  The query
+     *
+     * @return     <type>  ( description_of_the_return_value )
+     */
+    public function scopeImportant($query)
+    {
+        return $query->where('level','>',300);
+    }
+
+    /**
+     * Get unimportant log entries
+     *
+     * @param      <type>  $query  The query
+     *
+     * @return     <type>  ( description_of_the_return_value )
+     */
+    public function scopeWeekly( $query )
+    {
+        return $query
+            ->notDashboard()
+            ->whereIn('level_name',['INFO','DEBUG'])
+            ->orderBy('level','DESC');
+    }
+
+    /**
+     * Get daily log entries
+     *
+     * @param      <type>  $query  The query
+     *
+     * @return     <type>  ( description_of_the_return_value )
+     */
+    public function scopeDaily( $query )
+    {
+        return $query
+            ->notDashboard()
+            ->whereIn('level_name',['WARNING','NOTICE'])
+            ->orderBy('level','DESC'); 
+    } 
+
+    /**
+     * Get every 15 minutes log entries
+     *
+     * @param      <type>  $query  The query
+     *
+     * @return     <type>  ( description_of_the_return_value )
+     */
+    public function scopeFifteen( $query )
+    {
+        return $query
+            ->notDashboard()
+            ->whereIn('level_name',['ERROR','CRITICAL'])
+            ->orderBy('level','DESC'); 
+    } 
+
+    /**
+     * Get unnotified log entries
+     *
+     * @param      <type>  $query  The query
+     */
+    public function scopeUnnotified($query)
+    {
+        return $query->whereNull('notified_at');
+    }
+
+    /**
+     * A notification was sent for this Log Entry
+     */
+    public function didNotify()
+    {
+        $this->update(['notified_at' => Carbon::now()]);
+    }
 }

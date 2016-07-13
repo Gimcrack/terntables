@@ -221,6 +221,8 @@ return [
         'Notifier'  => App\Dashboard\Notifier::class,
         'Logger'    => App\Dashboard\Logger::class,
 
+        'Carbon'    => Carbon\Carbon::class,
+
     ],
 
 ];

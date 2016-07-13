@@ -23,6 +23,7 @@
 			helpText : "Most recent shown first"
 		},
 		refreshInterval : 22000,
+		
 		columns : [ 				// columns to query
 			"id",
 			"level_name",
@@ -36,7 +37,7 @@
 			"ID",
 			"Level",
 			"Channel",
-			"Source ",
+			"Source",
 			"Message",
 			"Date Reported",
 		],
@@ -46,7 +47,7 @@
 			loggable_type : function(val) {
 				var r = jApp.activeGrid.currentRow;
 
-				return val + '\\' + r.loggable.name;
+				return val.split('\\').slice(1).join(':') + ':' + r.loggable.name;
 			}
 		},
 	},

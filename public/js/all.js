@@ -15455,7 +15455,7 @@ $(function() {
 			"ID",
 			"Level",
 			"Channel",
-			"Source ",
+			"Source",
 			"Message",
 			"Date Reported",
 		],
@@ -15465,7 +15465,7 @@ $(function() {
 			loggable_type : function(val) {
 				var r = jApp.activeGrid.currentRow;
 
-				return val + '\\' + r.loggable.name;
+				return val.split('\\').slice(1).join(':') + ':' + r.loggable.name;
 			}
 		},
 	},
