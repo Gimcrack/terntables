@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Notifier;
 
 use App\Jobs\MailLogEntry;
+use App\Jobs\TextLogEntry;
 
 class SendNotification
 {
