@@ -7,6 +7,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
+use App\Service;
+
 class UpdateServices extends Job implements ShouldQueue
 {
     use InteractsWithQueue, SerializesModels;
@@ -56,5 +58,17 @@ class UpdateServices extends Job implements ShouldQueue
           ->toArray();
           
         $this->server->services()->sync( $services );
+    }
+
+    /**
+    * Get the Service by name
+    *
+    * @param      <type>  $name   The name
+    * 
+    * @return     App\Service
+    */
+    private function getServiceByName( $name )
+    {
+        return Service::firstOrCreate(['name' => $name]);
     }
 }

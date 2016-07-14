@@ -161,15 +161,5 @@ class ServerController extends ApiController
     return $this->operationSuccessful();
   }
 
-  /**
-   * Get the Service by name
-   *
-   * @param      <type>  $name   The name
-   * 
-   * @return     App\Service
-   */
-  private function getServiceByName( $name )
-  {
-    return Service::firstOrCreate(['name' => $name]);
-  }
+  
 }
