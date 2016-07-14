@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\v1;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
+use App\Jobs\UpdateServices;
 use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
 use App\Server;
 use App\Service;
+
 use Input;
 
 class ServerController extends ApiController
@@ -154,7 +156,7 @@ class ServerController extends ApiController
    */
   public function updateServices($server_id, Request $request)
   {
-    $this->dispatch( new App\Jobs\UpdateServices( $server_id, $request ) );
+    $this->dispatch( new UpdateServices( $server_id, $request ) );
       
     return $this->operationSuccessful();
   }
