@@ -87,6 +87,14 @@ class DashboardServerServices extends Command
             '*'
         ],
 
+        'HP Records Manager Render Service' => [
+            '*'
+        ],
+
+        'Web Management Service' => [
+            'actions2'
+        ],
+
     ];
 
     /**
