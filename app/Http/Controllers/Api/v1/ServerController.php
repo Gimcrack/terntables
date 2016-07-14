@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
@@ -12,6 +13,7 @@ use Input;
 
 class ServerController extends ApiController
 {
+  use DispatchesJobs;
 
   /**
    * The class name of the associated model
@@ -152,24 +154,7 @@ class ServerController extends ApiController
    */
   public function updateServices($server_id, Request $request)
   {
-    $server = Server::findOrFail($server_id);
-
-    $services = collect( $request->all() ) // iterate through the services
-      
-      ->filter( function( $service ) {
-        return  ! empty($service['name']);
-      })
-
-      ->map( function($service) {
-        $service['service_id'] = $this->getServiceByName( $service['name'] )->id;
-        unset($service['name']);
-        return $service;
-      })
-
-      ->keyBy('service_id')
-      ->toArray();
-      
-    $server->services()->sync( $services );
+    $this->dispatch( new App\Jobs\UpdateServices( $server_id, $request ) );
       
     return $this->operationSuccessful();
   }
