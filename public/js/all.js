@@ -15442,6 +15442,7 @@ $(function() {
 			helpText : "Most recent shown first"
 		},
 		refreshInterval : 22000,
+		
 		columns : [ 				// columns to query
 			"id",
 			"level_name",
@@ -15466,6 +15467,10 @@ $(function() {
 				var r = jApp.activeGrid.currentRow;
 
 				return val.split('\\').slice(1).join(':') + ':' + r.loggable.name;
+			},
+
+			id : function(val) {
+				return val;
 			}
 		},
 	},

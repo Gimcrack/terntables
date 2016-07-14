@@ -48,6 +48,10 @@
 				var r = jApp.activeGrid.currentRow;
 
 				return val.split('\\').slice(1).join(':') + ':' + r.loggable.name;
+			},
+
+			id : function(val) {
+				return val;
 			}
 		},
 	},
