@@ -66,12 +66,13 @@ class ServerDisk extends Model
    * @param  [type]          $query [description]
    * @return [type]                 [description]
    */
-  public function scopeGettingFull($query)
+  public function scopeGettingFull($query, $max = 0.2, $min = 0.1)
   {
     return $query
       ->where('free_gb','<',50)
-      ->where('size_gb','>',0)
-      ->whereRaw('free_gb / size_gb < 0.20');
+      ->where('size_gb','>',10)
+      ->whereRaw("free_gb / size_gb < {$max}")
+      ->whereRaw("free_gb / size_gb >= {$min}");
   }
 
 }

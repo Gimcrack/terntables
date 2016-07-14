@@ -26,7 +26,7 @@ class DashboardServerCheckDisks extends Command
      *
      * @var string
      */
-    protected $signature = 'dashboard:serverDisks';
+    protected $signature = 'dashboard:serverDisks {which}';
 
     /**
      * The console command description.
@@ -61,8 +61,25 @@ class DashboardServerCheckDisks extends Command
      */
     public function handle()
     {
+        switch ( $this->argument('which') ) // daily | hourly | critical
+        {
+          case 'daily' : 
+            $max = static::NOTICE; 
+            $min = static::ERROR;
+            break;
+            
+          case 'hourly' : 
+            $max = static::ERROR; 
+            $min = static::CRITICAL;
+            break;
+            
+          default : 
+            $max = static::CRITICAL; 
+            $min = 0;
+        }
+
         ServerDisk::with(['server'])
-            ->gettingFull()
+            ->gettingFull( $max, $min )
             ->get()
             ->reject( function($disk) {
                 return $this->ignore($disk);

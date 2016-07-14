@@ -81,11 +81,33 @@ class ServerService extends Model
     }
 
     /**
+     * Get services for active servers
+     */
+    public function scopeActive($query)
+    {
+        return $query->whereHas('server', function($q) {
+                $q->where('inactive_flag',0);
+            });
+    }
+
+    /**
      * Get offline services
      */
     public function scopeOffline($query)
     {
-        return $query->where('status','Stopped');
+        return $query
+            ->active()
+            ->where('status','Stopped');
+    }
+
+    /**
+     * Get services late to checkin
+     */
+    public function scopeLate($query)
+    {
+        return $query
+            ->active()
+            ->where('updated_at','<', date('Y-m-d', strtotime("-20 minutes")) );
     }
 
     /**

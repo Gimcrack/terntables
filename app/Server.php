@@ -193,7 +193,9 @@ class Server extends Model
    */
   public function services()
   {
-    return $this->belongsToMany('App\Service')->withTimestamps()->withPivot(['status', 'start_mode', 'level']);
+    return $this->belongsToMany('App\Service')
+      ->withTimestamps()
+      ->withPivot(['status', 'start_mode', 'level']);
   }
 
   /**
@@ -232,7 +234,9 @@ class Server extends Model
    */
   public function people()
   {
-    return $this->belongsToMany('App\Person')->withTimestamps()->withPivot(['comment','contact_type']);
+    return $this->belongsToMany('App\Person')
+      ->withTimestamps()
+      ->withPivot(['comment','contact_type']);
   }
 
   /**
@@ -242,7 +246,9 @@ class Server extends Model
    */
   public function applications()
   {
-    return $this->belongsToMany('App\Application')->withTimestamps()->withPivot(['comment','server_type']);
+    return $this->belongsToMany('App\Application')
+      ->withTimestamps()
+      ->withPivot(['comment','server_type']);
   }
 
   /**
@@ -252,7 +258,9 @@ class Server extends Model
    */
   public function databases()
   {
-    return $this->belongsToMany('App\Database')->withTimestamps()->withPivot(['comment','server_type']);
+    return $this->belongsToMany('App\Database')
+      ->withTimestamps()
+      ->withPivot(['comment','server_type']);
   }
 
   /**
@@ -302,6 +310,8 @@ class Server extends Model
    */
   public function notifications()
   {
+    if ( ! $this->owner )  return collect([]);
+    
     return Notification::where('group_id', $this->owner->id )
       ->where('notifications_enabled','<>','None')
       ->get();

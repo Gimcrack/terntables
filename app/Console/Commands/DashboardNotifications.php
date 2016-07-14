@@ -8,6 +8,8 @@ use App\Notification;
 use Notifier;
 use Exception;
 
+use App\Jobs\NotifierMail;
+
 class DashboardNotifications extends Command
 {
     /**
@@ -53,11 +55,12 @@ class DashboardNotifications extends Command
             return in_array($notification->notifications_enabled, ['Both','Email']);
           })
           ->each( function( $notification ) use ($logEntries) {
-            Notifier::mail('emails.notificationDigest'
+            dispatch( new NotifierMail([
+                'emails.notificationDigest'
                 ,[ 'logEntries' => $logEntries ]
                 ,$notification->email
                 ,'IT Dashboard Notifications'
-            );
+            ]) );
           });
     }
 

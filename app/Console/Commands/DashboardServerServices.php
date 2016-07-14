@@ -145,6 +145,7 @@ class DashboardServerServices extends Command
      */
     public function handle()
     {
+        // handle offline services
         ServerService::with(['server','service'])
             ->automatic()
             ->offline()
@@ -154,6 +155,17 @@ class DashboardServerServices extends Command
             })
             ->each( function($service) {
                 return $this->log($service);
+            });
+
+        // handle services that are late to checkin
+        ServerService::with(['server','service'])
+            ->late()
+            ->get()
+            ->reject( function($service) {
+                return $this->ignore($service);
+            })
+            ->each( function($service) {
+                return $this->log($service, "Service Late Checking In");
             });
     }
 
@@ -179,14 +191,14 @@ class DashboardServerServices extends Command
     }
 
     /**
-     * Log the offline service
+     * Log the service error.
      *
      * @param      ServerService  $service  The service
      */
-    private function log( ServerService $service )
+    private function log( ServerService $service, $message = "Service Offline" )
     {
         $level = $this->getLevel($service);
-        $message = $this->getMessage($service);
+        $message = $this->getMessage($service, $message);
 
         Logger::$level( $message, 'App\Server', $service->server->id );
     }
@@ -196,9 +208,10 @@ class DashboardServerServices extends Command
      *
      * @param      ServerService  $service  The service
      */
-    private function getMessage( ServerService $service )
+    private function getMessage( ServerService $service, $message )
     {
-        return sprintf("Service Offline - %s - as of %s",
+        return sprintf("%s - %s - Last Checkin: %s",
+            $message,
             $service->name,
             $service->updated_at->diffForHumans()
         );

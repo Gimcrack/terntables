@@ -37,8 +37,16 @@ class Kernel extends ConsoleKernel
         $schedule->command('dashboard:serverServices')
                  ->everyFiveMinutes();
 
-        $schedule->command('dashboard:serverDisks')
-                 ->everyThirtyMinutes();
+        $schedule->command('dashboard:serverDisks critical')
+                 ->everyFiveMinutes();
+
+        $schedule->command('dashboard:serverDisks hourly')
+                 ->weekdays()
+                 ->hourly();
+
+        $schedule->command('dashboard:serverDisks daily')
+                 ->weekdays()
+                 ->dailyAt('08:00');
 
         $schedule->command('dashboard:notifications fifteen')
                  ->weekdays()

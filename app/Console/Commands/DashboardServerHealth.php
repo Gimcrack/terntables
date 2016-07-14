@@ -7,13 +7,6 @@ use App\Server;
 use Carbon\Carbon;
 use Logger;
 
-// use App\Alert;
-// use App\Notification;
-// use App\ServerDisk;
-// use App\Dashboard\Notifier;
-// use Illuminate\Database\Eloquent\Collection;
-
-
 class DashboardServerHealth extends Command
 {
     /**
@@ -28,7 +21,7 @@ class DashboardServerHealth extends Command
      *
      * @var string
      */
-    protected $description = 'Queries the servers table and sends notifications of any alerts.';
+    protected $description = 'Logs any servers that are late checking in - could be an indication that the server or the agent is offline.';
 
     /**
      * Create a new command instance.
@@ -47,31 +40,32 @@ class DashboardServerHealth extends Command
      */
     public function handle()
     {
-      $this->process();
+      Server::lateCheckingIn()
+        ->get()
+        ->each( function(Server $server)
+          {
+            $this->log($server);
+          });
     }
 
     /**
-     * Process servers that are late checking in.
-     * @method process
-     * @return [type]           [description]
+     * Log the error
+     *
+     * @param      \App\Server  $server  The server
      */
-    public function process()
+    private function log(Server $server)
     {
-      $late_servers = $this->getLateServers()->each( function(Server $server)
-      {
-        $message = sprintf("Last checkin: %s", (new Carbon($server->last_checkin))->diffForHumans() );
-        Logger::error($message, 'App\Server', $server->id);
-      });
+        Logger::error( $this->getMessage($server) , 'App\Server', $server->id);
     }
 
     /**
-     * Get servers that are late checking in.
-     * @method checkLateServers
-     * @return [type]           [description]
+     * Gets the message.
+     *
+     * @param      \App\Server  $server  The server
      */
-    private function getLateServers()
+    private function getMessage(Server $server)
     {
-      return Server::lateCheckingIn()->get();
+        return sprintf("Last checkin: %s", (new Carbon($server->last_checkin))->diffForHumans() );
     }
 
 }
