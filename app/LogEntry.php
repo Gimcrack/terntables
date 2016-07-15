@@ -37,6 +37,11 @@ class LogEntry extends Model
         'loggable_type',
     ];
 
+    public function getLoggableNameAttribute()
+    {
+        return ( !! $this->loggable ) ? $this->loggable->identifiable_name() : '';
+    }
+
     
     /**
      * Polymorphic relationship

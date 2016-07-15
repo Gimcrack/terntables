@@ -83,15 +83,6 @@ class Database extends Model
   }
 
   /**
-   * Polymorphic relationship. Second parameter to morphOne/morphMany
-   * should be the same as the prefix for the *_id/*_type fields.
-   */
-  public function recordLock()
-  {
-      return $this->morphOne('App\RecordLock', 'lockable');
-  }
-
-  /**
    * A database is managaed by one group
    * @method owner
    * @return [type] [description]

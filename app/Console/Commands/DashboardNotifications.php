@@ -78,6 +78,9 @@ class DashboardNotifications extends Command
             ->each( function( $logEntry ) {
                 $logEntry->didNotify();
             })
+            ->unique( function($logEntry) {
+                return $logEntry->message . $logEntry->loggable_type . $logEntry->loggable_id;
+            })
             ->groupBy( function( $logEntry ) {
                 return $logEntry->loggable->group_id;
             })
