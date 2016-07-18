@@ -58,11 +58,11 @@ class LogEntry extends Model
 	* @method scopeAll
 	* @return [type]   [description]
 	*/
-	public function scopeAll($query)
+	public function scopeAll( $query )
 	{
-		return $query->whereRaw('1=1')->orderBy('created_at','DESC');
+		return $query->latest();
 	}
-
+ 
     /**
      * Get the recently reported events
      *
@@ -98,7 +98,7 @@ class LogEntry extends Model
      */
     public function scopeImportant($query)
     {
-        return $query->where('level','>',300);
+        return $query->where('level','>',300)->latest();
     }
 
     /**
