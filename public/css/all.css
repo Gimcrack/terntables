@@ -1106,6 +1106,7 @@ img {
   background-color: #f8f8f8;
   border: 1px solid #ddd;
   border-radius: 4px;
+  -webkit-transition: all 0.2s ease-in-out;
   transition: all 0.2s ease-in-out;
   display: inline-block;
   max-width: 100%;
@@ -2318,6 +2319,7 @@ output {
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s; }
   .form-control:focus {
     border-color: #66afe9;
@@ -2784,7 +2786,6 @@ select[multiple].input-lg,
   font-weight: normal;
   text-align: center;
   vertical-align: middle;
-  -ms-touch-action: manipulation;
   touch-action: manipulation;
   cursor: pointer;
   background-image: none;
@@ -3094,6 +3095,7 @@ input[type="button"].btn-block {
 
 .fade {
   opacity: 0;
+  -webkit-transition: opacity 0.15s linear;
   transition: opacity 0.15s linear; }
   .fade.in {
     opacity: 1; }
@@ -3113,8 +3115,11 @@ tbody.collapse.in {
   position: relative;
   height: 0;
   overflow: hidden;
+  -webkit-transition-property: height, visibility;
   transition-property: height, visibility;
+  -webkit-transition-duration: 0.35s;
   transition-duration: 0.35s;
+  -webkit-transition-timing-function: ease;
   transition-timing-function: ease; }
 
 .caret {
@@ -4305,6 +4310,7 @@ a.badge:hover, a.badge:focus {
   background-color: #f8f8f8;
   border: 1px solid #ddd;
   border-radius: 4px;
+  -webkit-transition: border 0.2s ease-in-out;
   transition: border 0.2s ease-in-out; }
   .thumbnail > img,
   .thumbnail a > img {
@@ -4384,6 +4390,12 @@ a.thumbnail.active {
   .alert-danger .alert-link {
     color: #843534; }
 
+@-webkit-keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0; }
+  to {
+    background-position: 0 0; } }
+
 @keyframes progress-bar-stripes {
   from {
     background-position: 40px 0; }
@@ -4408,35 +4420,42 @@ a.thumbnail.active {
   text-align: center;
   background-color: #337ab7;
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  -webkit-transition: width 0.6s ease;
   transition: width 0.6s ease; }
 
 .progress-striped .progress-bar,
 .progress-bar-striped {
+  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-size: 40px 40px; }
 
 .progress.active .progress-bar,
 .progress-bar.active {
+  -webkit-animation: progress-bar-stripes 2s linear infinite;
   animation: progress-bar-stripes 2s linear infinite; }
 
 .progress-bar-success {
   background-color: #5cb85c; }
   .progress-striped .progress-bar-success {
+    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
     background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent); }
 
 .progress-bar-info {
   background-color: #5bc0de; }
   .progress-striped .progress-bar-info {
+    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
     background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent); }
 
 .progress-bar-warning {
   background-color: #f0ad4e; }
   .progress-striped .progress-bar-warning {
+    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
     background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent); }
 
 .progress-bar-danger {
   background-color: #d9534f; }
   .progress-striped .progress-bar-danger {
+    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
     background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent); }
 
 .media {
@@ -5030,9 +5049,14 @@ button.close {
   -webkit-overflow-scrolling: touch;
   outline: 0; }
   .modal.fade .modal-dialog {
+    -webkit-transform: translate(0, -25%);
     transform: translate(0, -25%);
-    transition: transform 0.3s ease-out; }
+    -webkit-transition: -webkit-transform 0.3s ease-out;
+    transition: -webkit-transform 0.3s ease-out;
+    transition: transform 0.3s ease-out;
+    transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out; }
   .modal.in .modal-dialog {
+    -webkit-transform: translate(0, 0);
     transform: translate(0, 0); }
 
 .modal-open .modal {
@@ -5366,6 +5390,7 @@ button.close {
   .carousel-inner > .item {
     display: none;
     position: relative;
+    -webkit-transition: 0.6s ease-in-out left;
     transition: 0.6s ease-in-out left; }
     .carousel-inner > .item > img,
     .carousel-inner > .item > a > img {
@@ -5375,16 +5400,24 @@ button.close {
       line-height: 1; }
     @media all and (transform-3d), (-webkit-transform-3d) {
       .carousel-inner > .item {
+        -webkit-transition: -webkit-transform 0.6s ease-in-out;
+        transition: -webkit-transform 0.6s ease-in-out;
         transition: transform 0.6s ease-in-out;
+        transition: transform 0.6s ease-in-out, -webkit-transform 0.6s ease-in-out;
+        -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
+        -webkit-perspective: 1000px;
         perspective: 1000px; }
         .carousel-inner > .item.next, .carousel-inner > .item.active.right {
+          -webkit-transform: translate3d(100%, 0, 0);
           transform: translate3d(100%, 0, 0);
           left: 0; }
         .carousel-inner > .item.prev, .carousel-inner > .item.active.left {
+          -webkit-transform: translate3d(-100%, 0, 0);
           transform: translate3d(-100%, 0, 0);
           left: 0; }
         .carousel-inner > .item.next.left, .carousel-inner > .item.prev.right, .carousel-inner > .item.active {
+          -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
           left: 0; } }
   .carousel-inner > .active,
@@ -5424,12 +5457,14 @@ button.close {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   background-color: transparent; }
   .carousel-control.left {
+    background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0001) 100%);
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0001) 100%);
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1); }
   .carousel-control.right {
     left: auto;
     right: 0;
+    background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1); }
@@ -5836,35 +5871,52 @@ button.close {
   margin-left: .3em; }
 
 .fa-spin {
+  -webkit-animation: fa-spin 2s infinite linear;
   animation: fa-spin 2s infinite linear; }
 
 .fa-pulse {
+  -webkit-animation: fa-spin 1s infinite steps(8);
   animation: fa-spin 1s infinite steps(8); }
+
+@-webkit-keyframes fa-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg); } }
 
 @keyframes fa-spin {
   0% {
+    -webkit-transform: rotate(0deg);
     transform: rotate(0deg); }
   100% {
+    -webkit-transform: rotate(359deg);
     transform: rotate(359deg); } }
 
 .fa-rotate-90 {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1)";
+  -webkit-transform: rotate(90deg);
   transform: rotate(90deg); }
 
 .fa-rotate-180 {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)";
+  -webkit-transform: rotate(180deg);
   transform: rotate(180deg); }
 
 .fa-rotate-270 {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";
+  -webkit-transform: rotate(270deg);
   transform: rotate(270deg); }
 
 .fa-flip-horizontal {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)";
+  -webkit-transform: scale(-1, 1);
   transform: scale(-1, 1); }
 
 .fa-flip-vertical {
   -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)";
+  -webkit-transform: scale(1, -1);
   transform: scale(1, -1); }
 
 :root .fa-rotate-90,
@@ -7953,6 +8005,7 @@ button.close {
   content: "\f067"; }
 
 .metismenu .active > a > .fa.plus-times {
+  -webkit-transform: rotate(45deg);
   transform: rotate(45deg); }
 
 .metismenu .plus-minus {
@@ -7977,8 +8030,11 @@ button.close {
   position: relative;
   height: 0;
   overflow: hidden;
+  -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
+  -webkit-transition-duration: .35s;
   transition-duration: .35s;
+  -webkit-transition-property: height, visibility;
   transition-property: height, visibility; }
 
 /*!
@@ -8135,6 +8191,8 @@ button.close {
 .datetimepicker table tr td.today.disabled,
 .datetimepicker table tr td.today.disabled:hover {
   background-color: #fde19a;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fdd49a), to(#fdf59a));
+  background-image: -webkit-linear-gradient(top, #fdd49a, #fdf59a);
   background-image: linear-gradient(top, #fdd49a, #fdf59a);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fdd49a', endColorstr='#fdf59a', GradientType=0);
@@ -8179,6 +8237,8 @@ button.close {
 .datetimepicker table tr td.active.disabled,
 .datetimepicker table tr td.active.disabled:hover {
   background-color: #006dcc;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
+  background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
   background-image: linear-gradient(top, #0088cc, #0044cc);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0088cc', endColorstr='#0044cc', GradientType=0);
@@ -8261,6 +8321,8 @@ button.close {
 .datetimepicker table tr td span.active.disabled,
 .datetimepicker table tr td span.active.disabled:hover {
   background-color: #006dcc;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
+  background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
   background-image: linear-gradient(top, #0088cc, #0044cc);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0088cc', endColorstr='#0044cc', GradientType=0);
@@ -8409,6 +8471,7 @@ button.close {
   /* please don't change 'position' */
   border-radius: 4px;
   opacity: 0;
+  -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
   transition: background-color 0.2s linear, opacity 0.2s linear;
   bottom: 3px;
   /* there must be 'bottom' for ps-scrollbar-x-rail */
@@ -8419,6 +8482,7 @@ button.close {
   /* please don't change 'position' */
   background-color: #aaa;
   border-radius: 4px;
+  -webkit-transition: background-color 0.2s linear;
   transition: background-color 0.2s linear;
   bottom: 0;
   /* there must be 'bottom' for ps-scrollbar-x */
@@ -8430,6 +8494,7 @@ button.close {
   /* please don't change 'position' */
   border-radius: 4px;
   opacity: 0;
+  -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
   transition: background-color 0.2s linear, opacity 0.2s linear;
   right: 3px;
   /* there must be 'right' for ps-scrollbar-y-rail */
@@ -8440,6 +8505,7 @@ button.close {
   /* please don't change 'position' */
   background-color: #aaa;
   border-radius: 4px;
+  -webkit-transition: background-color 0.2s linear;
   transition: background-color 0.2s linear;
   right: 0;
   /* there must be 'right' for ps-scrollbar-y */
@@ -8587,11 +8653,13 @@ button.close {
   margin-left: 0; }
 
 .slider.slider-disabled .slider-handle {
+  background-image: -webkit-linear-gradient(top, #dfdfdf 0%, #bebebe 100%);
   background-image: linear-gradient(to bottom, #dfdfdf 0%, #bebebe 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffdfdfdf', endColorstr='#ffbebebe', GradientType=0); }
 
 .slider.slider-disabled .slider-track {
+  background-image: -webkit-linear-gradient(top, #e5e5e5 0%, #e9e9e9 100%);
   background-image: linear-gradient(to bottom, #e5e5e5 0%, #e9e9e9 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe5e5e5', endColorstr='#ffe9e9e9', GradientType=0);
@@ -8612,6 +8680,7 @@ button.close {
 .slider-track {
   position: absolute;
   cursor: pointer;
+  background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #f9f9f9 100%);
   background-image: linear-gradient(to bottom, #f5f5f5 0%, #f9f9f9 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#fff9f9f9', GradientType=0);
@@ -8620,6 +8689,7 @@ button.close {
 
 .slider-selection {
   position: absolute;
+  background-image: -webkit-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);
   background-image: linear-gradient(to bottom, #f9f9f9 0%, #f5f5f5 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff9f9f9', endColorstr='#fff5f5f5', GradientType=0);
@@ -8628,6 +8698,7 @@ button.close {
   border-radius: 4px; }
 
 .slider-selection.tick-slider-selection {
+  background-image: -webkit-linear-gradient(top, #89cdef 0%, #81bfde 100%);
   background-image: linear-gradient(to bottom, #89cdef 0%, #81bfde 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff89cdef', endColorstr='#ff81bfde', GradientType=0); }
@@ -8644,6 +8715,7 @@ button.close {
   width: 20px;
   height: 20px;
   background-color: #337ab7;
+  background-image: -webkit-linear-gradient(top, #149bdf 0%, #0480be 100%);
   background-image: linear-gradient(to bottom, #149bdf 0%, #0480be 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff149bdf', endColorstr='#ff0480be', GradientType=0);
@@ -8671,6 +8743,7 @@ button.close {
   position: absolute;
   width: 20px;
   height: 20px;
+  background-image: -webkit-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);
   background-image: linear-gradient(to bottom, #f9f9f9 0%, #f5f5f5 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff9f9f9', endColorstr='#fff5f5f5', GradientType=0);
@@ -8697,6 +8770,7 @@ button.close {
   color: #726204; }
 
 .slider-tick.in-selection {
+  background-image: -webkit-linear-gradient(top, #89cdef 0%, #81bfde 100%);
   background-image: linear-gradient(to bottom, #89cdef 0%, #81bfde 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff89cdef', endColorstr='#ff81bfde', GradientType=0);
@@ -8707,6 +8781,11 @@ button.close {
  * https://github.com/sliptree/bootstrap-tokenfield
  * Copyright 2013-2014 Sliptree and other contributors; Licensed MIT
  */
+@-webkit-keyframes blink {
+  0% {
+    border-color: #ededed; }
+  100% {
+    border-color: #b94a48; } }
 
 @keyframes blink {
   0% {
@@ -8745,10 +8824,15 @@ button.close {
 
 .tokenfield .token.duplicate {
   border-color: #ebccd1;
+  -webkit-animation-name: blink;
   animation-name: blink;
+  -webkit-animation-duration: 0.1s;
   animation-duration: 0.1s;
+  -webkit-animation-direction: normal;
   animation-direction: normal;
+  -webkit-animation-timing-function: ease;
   animation-timing-function: ease;
+  -webkit-animation-iteration-count: infinite;
   animation-iteration-count: infinite; }
 
 .tokenfield .token.invalid {
@@ -9004,6 +9088,7 @@ button.close {
 
 .tt-suggestion.tt-cursor {
   color: #262626;
+  background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #e8e8e8 100%);
   background-image: linear-gradient(to bottom, #f5f5f5 0%, #e8e8e8 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#ffe8e8e8', GradientType=0); }
@@ -9483,7 +9568,6 @@ button.ui-button::-moz-focus-inner {
   cursor: move; }
 
 .ui-draggable-handle {
-  -ms-touch-action: none;
   touch-action: none; }
 
 .ui-menu {
@@ -9563,7 +9647,6 @@ button.ui-button::-moz-focus-inner {
   position: absolute;
   font-size: 0.1px;
   display: block;
-  -ms-touch-action: none;
   touch-action: none; }
 
 .ui-resizable-disabled .ui-resizable-handle,
@@ -9627,7 +9710,6 @@ button.ui-button::-moz-focus-inner {
   top: -5px; }
 
 .ui-selectable {
-  -ms-touch-action: none;
   touch-action: none; }
 
 .ui-selectable-helper {
@@ -9694,7 +9776,6 @@ button.ui-button::-moz-focus-inner {
   width: 1.2em;
   height: 1.2em;
   cursor: default;
-  -ms-touch-action: none;
   touch-action: none; }
 
 .ui-slider .ui-slider-range {
@@ -9748,7 +9829,6 @@ button.ui-button::-moz-focus-inner {
   top: 0; }
 
 .ui-sortable-handle {
-  -ms-touch-action: none;
   touch-action: none; }
 
 .ui-spinner {
@@ -11397,7 +11477,7 @@ body .ui-tooltip {
   padding: 3px 7px; }
 
 .btn-group {
-  display: -ms-flexbox !important;
+  display: -webkit-box !important;
   display: flex !important; }
 
 .div-btn-reset {
@@ -11420,6 +11500,7 @@ body .ui-tooltip {
 
 .readmore {
   display: none;
+  -webkit-transition: all 0.4s linear;
   transition: all 0.4s linear; }
   .readmore.active {
     display: inline; }
@@ -11427,6 +11508,7 @@ body .ui-tooltip {
 .btn-outline {
   color: inherit;
   background-color: transparent;
+  -webkit-transition: all .5s;
   transition: all .5s; }
 
 .btn-primary.btn-outline {
@@ -11580,6 +11662,7 @@ span.qa-deleteicon {
   background: #f0f9fc; }
 
 .dropdown-menu {
+  -webkit-transition: all 0.5s ease !important;
   transition: all 0.5s ease !important;
   z-index: 10001 !important; }
   .dropdown-menu.dropdown-messages.expand {
@@ -11646,6 +11729,7 @@ fieldset[disabled] {
   left: 0;
   border-radius: 5px;
   opacity: 0;
+  -webkit-transition: all 0.3s;
   transition: all 0.3s; }
   .div-btn-edit fieldset, .div-btn-reset fieldset, .div-btn-delete fieldset, .div-btn-new fieldset, .div-btn-other fieldset {
     border: none; }
@@ -11874,47 +11958,63 @@ i.i-yellow {
 #circularG_1 {
   left: 0;
   top: 50px;
+  -webkit-animation-delay: 0.3s;
   animation-delay: 0.3s; }
 
 #circularG_2 {
   left: 14px;
   top: 14px;
+  -webkit-animation-delay: 0.4s;
   animation-delay: 0.4s; }
 
 #circularG_3 {
   top: 0;
   left: 50px;
+  -webkit-animation-delay: 0.5s;
   animation-delay: 0.5s; }
 
 #circularG_4 {
   right: 14px;
   top: 14px;
+  -webkit-animation-delay: 0.6s;
   animation-delay: 0.6s; }
 
 #circularG_5 {
   right: 0;
   top: 50px;
+  -webkit-animation-delay: 0.7s;
   animation-delay: 0.7s; }
 
 #circularG_6 {
   right: 14px;
   bottom: 14px;
+  -webkit-animation-delay: 0.8s;
   animation-delay: 0.8s; }
 
 #circularG_7 {
   left: 50px;
   bottom: 0;
+  -webkit-animation-delay: 0.9s;
   animation-delay: 0.9s; }
 
 #circularG_8 {
   left: 14px;
   bottom: 14px;
+  -webkit-animation-delay: 1s;
   animation-delay: 1s; }
+
+@-webkit-keyframes bounce_circularG {
+  0% {
+    -webkit-transform: scale(1); }
+  100% {
+    -webkit-transform: scale(0.3); } }
 
 @keyframes bounce_circularG {
   0% {
+    -webkit-transform: scale(1);
     transform: scale(1); }
   100% {
+    -webkit-transform: scale(0.3);
     transform: scale(0.3); } }
 
 @media (min-width: 768px) {
@@ -11974,6 +12074,7 @@ i.i-yellow {
   left: auto; }
 
 .navbar-default {
+  -webkit-transition: margin 0.4s ease-in !important;
   transition: margin 0.4s ease-in !important; }
   .navbar-default li.menu-section-heading {
     font-weight: bold;
@@ -11987,6 +12088,7 @@ i.i-yellow {
   border: none !important;
   margin: 12px 5px 0;
   padding: 5px 5px;
+  -webkit-transition: margin 0.4s ease-in;
   transition: margin 0.4s ease-in; }
   .navbar-default .navbar-toggle .icon-bar {
     background: white !important; }
@@ -12292,6 +12394,7 @@ table {
         line-height: 36px;
         float: left;
         padding: 5px 12px;
+        -webkit-transition: background-color 0.5s linear;
         transition: background-color 0.5s linear; }
         #page-wrapper .grid-panel-body .table .table-body .table-row .table-cell:nth-child(-n+1), #page-wrapper .grid-panel-body .table .table-body .table-row .table-header:nth-child(-n+1) {
           width: 100px; }
@@ -12457,6 +12560,7 @@ table {
   border-top: 2px double #85d0e7 !important;
   padding: 6px 6px 0;
   width: 300px;
+  -webkit-transition: all 0.3s linear;
   transition: all 0.3s linear; }
   .quick-add-container .qa-preview {
     margin: 0 0 10px; }
@@ -12468,6 +12572,7 @@ table {
   top: 50px;
   left: -250px;
   bottom: 0;
+  -webkit-transition: all 0.4s;
   transition: all 0.4s; }
   .sidebar .sidebar-overlay {
     position: fixed;
@@ -12479,6 +12584,7 @@ table {
     background: rgba(0, 0, 0, 0.3);
     opacity: 0;
     visibility: hidden;
+    -webkit-transition: opacity 0.4s, visibility 0.4s, left 0.4s;
     transition: opacity 0.4s, visibility 0.4s, left 0.4s; }
   .sidebar.active {
     left: 0px;
@@ -12893,12 +12999,14 @@ table {
     width: 0px;
     padding: 0;
     z-index: -1;
+    -webkit-transition: width 0.35s ease-in, padding 0.35s ease-in, z-index 0.01s linear 0.34s;
     transition: width 0.35s ease-in, padding 0.35s ease-in, z-index 0.01s linear 0.34s; }
 
 #tbl_grid_body .rowMenu.expand button.btn {
   width: 55px;
   padding: 8px 38px 8px 14px;
   z-index: 1;
+  -webkit-transition: width 0.35s ease-in, padding 0.35s ease-in;
   transition: width 0.35s ease-in, padding 0.35s ease-in; }
 
 #tbl_grid_body .btn-showMenu {
@@ -12911,6 +13019,7 @@ table {
   outline: none !important;
   z-index: 2; }
   #tbl_grid_body .btn-showMenu i {
+    -webkit-transition: all 0.4s ease;
     transition: all 0.4s ease; }
 
 #tbl_grid_body .btn-showMenu.active, #tbl_grid_body .btn-showMenu.hover {
@@ -12919,7 +13028,9 @@ table {
   width: auto; }
 
 #tbl_grid_body .btn-showMenu.rotate i {
+  -webkit-transition: all 0.4s ease;
   transition: all 0.4s ease;
+  -webkit-transform: rotate(180deg);
   transform: rotate(180deg); }
 
 [data-status] {
@@ -13272,6 +13383,7 @@ html {
         font-size: 16px;
         color: #dde3bf;
         position: relative;
+        -webkit-transition: all 0.2s ease-in-out;
         transition: all 0.2s ease-in-out; }
         body.dev .sidebar ul li a:before,
         html.dev .sidebar ul li a:before {
@@ -13283,11 +13395,14 @@ html {
           left: 0;
           border-bottom: 1px solid #dde3bf;
           visibility: hidden;
+          -webkit-transform: scaleX(0);
           transform: scaleX(0);
+          -webkit-transition: all 0.2s ease-in-out 0s;
           transition: all 0.2s ease-in-out 0s; }
         body.dev .sidebar ul li a:hover:before,
         html.dev .sidebar ul li a:hover:before {
           visibility: visible;
+          -webkit-transform: scaleX(1);
           transform: scaleX(1); }
       body.dev .sidebar ul li a:hover,
       body.dev .sidebar ul li a:focus,
@@ -13370,6 +13485,7 @@ html {
         font-size: 16px;
         color: #d2f6e0;
         position: relative;
+        -webkit-transition: all 0.2s ease-in-out;
         transition: all 0.2s ease-in-out; }
         body.prod .sidebar ul li a:before,
         html.prod .sidebar ul li a:before {
@@ -13381,11 +13497,14 @@ html {
           left: 0;
           border-bottom: 1px solid #d2f6e0;
           visibility: hidden;
+          -webkit-transform: scaleX(0);
           transform: scaleX(0);
+          -webkit-transition: all 0.2s ease-in-out 0s;
           transition: all 0.2s ease-in-out 0s; }
         body.prod .sidebar ul li a:hover:before,
         html.prod .sidebar ul li a:hover:before {
           visibility: visible;
+          -webkit-transform: scaleX(1);
           transform: scaleX(1); }
       body.prod .sidebar ul li a:hover,
       body.prod .sidebar ul li a:focus,
@@ -13468,6 +13587,7 @@ html {
         font-size: 16px;
         color: #dde3bf;
         position: relative;
+        -webkit-transition: all 0.2s ease-in-out;
         transition: all 0.2s ease-in-out; }
         body.home .sidebar ul li a:before,
         html.home .sidebar ul li a:before {
@@ -13479,11 +13599,14 @@ html {
           left: 0;
           border-bottom: 1px solid #dde3bf;
           visibility: hidden;
+          -webkit-transform: scaleX(0);
           transform: scaleX(0);
+          -webkit-transition: all 0.2s ease-in-out 0s;
           transition: all 0.2s ease-in-out 0s; }
         body.home .sidebar ul li a:hover:before,
         html.home .sidebar ul li a:hover:before {
           visibility: visible;
+          -webkit-transform: scaleX(1);
           transform: scaleX(1); }
       body.home .sidebar ul li a:hover,
       body.home .sidebar ul li a:focus,
@@ -13560,6 +13683,7 @@ html {
         font-size: 16px;
         color: #C6DFF0;
         position: relative;
+        -webkit-transition: all 0.2s ease-in-out;
         transition: all 0.2s ease-in-out; }
         body.homeprod .sidebar ul li a:before,
         html.homeprod .sidebar ul li a:before {
@@ -13571,11 +13695,14 @@ html {
           left: 0;
           border-bottom: 1px solid #C6DFF0;
           visibility: hidden;
+          -webkit-transform: scaleX(0);
           transform: scaleX(0);
+          -webkit-transition: all 0.2s ease-in-out 0s;
           transition: all 0.2s ease-in-out 0s; }
         body.homeprod .sidebar ul li a:hover:before,
         html.homeprod .sidebar ul li a:hover:before {
           visibility: visible;
+          -webkit-transform: scaleX(1);
           transform: scaleX(1); }
       body.homeprod .sidebar ul li a:hover,
       body.homeprod .sidebar ul li a:focus,

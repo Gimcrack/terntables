@@ -60,6 +60,8 @@ class Kernel extends ConsoleKernel
                  ->dailyAt('08:00');
 
         $schedule->command('dashboard:notifications weekly')
-                 ->weekly();
+                 ->weekly()
+                 ->mondays()
+                 ->at('08:00');
     }
 }

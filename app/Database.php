@@ -71,6 +71,7 @@ class Database extends Model
     return $query->where('production_flag',1)->where('ignore_flag',0);
   }
 
+
   /**
    * Get only non-production databases
    * @method scopeNonroduction

@@ -1,12 +1,5 @@
 var elixir = require('laravel-elixir');
 
-elixir.config.js.browserify.watchify = {
-    enabled: true,
-    options: {
-        poll: true
-    }
-}
-
 require('laravel-elixir-livereload');
 
 /*
@@ -147,5 +140,3 @@ elixir(function(mix) {
     //mix.phpUnit();
 })
 
- elixir.Task.find('sass').watch('resources/assets/sass/**/*.scss',['sass']);
- elixir.Task.find('scripts').watch('resources/assets/js/**/*.js',['scripts']);
