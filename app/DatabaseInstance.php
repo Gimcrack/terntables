@@ -11,23 +11,17 @@ class DatabaseInstance extends Model
         'server_id',
         'group_id',
         'sql_product',
+        'sql_edition',
         'sql_version',
-        'total_memory',
-        'processors',
-        'root_directory',
-        'server_collation',
         'min_memory',
         'max_memory',
+        'total_memory',
+        'processors',
+        'collation',
         'compress_backups_flag',
         'max_degree_of_parallelism',
         'cost_threshold_of_parallelism',
-        'aoag_member_flag',
-        'aoag_role',
-        'aoag_wsfc_name',
-        'aoag_listener_name',
-        'aoag_listener_ips',
         'inactive_flag',
-        'production_flag',
     ];
 
     /**
@@ -45,6 +39,6 @@ class DatabaseInstance extends Model
      */
     public function owner()
     {
-        return $this->belongsTo('App\Group','group_id');
+        return $this->belongsTo(Group::class,'group_id');
     }
 }

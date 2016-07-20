@@ -70,6 +70,7 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::any('Server/{id}/Services', 'ServerController@updateServices');
   Route::resource('Server',         'ServerController');
 
+  Route::any('DatabaseInstance/Server/{id}', 'DatabaseInstanceController@updateFromAgent');
 
   Route::get('Alert/_acknowledge',      'AlertController@acknowledge_all');
   Route::get('Alert/{id}/_acknowledge', 'AlertController@acknowledge');
