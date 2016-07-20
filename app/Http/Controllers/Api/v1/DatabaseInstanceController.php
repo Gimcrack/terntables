@@ -165,7 +165,7 @@ class DatabaseInstanceController extends ApiController
   {
       $data = $request->get("0");
 
-      if ( ! isset($data['name']) )
+      if ( ! isset($data['Instance']) )
       {
         return $this->operationFailed("Oops, looks like you forgot to include the data.",406);
       }
