@@ -165,6 +165,11 @@ class DatabaseInstanceController extends ApiController
   {
       $data = $request->get("0");
 
+      if ( ! isset($data['name']) )
+      {
+        return $this->operationFailed("Oops, looks like you forgot to include the data.",406);
+      }
+
       $atts = [
         'server_id' => $server_id,
         'group_id' => \App\Group::where('name','BIT')->first()->id,
