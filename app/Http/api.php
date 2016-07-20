@@ -71,6 +71,7 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::resource('Server',         'ServerController');
 
   Route::any('DatabaseInstance/Server/{id}', 'DatabaseInstanceController@updateFromAgent');
+  Route::resource('DatabaseInstance', 'DatabaseInstanceController', ['except' => 'delete'] );
 
   Route::get('Alert/_acknowledge',      'AlertController@acknowledge_all');
   Route::get('Alert/{id}/_acknowledge', 'AlertController@acknowledge');

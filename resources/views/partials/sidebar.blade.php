@@ -58,6 +58,12 @@
           </li>
           @endif
 
+          @if( Auth::user()->checkAccess('DatabaseInstance.read') )
+          <li>
+            <a href="{{ url('oit/sql-servers') }}"><i class="fa fa-database fa-fw"></i> Sql Servers</a>
+          </li>
+          @endif
+
           @if( Auth::user()->checkAccess('Application.read') )
           <li>
             <a href="{{ url('oit/applications') }}"><i class="fa fa-cubes fa-fw"></i> Applications</a>

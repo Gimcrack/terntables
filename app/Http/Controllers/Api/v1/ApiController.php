@@ -189,6 +189,7 @@ class ApiController extends Controller
         'Notification' => 'Admin\NotificationController',
         'NotificationExemption' => 'Admin\NotificationExemptionController',
         'LogEntry' => 'BI\LogEntryController',
+        'DatabaseInstance' => 'BI\DatabaseInstanceController',
       ];
 
       $class = 'App\Http\Controllers' . "\\" . $classControllers[$model];
