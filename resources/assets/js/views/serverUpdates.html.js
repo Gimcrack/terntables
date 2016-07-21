@@ -79,6 +79,16 @@
 						type : 'button',
 						fn : function(e) {
 							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Start Agent'})
+						},
+						label : 'Start Agent Service'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
 							jApp.activeGrid.fn.markServer({ 'status' : 'Look For Updates'})
 						},
 						label : 'As Look For Updates'

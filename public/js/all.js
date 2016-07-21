@@ -17112,7 +17112,7 @@ $(function() {
 			},
 			rowBtns : {
 				markSelected : [
-					{ label: 'Flag Selected Servers', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{ label: 'Modify Selected Servers', class: 'btn btn-primary', icon : 'fa-check-square-o' },
 					{
 						'data-multiple' : true,
 						'data-permission' : 'update_enabled',
@@ -17128,10 +17128,20 @@ $(function() {
 						'data-permission' : 'update_enabled',
 						type : 'button',
 						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Start Agent'})
+						},
+						label : 'Start Agent Service'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
 								e.preventDefault();
 								jApp.activeGrid.fn.markServer( { 'inactive_flag' : 1} );
 						},
-						label : 'As Inactive'
+						label : 'Flag As Inactive'
 					},
 					{
 						'data-multiple' : true,
@@ -17141,7 +17151,7 @@ $(function() {
 							e.preventDefault();
 							jApp.activeGrid.fn.markServer({ 'inactive_flag' : 0})
 						},
-						label : 'As Not Inactive'
+						label : 'Flag As Active'
 					},
 					{
 						'data-multiple' : true,
@@ -17151,7 +17161,7 @@ $(function() {
 							e.preventDefault();
 							jApp.activeGrid.fn.markServer({ 'production_flag' : 1})
 						},
-						label : 'As Production'
+						label : 'Flag As Production'
 					},
 					{
 						'data-multiple' : true,
@@ -17161,7 +17171,7 @@ $(function() {
 							e.preventDefault();
 							jApp.activeGrid.fn.markServer({ 'production_flag' : 0})
 						},
-						label : 'As Not Production'
+						label : 'Flag As Not Production'
 					}
 				]
 			},
@@ -17395,6 +17405,16 @@ $(function() {
 							jApp.activeGrid.fn.markServer({ 'status' : 'Update Software'})
 						},
 						label : 'Update Agent Software'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Start Agent'})
+						},
+						label : 'Start Agent Service'
 					},
 					{
 						'data-multiple' : true,
