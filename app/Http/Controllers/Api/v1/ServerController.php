@@ -167,7 +167,7 @@ class ServerController extends ApiController
    *
    * @return   void
    */
-  public function updateAgent($server_id, Request $request)
+  public function updateAgentStatus($server_id, Request $request)
   {
       $this->dispatch( new UpdateAgent( $server_id, $request ) );
 

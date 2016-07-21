@@ -79,7 +79,10 @@
     				<a href="{{ url('admin/operatingSystems')}}" ><i class="fa fa-windows fa-fw"></i> Manage Operating Systems</a>
     			</li>
     			<li>
-    				<a href="{{ url('oit/outageTasks/_generate')}}" ><i class="fa fa-check-square-o fa-fw"></i> Auto-Generate Outage Tasks</a>
+            <a href="{{ url('oit/outageTasks/_generate')}}" ><i class="fa fa-check-square-o fa-fw"></i> Auto-Generate Outage Tasks</a>
+          </li>
+          <li>
+    				<a href="{{ url('oit/servers/agents/update')}}" ><i class="fa fa-check-square-o fa-fw"></i> Update All Agents</a>
     			</li>
   			@endif
 

@@ -68,7 +68,8 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::patch('Server/_massUpdate',  'ServerController@markServers');
   Route::get('Server/_health',        'ServerController@healthServers');
   Route::any('Server/{id}/Services',  'ServerController@updateServices');
-  Route::any('Server/{id}/Agent',     'ServerController@updateAgent');
+  Route::any('Server/{id}/Agent',     'ServerController@updateAgentStatus');
+  Route::any('Server/UpdateAgents',   'ServerController@updateAllAgents');
   Route::resource('Server',           'ServerController');
 
   Route::any('DatabaseInstance/Server/{id}', 'DatabaseInstanceController@updateFromAgent');

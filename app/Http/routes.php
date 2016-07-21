@@ -53,7 +53,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth_admin'], function(){
   * oit Routes
   */
  Route::group(["prefix" => 'oit', 'middleware' => 'auth'], function(){
-   Route::get('servers/health',     'BI\ServerController@healthServers', [ 'only' => [ 'index','show'] ] );
+   Route::get('servers/health',     'BI\ServerController@healthServers');
+   Route::get('servers/agents/update',     'BI\ServerController@updateAllAgents' );
    Route::resource('servers',       'BI\ServerController', [ 'only' => [ 'index','show'] ] );
    Route::resource('sql-servers',   'BI\DatabaseInstanceController', [ 'only' => [ 'index','show'] ] );
    Route::resource('applications',  'BI\ApplicationController', [ 'only' => [ 'index', 'show'] ] );
