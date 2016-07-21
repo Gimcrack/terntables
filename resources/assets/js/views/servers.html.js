@@ -222,6 +222,36 @@
 				},
 			},
 			rowBtns : {
+				tagSelected : [
+					{ label: 'Tag Selected Servers', class: 'btn btn-primary', icon : 'fa-tag' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							bootbox.prompt('What tag should be added to the selected servers?', function( val ) {
+								jApp.activeGrid.fn.addTag({ 'tag' : val });
+							});
+							
+						},
+						label : 'Add Tag...'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							bootbox.prompt('What tag should be removed from the selected servers?', function( val ) {
+								jApp.activeGrid.fn.removeTag({ 'tag' : val });
+							});
+							
+						},
+						label : 'Remove Tag...'
+					},
+				],
+
 				markSelected : [
 					{ label: 'Modify Selected Servers', class: 'btn btn-primary', icon : 'fa-check-square-o' },
 					{
@@ -366,6 +396,38 @@
 					jUtility.withSelected('custom', function(ids) {
 						jUtility.postJSON( {
 							url : jUtility.getCurrentFormAction(),
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
+				
+				/**
+				 * Tag selected server
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				addTag			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction() + '/_addTag',
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
+				
+				/**
+				 * Remove Tag from selected server
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				removeTag			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction() + '/_removeTag',
 							success : jUtility.callback.submitCurrentForm,
 							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
 						});

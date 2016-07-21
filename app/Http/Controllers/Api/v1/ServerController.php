@@ -101,6 +101,44 @@ class ServerController extends ApiController
   }
 
   /**
+   * Add tag to the selected servers
+   * @method addTag
+   *
+   * @return   void
+   */
+  public function addTag(Request $request)
+  {
+      $tag = \App\Tag::firstOrCreate(['name' => $request->get('tag')]);
+
+      Server::whereIn('id', $this->getInputIds()) 
+        ->each( function(Server $server) use ($tag) {
+          $tags = $server->tags()->lists('tag_id')->push($tag->id)->unique()->all();
+          $server->tags()->detach();
+          $server->tags()->sync($tags);
+        });
+
+      return $this->operationSuccessful();
+  }
+
+  /**
+   * Remove tag from the selected servers
+   * @method removeTag
+   *
+   * @return   void
+   */
+  public function removeTag(Request $request)
+  {
+      $tag = \App\Tag::where(['name' => $request->get('tag')])->firstOrFail();
+
+      Server::whereIn('id', $this->getInputIds()) 
+        ->each( function(Server $server) use ($tag) {
+          $server->tags()->detach($tag->id);
+        });
+
+      return $this->operationSuccessful();
+  }
+
+  /**
    * Get all the servers for a health check
    * @method healthServers
    * @return [type]        [description]

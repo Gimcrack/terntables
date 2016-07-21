@@ -65,6 +65,8 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
 
   // oit routes
   Route::delete('Server',             'ServerController@destroy');
+  Route::patch('Server/_massUpdate/_addTag',        'ServerController@addTag');
+  Route::patch('Server/_massUpdate/_removeTag',      'ServerController@removeTag');
   Route::patch('Server/_massUpdate',  'ServerController@markServers');
   Route::get('Server/_health',        'ServerController@healthServers');
   Route::any('Server/{id}/Services',  'ServerController@updateServices');
