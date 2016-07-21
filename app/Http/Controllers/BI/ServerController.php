@@ -67,7 +67,7 @@ class ServerController extends Controller
           ->where('status','Idle')
           ->update(['status' => 'Update Software']);
 
-      return view('bi.updates.index');
+      return redirect(url( '/oit/updates' ));
   }
 
 }

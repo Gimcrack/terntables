@@ -17176,7 +17176,8 @@ $(function() {
 				//"databases",
 				'tags',
 				'status',
-				"software_version"
+				"software_version",
+				"agent_status",
 			],
 			headers : [ 				// headers for table
 				"ID",
@@ -17189,7 +17190,8 @@ $(function() {
 				//"Databases",
 				"Tags",
 				"Status",
-				"Agent"
+				"Agent Version",
+				"Agent Status",
 			],
 			templates : { 				// html template functions
 
@@ -17221,7 +17223,15 @@ $(function() {
 					var ip = _.map( val.split('.'), function(part) { return ('   ' + part).slice(-3) }).join('.');
 					
 					return  `<div class="pull-right">${ip}</div>`;
-				}
+				},
+
+				agent_status : function(val) {
+					if ( val == null ) return "";
+
+					status = ( val == 'Running' ) ? 1 : 0;
+
+					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' );
+				},
 
 			},
 			fn : {
