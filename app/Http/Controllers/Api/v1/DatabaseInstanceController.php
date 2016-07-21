@@ -58,7 +58,7 @@ class DatabaseInstanceController extends ApiController
 
       $atts = [
         'server_id' => $server_id,
-        'group_id' => \App\Group::where('name','BIT')->first()->id,
+        'group_id' => \App\Server::find($server_id)->owner->id,
         'name' => $data['Instance'],
         'sql_product' => $data['Product'],
         'sql_edition' => $data['ProductEdition'],
