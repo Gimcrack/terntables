@@ -17085,6 +17085,7 @@ $(function() {
 		{ // grid definition
 			model : 'Server',
 			columnFriendly : 'name',
+			filter : 'inactive_flag = 0',
 			gridHeader : {
 				icon : 'fa-building-o',
 				headerTitle : 'Manage Servers',
@@ -17094,8 +17095,8 @@ $(function() {
 				custom : {
 					toggleInactive : {
 						type : 'button',
-						class : 'btn btn-success active btn-toggle',
-						icon : 'fa-toggle-on',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
 						label : 'Toggle Inactive',
 						fn : 'toggleInactive',
 						'data-order' : 100
@@ -17331,7 +17332,7 @@ $(function() {
 				updateGridFilter : function() {
 					var filter = [], temp = jApp.activeGrid.temp;
 
-					if (typeof temp.hideInactive !== 'undefined' && !!temp.hideInactive) {
+					if (typeof temp.hideInactive === 'undefined' || !!temp.hideInactive) {
 						filter.push('inactive_flag = 0');
 					}
 
@@ -17350,7 +17351,7 @@ $(function() {
 				 */
 				toggleInactive : function( ) {
 					jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
-						? true : !jApp.activeGrid.temp.hideInactive;
+						? false : !jApp.activeGrid.temp.hideInactive;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
