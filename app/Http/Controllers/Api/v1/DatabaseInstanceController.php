@@ -68,7 +68,7 @@ class DatabaseInstanceController extends ApiController
         'total_memory' => $data['ServerMemoryMB'],
         'processors' => $data['CPUs'],
         'collation' => $data['Collation'],
-        'compress_backups_flag' => $data['BackupCompression'],
+        'compress_backups_flag' => $data['BackupCompression'] ?: 0,
         'max_degree_of_parallelism' => $data['MaxDegreeOfParallelism'],
         'cost_threshold_of_parallelism' => $data['CostThresholdOfParalleism'],
       ];

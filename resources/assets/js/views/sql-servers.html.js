@@ -15,7 +15,7 @@
 			gridHeader : {
 				icon : 'fa-database',
 				headerTitle : 'Manage Sql Servers',
-				helpText : "<strong>Note:</strong> Manage Sql Servers Here"
+				helpText : "<strong>Note:</strong> These values are auto-populated by the agent. "
 			},
 			toggles : {
 				new : false,
@@ -51,7 +51,7 @@
 				name : function(val) {
 					var r = jApp.activeGrid.currentRow;
 
-					return _.nameButton( r.server.name + '\\' + val,  jApp.opts().gridHeader.icon );
+					return _.nameButton( r.server.name + '\\' + val,  jApp.opts().gridHeader.icon ) + _.getFlag(r.server.production_flag, 'Prod', 'Test', 'primary','success');
 				},
 
 				sql_product : function(val) {
