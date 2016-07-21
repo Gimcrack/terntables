@@ -17467,8 +17467,8 @@ $(function() {
 				"approved_updates",
 				"new_updates",
 				"software_version",
+				"agent_status",
 				"updated_at_for_humans"
-				//'tags',
 			],
 			headers : [ 				// headers for table
 				"ID",
@@ -17480,6 +17480,7 @@ $(function() {
 				"Approved Updates",
 				"New Updates",
 				"Agent Version",
+				"Agent Status",
 				"Updated"
 			],
 			templates : { 				// html template functions
@@ -17496,7 +17497,15 @@ $(function() {
 
 				ip : function( val ) {
 					return _.map( val.split('.'), function(part) { return ('000' + part).slice(-3) }).join('.');
-				}
+				},
+
+				agent_status : function(val) {
+					if ( val == null ) return "";
+
+					status = ( val == 'Running' ) ? 1 : 0;
+
+					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' );
+				},
 
 			},
 			fn : {

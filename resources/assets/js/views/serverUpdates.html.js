@@ -146,7 +146,6 @@
 				"software_version",
 				"agent_status",
 				"updated_at_for_humans"
-				//'tags',
 			],
 			headers : [ 				// headers for table
 				"ID",
