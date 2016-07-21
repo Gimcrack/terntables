@@ -161,5 +161,17 @@ class ServerController extends ApiController
     return $this->operationSuccessful();
   }
 
-  
+  /**
+   * Update the status of the agent for the selected server
+   * @method updateAgent
+   *
+   * @return   void
+   */
+  public function updateAgent($server_id, Request $request)
+  {
+      $this->dispatch( new UpdateAgent( $server_id, $request ) );
+
+      return $this->operationSuccessful();
+  }
+
 }

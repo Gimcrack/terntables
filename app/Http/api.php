@@ -64,11 +64,12 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::patch('Profile/{id}',          'ProfileController@update');
 
   // oit routes
-  Route::delete('Server',           'ServerController@destroy');
-  Route::patch('Server/_massUpdate', 'ServerController@markServers');
-  Route::get('Server/_health',      'ServerController@healthServers');
-  Route::any('Server/{id}/Services', 'ServerController@updateServices');
-  Route::resource('Server',         'ServerController');
+  Route::delete('Server',             'ServerController@destroy');
+  Route::patch('Server/_massUpdate',  'ServerController@markServers');
+  Route::get('Server/_health',        'ServerController@healthServers');
+  Route::any('Server/{id}/Services',  'ServerController@updateServices');
+  Route::any('Server/{id}/Agent',     'ServerController@updateAgent');
+  Route::resource('Server',           'ServerController');
 
   Route::any('DatabaseInstance/Server/{id}', 'DatabaseInstanceController@updateFromAgent');
   Route::resource('DatabaseInstance', 'DatabaseInstanceController', ['except' => 'delete'] );
