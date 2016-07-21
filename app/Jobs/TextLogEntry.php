@@ -35,6 +35,11 @@ class TextLogEntry extends Job implements ShouldQueue
      */
     public function handle()
     {
+        if ( ! $this->logEntry )
+        {
+            return false;
+        }
+        
         $this
          ->logEntry
          ->loggable

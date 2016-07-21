@@ -71,11 +71,6 @@ class DashboardNotifications extends Command
      */
     private function digest($which = 'fifteen')
     {
-        if ( ! LogEntry::with('loggable')->unnotified()->$which()->count() )
-        {
-            return false;
-        }
-
         $logEntries = LogEntry::with('loggable')
             ->unnotified() // turn this off for testing
             ->$which()
