@@ -74,6 +74,10 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::any('Server/UpdateAgents',   'ServerController@updateAllAgents');
   Route::resource('Server',           'ServerController');
 
+  Route::delete('ServerAgent',             'ServerAgentController@destroy');
+  Route::patch('ServerAgent/_massUpdate',  'ServerAgentController@markServerAgents');
+  Route::resource('ServerAgent',           'ServerAgentController');
+
   Route::any('DatabaseInstance/Server/{id}', 'DatabaseInstanceController@updateFromAgent');
   Route::resource('DatabaseInstance', 'DatabaseInstanceController', ['except' => 'delete'] );
 

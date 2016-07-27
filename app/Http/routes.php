@@ -22,6 +22,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth_admin'], function(){
   Route::resource('notifications',   'Admin\NotificationController', [ 'only' => [ 'index','show'] ]);
   Route::resource('notificationExemptions',   'Admin\NotificationExemptionController', [ 'only' => [ 'index','show'] ]);
   Route::resource('operatingSystems',   'Admin\OperatingSystemController', [ 'only' => [ 'index','show'] ]);
+  Route::resource('serverAgents',  'Admin\ServerAgentController', [ 'only' => [ 'index','show'] ] );
 });
 
 /**

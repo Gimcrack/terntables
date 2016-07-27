@@ -20,7 +20,7 @@
 			toggles : {
 				new : false,
 				edit : false,
-				delete : false,
+				del : false,
 			},
 			columns : [ 				// columns to query
 				"id",

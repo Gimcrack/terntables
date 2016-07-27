@@ -178,6 +178,7 @@ class ApiController extends Controller
         'User'    => 'Admin\UserController',
         'Group'   => 'Admin\GroupController',
         'Role'    => 'Admin\RoleController',
+        'ServerAgent'  => 'Admin\ServerAgentController',
         'Server'  => 'BI\ServerController',
         'WindowsUpdateServer' => 'BI\ServerController',
         'Application' => 'BI\ApplicationController',
@@ -417,11 +418,11 @@ class ApiController extends Controller
    * @param  int  $id
    * @return Response
    */
-  public function massUpdate($ids = null, $changes = null)
+  public function massUpdate($ids = null, $changes = null, $class = null)
   {
     $ids = $ids ?: $this->getInputIds();
     $changes = $changes ?: Input::get('changes', null);
-    $class = $this->model_class;
+    $class = $class ?: $this->model_class;
 
     if ( ! $ids || ! $changes ) {
       throw new InvalidArgumentException();

@@ -21,5 +21,17 @@ class ServerAgent extends Model
         return $this->belongsTo(Server::class);
     }
 
+    /**
+     * Get the outdated agents.
+     *
+     * @param      <type>  $query  The query
+     *
+     * @return     <type>  ( description_of_the_return_value )
+     */
+    public function scopeOutdated($query)
+    {
+        return $query->where('version','<',static::all()->lists('version')->max());
+    }
+
 
 }
