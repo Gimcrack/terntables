@@ -16922,6 +16922,14 @@ $(function() {
 						fn : 'toggleUpToDate',
 						'data-order' : 99
 					},
+					toggleRunning : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle active',
+						icon : 'fa-toggle-on',
+						label : 'Toggle Running',
+						fn : 'toggleRunning',
+						'data-order' : 100
+					},
 				},
 			},
 			rowBtns : {
@@ -16941,7 +16949,21 @@ $(function() {
 						});
 					},
 					'data-order' : 100
-				}
+				},
+				runSelected : {
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					class: 'btn btn-primary',
+					type : 'button',
+					icon : 'fa-gears',
+					label : 'Start Agent Service...',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markServer({ 'status' : 'Start Agent'});
+					},
+					'data-order' : 100
+				},
+
 			},
 			fn : {
 				/**
@@ -16968,6 +16990,15 @@ $(function() {
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
 				}, //end fn
+				
+				toggleRunning : function( ) {
+					var temp = jApp.activeGrid.temp;
+
+					temp.hideRunning = ( !!! temp.hideRunning );
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
 				   
 				/**
 				 * Update the grid filter with the current values
@@ -16981,7 +17012,12 @@ $(function() {
 						scope = 'outdated';
 					}
 
+					if ( !! temp.hideRunning ) {
+						filter.push( "status <> 'Running'" );
+					}
+
 					data.scope = scope;
+					data.filter = filter.join(' AND ');
 
 				}, // end fn  
 			},
@@ -17412,7 +17448,7 @@ $(function() {
 
 					status = ( agent.status == 'Running' ) ? 1 : 0;
 
-					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' );
+					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' ) + ' <em>' + agent.updated_at_for_humans + '</em>';;
 				},
 
 				agent_version : function() {

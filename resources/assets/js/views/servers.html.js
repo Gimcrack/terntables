@@ -384,7 +384,7 @@
 
 					status = ( agent.status == 'Running' ) ? 1 : 0;
 
-					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' );
+					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' ) + ' <em>' + agent.updated_at_for_humans + '</em>';;
 				},
 
 				agent_version : function() {
