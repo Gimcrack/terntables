@@ -5,13 +5,6 @@ namespace App;
 class Server extends Model
 {
   /**
-   * The database table that the model references
-   *
-   * @var string
-   */
-  protected $table = 'servers';
-
-  /**
    * The mass assignable fields
    *
    * @var array
@@ -115,7 +108,7 @@ class Server extends Model
     return $query
       ->active()
       ->hasAgent()
-      ->where('last_checkin','<', date('Y-m-d H:i:s', strtotime("15 minutes ago") ) );
+      ->where('last_checkin','<', Carbon::now()->subMinutes(15) );
   }
 
   /**
@@ -126,7 +119,7 @@ class Server extends Model
    */
   public function scopeHasAgent($query)
   {
-    return $query->whereNotNull('software_version');
+    return $query->has('agent');
   }
 
   /**
@@ -193,7 +186,7 @@ class Server extends Model
    */
   public function services()
   {
-    return $this->belongsToMany('App\Service')
+    return $this->belongsToMany(Service::class)
       ->withTimestamps()
       ->withPivot(['status', 'start_mode', 'level']);
   }
@@ -205,7 +198,7 @@ class Server extends Model
    */
   public function disks()
   {
-    return $this->hasMany('App\ServerDisk');
+    return $this->hasMany(ServerDisk::class);
   }
 
   /**
@@ -215,7 +208,7 @@ class Server extends Model
    */
   public function alerts()
   {
-    return $this->morphMany('App\Alert','alertable');
+    return $this->morphMany(Alert::class,'alertable');
   }
 
   /**
@@ -224,7 +217,7 @@ class Server extends Model
    */
   public function tags()
   {
-      return $this->morphToMany('App\Tag', 'taggable');
+      return $this->morphToMany(Tag::class, 'taggable');
   }
 
   /**
@@ -234,7 +227,7 @@ class Server extends Model
    */
   public function people()
   {
-    return $this->belongsToMany('App\Person')
+    return $this->belongsToMany(Person::class)
       ->withTimestamps()
       ->withPivot(['comment','contact_type']);
   }
@@ -246,7 +239,7 @@ class Server extends Model
    */
   public function applications()
   {
-    return $this->belongsToMany('App\Application')
+    return $this->belongsToMany(Application::class)
       ->withTimestamps()
       ->withPivot(['comment','server_type']);
   }
@@ -258,7 +251,7 @@ class Server extends Model
    */
   public function databases()
   {
-    return $this->belongsToMany('App\Database')
+    return $this->belongsToMany(Database::class)
       ->withTimestamps()
       ->withPivot(['comment','server_type']);
   }
@@ -270,7 +263,7 @@ class Server extends Model
    */
   public function owner()
   {
-    return $this->belongsTo('App\Group','group_id');
+    return $this->belongsTo(Group::class,'group_id');
   }
 
   /**
@@ -280,7 +273,7 @@ class Server extends Model
    */
   public function operating_system()
   {
-    return $this->belongsTo('App\OperatingSystem','operating_system_id');
+    return $this->belongsTo(OperatingSystem::class,'operating_system_id');
   }
 
   /**
@@ -290,7 +283,18 @@ class Server extends Model
    */
   public function updates()
   {
-    return $this->hasMany('App\UpdateDetail','server_id');
+    return $this->hasMany(UpdateDetail::class,'server_id');
+  }
+
+  /**
+   * A server can have one agent
+   * @method agent
+   *
+   * @return   
+   */
+  public function agent()
+  {
+      return $this->hasOne(ServerAgent::class);
   }
 
   /**
@@ -300,7 +304,7 @@ class Server extends Model
    */
   public function update_batches()
   {
-    return $this->hasMany('App\UpdateBatch','server_id');
+    return $this->hasMany(UpdateBatch::class,'server_id');
   }
 
   /**

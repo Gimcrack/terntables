@@ -328,7 +328,7 @@
 				//"databases",
 				'tags',
 				'status',
-				"software_version",
+				"agent_version",
 				"agent_status",
 			],
 			headers : [ 				// headers for table
@@ -377,12 +377,22 @@
 					return  `<div class="pull-right">${ip}</div>`;
 				},
 
-				agent_status : function(val) {
-					if ( val == null ) return "";
+				agent_status : function() {
+					var r = jApp.activeGrid.currentRow
+						agent = r.agent;
+					if ( agent == null ) return "";
 
-					status = ( val == 'Running' ) ? 1 : 0;
+					status = ( agent.status == 'Running' ) ? 1 : 0;
 
 					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' );
+				},
+
+				agent_version : function() {
+					var r = jApp.activeGrid.currentRow
+						agent = r.agent;
+					if ( agent == null ) return "";
+
+					return agent.version;
 				},
 
 			},

@@ -37,7 +37,8 @@ class ServerController extends Controller
     'tags',
     'owner',
     'operating_system',
-    'update_batches'
+    'update_batches',
+    'agent'
   ];
 
   /**

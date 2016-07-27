@@ -43,7 +43,8 @@ class ServerController extends ApiController
     'tags',
     'owner',
     'operating_system',
-    'update_batches'
+    'update_batches',
+    'agent'
   ];
 
   /**
