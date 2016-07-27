@@ -24,6 +24,15 @@ class DatabaseInstance extends Model
         'inactive_flag',
     ];
 
+    protected $searchableColumns = [
+        'server.name' => 80,
+        'name' => 50,
+        'owner.name' => 50,
+        'sql_product' => 20,
+        'sql_edition' => 20,
+        'sql_version' => 20,
+      ];
+
     /**
      * An instance has one server
      */
