@@ -10,6 +10,13 @@ class ServerAgent extends Model
         'version'
     ];
 
+    protected $searchableColumns = [
+    'server.name' => 80,
+    'status' => 50,
+    'version' => 20,
+    'server.status' => 10,
+  ];
+
     /**
      * A ServerAgent belongs to one Server
      * @method server
