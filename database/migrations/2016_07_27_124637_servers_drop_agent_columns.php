@@ -13,8 +13,8 @@ class ServersDropAgentColumns extends Migration
     public function up()
     {
         Schema::table('servers', function (Blueprint $table) {
-            $table->dropColumn('software_version');
-            $table->dropColumn('agent_status');
+            // $table->dropColumn('software_version');
+            // $table->dropColumn('agent_status');
         });
     }
 
@@ -26,8 +26,8 @@ class ServersDropAgentColumns extends Migration
     public function down()
     {
         Schema::table('servers', function (Blueprint $table) {
-            $table->string('software_version')->nullable();
-            $table->string('agent_status')->nullable();
+            // $table->string('software_version')->nullable();
+            // $table->string('agent_status')->nullable();
         });
     }
 }

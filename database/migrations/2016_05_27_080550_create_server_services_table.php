@@ -12,14 +12,14 @@ class CreateServerServicesTable extends Migration
      */
     public function up()
     {
-        Schema::create('server_services', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->unsignedInteger('server_id');
-            $table->string('status');
-            $table->string('start_mode');
-            $table->timestamps();
-        });
+        // Schema::create('server_services', function (Blueprint $table) {
+        //     $table->increments('id');
+        //     $table->string('name');
+        //     $table->unsignedInteger('server_id');
+        //     $table->string('status');
+        //     $table->string('start_mode');
+        //     $table->timestamps();
+        // });
     }
 
     /**
@@ -29,6 +29,6 @@ class CreateServerServicesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('server_services');
+        // Schema::drop('server_services');
     }
 }

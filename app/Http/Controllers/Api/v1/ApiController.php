@@ -179,6 +179,7 @@ class ApiController extends Controller
         'Group'   => 'Admin\GroupController',
         'Role'    => 'Admin\RoleController',
         'ServerAgent'  => 'Admin\ServerAgentController',
+        'ServerDisk'  => 'BI\ServerDiskController',
         'Server'  => 'BI\ServerController',
         'WindowsUpdateServer' => 'BI\ServerController',
         'Application' => 'BI\ApplicationController',

@@ -58,6 +58,12 @@
           </li>
           @endif
 
+          @if( Auth::user()->checkAccess('Server.read') )
+          <li>
+            <a href="{{ url('oit/serverDisks') }}"><i class="fa fa-files-o fa-fw"></i> Server Disks</a>
+          </li>
+          @endif
+
           @if( Auth::user()->checkAccess('DatabaseInstance.read') )
           <li>
             <a href="{{ url('oit/sql-servers') }}"><i class="fa fa-database fa-fw"></i> Sql Servers</a>

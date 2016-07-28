@@ -12,7 +12,7 @@ class DropServerServicesTable extends Migration
      */
     public function up()
     {
-        Schema::drop('server_services');
+        // Schema::drop('server_services');
     }
 
     /**
@@ -22,13 +22,13 @@ class DropServerServicesTable extends Migration
      */
     public function down()
     {
-        Schema::table('server_services', function (Blueprint $table) {
-            $table->increments('id');
-            $table->unsignedInteger('service_id')->nullable();
-            $table->unsignedInteger('server_id');
-            $table->string('status');
-            $table->string('start_mode');
-            $table->timestamps();
-        });
+        // Schema::table('server_services', function (Blueprint $table) {
+        //     $table->increments('id');
+        //     $table->unsignedInteger('service_id')->nullable();
+        //     $table->unsignedInteger('server_id');
+        //     $table->string('status');
+        //     $table->string('start_mode');
+        //     $table->timestamps();
+        // });
     }
 }

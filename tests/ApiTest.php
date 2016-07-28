@@ -8,7 +8,7 @@ use App\User;
 
 abstract class ApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
     //use WithoutMiddleware;
 
     /**
@@ -71,14 +71,36 @@ abstract class ApiTest extends TestCase
     public function setUp() {
       parent::setUp();
 
-      \Auth::loginUsingId(1);
-      \Auth::guard('api')->loginUsingToken('JRq1WSlKwtlLGb5iM1CugmS0qGIGAIddHvcPPxVz2fQBV2XO6e0XSDeN3YVw');
+      $this->login();
 
       $this->test_dummy = factory($this->model_class)->make();
       $this->test_dummy_attributes = $this->test_dummy->getBaseAtts();
 
       unset($this->test_dummy_attributes['updated_at_for_humans']);
       unset($this->test_dummy_attributes['identifiable_name']);
+    }
+
+    /**
+     * Login
+     */
+    public function login()
+    {
+      if ( ! \App\User::where('username','jeremy')->count() )
+      {
+        \App\Group::create([ 'name' => 'Super Administrators']);
+
+        \App\User::create(
+          [ 
+              'username' => 'jeremy', 
+              'email' => 'jeremy.bloomstrom@matsugov.us', 
+              'password' => bcrypt('Matanuska1'),
+              'api_token' => 'JRq1WSlKwtlLGb5iM1CugmS0qGIGAIddHvcPPxVz2fQBV2XO6e0XSDeN3YVw'
+          ]                
+        )->groups()->attach([1]);
+      }
+      
+      \Auth::loginUsingId(1);
+      \Auth::guard('api')->loginUsingToken('JRq1WSlKwtlLGb5iM1CugmS0qGIGAIddHvcPPxVz2fQBV2XO6e0XSDeN3YVw');
     }
 
 

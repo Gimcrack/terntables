@@ -55,16 +55,16 @@ class ServerAgent extends Model
     }
 
     /**
-   * Get server agents which are late checking in
-   * @method scopeLateCheckingIn
-   * @param  [type]              $query [description]
-   * @return [type]                     [description]
-   */
-  public function scopeLateCheckingIn($query)
-  {
-    return $query
-      ->where('updated_at','<', Carbon::now()->subMinutes(5) );
-  }
+     * Get server agents which are late checking in
+     * @method scopeLateCheckingIn
+     * @param  [type]              $query [description]
+     * @return [type]                     [description]
+     */
+    public function scopeLateCheckingIn($query)
+    {
+        return $query
+        ->where('updated_at','<', Carbon::now()->subMinutes(5) );
+    }
 
 
 }
