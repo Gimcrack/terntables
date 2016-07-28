@@ -34,6 +34,16 @@ class ServerDisk extends Model
   ];
 
   /**
+   * Scope All
+   * @method scopeAll
+   * @return [type]   [description]
+   */
+  public function scopeAll($query)
+  {
+    return $query->active();
+  }
+
+  /**
    * Gets the percent free attribute.
    * 
    * @return float
@@ -84,7 +94,7 @@ class ServerDisk extends Model
   }
 
   /**
-   * Get server agents which are late checking in
+   * Get server disks which are late checking in
    * @method scopeLateCheckingIn
    * @param  [type]              $query [description]
    * @return [type]                     [description]
@@ -92,7 +102,21 @@ class ServerDisk extends Model
   public function scopeLateCheckingIn($query)
   {
       return $query
+      ->active()
       ->where('updated_at','<', Carbon::now()->subMinutes(15) );
+  }
+
+  /**
+   * Get server disks for active servers
+   * @method scopeActive
+   *
+   * @return   void
+   */
+  public function scopeActive($query)
+  {
+      return $query->whereHas('server', function($q) {
+        return $q->where('inactive_flag',0);
+      });
   }
 
 }
