@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Carbon;
+
 class Server extends Model
 {
   /**
