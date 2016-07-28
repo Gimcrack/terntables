@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         \App\Console\Commands\Inspire::class,
         \App\Console\Commands\DashboardServerHealth::class,
+        \App\Console\Commands\DashboardServerAgentHealth::class,
         \App\Console\Commands\DashboardServerCheckDisks::class,
         \App\Console\Commands\DashboardServerServices::class,
         \App\Console\Commands\DashboardNotifications::class
@@ -32,6 +33,9 @@ class Kernel extends ConsoleKernel
         if ( app()->environment() !== 'production' ) return false;
 
         $schedule->command('dashboard:serverHealth')
+                 ->everyFiveMinutes();
+
+        $schedule->command('dashboard:serverAgentHealth')
                  ->everyFiveMinutes();
 
         $schedule->command('dashboard:serverServices')
