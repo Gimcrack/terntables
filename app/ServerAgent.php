@@ -63,6 +63,9 @@ class ServerAgent extends Model
     public function scopeLateCheckingIn($query)
     {
         return $query
+        ->whereHas('server', function($q) {
+            return $q->where('inactive_flag',0);
+        })
         ->where('updated_at','<', Carbon::now()->subMinutes(5) );
     }
 
