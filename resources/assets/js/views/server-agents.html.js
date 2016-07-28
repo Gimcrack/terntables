@@ -1,8 +1,3 @@
-/**
- * servers.html.js
- *
- * servers view definition
- */
 ;(function(jApp) {
 
 	/**
@@ -66,11 +61,28 @@
 					'data-permission' : 'update_enabled',
 					class: 'btn btn-primary',
 					type : 'button',
-					icon : 'fa-gears',
-					label : 'Start Agent Service...',
+					icon : 'fa-play',
+					label : 'Start Agent Service',
 					fn : function(e) {
 						e.preventDefault();
 						jApp.activeGrid.fn.markServer({ 'status' : 'Start Agent'});
+					},
+					'data-order' : 100
+				},
+				restartSelected : {
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					class: 'btn btn-primary',
+					type : 'button',
+					icon : 'fa-refresh',
+					label : 'Restart Agent Service...',
+					fn : function(e) {
+						e.preventDefault();
+						bootbox.confirm('Are you sure you want to restart the agent on the selected servers?', function( response ) {
+							if ( !!response ) {
+								jApp.activeGrid.fn.markServer({ 'status' : 'Restart Agent'});
+							}
+						});
 					},
 					'data-order' : 100
 				},

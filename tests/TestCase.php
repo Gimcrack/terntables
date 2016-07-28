@@ -1,12 +1,27 @@
 <?php
+
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
+    use DatabaseMigrations;
+
     /**
      * The base URL to use while testing the application.
      *
      * @var string
      */
     protected $baseUrl = 'http://localhost';
+
+    /**
+     * Sets Up.
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->runDatabaseMigrations();
+    }
 
     /**
      * Creates the application.
@@ -18,21 +33,6 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
         $app = require __DIR__.'/../bootstrap/app.php';
 
         $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-
-
-        if ( ! \App\User::where('username','jeremy')->count() )
-        {
-          \App\Group::create([ 'name' => 'Super Administrators']);
-
-          \App\User::create(
-            [ 
-                'username' => 'jeremy', 
-                'email' => 'jeremy.bloomstrom@matsugov.us', 
-                'password' => bcrypt('Matanuska1'),
-                'api_token' => 'JRq1WSlKwtlLGb5iM1CugmS0qGIGAIddHvcPPxVz2fQBV2XO6e0XSDeN3YVw'
-            ]                
-          )->groups()->attach([1]);
-        }
 
         return $app;
     }

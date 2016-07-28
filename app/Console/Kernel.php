@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Inspire::class,
         \App\Console\Commands\DashboardServerHealth::class,
         \App\Console\Commands\DashboardServerAgentHealth::class,
+        \App\Console\Commands\DashboardServerDiskHealth::class,
         \App\Console\Commands\DashboardServerCheckDisks::class,
         \App\Console\Commands\DashboardServerServices::class,
         \App\Console\Commands\DashboardNotifications::class
@@ -30,7 +31,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        if ( app()->environment() !== 'production' ) return false;
+        if ( app()->isLocal() ) return false;
 
         $schedule->command('dashboard:serverHealth')
                  ->everyFiveMinutes();
@@ -42,6 +43,9 @@ class Kernel extends ConsoleKernel
                  ->everyFiveMinutes();
 
         $schedule->command('dashboard:serverDisks critical')
+                 ->everyFiveMinutes();
+
+        $schedule->command('dashboard:serverDiskHealth')
                  ->everyFiveMinutes();
 
         $schedule->command('dashboard:serverDisks hourly')

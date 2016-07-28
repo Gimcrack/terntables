@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Carbon;
+
 class ServerDisk extends Model
 {
   /**
@@ -25,6 +27,12 @@ class ServerDisk extends Model
       'free_gb',
   ];
 
+  protected $searchableColumns = [
+      'name',
+      'label',
+      'server.name',
+  ];
+
   /**
    * Gets the percent free attribute.
    * 
@@ -42,7 +50,7 @@ class ServerDisk extends Model
    */
   public function server()
   {
-    return $this->belongsTo('App\Server');
+    return $this->belongsTo(Server::class);
   }
 
 
@@ -73,6 +81,18 @@ class ServerDisk extends Model
       ->where('size_gb','>',10)
       ->whereRaw("free_gb / size_gb < {$max}")
       ->whereRaw("free_gb / size_gb >= {$min}");
+  }
+
+  /**
+   * Get server agents which are late checking in
+   * @method scopeLateCheckingIn
+   * @param  [type]              $query [description]
+   * @return [type]                     [description]
+   */
+  public function scopeLateCheckingIn($query)
+  {
+      return $query
+      ->where('updated_at','<', Carbon::now()->subMinutes(15) );
   }
 
 }

@@ -12,10 +12,10 @@ class ServerServicesDropNameColumn extends Migration
      */
     public function up()
     {
-        Schema::table('server_services', function (Blueprint $table) {
-            $table->dropColumn('name');
-            $table->unsignedInteger('service_id')->nullable();
-        });
+        // Schema::table('server_services', function (Blueprint $table) {
+        //     $table->dropColumn('name');
+        //     $table->unsignedInteger('service_id')->nullable();
+        // });
     }
 
     /**
@@ -25,9 +25,9 @@ class ServerServicesDropNameColumn extends Migration
      */
     public function down()
     {
-        Schema::table('server_services', function (Blueprint $table) {
-            $table->string('name')->nullable();
-            $table->dropColumn('service_id');
-        });
+        // Schema::table('server_services', function (Blueprint $table) {
+        //     $table->string('name')->nullable();
+        //     $table->dropColumn('service_id');
+        // });
     }
 }
