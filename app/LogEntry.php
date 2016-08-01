@@ -64,8 +64,24 @@ class LogEntry extends Model
 	*/
 	public function scopeAll( $query )
 	{
-		return $query->latest();
+		return $query->whereDoesntHave('loggable', function($q) {
+            $q->where('loggable_type','App\Application')
+               ->where('loggable_id',Application::where('name','IT Dashboard')->first()->id);
+        })->latest();
 	}
+
+    /**
+    * Scope Dashboard
+    * @method scopeDashboard
+    * @return [type]   [description]
+    */
+    public function scopeDashboard( $query )
+    {
+        return $query->whereHas('loggable', function($q) {
+            $q->where('loggable_type','App\Application')
+               ->where('loggable_id',Application::where('name','IT Dashboard')->first()->id);
+        })->latest();
+    }
  
     /**
      * Get the recently reported events
