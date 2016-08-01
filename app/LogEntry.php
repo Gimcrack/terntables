@@ -42,7 +42,11 @@ class LogEntry extends Model
         return ( !! $this->loggable ) ? $this->loggable->identifiable_name() : '';
     }
 
-    
+    public function getMessageAttribute($message)
+    {
+        return substr($message, 0, 250);
+    }
+
     /**
      * Polymorphic relationship
      *
