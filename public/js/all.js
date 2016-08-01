@@ -17222,6 +17222,7 @@ $(function() {
 		{ // grid definition
 			model : 'ServerDisk',
 			columnFriendly : 'name',
+			filter : 'inactive_flag = 0',
 			gridHeader : {
 				icon : 'fa-files-o',
 				headerTitle : 'Server Disks',
@@ -17234,7 +17235,14 @@ $(function() {
 			},
 			tableBtns : {
 				custom : {
-					
+					toggleInactive : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
+						label : 'Toggle Inactive',
+						fn : 'toggleInactive',
+						'data-order' : 100
+					},
 				},
 			},
 			rowBtns : {
@@ -17318,6 +17326,19 @@ $(function() {
 					data.filter = filter.join(' AND ');
 
 				}, // end fn  
+				
+				/**
+				 * Toggle inactive server visibility
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				toggleInactive : function( ) {
+					jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
+						? false : !jApp.activeGrid.temp.hideInactive;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn  
 			},
 			columns : [ 				// columns to query
 				"id",
