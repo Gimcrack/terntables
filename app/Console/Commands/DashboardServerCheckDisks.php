@@ -99,7 +99,7 @@ class DashboardServerCheckDisks extends Command
         $level = $this->getLevel( $disk );
         $message = $this->getMessage( $disk );
 
-        Logger::$level( $message, 'App\Server', $disk->server->id );
+        Logger::$level( $message, 'App\ServerDisk', $disk->id );
     }
 
     /**
@@ -131,7 +131,8 @@ class DashboardServerCheckDisks extends Command
      */
     private function getMessage( ServerDisk $disk )
     {
-        return sprintf( "{$disk->name} [$disk->label] has %s/%s GB (%s%%) free space as of %s.",
+        return sprintf( "{$disk->name} [$disk->label] on [%s] has %s/%s GB (%s%%) free space as of %s.",
+            $disk->server->name,
             number_format($disk->free_gb,0),
             number_format($disk->size_gb,0),
             number_format($disk->percent_free*100,2),

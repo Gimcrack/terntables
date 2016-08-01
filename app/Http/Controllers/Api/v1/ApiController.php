@@ -178,6 +178,7 @@ class ApiController extends Controller
         'User'    => 'Admin\UserController',
         'Group'   => 'Admin\GroupController',
         'Role'    => 'Admin\RoleController',
+        'SilencedNotification'    => 'Admin\SilencedNotificationController',
         'ServerAgent'  => 'Admin\ServerAgentController',
         'ServerDisk'  => 'BI\ServerDiskController',
         'Server'  => 'BI\ServerController',

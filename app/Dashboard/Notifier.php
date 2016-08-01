@@ -105,10 +105,13 @@ class Notifier {
         // don't notify if there is an outage happening.
         case static::isOutage() :
 
+        // don't notify if the logEntry is silenced
+        case $logEntry->isSilenced() : 
+
         // don't notify if it is quiet hours, unless a production 
         //  server exceeds the threshold for logged events
         case static::isQuietHours( $logEntry->loggable->production_flag ) 
-        && ! static::exceedsProductionThreshold($logEntry->loggable) :
+        && ! static::exceedsProductionThreshold($logEntry) :
           return false;
       }
 
@@ -119,15 +122,16 @@ class Notifier {
      * Have the number of recent important unnotified events
      *  exceeded the threshold?
      *
-     * @param      <type>  $loggable  The loggable
+     * @param      <type>  $logEntry  The logEntry
      *
      * @return     bool
      */
-    public static function exceedsProductionThreshold($loggable)  
+    public static function exceedsProductionThreshold(LogEntry $logEngry)  
     {
-      if ( ! $loggable->production_flag ) return false;
+      if ( ! $logEntry->loggable->production_flag ) return false;
 
-      return !! LogEntry::where('loggable_id',$loggable->loggable_id)
+      return !! LogEntry::where('loggable_id',$logEntry->loggable_id)
+        ->where('loggable_type',$logEntry->loggable_type)
         ->unnotified()
         ->important()
         ->recent()

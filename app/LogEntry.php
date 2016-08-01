@@ -14,7 +14,7 @@ class LogEntry extends Model
     protected $table = 'log_entries';
 
     /**
-     * The fillable fiels
+     * The fillable fields
      *
      * @var        array
      */
@@ -162,5 +162,19 @@ class LogEntry extends Model
     public function didNotify()
     {
         $this->update(['notified_at' => Carbon::now()]);
+    }
+
+    /**
+     * Is the logEntry Silenced?
+     * @method isSilenced
+     *
+     * @return   void
+     */
+    public function isSilenced()
+    {
+        return !! SilencedNotification::where('loggable_id',$this->loggable_id)
+            ->where('loggable_type',$this->loggable_type)
+            ->active()
+            ->count();
     }
 }

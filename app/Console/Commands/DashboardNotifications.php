@@ -78,6 +78,9 @@ class DashboardNotifications extends Command
             ->each( function( $logEntry ) {
                 $logEntry->didNotify();
             })
+            ->reject( function( $logEntry ) {
+                return $logEntry->isSilenced();
+            })
             ->unique( function($logEntry) {
                 return $logEntry->message . $logEntry->loggable_type . $logEntry->loggable_id;
             })
