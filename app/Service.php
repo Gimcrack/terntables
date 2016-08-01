@@ -17,7 +17,7 @@ class Service extends Model
     protected $appends = [
         'identifiable_name',
         'updated_at_for_humans',
-        'count'
+        //'count'
     ];
 
     /**
