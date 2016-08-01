@@ -23,6 +23,11 @@ class ServerService extends Model
         'start_mode'
     ];
 
+    protected $appends = [
+        'identifiable_name',
+        'name'
+    ];
+
     /**
      * Gets the name attribute.
      */
