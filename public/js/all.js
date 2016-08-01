@@ -15558,7 +15558,15 @@ $(function() {
 					label : 'Toggle Low-Importance Entries',
 					fn : 'toggleUnimportant',
 					'data-order' : 100
-				}
+				},
+				toggleDashboard : {
+					type : 'button',
+					class : 'btn btn-success btn-toggle btn-toggleDashboard',
+					icon : 'fa-toggle-off',
+					label : 'Toggle Dashboard Entries',
+					fn : 'toggleDashboard',
+					'data-order' : 100
+				},
 			}
 		},
 
@@ -15594,6 +15602,23 @@ $(function() {
 				data.scope = ( temp.hideUnimportant ) ? 'important' : 'all';
 
 				jUtility.executeGridDataRequest();
+
+				$(this).toggleClass('active')
+					.find('i').toggleClass('fa-toggle-on fa-toggle-off');
+			},
+
+			toggleDashboard : function() {
+				var temp = jApp.activeGrid.temp, 
+					data = jApp.activeGrid.dataGrid.requestOptions.data;
+
+				temp.toggleDashboard = ( !!! temp.toggleDashboard );
+
+				data.scope = ( temp.toggleDashboard ) ? 'dashboard' : 'all';
+
+				jUtility.executeGridDataRequest();
+
+				$('.btn-toggleUnimportant').removeClass('active')
+					.find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
 
 				$(this).toggleClass('active')
 					.find('i').toggleClass('fa-toggle-on fa-toggle-off');
