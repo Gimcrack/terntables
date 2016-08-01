@@ -27,6 +27,7 @@
 			},
 			toggles : {
 				new : false,
+				ellipses : false,
 			},
 			tableBtns : {
 				custom : {
