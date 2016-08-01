@@ -23,7 +23,29 @@
 				},
 			},
 			rowBtns : {
-
+				markSelected : [
+					{ label: 'Modify Selected Disks', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+								e.preventDefault();
+								jApp.activeGrid.fn.markDisk( { 'inactive_flag' : 1} );
+						},
+						label : 'Flag As Inactive'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markDisk({ 'inactive_flag' : 0})
+						},
+						label : 'Flag As Active'
+					},
+				]
 			},
 			fn : {
 							
@@ -44,6 +66,22 @@
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
 				}, //end fn
+				
+				/**
+				 * Mark selected applications as inactive/active
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				markDisk			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction(),
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
 				   
 				/**
 				 * Update the grid filter with the current values
@@ -74,7 +112,8 @@
 				"free_gb",
 				"used_gb",
 				"size_gb",
-				"updated_at_for_humans"
+				"inactive_flag",
+				"updated_at_for_humans",
 			],
 			headers : [ 				// headers for table
 				"ID",
@@ -84,6 +123,7 @@
 				"Free (GB)",
 				"Used (GB)",
 				"Total (GB)",
+				"Active",
 				"Last Checkin"
 			],
 			templates : { 				// html template functions
@@ -141,6 +181,10 @@
 					}
 
 					return _.nameButton( server.name, 'fa-building-o') + _.getFlag(server.production_flag, 'Prod', 'Test', 'primary','success');
+				},
+
+				inactive_flag : function(val) {
+					return _.getFlag(val,'Inactive','Active','danger','success');
 				}
 			},
 		},

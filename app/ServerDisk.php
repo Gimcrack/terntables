@@ -25,6 +25,7 @@ class ServerDisk extends Model
       'size_gb',
       'used_gb',
       'free_gb',
+      'inactive_flag',
   ];
 
   protected $searchableColumns = [
