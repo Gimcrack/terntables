@@ -5,13 +5,6 @@ namespace App;
 class Service extends Model
 {
     /**
-     * The database table
-     *
-     * @var        string
-     */
-    protected $table = 'services';
-
-    /**
      * The assignable fields
      *
      * @var        array
@@ -24,7 +17,7 @@ class Service extends Model
     protected $appends = [
         'identifiable_name',
         'updated_at_for_humans',
-        'appends'
+        'count'
     ];
 
     /**
