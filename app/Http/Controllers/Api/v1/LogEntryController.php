@@ -56,7 +56,7 @@ class LogEntryController extends ApiController
       SilencedNotification::create([
         'loggable_type' => $logEntry->loggable_type,
         'loggable_id' => $logEntry->loggable_id,
-        'expires_at' => $expires->format("Y-m-d\TG:i")
+        'expires_at' => $expires
       ]);
     });
 
