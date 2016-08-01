@@ -3,7 +3,7 @@
 Homestead.yaml
 Homestead.json
 .env
-components/
+/components
 public/js/async-grid/
 storage/temp/
 .htaccess

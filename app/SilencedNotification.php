@@ -40,18 +40,6 @@ class SilencedNotification extends Model
         return $this->loggable->server ?: null;
     }
 
-    public function getExpiresAtAttribute($date)
-    {
-        if (empty($this->attributes['expires_at'])) return null;
-
-        return Carbon::createFromFormat('Y-m-d G:i:s.000',(string) $date)->copy()->format("Y-m-d\TG:i");
-    }
-
-    public function setExpiresAtAttribute($val)
-    {
-        $this->attributes['expires_at'] = Carbon::createFromFormat("Y-m-d\TG:i",(string) $val)->format('Y-m-d G:i:s.000');
-    }
-
     /**
      * Gets the expired flag attribute.
      */

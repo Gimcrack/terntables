@@ -3,14 +3,14 @@
 	/**
 	 * Setup the form fields
 	 */
-	var fieldset_1__fields = [
-		{
-			name : 'expires_at',
-			required : true,
-			type : 'datetime-local',
-			_label : 'When should the silenced notification expire?',
-		},
-	]
+	// var fieldset_1__fields = [
+	// 	{
+	// 		name : 'expires_at',
+	// 		required : true,
+	// 		type : 'datetime-local',
+	// 		_label : 'When should the silenced notification expire?',
+	// 	},
+	// ]
 
 	/**
 	 * Add the view
@@ -27,6 +27,8 @@
 			},
 			toggles : {
 				new : false,
+				edit : false,
+				ellipses : false,
 			},
 			tableBtns : {
 				custom : {
@@ -76,7 +78,7 @@
 			templates : { 				// html template functions
 
 				expires_at : function(val) {
-					return val.replace('T','  ');
+					return val.substr(0,16);
 				},		
 						
 				expired_flag : function(val) {
@@ -94,12 +96,12 @@
 		},
 		[ 
 			// colparams
-			{ // fieldset
-				label : 'Details',
-				helpText : 'Please fill out the form',
-				class : 'col-lg-5',
-				fields : fieldset_1__fields
-			},
+			// { // fieldset
+			// 	label : 'Details',
+			// 	helpText : 'Please fill out the form',
+			// 	class : 'col-lg-5',
+			// 	fields : fieldset_1__fields
+			// },
 		]
 	)
 })(jApp);
