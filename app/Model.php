@@ -18,11 +18,6 @@ abstract class Model extends BaseModel
    */
   use RevisionableTrait, Eloquence;
 
-  protected $dates = [
-    'updated_at',
-    'created_at'
-  ];
-
   protected $appends = [
     'identifiable_name',
     'updated_at_for_humans'

@@ -73,7 +73,10 @@
     				<a href="{{ url('admin/notifications')}}" ><i class="fa fa-bell-o fa-fw"></i> Manage Notifications</a>
     			</li>
           <li>
-    				<a href="{{ url('admin/notificationExemptions')}}" ><i class="fa fa-bell-slash-o fa-fw"></i> Notifications Exceptions</a>
+            <a href="{{ url('admin/notificationExemptions')}}" ><i class="fa fa-bell-slash-o fa-fw"></i> Notifications Exceptions</a>
+          </li>
+          <li>
+    				<a href="{{ url('admin/silencedNotifications')}}" ><i class="fa fa-bell-slash-o fa-fw"></i> Silenced Notifications</a>
     			</li>
     			<li>
     				<a href="{{ url('admin/operatingSystems')}}" ><i class="fa fa-windows fa-fw"></i> Manage Operating Systems</a>

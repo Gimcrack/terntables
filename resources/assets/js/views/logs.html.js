@@ -37,6 +37,28 @@
 			}
 		},
 
+		rowBtns : {
+			updateSelected : {
+				'data-multiple' : true,
+				'data-permission' : 'update_enabled',
+				class: 'btn btn-primary',
+				type : 'button',
+				icon : 'fa-bell-slash-o',
+				label : 'Silence Notifications...',
+				fn : function(e) {
+					e.preventDefault();
+					bootbox.prompt('How many hours should the selected entries be silenced for?', function( response ) {
+						if ( ! isNaN(response) ) {
+							jApp.activeGrid.fn.silenceNotifications({ 'hours' : response });
+						} else {
+							bootbox.alert('Please enter a numeric value for hours.');
+						}
+					});
+				},
+				'data-order' : 100
+			}
+		},
+
 		fn : {
 			toggleUnimportant : function() {
 				var temp = jApp.activeGrid.temp, 
@@ -50,7 +72,18 @@
 
 				$(this).toggleClass('active')
 					.find('i').toggleClass('fa-toggle-on fa-toggle-off');
-			}
+			},
+
+			silenceNotifications : function( data ) {
+				jApp.aG().action = 'withSelectedUpdate';
+				jUtility.withSelected('custom', function(ids) {
+					jUtility.postJSON( {
+						url : jUtility.getCurrentFormAction(),
+						success : jUtility.callback.submitCurrentForm,
+						data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, data )
+					});
+				});
+			},
 		},
 		
 		columns : [ 				// columns to query

@@ -32,6 +32,9 @@ Route::group( [ 'prefix' => 'api/v1', 'middleware' => 'api.admin' ], function() 
   Route::delete('Group',                   'Admin\GroupController@destroy');
   Route::resource('Group',                 'Admin\GroupController');
 
+  Route::delete('SilencedNotification',    'Admin\SilencedNotificationController@destroy');
+  Route::resource('SilencedNotification',  'Admin\SilencedNotificationController');
+
   Route::delete('Notification',            'Admin\NotificationController@destroy');
   Route::patch('Notification/_massUpdate', 'Admin\NotificationController@markNotifications');
   Route::resource('Notification',          'Admin\NotificationController');
@@ -88,6 +91,7 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::get('Alert/_server',          'AlertController@serverAlerts');
   Route::resource('Alert',              'AlertController', [ 'except' => 'delete']);
 
+  Route::patch('LogEntry/_massUpdate', 'LogEntryController@silenceNotifications');
   Route::resource('LogEntry', 'LogEntryController');
   
   Route::resource('Service', 'ServiceController');
