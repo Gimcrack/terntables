@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use Input;
 use App\Http\Controllers\Api\v1\ApiController;
 
 
@@ -30,5 +31,16 @@ class ServerDiskController extends ApiController
   public $with = [
     'server'
   ];
+
+  /**
+   * Mark server disks as inactive/not inactive
+   * @method markServersDisks
+   * @return [type]      [description]
+   */
+  public function markServerDisks()
+  {
+    $fillable = ['inactive_flag'];
+    return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
+  }
 
 }

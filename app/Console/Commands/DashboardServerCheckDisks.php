@@ -109,7 +109,7 @@ class DashboardServerCheckDisks extends Command
      */
     private function ignore( ServerDisk $disk )
     {
-        return ( ! $disk->server || !! $disk->server->inactive_flag || $this->is_ignored_server($disk->server) );
+        return ( !! $disk->inactive_flag || ! $disk->server || !! $disk->server->inactive_flag || $this->is_ignored_server($disk->server) );
     }
 
     /**

@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Logger;
 use Carbon;
+use Logger;
+use App\Server;
 use App\ServerDisk;
 use Illuminate\Console\Command;
 
@@ -25,6 +26,15 @@ class DashboardServerDiskHealth extends Command
     protected $description = 'Logs any disks that are late checking in - could be an indication that the disk is offline.';
 
     /**
+     * Ignore these servers when doing checks.
+     * @var [type]
+     */
+    protected $ignored = [
+      'DSJCOMM1' => '*',
+      'DSJVSA' => '*'
+    ];
+
+    /**
      * Create a new command instance.
      *
      * @return void
@@ -43,6 +53,9 @@ class DashboardServerDiskHealth extends Command
     {
         ServerDisk::lateCheckingIn()
             ->get()
+            ->reject( function($disk) {
+                return $this->ignore($disk);
+            })
             ->each( function(ServerDisk $disk){
                 $this->log($disk);
             });
@@ -56,6 +69,26 @@ class DashboardServerDiskHealth extends Command
     private function log(ServerDisk $disk)
     {
         Logger::error( $this->getMessage($disk) , 'App\ServerDisk', $disk->id);
+    }
+
+    /**
+     * Should the disk be ignored?
+     *
+     * @param      ServerDisk  $disk   The disk
+     */
+    private function ignore( ServerDisk $disk )
+    {
+        return ( !! $disk->inactive_flag || ! $disk->server || !! $disk->server->inactive_flag || $this->is_ignored_server($disk->server) );
+    }
+
+    /**
+     * Determines if ignored server.
+     *
+     * @param      Server  $server  The server
+     */
+    private function is_ignored_server( Server $server )
+    {
+        return isset( $this->ignored[$server->name] );
     }
 
     /**
