@@ -106,12 +106,15 @@ class ApiController extends Controller
 
       $q = Input::get('q',null);
       $scope = Input::get('scope','all');
+      $order = Input::get('order','oldest');
+
       $select = ( !empty( $this->select ) ) ? $this->select : null;
 
       $models = ( !! $q ) ? $model_class::search( $q )->with($with) : $model_class::with($with);
 
       $results = $models
                   ->$scope()
+                  ->$order()
                   ->whereRaw($filter);
 
       //$results = ( !! $select ) ? $models->get($select) : $results;

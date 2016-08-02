@@ -3,6 +3,7 @@
 namespace App;
 
 use Carbon;
+use Ingenious\Eloquence\Builder;
 
 class SilencedNotification extends Model
 {
@@ -68,18 +69,13 @@ class SilencedNotification extends Model
         return $this->morphTo();
     }
 
-    public function scopeAll($query)
-    {
-        return $query;
-    }
-
     /**
      * Get the active records
      * @method scopeActive
      *
      * @return   void
      */
-    public function scopeActive($query)
+    public function scopeActive( Builder $query )
     {
         return $query->where('expires_at','>',Carbon::now());
     }

@@ -3,6 +3,7 @@
 namespace App;
 
 use Carbon;
+use Ingenious\Eloquence\Builder;
 
 class ServerDisk extends Model
 {
@@ -39,7 +40,7 @@ class ServerDisk extends Model
    * @method scopeAll
    * @return [type]   [description]
    */
-  public function scopeAll($query)
+  public function scopeAll( Builder $query )
   {
     return $query->active();
   }
