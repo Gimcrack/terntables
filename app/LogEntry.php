@@ -3,6 +3,7 @@
 namespace App;
 
 use Carbon;
+use Ingenious\Eloquence\Builder;
 
 class LogEntry extends Model
 {	
@@ -62,25 +63,30 @@ class LogEntry extends Model
 	* @method scopeAll
 	* @return [type]   [description]
 	*/
-	public function scopeAll( $query )
+	public function scopeAll( Builder $query )
 	{
-		return $query->whereDoesntHave('loggable', function($q) {
-            $q->where('loggable_type','App\Application')
-               ->where('loggable_id',Application::where('name','IT Dashboard')->first()->id);
-        })->latest();
+		return $query->where('channel','dashboard');
 	}
+
+    /**
+     * Order By Level
+     * @method scopeByLevel
+     *
+     * @return   void
+     */
+    public function scopeByLevel(Builder $query )
+    {
+        return $query->orderBy($level,'DESC');
+    }
 
     /**
     * Scope Dashboard
     * @method scopeDashboard
     * @return [type]   [description]
     */
-    public function scopeDashboard( $query )
+    public function scopeDashboard(Builder $query )
     {
-        return $query->whereHas('loggable', function($q) {
-            $q->where('loggable_type','App\Application')
-               ->where('loggable_id',Application::where('name','IT Dashboard')->first()->id);
-        })->latest();
+        return $query->where('channel','production');
     }
  
     /**
@@ -90,7 +96,7 @@ class LogEntry extends Model
      *
      * @return     <type>  ( description_of_the_return_value )
      */
-    public function scopeRecent($query)
+    public function scopeRecent( Builder $query )
     {
         return $query->where('reported_at','>',date('Y-m-d H:i:s', strtotime("-48 hours")));
     }
@@ -102,7 +108,7 @@ class LogEntry extends Model
      *
      * @return     <type>  ( description_of_the_return_value )
      */
-    public function scopeNotDashboard($query)
+    public function scopeNotDashboard( Builder $query )
     {
         return $query
             ->where('loggable_type','<>','App\Application')
@@ -116,9 +122,9 @@ class LogEntry extends Model
      *
      * @return     <type>  ( description_of_the_return_value )
      */
-    public function scopeImportant($query)
+    public function scopeImportant( Builder $query )
     {
-        return $query->where('level','>',300)->latest();
+        return $query->where('level','>',300);
     }
 
     /**
@@ -128,12 +134,11 @@ class LogEntry extends Model
      *
      * @return     <type>  ( description_of_the_return_value )
      */
-    public function scopeWeekly( $query )
+    public function scopeWeekly( Builder $query )
     {
         return $query
             ->notDashboard()
-            ->whereIn('level_name',['INFO','DEBUG'])
-            ->orderBy('level','DESC');
+            ->whereIn('level_name',['INFO','DEBUG']);
     }
 
     /**
@@ -143,12 +148,11 @@ class LogEntry extends Model
      *
      * @return     <type>  ( description_of_the_return_value )
      */
-    public function scopeDaily( $query )
+    public function scopeDaily( Builder $query )
     {
         return $query
             ->notDashboard()
-            ->whereIn('level_name',['WARNING','NOTICE'])
-            ->orderBy('level','DESC'); 
+            ->whereIn('level_name',['WARNING','NOTICE']);
     } 
 
     /**
@@ -158,12 +162,11 @@ class LogEntry extends Model
      *
      * @return     <type>  ( description_of_the_return_value )
      */
-    public function scopeFifteen( $query )
+    public function scopeFifteen( Builder $query )
     {
         return $query
             ->notDashboard()
-            ->whereIn('level_name',['ERROR','CRITICAL'])
-            ->orderBy('level','DESC'); 
+            ->whereIn('level_name',['ERROR','CRITICAL']);
     } 
 
     /**
@@ -171,7 +174,7 @@ class LogEntry extends Model
      *
      * @param      <type>  $query  The query
      */
-    public function scopeUnnotified($query)
+    public function scopeUnnotified( Builder $query )
     {
         return $query->whereNull('notified_at');
     }

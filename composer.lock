@@ -1567,12 +1567,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Gimcrack/terntables.js.git",
-                "reference": "54ff5d0baf419f25ef0697ca4e05595f41cfb59d"
+                "reference": "f1e3458a8f4138e4832a78524865170c98eb753a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Gimcrack/terntables.js/zipball/54ff5d0baf419f25ef0697ca4e05595f41cfb59d",
-                "reference": "54ff5d0baf419f25ef0697ca4e05595f41cfb59d",
+                "url": "https://api.github.com/repos/Gimcrack/terntables.js/zipball/f1e3458a8f4138e4832a78524865170c98eb753a",
+                "reference": "f1e3458a8f4138e4832a78524865170c98eb753a",
                 "shasum": ""
             },
             "require": {
@@ -1596,7 +1596,7 @@
                 }
             ],
             "description": "AJAX CRUD framework http://terntables.com",
-            "time": "2016-07-12 00:36:42"
+            "time": "2016-08-02 18:56:47"
         },
         {
             "name": "ingenious/underscore",

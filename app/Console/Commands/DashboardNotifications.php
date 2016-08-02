@@ -74,6 +74,7 @@ class DashboardNotifications extends Command
         $logEntries = LogEntry::with('loggable')
             ->unnotified() // turn this off for testing
             ->$which()
+            ->byLevel()
             ->get()
             ->each( function( $logEntry ) {
                 $logEntry->didNotify();

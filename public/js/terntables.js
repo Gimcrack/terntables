@@ -21302,7 +21302,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
      * URL of JSON resource (grid data)
      * @type {String}
      */
-    url: jApp.routing.get(jApp.opts().runtimeParams.model), // jApp.prefixURL( jApp.opts().runtimeParams.table + '/json' ), 	// url of JSON resource
+    url: jApp.routing.get(jApp.opts().runtimeParams.model),
 
     /**
      * Database table name of grid data
@@ -21321,6 +21321,12 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
      * @type {String}
      */
     filter: '', // where clause for query
+
+    /**
+     * The order query scope to apply
+     * @type string
+     */
+    order: 'oldest',
 
     /**
      * Scope of the query
@@ -21468,6 +21474,38 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         'data-order': 2
       },
 
+      firstPage: {
+        type: 'button',
+        class: 'btn btn-success btn-firstPage',
+        icon: 'fa-angle-double-left',
+        label: '',
+        'data-order': 3
+      },
+
+      prevPage: {
+        type: 'button',
+        class: 'btn btn-success btn-prevPage',
+        icon: 'fa-angle-left',
+        label: '',
+        'data-order': 4
+      },
+
+      nextPage: {
+        type: 'button',
+        class: 'btn btn-success btn-nextPage',
+        icon: 'fa-angle-right',
+        label: '',
+        'data-order': 5
+      },
+
+      lastPage: {
+        type: 'button',
+        class: 'btn btn-success btn-lastPage',
+        icon: 'fa-angle-double-right',
+        label: '',
+        'data-order': 6
+      },
+
       /**
        * Header Filters Button
        * @type {Object}
@@ -21478,7 +21516,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         id: 'btn_toggle_header_filters',
         icon: 'fa-filter',
         label: 'Filter Rows',
-        'data-order': 3
+        'data-order': 7
       },
 
       /**
@@ -22035,6 +22073,45 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     }
   },
 
+  ".btn-firstPage": {
+    click: function click() {
+      var data = jApp.activeGrid.dataGrid.requestOptions.data;
+
+      data.page = 1;
+      jUtility.executeGridDataRequest();
+    }
+  },
+
+  ".btn-prevPage": {
+    click: function click() {
+      var data = jApp.activeGrid.dataGrid.requestOptions.data;
+
+      data.page = isNaN(data.page) || data.page < 2 ? 1 : data.page - 1;
+      jUtility.executeGridDataRequest();
+    }
+  },
+
+  ".btn-nextPage": {
+    click: function click() {
+      var data = jApp.activeGrid.dataGrid.requestOptions.data,
+          last_page = jApp.activeGrid.dataGrid.last_page;
+
+      data.page = isNaN(data.page) || data.page < 2 ? 2 : +data.page + 1;
+      data.page = data.page > last_page ? last_page : data.page;
+      jUtility.executeGridDataRequest();
+    }
+  },
+
+  ".btn-lastPage": {
+    click: function click() {
+      var data = jApp.activeGrid.dataGrid.requestOptions.data,
+          last_page = jApp.activeGrid.dataGrid.last_page;
+
+      data.page = last_page;
+      jUtility.executeGridDataRequest();
+    }
+  },
+
   ".btn-editOther": {
     click: jUtility.DOM.editOtherButtonHandler
   },
@@ -22104,6 +22181,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       data: {
         filter: jApp.aG().options.filter,
         scope: jApp.aG().options.scope || 'all',
+        order: jApp.aG().options.order || 'oldest',
         filterMine: 0
       }
     },

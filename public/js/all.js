@@ -15705,7 +15705,7 @@ $(function() {
 			helpText : "Most recent shown first"
 		},
 		refreshInterval : 22000,
-
+		order : 'latest',
 		tableBtns : {
 			custom : {
 				toggleUnimportant : {
@@ -15722,7 +15722,7 @@ $(function() {
 					icon : 'fa-toggle-off',
 					label : 'Toggle Dashboard Entries',
 					fn : 'toggleDashboard',
-					'data-order' : 100
+					'data-order' : 101
 				},
 			}
 		},
