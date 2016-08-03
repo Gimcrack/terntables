@@ -76,7 +76,7 @@ class LogEntry extends Model
      */
     public function scopeByLevel(Builder $query )
     {
-        return $query->orderBy($level,'DESC');
+        return $query->orderBy('level','DESC');
     }
 
     /**

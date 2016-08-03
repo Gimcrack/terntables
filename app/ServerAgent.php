@@ -28,6 +28,7 @@ class ServerAgent extends Model
 
     public function getNameAttribute()
     {
+        if ( $this->server == null ) return '';
         return $this->server->name;
     }
 
