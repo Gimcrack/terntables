@@ -13,7 +13,7 @@ class ServerServicesAddIdColumn extends Migration
     public function up()
     {
         Schema::table('server_service', function (Blueprint $table) {
-            $table->increments('id');
+            //$table->increments('id');
         });
     }
 
@@ -25,7 +25,7 @@ class ServerServicesAddIdColumn extends Migration
     public function down()
     {
         Schema::table('server_service', function (Blueprint $table) {
-            $table->dropColumn('id');
+            //$table->dropColumn('id');
         });
     }
 }
