@@ -50,25 +50,4 @@ class ServerController extends Controller
   {
     return view('bi.servers.health');
   }
-
-  /**
-   * Update all the server agents
-   * @method updateAllAgents
-   *
-   * @return   void
-   */
-  public function updateAllAgents()
-  {
-      $this->middleware('admin');
-
-      $max_version = Server::active()->lists('software_version')->max();
-
-      Server::whereNotNull('software_version')
-          ->where('software_version','<',$max_version)
-          ->where('status','Idle')
-          ->update(['status' => 'Update Software']);
-
-      return redirect(url( '/oit/updates' ));
-  }
-
 }

@@ -88,7 +88,7 @@
             <a href="{{ url('admin/serverAgents') }}"><i class="fa fa-gears fa-fw"></i> Server Agents</a>
           </li>
           <li>
-    				<a href="{{ url('oit/servers/agents/update')}}" ><i class="fa fa-check-square-o fa-fw"></i> Update All Agents</a>
+    				<a href="{{ url('admin/serverAgents/update')}}" ><i class="fa fa-check-square-o fa-fw"></i> Update All Agents</a>
     			</li>
   			@endif
 

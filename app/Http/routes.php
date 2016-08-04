@@ -23,7 +23,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth_admin'], function(){
   Route::resource('silencedNotifications',   'Admin\SilencedNotificationController', [ 'only' => [ 'index','show'] ]);
   Route::resource('notificationExemptions',   'Admin\NotificationExemptionController', [ 'only' => [ 'index','show'] ]);
   Route::resource('operatingSystems',   'Admin\OperatingSystemController', [ 'only' => [ 'index','show'] ]);
+  Route::get('serverAgents/update',     'Admin\ServerAgentController@updateAll' );
   Route::resource('serverAgents',  'Admin\ServerAgentController', [ 'only' => [ 'index','show'] ] );
+
 });
 
 /**
@@ -56,9 +58,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth_admin'], function(){
   */
  Route::group(["prefix" => 'oit', 'middleware' => 'auth'], function(){
    Route::get('servers/health',     'BI\ServerController@healthServers');
-   Route::get('servers/agents/update',     'BI\ServerController@updateAllAgents' );
    Route::resource('servers',       'BI\ServerController', [ 'only' => [ 'index','show'] ] );
-   Route::resource('serverDisks',       'BI\ServerDiskController', [ 'only' => [ 'index','show'] ] );
+   Route::resource('serverDisks',   'BI\ServerDiskController', [ 'only' => [ 'index','show'] ] );
    Route::resource('sql-servers',   'BI\DatabaseInstanceController', [ 'only' => [ 'index','show'] ] );
    Route::resource('applications',  'BI\ApplicationController', [ 'only' => [ 'index', 'show'] ] );
    Route::resource('databases',     'BI\DatabaseController', [ 'only' => [ 'index', 'show'] ] );
