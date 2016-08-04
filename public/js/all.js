@@ -17227,6 +17227,7 @@ $(function() {
 			new : false,
 			edit : false,
 			del : false,
+			ellipses : false,
 		},
 		tableBtns : {
 			custom : {
