@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
 use Input;
+use App\ServerAgent;
+use App\Http\Requests;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class ServerAgentController extends Controller
 {
@@ -32,5 +32,24 @@ class ServerAgentController extends Controller
   public $with = [
     'server'
   ];
+
+  /**
+   * Update all the server agents
+   * @method updateAllAgents
+   *
+   * @return   void
+   */
+  public function updateAll()
+  {
+      ServerAgent::all()
+      ->reject( function( ServerAgent $agent ) {
+        return ! $agent->server || $agent->server->inactive_flag;
+      })
+      ->each( function( ServerAgent $agent ) {
+        $agent->server->update(['status' => 'Update Software']);
+      });
+
+      return redirect(url( '/admin/serverAgents' ));
+  }
 
 }

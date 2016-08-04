@@ -23355,7 +23355,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       // perfect scrollbar
       $('.table-grid').perfectScrollbar('update');
 
-      jApp.opts().maxColWidth = +350 / 1920 * +$(window).innerWidth();
+      jApp.opts().maxColWidth = +500 / 1920 * +$(window).innerWidth();
 
       //visible columns
       var visCols = +$('.table-head .table-row.colHeaders').find('.table-header:visible').length - 1;
@@ -23556,6 +23556,10 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
       // .prop('disabled',false)
       // .find('i').removeClass('fa-spin').end();
       jUtility.updateAll();
+    }, // end fn
+
+    updateServerPagination: function updateServerPagination(total_pages) {
+      $('.btn-firstPage,.btn-prevPage,.btn-nextPage,.btn-lastPage').toggle(total_pages > 1);
     }, // end fn
 
     /**
@@ -25622,6 +25626,8 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     //jUtility.DOM.buildLnkMenu( jApp.opts().withSelectedBtns, jApp.aG().DOM.$withSelectedMenu );
 
     jUtility.DOM.attachRowMenu();
+
+    jUtility.DOM.updateServerPagination(jApp.activeGrid.dataGrid.last_page);
   }, // end fn
 
   /**
