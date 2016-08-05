@@ -42,6 +42,7 @@ class DashboardServerCheckDisks extends Command
     protected $ignored = [
       'DSJCOMM1' => '*',
       'webdev' => '*',
+      'DSJ-VSA' => '*'
     ];
 
     /**
