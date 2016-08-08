@@ -41,7 +41,6 @@ class DashboardServerCheckDisks extends Command
      */
     protected $ignored = [
       'DSJCOMM1' => '*',
-      'webdev' => '*',
       'DSJ-VSA' => '*'
     ];
 
@@ -110,17 +109,18 @@ class DashboardServerCheckDisks extends Command
      */
     private function ignore( ServerDisk $disk )
     {
-        return ( !! $disk->inactive_flag || ! $disk->server || !! $disk->server->inactive_flag || $this->is_ignored_server($disk->server) );
+        return ( !! $disk->inactive_flag || ! $disk->server || !! $disk->server->inactive_flag || $this->isIgnored($disk) );
     }
 
     /**
      * Determines if ignored server.
      *
-     * @param      Server  $server  The server
+     * @param      ServerDisk  $disk  The disk
      */
-    private function is_ignored_server( Server $server )
+    private function isIgnored( ServerDisk $disk )
     {
-        return isset( $this->ignored[$server->name] );
+        $server = strtoupper($disk->server->name);
+        return in_array($server, $this->ignored);
     }
 
     /**
