@@ -120,7 +120,7 @@ class DashboardServerCheckDisks extends Command
     private function isIgnored( ServerDisk $disk )
     {
         $server = strtoupper($disk->server->name);
-        return in_array($server, $this->ignored);
+        return in_array($server, $this->ignored) || in_array($server, array_keys($this->ignored));
     }
 
     /**
