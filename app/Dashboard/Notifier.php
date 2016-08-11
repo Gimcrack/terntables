@@ -126,7 +126,7 @@ class Notifier {
      *
      * @return     bool
      */
-    public static function exceedsProductionThreshold(LogEntry $logEngry)  
+    public static function exceedsProductionThreshold(LogEntry $logEntry)  
     {
       if ( ! $logEntry->loggable->production_flag ) return false;
 

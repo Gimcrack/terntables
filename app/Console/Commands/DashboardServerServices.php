@@ -35,7 +35,7 @@ class DashboardServerServices extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Check services to see if any are offline or have not checked in recently';
 
     /**
      * Create a new command instance.
