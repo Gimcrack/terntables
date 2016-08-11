@@ -8,22 +8,22 @@ class ServerAgent extends Model
 {
 
     protected $fillable = [
-        'server_id',
-        'status',
-        'version'
+    'server_id',
+    'status',
+    'version'
     ];
 
     protected $appends = [
-        'identifiable_name',
-        'updated_at_for_humans',
-        'name'
+    'identifiable_name',
+    'updated_at_for_humans',
+    'name'
     ];
 
     protected $searchableColumns = [
-        'server.name' => 80,
-        'status' => 50,
-        'version' => 20,
-        'server.status' => 10,
+    'server.name' => 80,
+    'status' => 50,
+    'version' => 20,
+    'server.status' => 10,
     ];
 
     public function getNameAttribute()
@@ -41,6 +41,20 @@ class ServerAgent extends Model
     public function server()
     {
         return $this->belongsTo(Server::class);
+    }
+
+    /**
+    * A server agent can have multiple notifications
+    * @method notifications
+    * @return [type]        [description]
+    */
+    public function notifications()
+    {
+        if ( ! $this->server || ! $this->server->owner )  return collect([]);
+        
+        return Notification::where('group_id', $this->server->owner->id )
+         ->where('notifications_enabled','<>','None')
+         ->get();
     }
 
     /**

@@ -17372,7 +17372,13 @@ $(function() {
 		templates : { 				// html template functions
 
 			server_name : function(val) {
-				var r = jApp.activeGrid.currentRow;
+				var r = jApp.activeGrid.currentRow,
+					server = r.server;
+
+				if ( r.server_id == null || r.server_id < 1 )
+				{
+					return "";
+				}
 
 				return _.nameButton( r.server.name,  jApp.opts().gridHeader.icon ) + _.getFlag(r.server.production_flag, 'Prod', 'Test', 'primary','success');
 			},

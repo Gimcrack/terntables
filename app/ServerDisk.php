@@ -65,6 +65,19 @@ class ServerDisk extends Model
     return $this->belongsTo(Server::class);
   }
 
+    /**
+    * A serverDisk can have multiple notifications
+    * @method notifications
+    * @return [type]        [description]
+    */
+    public function notifications()
+    {
+        if ( ! $this->server || ! $this->server->owner )  return collect([]);
+        
+        return Notification::where('group_id', $this->server->owner->id )
+         ->where('notifications_enabled','<>','None')
+         ->get();
+    }
 
   /**
    * Get disks with <20GB and <5% free space

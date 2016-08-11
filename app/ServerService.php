@@ -76,6 +76,20 @@ class ServerService extends Model
     }
 
     /**
+    * A server service can have multiple notifications
+    * @method notifications
+    * @return [type]        [description]
+    */
+    public function notifications()
+    {
+        if ( ! $this->server || ! $this->server->owner )  return collect([]);
+        
+        return Notification::where('group_id', $this->server->owner->id )
+         ->where('notifications_enabled','<>','None')
+         ->get();
+    }
+
+    /**
      * A ServerService belongs to one service
      *
      * @return     <type>  ( description_of_the_return_value )
