@@ -32,6 +32,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         if ( app()->isLocal() ) return false;
+        if ( ! config('app.run_commands') ) return false;
 
         $schedule->command('dashboard:serverHealth')
                  ->everyFiveMinutes();

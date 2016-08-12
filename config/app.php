@@ -17,6 +17,8 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+    'run_commands' => env('APP_COMMANDS',true),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL
