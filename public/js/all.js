@@ -17280,6 +17280,19 @@ $(function() {
 				},
 				'data-order' : 100
 			},
+			stopSelected : {
+				'data-multiple' : true,
+				'data-permission' : 'update_enabled',
+				class: 'btn btn-primary',
+				type : 'button',
+				icon : 'fa-stop',
+				label : 'Stop Agent Service',
+				fn : function(e) {
+					e.preventDefault();
+					jApp.activeGrid.fn.markServer({ 'status' : 'Stop Agent'});
+				},
+				'data-order' : 100
+			},
 			restartSelected : {
 				'data-multiple' : true,
 				'data-permission' : 'update_enabled',
