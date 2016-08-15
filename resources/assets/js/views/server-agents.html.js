@@ -176,6 +176,11 @@
 			server_status : function(val) {
 				var r = jApp.activeGrid.currentRow;
 
+				if ( r.server_id == null || r.server_id < 1 )
+				{
+					return "";
+				}
+
 				return r.server.status + ' <em>' + r.server.updated_at_for_humans + '</em>';
 			},
 
