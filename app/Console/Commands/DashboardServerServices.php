@@ -235,6 +235,10 @@ class DashboardServerServices extends Command
             '*'
         ], 
 
+        'New World Logos Scheduling Service' => [
+            '*'
+        ],
+
         'Virtual Disk' => [
             '*'
         ],
