@@ -235,7 +235,7 @@ class DashboardServerServices extends Command
             '*'
         ], 
 
-        'New World Logos Scheduling Service' => [
+        'NWS Logos Automated Import' => [
             '*'
         ],
 
