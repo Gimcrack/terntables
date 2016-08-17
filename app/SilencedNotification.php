@@ -38,7 +38,18 @@ class SilencedNotification extends Model
      */
     public function getServerAttribute()
     {
-        return $this->loggable->server ?: null;
+
+        if ( $this->loggable_type == 'App\Server' )
+        {
+            return $this->loggable;
+        }
+
+        if ( !! $this->loggable && !! $this->loggable->server )
+        {
+            return $this->loggable->server;
+        }
+
+        return null;
     }
 
     /**
