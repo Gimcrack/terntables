@@ -112,6 +112,11 @@ class ApiController extends Controller
 
       $models = ( !! $q ) ? $model_class::search( $q )->with($with) : $model_class::with($with);
 
+      dd( $models
+                  ->$scope()
+                  ->$order()
+                  ->whereRaw($filter)->toSql() );
+
       $results = $models
                   ->$scope()
                   ->$order()

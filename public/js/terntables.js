@@ -21506,6 +21506,14 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         'data-order': 6
       },
 
+      collapseText: {
+        type: 'button',
+        class: 'btn btn-success btn-collapseText btn-toggle active',
+        icon: 'fa-ellipsis-h',
+        label: 'Collapse Text',
+        'data-order': 7
+      },
+
       /**
        * Header Filters Button
        * @type {Object}
@@ -21516,7 +21524,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
         id: 'btn_toggle_header_filters',
         icon: 'fa-filter',
         label: 'Filter Rows',
-        'data-order': 7
+        'data-order': 8
       },
 
       /**
@@ -22109,6 +22117,14 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
 
       data.page = last_page;
       jUtility.executeGridDataRequest();
+    }
+  },
+
+  ".btn-collapseText": {
+    click: function click() {
+      jApp.opts().toggles.ellipses = !jApp.opts().toggles.ellipses;
+      $(this).toggleClass('active', jApp.opts().toggles.ellipses);
+      jUtility.DOM.refreshGrid();
     }
   },
 
@@ -25628,6 +25644,7 @@ function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.const
     jUtility.DOM.attachRowMenu();
 
     jUtility.DOM.updateServerPagination(jApp.activeGrid.dataGrid.last_page);
+    $(".btn-collapseText").toggleClass('active', jApp.opts().toggles.ellipses);
   }, // end fn
 
   /**
