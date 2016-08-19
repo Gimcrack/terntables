@@ -2,13 +2,14 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\LogEntry;
-use App\Notification;
+use DB;
 use Notifier;
 use Exception;
-
+use App\LogEntry;
+use Carbon;
+use App\Notification;
 use App\Jobs\NotifierMail;
+use Illuminate\Console\Command;
 
 class DashboardNotifications extends Command
 {
@@ -71,22 +72,40 @@ class DashboardNotifications extends Command
      */
     private function digest($which = 'fifteen')
     {
-        $logEntries = LogEntry::with('loggable')
-            ->unnotified() // turn this off for testing
-            ->$which()
-            ->byLevel()
-            ->get()
-            ->each( function( $logEntry ) {
-                $logEntry->didNotify();
+        $logEntries = collect( DB::table('vw_log_entries')
+            ->whereNull('notified_at') // turn this off for testing
+            ->where('loggable_type','<>','App\Application')
+            ->where('loggable_id','<>',9)
+            ->where( function($q) use ($which) {
+                switch($which) {
+                    case 'fifteen' : return $q->whereIn('level_name',['ERROR','CRITICAL']);
+                    case 'daily' : return $q->whereIn('level_name',['WARNING','NOTICE']);
+                    case 'weekly' : return $q->whereIn('level_name',['INFO','DEBUG']);
+                }
             })
-            ->reject( function( $logEntry ) {
-                return $logEntry->isSilenced();
+            ->orderBy('level','DESC')
+            ->get()
+        );
+            
+        LogEntry::whereNull('notified_at') 
+            ->where('loggable_type','<>','App\Application')
+            ->where('loggable_id','<>',9)
+            ->where( function($q) use ($which) {
+                switch($which) {
+                    case 'fifteen' : return $q->whereIn('level_name',['ERROR','CRITICAL']);
+                    case 'daily' : return $q->whereIn('level_name',['WARNING','NOTICE']);
+                    case 'weekly' : return $q->whereIn('level_name',['INFO','DEBUG']);
+                }
+            })->update(['notified_at' => Carbon::now()] );
+
+        $logEntries->reject( function( $logEntry ) {
+                return LogEntry::find($logEntry->id)->isSilenced();
             })
             ->unique( function($logEntry) {
                 return $logEntry->message . $logEntry->loggable_type . $logEntry->loggable_id;
             })
             ->groupBy( function( $logEntry ) {
-                return $logEntry->loggable->group_id;
+                return $logEntry->group_id;
             })
             ->each( function( $logEntries, $group_id ) {
                 $notifications = Notification::where('group_id',$group_id)->get();
