@@ -126,7 +126,8 @@ class ServerService extends Model
     {
         return $query
             ->active()
-            ->where('updated_at','<', date('Y-m-d', strtotime("-20 minutes")) );
+            ->where('updated_at','<', date('Y-m-d', strtotime("-30 minutes")) )
+            ->where('updated_at','>', date('Y-m-d', strtotime("-40 minutes")) );
     }
 
     /**
