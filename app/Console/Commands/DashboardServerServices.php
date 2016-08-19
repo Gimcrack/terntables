@@ -105,10 +105,10 @@ class DashboardServerServices extends Command
      *
      * @param      ServerService  $service  The service
      */
-    private function log( ServerService $service )
+    private function log( ServerService $service, $message = null )
     {
         $level = $this->getLevel($service);
-        $message = $this->getMessage($service);
+        $message = $this->getMessage($service, $message);
 
         Logger::$level( $message, 'App\ServerService', $service->id );
     }
@@ -118,9 +118,10 @@ class DashboardServerServices extends Command
      *
      * @param      ServerService  $service  The service
      */
-    private function getMessage( ServerService $service )
+    private function getMessage( ServerService $service, $message = null )
     {
-        return sprintf("Service Offline On [%s] - %s",
+        return sprintf("%s On [%s] - %s",
+            $message ?: "Service Offline",
             $service->server->name,
             $service->name
         );
