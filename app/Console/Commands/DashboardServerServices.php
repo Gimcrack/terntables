@@ -256,6 +256,10 @@ class DashboardServerServices extends Command
             '*'
         ],
 
+        'Volume Shadow Copy' => [
+            '*'
+        ],
+
         'Web Management Service' => [
             'actions2'
         ],
