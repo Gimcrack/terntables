@@ -23,7 +23,8 @@ table tr:nth-child(odd) {
         <th>Severity</th>
         <th>Source</th>
         <th>Message</th>
-        <th>Reported At</th>
+        <th>Last Reported At</th>
+        <th>Entry Count</th>
     </tr>
     @each('emails.logEntry',$logEntries,'logEntry' )
 </table>
