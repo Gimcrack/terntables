@@ -3,10 +3,11 @@
 namespace App\Console\Commands;
 
 use DB;
+use Log;
+use Carbon;
 use Notifier;
 use Exception;
 use App\LogEntry;
-use Carbon;
 use App\Notification;
 use App\Jobs\NotifierMail;
 use Illuminate\Console\Command;
@@ -48,6 +49,12 @@ class DashboardNotifications extends Command
         return $this->$which();
     }
 
+    /**
+     * Mail out the notifications for the logentries
+     *
+     * @param      <type>  $notifications  The notifications
+     * @param      <type>  $logEntries     The log entries
+     */
     private function mail($notifications, $logEntries)
     {
         // send the mail messages
@@ -56,9 +63,11 @@ class DashboardNotifications extends Command
             return in_array($notification->notifications_enabled, ['Both','Email']);
           })
           ->each( function( $notification ) use ($logEntries) {
+            Log::debug('Sending notifications to '. $notification->email);
+
             dispatch( new NotifierMail([
                 'emails.notificationDigest'
-                ,[ 'logEntries' => $logEntries ]
+                ,[ 'logEntries' => $logEntries, 'which' => $this->argument('which') ]
                 ,$notification->email
                 ,'IT Dashboard Notifications'
             ]) );
@@ -75,10 +84,9 @@ class DashboardNotifications extends Command
         $logEntries = collect( DB::table('vw_log_entries')
             ->whereNull('notified_at') // turn this off for testing
             ->where('loggable_type','<>','App\Application')
-            ->where('loggable_id','<>',9)
             ->where( function($q) use ($which) {
                 switch($which) {
-                    case 'fifteen' : return $q->whereIn('level_name',['ERROR','CRITICAL']);
+                    case 'fifteen' : return $q->whereIn('level_name',['ERROR','CRITICAL','ALERT','EMERGENCY']);
                     case 'daily' : return $q->whereIn('level_name',['WARNING','NOTICE']);
                     case 'weekly' : return $q->whereIn('level_name',['INFO','DEBUG']);
                 }
@@ -89,7 +97,6 @@ class DashboardNotifications extends Command
             
         LogEntry::whereNull('notified_at') 
             ->where('loggable_type','<>','App\Application')
-            ->where('loggable_id','<>',9)
             ->where( function($q) use ($which) {
                 switch($which) {
                     case 'fifteen' : return $q->whereIn('level_name',['ERROR','CRITICAL','ALERT','EMERGENCY']);
@@ -131,7 +138,7 @@ class DashboardNotifications extends Command
     }
 
     /**
-     * Send a digest of logged ERROR and ALERT events
+     * Send a digest of logged ERROR and ALERT and CRITICAL and EMERGENCY events
      */
     private function fifteen()
     {
