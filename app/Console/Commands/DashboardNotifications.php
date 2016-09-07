@@ -92,7 +92,7 @@ class DashboardNotifications extends Command
             ->where('loggable_id','<>',9)
             ->where( function($q) use ($which) {
                 switch($which) {
-                    case 'fifteen' : return $q->whereIn('level_name',['ERROR','CRITICAL']);
+                    case 'fifteen' : return $q->whereIn('level_name',['ERROR','CRITICAL','ALERT','EMERGENCY']);
                     case 'daily' : return $q->whereIn('level_name',['WARNING','NOTICE']);
                     case 'weekly' : return $q->whereIn('level_name',['INFO','DEBUG']);
                 }
