@@ -12,6 +12,7 @@
 	{	
 		model : 'LogEntry',
 		columnFriendly : 'reported_at',
+		filter : 'notified_at is null',
 		toggles : {
 			new : false,
 			edit : false,
@@ -42,6 +43,15 @@
 					fn : 'toggleDashboard',
 					'data-order' : 101
 				},
+				toggleNotified : {
+					type : 'button',
+					class : 'btn btn-success btn-toggle btn-toggleNotified',
+					icon : 'fa-toggle-off',
+					label : 'Toggle Notified Entries',
+					fn : 'toggleNotified',
+					'data-order' : 102
+				},
+
 			}
 		},
 
@@ -94,6 +104,20 @@
 
 				$('.btn-toggleUnimportant').removeClass('active')
 					.find('i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+
+				$(this).toggleClass('active')
+					.find('i').toggleClass('fa-toggle-on fa-toggle-off');
+			},
+
+			toggleNotified : function() {
+				var temp = jApp.activeGrid.temp, 
+					data = jApp.activeGrid.dataGrid.requestOptions.data;
+
+				temp.toggleNotified = ( !! temp.toggleNotified );
+
+				data.filter = ( temp.toggleNotified ) ? '' : 'notified_at is null';
+
+				jUtility.executeGridDataRequest();
 
 				$(this).toggleClass('active')
 					.find('i').toggleClass('fa-toggle-on fa-toggle-off');
