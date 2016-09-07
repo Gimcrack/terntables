@@ -12,10 +12,18 @@ table tr:nth-child(odd) {
 }
 </style>
 <!--<![endif]-->
+
 <div style="font-family:'Calibri, Arial, sans-serif', background:#fcf8e3; ">
 
 <h1>MSB IT Dashboard</h1>
 <h2>Notification Digest</h2>
+@if( $which == 'fifteen' )
+<h3>From last 15 minutes</h3>
+@elseif( $which == 'daily' )
+<h3>From last day</h3>
+@else
+<h3>From last week</h3>
+@endif
 
 @if( $logEntries->count() )
 <table style="width:100%; border:1px solid #bce8f1; color:#31708f; border-radius:3px; padding:15px;">

@@ -26,7 +26,7 @@ class Notifier {
 
       foreach( $to as $recipient )
       {
-        Mail::send($view, $data , function($message) use ($recipient, $subject, $from) {
+        Mail::send($view, $data, function($message) use ($recipient, $subject, $from) {
           $message->to($recipient)->from($from)->subject($subject);
         });
       }
