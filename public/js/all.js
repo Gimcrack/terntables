@@ -15795,7 +15795,7 @@ $(function() {
 				var temp = jApp.activeGrid.temp, 
 					data = jApp.activeGrid.dataGrid.requestOptions.data;
 
-				temp.toggleNotified = ( !! temp.toggleNotified );
+				temp.toggleNotified = ( !!! temp.toggleNotified );
 
 				data.filter = ( temp.toggleNotified ) ? '' : 'notified_at is null';
 
