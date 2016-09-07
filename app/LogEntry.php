@@ -124,7 +124,7 @@ class LogEntry extends Model
      */
     public function scopeImportant( Builder $query )
     {
-        return $query->where('level','>',300);
+        return $query->notDashboard()->where('level','>',300);
     }
 
     /**
