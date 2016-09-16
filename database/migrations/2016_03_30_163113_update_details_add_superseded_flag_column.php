@@ -24,6 +24,8 @@ class UpdateDetailsAddSupersededFlagColumn extends Migration
      */
     public function down()
     {
+        $this->dropDefault('update_details', 'superseded_flag');
+        
         Schema::table('update_details', function (Blueprint $table) {
             $table->dropColumn('superseded_flag');
         });

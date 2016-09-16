@@ -68,7 +68,26 @@ class DashboardServerDiskHealth extends Command
      */
     private function log(ServerDisk $disk)
     {
+        $level = $this->getLevel( $disk->updated_at );
         Logger::error( $this->getMessage($disk) , 'App\ServerDisk', $disk->id);
+    }
+
+    /**
+     * Get the severity of the issue
+     * @method getLevel
+     *
+     * @return   string
+     */
+    private function getLevel($last_checkin)
+    {
+        $diff = Carbon::now()->diffInMinutes( Carbon::parse($last_checkin) );
+
+        switch($diff) {
+            case $diff < 20 : return 'error';
+            case $diff >= 20 && $diff < 40 : return 'critical';
+            case $diff >= 40 && $diff < 60 : return 'alert';
+            case $diff >= 60 : return 'emergency';
+        }
     }
 
     /**
@@ -101,7 +120,7 @@ class DashboardServerDiskHealth extends Command
     {
         return sprintf("Possible Offline Disk on [%s]: Last checkin: %s", 
             ( $disk->server != null ) ? $disk->server->name : '',
-            (new Carbon($disk->updated_at))->diffForHumans() 
+            Carbon::parse($disk->updated_at)->format('g:i A, Y-m-d') 
         );
     }
 }

@@ -13,6 +13,7 @@ class CreateServerServiceTable extends Migration
     public function up()
     {
         Schema::create('server_service', function (Blueprint $table) {
+            $table->increments('id');
             $table->unsignedInteger('service_id');
             $table->unsignedInteger('server_id');
             $table->string('status');
