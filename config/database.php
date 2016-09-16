@@ -47,9 +47,15 @@ return [
     'connections' => [
 
         'test' => [
+            // 'driver'   => 'sqlsrv',
+            // 'host'     => env('DB_HOST_TESTING', 'localhost'),
+            // 'database' => env('DB_DATABASE_TESTING', 'forge'),
+            // 'username' => env('DB_USERNAME_TESTING', 'forge'),
+            // 'password' => env('DB_PASSWORD_TESTING', ''),
+            // 'charset'  => 'utf8',
+            // 'prefix'   => '',
             'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix' => ''
         ],
 
         'sqlite' => [

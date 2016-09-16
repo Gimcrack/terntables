@@ -1,11 +1,10 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
-    use DatabaseMigrations;
-
     /**
      * The base URL to use while testing the application.
      *
@@ -14,13 +13,19 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     protected $baseUrl = 'http://localhost';
 
     /**
+     * The database connection to transact
+     */
+    public $connectionsToTransact = ['test'];
+
+    /**
      * Sets Up.
      */
     public function setUp()
     {
         parent::setUp();
 
-        $this->runDatabaseMigrations();
+        //$this->runDatabaseMigrations();
+        //$this->beginDatabaseTransaction();
     }
 
     /**

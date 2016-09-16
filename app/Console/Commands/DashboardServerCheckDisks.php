@@ -9,6 +9,9 @@ use Logger;
 
 class DashboardServerCheckDisks extends Command
 {
+    /**
+     * The level to assign for test servers
+     */
     const TESTING_LEVEL = 'notice';
 
     /**
@@ -137,7 +140,7 @@ class DashboardServerCheckDisks extends Command
             number_format($disk->free_gb,0),
             number_format($disk->size_gb,0),
             number_format($disk->percent_free*100,2),
-            $disk->updated_at->diffForHumans()
+            Carbon::parse($disk->updated_at)->format('g:i A, Y-m-d')
         );
     }
 
@@ -154,7 +157,8 @@ class DashboardServerCheckDisks extends Command
         }
 
         $percent_free = $disk->percent_free;
-        switch(true)
+
+        switch( $percent_free )
         {
             case $percent_free < static::EMERGENCY    : return 'emergency';
             case $percent_free < static::ALERT        : return 'alert';

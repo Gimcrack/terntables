@@ -8,7 +8,7 @@ use App\User;
 
 abstract class ApiTest extends TestCase
 {
-    //use DatabaseTransactions;
+    use DatabaseMigrations;
     //use WithoutMiddleware;
 
     /**
@@ -23,7 +23,6 @@ abstract class ApiTest extends TestCase
      * @var [type]
      */
     public $headers;
-
 
     /**
      * The class of the model to test: e.g. App\Person.
@@ -327,6 +326,9 @@ abstract class ApiTest extends TestCase
      */
     public function testDeleteModel()
     {
+      // login
+      $this->login();
+
       // create a model
       $this->test_dummy->save();
       $id = $this->test_dummy->id;
@@ -336,6 +338,9 @@ abstract class ApiTest extends TestCase
            ->seeJsonContainsTestDummyAttributes()
            ->seeTestDummyInDatabase()
            ->seeStatusCode(200);
+
+      // checkout the model
+      $this->test_dummy->checkoutToMe();
 
       // delete
       $this->delete("/{$this->model_short}/{$id}", [], $this->headers)

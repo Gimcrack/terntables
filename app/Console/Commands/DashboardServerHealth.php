@@ -55,9 +55,9 @@ class DashboardServerHealth extends Command
      */
     private function log(Server $server)
     {
-        $severity = $this->getSeverity( $server->last_checkin );
+        $level = $this->getLevel( $server->last_checkin );
 
-        Logger::$severity( $this->getMessage($server) , 'App\Server', $server->id);
+        Logger::$level( $this->getMessage($server) , 'App\Server', $server->id);
     }
 
     /**
@@ -68,25 +68,26 @@ class DashboardServerHealth extends Command
     private function getMessage(Server $server)
     {
         return sprintf("Last checkin at [%s on %s]. Server may be offline.", 
-            Carbon::parse($server->last_checkin)->format('G:i A'),
+            Carbon::parse($server->last_checkin)->format('g:i A'),
             Carbon::parse($server->last_checkin)->format('Y-m-d')
         );
     }
 
     /**
      * Get the severity of the issue
-     * @method getSeverity
+     * @method getLevel
      *
      * @return   string
      */
-    private function getSeverity($last_checkin)
+    private function getLevel($last_checkin)
     {
         $diff = Carbon::now()->diffInMinutes( Carbon::parse($last_checkin) );
 
         switch($diff) {
-            case $diff < 20 : return 'ERROR';
-            case $diff >= 20 && $diff < 40 : return 'CRITICAL';
-            case $diff >= 40 : return 'EMERGENCY';
+            case $diff < 20 : return 'error';
+            case $diff >= 20 && $diff < 40 : return 'critical';
+            case $diff >= 40 && $diff < 60 : return 'alert';
+            case $diff >= 60 : return 'emergency';
         }
     }
 

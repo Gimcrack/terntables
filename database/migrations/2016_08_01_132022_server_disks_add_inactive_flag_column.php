@@ -24,6 +24,8 @@ class ServerDisksAddInactiveFlagColumn extends Migration
      */
     public function down()
     {
+        $this->dropDefault('server_disks', 'inactive_flag');
+
         Schema::table('server_disks', function (Blueprint $table) {
             $table->dropColumn('inactive_flag');
         });
