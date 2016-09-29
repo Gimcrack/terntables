@@ -83,5 +83,20 @@ class DatabaseInstanceController extends ApiController
 
       return $dbi;
   }
+
+  /**
+   * Update server statuses
+   * @method markServers
+   * @return [type]      [description]
+   */
+  public function markServers()
+  {
+    $fillable = ['status'];
+    return $this->massUpdate( 
+        DatabaseInstance::whereIn('id',$this->getInputIds())->pluck('server_id')->all(), 
+        array_intersect_key( Input::all() , array_flip( $fillable ) ), 
+        Server::class 
+    );
+  }
   
 }

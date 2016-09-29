@@ -83,6 +83,7 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::patch('ServerDisk/_massUpdate',  'ServerDiskController@markServerDisks');
   Route::resource('ServerDisk',           'ServerDiskController');
 
+  Route::patch('DatabaseInstance/_massUpdate',  'DatabaseInstanceController@markServers');
   Route::any('DatabaseInstance/Server/{id}', 'DatabaseInstanceController@updateFromAgent');
   Route::resource('DatabaseInstance', 'DatabaseInstanceController', ['except' => 'delete'] );
 
