@@ -35,6 +35,13 @@ class DatabaseInstance extends Model
         'sql_version' => 20,
       ];
 
+    protected $casts = [
+        'min_memory' => 'int',
+        'max_memory' => 'int',
+        'total_memory' => 'int',
+        'processors' => 'int',
+    ];
+
     /**
      * An instance has one server
      */
