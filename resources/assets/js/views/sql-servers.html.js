@@ -112,8 +112,18 @@
 				},
 
 				memory : function() {
-					var r = jApp.activeGrid.currentRow;
-					return r.min_memory + '-' + r.max_memory + ' (' + r.total_memory + ')';
+					var r = jApp.activeGrid.currentRow,
+						os_min = 1024,
+						bg = '#80E02C';
+
+					if ( r.total_memory > 4096 && r.total_memory < 16384 ) os_min = 2048;
+					if ( r.total_memory >= 16384 ) os_min = 4096;
+
+					if ( ( r.total_memory - r.max_memory ) < os_min ) bg = '#d9534f';
+					if ( r.total_memory < r.max_memory ) bg = '#f0ad4e';
+					
+					return '<div style="padding: 0 6px; width:100%;height:100%;background:' + bg + '">' + 
+						r.min_memory + '-' + r.max_memory + ' (' + r.total_memory + ')</div>';
 				}
 
 			},
