@@ -4,6 +4,8 @@ namespace App;
 
 use Carbon;
 
+use Ingenious\Eloquence\Builder;
+
 class ServerAgent extends Model
 {
 
@@ -58,6 +60,19 @@ class ServerAgent extends Model
     }
 
     /**
+    * Get all the server agents that are active
+    * @method scopeAll
+    *
+    * @return   void
+    */
+    public function scopeAll(Builder $query)
+    {
+      return $query->whereHas('server', function(Builder $q) {
+            return $q->whereInactiveFlag(0);
+      });
+    }
+
+    /**
      * Get the outdated agents.
      *
      * @param      <type>  $query  The query
@@ -66,7 +81,7 @@ class ServerAgent extends Model
      */
     public function scopeOutdated($query)
     {
-        return $query->where('version','<',static::all()->lists('version')->max());
+        return $query->all()->where('version','<',static::all()->pluck('version')->max());
     }
 
     /**
@@ -83,6 +98,5 @@ class ServerAgent extends Model
         })
         ->where('updated_at','<', Carbon::now()->subMinutes(5) );
     }
-
 
 }
