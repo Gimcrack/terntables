@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Ingenious\Eloquence\Builder;
+
 class DatabaseInstance extends Model
 {
     protected $table = 'database_instances';
@@ -50,4 +52,17 @@ class DatabaseInstance extends Model
     {
         return $this->belongsTo(Group::class,'group_id');
     }
+
+    /**
+     * Get all active DatabaseInstance records
+     * @method scopeAll
+     *
+     * @return   Builder
+     */
+    public function scopeAll(Builder $query)
+    {
+        return $query->whereHas('server', function(Builder $q) {
+            return $q->whereInactiveFlag(0);
+        });
+    }   
 }
