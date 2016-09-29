@@ -18515,6 +18515,38 @@ $(function() {
 				edit : false,
 				del : false,
 			},
+			rowBtns : {
+				updateSelected : {
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					class: 'btn btn-primary',
+					type : 'button',
+					icon : 'fa-gears',
+					label : 'Update Sql Server Info...',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markServer({ 'status' : 'Refresh SQL Server'});
+					},
+					'data-order' : 100
+				},
+			},
+			fn : {
+				/**
+				 * Mark selected applications as inactive/active
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				markServer			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction(),
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
+			},
 			columns : [ 				// columns to query
 				"id",
 				"name",
@@ -18525,6 +18557,7 @@ $(function() {
 				"sql_version",
 				"memory",
 				"processors",
+				"server_status",
 				"updated_at_for_humans"
 			],
 			headers : [ 				// headers for table
@@ -18537,6 +18570,7 @@ $(function() {
 				"Version",
 				"Sql Ram Min-Max (OS Total)",
 				"Logical CPUs",
+				"Server Status",
 				"Updated"
 			],
 			templates : { 				// html template functions
@@ -18563,6 +18597,11 @@ $(function() {
 				server_name : function( val ) {
 					var r = jApp.activeGrid.currentRow;
 					return _.get('name', r.server, 'fa-building-o', 'Server');
+				},
+
+				server_status : function() {
+					var r = jApp.activeGrid.currentRow;
+					return r.server.status;
 				},
 
 				memory : function() {
