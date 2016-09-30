@@ -79,7 +79,7 @@ return [
         ],
 
         'Windows Modules Installer' => [
-            'dsjdc55'
+            '*'
         ],
     ],
 
