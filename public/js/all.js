@@ -18568,7 +18568,7 @@ $(function() {
 				"Sql Product",
 				"Edition",
 				"Version",
-				"Sql Ram Min-Max (OS Total)",
+				"Sql Ram (MB) Min-Max-Rec.Max (OS Avail/Total)",
 				"Logical CPUs",
 				"Server Status",
 				"Updated"
@@ -18607,16 +18607,31 @@ $(function() {
 				memory : function() {
 					var r = jApp.activeGrid.currentRow,
 						os_min = 1024,
-						bg = '#80E02C';
+						os_max = 2047,
+						rec = 0,
+						bg = '#80E02C',
+						os = r.total_memory - r.max_memory;
 
-					if ( r.total_memory > 4096 && r.total_memory < 16384 ) os_min = 2048;
-					if ( r.total_memory >= 16384 ) os_min = 4096;
+					switch (true) {
+						case ( r.total_memory <= 4096  ) : os_min = 1024; os_max = 2048; break;
+						case ( r.total_memory <= 16384 ) : os_min = 2048; os_max = 4096; break;
+						case ( r.total_memory > 16384 ) : os_min = 4096; os_max = r.total_memory/3; break;
+					}
 
-					if ( ( r.total_memory - r.max_memory ) <= os_min ) bg = '#f0ad4e';
+					// get the recommended amount for sql
+					rec = r.total_memory - os_min;
+
+					// determine if there is not enough ram for the OS
+					if ( ( r.total_memory - r.max_memory ) < os_min ) bg = '#f0ad4e';
+					
+					// determine if memory has not been configured
 					if ( r.total_memory <= r.max_memory ) bg = '#d9534f';
+
+					// determine if ram has been added and memory usage has not been reconfigured
+					if ( ( r.total_memory - r.max_memory ) > os_max ) bg = '#e2f04e'
 					
 					return '<div style="padding: 0 6px; width:100%;height:100%;background:' + bg + '">' + 
-						r.min_memory + '-' + r.max_memory + ' (' + r.total_memory + ')</div>';
+						r.min_memory + '-' + r.max_memory + '-' + rec + ' (' + os + '/' + r.total_memory + ')</div>';
 				}
 
 			},
