@@ -20,12 +20,19 @@ class ServerService extends Model
         'service_id',
         'server_id',
         'status',
-        'start_mode'
+        'start_mode',
+        'ignored_flag',
+        'command',
     ];
 
     protected $appends = [
         'identifiable_name',
-        'name'
+        'name',
+        'updated_at_for_humans',
+    ];
+
+    protected $casts = [
+        'ignored_flag' => 'int',
     ];
 
     /**
@@ -116,6 +123,7 @@ class ServerService extends Model
     {
         return $query
             ->active()
+            ->automatic()
             ->where('status','Stopped');
     }
 
@@ -139,7 +147,9 @@ class ServerService extends Model
      */
     public function scopeAutomatic($query)
     {
-        return $query->where('start_mode','auto');
+        return $query
+                ->active()
+                ->where('start_mode','auto');
     }
 
 }
