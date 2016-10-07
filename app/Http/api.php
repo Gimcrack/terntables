@@ -77,6 +77,9 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::any('Server/UpdateAgents',   'ServerController@updateAllAgents');
   Route::resource('Server',           'ServerController');
 
+  Route::patch('ServerService/_massUpdate',  'ServerServiceController@markServerServices');
+  Route::resource('ServerService',           'ServerServiceController');
+
   Route::patch('ServerAgent/_massUpdate',  'ServerAgentController@markServerAgents');
   Route::resource('ServerAgent',           'ServerAgentController');
 

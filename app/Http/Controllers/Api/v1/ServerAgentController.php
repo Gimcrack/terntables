@@ -46,7 +46,7 @@ class ServerAgentController extends ApiController
   public function markServerAgents()
   {
     $fillable = ['status'];
-    return $this->massUpdate( ServerAgent::whereIn('id',$this->getInputIds())->lists('server_id')->all(), array_intersect_key( Input::all() , array_flip( $fillable ) ), Server::class );
+    return $this->massUpdate( ServerAgent::whereIn('id',$this->getInputIds())->pluck('server_id')->all(), array_intersect_key( Input::all() , array_flip( $fillable ) ), Server::class );
   }
 
   

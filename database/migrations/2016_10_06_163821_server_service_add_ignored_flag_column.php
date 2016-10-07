@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class ServerDisksAddInactiveFlagColumn extends Migration
+class ServerServiceAddIgnoredFlagColumn extends Migration
 {
     /**
      * Run the migrations.
@@ -12,8 +12,9 @@ class ServerDisksAddInactiveFlagColumn extends Migration
      */
     public function up()
     {
-        Schema::table('server_disks', function (Blueprint $table) {
-            $table->boolean('inactive_flag')->default(0);
+        Schema::table('server_service', function (Blueprint $table) {
+            $table->boolean('ignored_flag')->default(0);
+            $table->string('command')->nullable();
         });
     }
 
@@ -24,10 +25,13 @@ class ServerDisksAddInactiveFlagColumn extends Migration
      */
     public function down()
     {
-        $this->dropDefault('server_disks', 'inactive_flag');
+        $this->dropDefault('server_service', 'ignored_flag');
 
-        Schema::table('server_disks', function (Blueprint $table) {
-            $table->dropColumn('inactive_flag');
+        Schema::table('server_service', function (Blueprint $table) {
+            
+
+            $table->dropColumn('ignored_flag');
+            $table->dropColumn('command');
         });
     }
 
