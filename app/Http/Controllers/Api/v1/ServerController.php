@@ -201,6 +201,18 @@ class ServerController extends ApiController
   }
 
   /**
+   * Update the services for the selected server
+   *  does not detach services that are not included 
+   *  in the data
+   */
+  public function updateIndividualServices($server_id, Request $request)
+  {
+    $this->dispatch( new UpdateServices( $server_id, $request, false ) );
+      
+    return $this->operationSuccessful();
+  }
+
+  /**
    * Update the status of the agent for the selected server
    * @method updateAgent
    *
