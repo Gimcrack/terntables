@@ -100,6 +100,19 @@
 				},
 				'data-order' : 100
 			},
+			refreshServices : {
+				'data-multiple' : true,
+				'data-permission' : 'update_enabled',
+				class: 'btn btn-primary',
+				type : 'button',
+				icon : 'fa-gears',
+				label : 'Refresh Services',
+				fn : function(e) {
+					e.preventDefault();
+					jApp.activeGrid.fn.markServer({ 'status' : 'Refresh Services'});
+				},
+				'data-order' : 100
+			},
 
 		},
 		fn : {
