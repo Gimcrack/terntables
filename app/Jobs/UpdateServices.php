@@ -24,15 +24,22 @@ class UpdateServices extends Job implements ShouldQueue
     protected $services;
 
     /**
+     * Whether to detach services that are not included with the data
+     */
+    protected $detach;
+
+    /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($server_id, $request)
+    public function __construct($server_id, $request, $detach = true)
     {
         $this->server = \App\Server::findOrFail($server_id);
 
         $this->services = collect( $request->all() );
+
+        $this->detach = $detach;
     }
 
     /**
@@ -57,7 +64,7 @@ class UpdateServices extends Job implements ShouldQueue
           ->keyBy('service_id')
           ->toArray();
           
-        $this->server->services()->sync( $services );
+        $this->server->services()->sync( $services, $this->detach );
     }
 
     /**
