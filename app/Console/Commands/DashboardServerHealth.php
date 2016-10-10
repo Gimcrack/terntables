@@ -42,10 +42,14 @@ class DashboardServerHealth extends Command
     {
       Server::lateCheckingIn()
         ->get()
-        ->each( function(Server $server)
-          {
+        ->reject( function( Server $server ) {
+            $server->fresh(); // get a fresh copy from the db
+            $diff = Carbon::now()->diffInMinutes( Carbon::parse($server->last_checkin) );
+            return ($diff < 15);
+        })
+        ->each( function(Server $server) {
             $this->log($server);
-          });
+        });
     }
 
     /**
