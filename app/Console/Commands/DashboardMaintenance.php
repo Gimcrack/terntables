@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Log;
 use Logger;
 use App\Server;
 use Carbon\Carbon;
