@@ -15999,6 +15999,14 @@ $(function() {
 						fn : 'toggleInactive',
 						'data-order' : 100
 					},
+					toggleExpired : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle',
+						label : 'Toggle Expired',
+						fn : 'toggleExpired',
+						'data-order' : 100
+					},
 				},
 			},
 			rowBtns : {
@@ -16011,7 +16019,7 @@ $(function() {
 							type : 'button',
 							fn : function(e) {
 									e.preventDefault();
-									jApp.activeGrid.fn.markMaintenanceWindow( { 'inactive_flag' : 1} );
+									jApp.activeGrid.fn.markMaintenanceWindow( { 'inactive_flag' : 1 } );
 							},
 							label : 'As Inactive'
 						},
@@ -16021,7 +16029,7 @@ $(function() {
 							type : 'button',
 							fn : function(e) {
 								e.preventDefault();
-								jApp.activeGrid.fn.markMaintenanceWindow({ 'inactive_flag' : 0})
+								jApp.activeGrid.fn.markMaintenanceWindow({ 'inactive_flag' : 0 })
 							},
 							label : 'As Not Inactive'
 						},
@@ -16080,7 +16088,7 @@ $(function() {
 				},
 
 				inactive_flag : function(val) {
-					return _.getFlag(!val);
+					return _.getFlag( !!! val);
 				},
 			},
 			fn : {
@@ -16106,10 +16114,14 @@ $(function() {
 				 * @return {[type]} [description]
 				 */
 				updateGridFilter : function() {
-					var filter = [], temp = jApp.activeGrid.temp;
+					var scope, temp = jApp.activeGrid.temp;
 
-					if (typeof temp.hideInactive !== 'undefined' && !!temp.hideInactive) {
-						filter.push('inactive_flag = 0');
+					if (typeof temp.hideInactive == 'undefined' || !!temp.hideInactive) {
+						scope = 'active';
+					}
+
+					if (typeof temp.showExpired !== 'undefined' && !!temp.showExpired ) {
+						scope = 'all';
 					}
 
 					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
@@ -16124,6 +16136,19 @@ $(function() {
 				toggleInactive : function( ) {
 					jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
 						? true : !jApp.activeGrid.temp.hideInactive;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+				
+				/**
+				 * Toggle inactive server visibility
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				toggleExpired : function( ) {
+					jApp.activeGrid.temp.showExpired = ( typeof jApp.activeGrid.temp.showExpired === 'undefined')
+						? true : !jApp.activeGrid.temp.showExpired;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
