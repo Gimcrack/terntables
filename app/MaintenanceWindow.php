@@ -18,6 +18,13 @@ class MaintenanceWindow extends Model
         'inactive_flag',
     ];
 
+    protected $casts = [
+        'approve_flag' => 'int',
+        'install_flag' => 'int',
+        'reboot_flag' => 'int',
+        'inactive_flag' => 'int',
+    ];
+
     /**
      * A MaintenanceWindow applies to one Group
      * @method group
