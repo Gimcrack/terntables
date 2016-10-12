@@ -111,7 +111,7 @@
 							type : 'button',
 							fn : function(e) {
 									e.preventDefault();
-									jApp.activeGrid.fn.markMaintenanceWindow( { 'inactive_flag' : 1} );
+									jApp.activeGrid.fn.markMaintenanceWindow( { 'inactive_flag' : 1 } );
 							},
 							label : 'As Inactive'
 						},
@@ -121,7 +121,7 @@
 							type : 'button',
 							fn : function(e) {
 								e.preventDefault();
-								jApp.activeGrid.fn.markMaintenanceWindow({ 'inactive_flag' : 0})
+								jApp.activeGrid.fn.markMaintenanceWindow({ 'inactive_flag' : 0 })
 							},
 							label : 'As Not Inactive'
 						},
@@ -180,7 +180,7 @@
 				},
 
 				inactive_flag : function(val) {
-					return _.getFlag(!val);
+					return _.getFlag( !!! val);
 				},
 			},
 			fn : {
