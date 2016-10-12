@@ -20,7 +20,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\DashboardServerDiskHealth::class,
         \App\Console\Commands\DashboardServerCheckDisks::class,
         \App\Console\Commands\DashboardServerServices::class,
-        \App\Console\Commands\DashboardNotifications::class
+        \App\Console\Commands\DashboardNotifications::class,
+        \App\Console\Commands\DashboardMaintenance::class
     ];
 
     /**
@@ -33,6 +34,9 @@ class Kernel extends ConsoleKernel
     {
         if ( app()->isLocal() ) return false;
         if ( ! config('app.run_commands') ) return false;
+
+        $schedule->command('dashboard:maintenance')
+                 ->everyFiveMinutes();
 
         $schedule->command('dashboard:serverHealth')
                  ->everyFiveMinutes();

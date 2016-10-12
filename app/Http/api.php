@@ -81,6 +81,9 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
   Route::patch('ServerService/_massUpdate',  'ServerServiceController@markServerServices');
   Route::resource('ServerService',           'ServerServiceController');
 
+  Route::patch('MaintenanceWindow/_massUpdate',  'MaintenanceWindowController@markMaintenanceWindows');
+  Route::resource('MaintenanceWindow',           'MaintenanceWindowController');
+
   Route::patch('ServerAgent/_massUpdate',  'ServerAgentController@markServerAgents');
   Route::resource('ServerAgent',           'ServerAgentController');
 

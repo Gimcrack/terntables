@@ -35,20 +35,26 @@
   			<a href="#"><i class="fa fa-desktop fa-fw"></i> OIT <span class="fa arrow"></span></a>
   			<ul class="nav nav-second-level">
           @if( Auth::user()->checkAccess('Outage.read') )
-          <li>
+          <!-- <li>
             <a href="{{ url('oit/outages') }}"><i class="fa fa-power-off fa-fw"></i> Outages</a>
-          </li>
+          </li> -->
           @endif
 
           @if( Auth::user()->checkAccess('OutageTaskDetail.read') )
-          <li>
+          <!-- <li>
             <a href="{{ url('oit/outageTasks') }}"><i class="fa fa-check-square-o fa-fw"></i> Outage Tasks</a>
-          </li>
+          </li> -->
           @endif
 
           @if( Auth::user()->checkAccess('OutageTask.read') )
-          <li>
+          <!-- <li>
             <a href="{{ url('oit/taskTemplates') }}"><i class="fa fa-file-text-o fa-fw"></i> Outage Templates</a>
+          </li> -->
+          @endif
+
+          @if( Auth::user()->checkAccess('MaintenanceWindow.read') )
+          <li>
+            <a href="{{ url('oit/maintenanceWindows') }}"><i class="fa fa-windows fa-fw"></i> Maintenance</a>
           </li>
           @endif
 
