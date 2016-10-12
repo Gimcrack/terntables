@@ -125,6 +125,17 @@ class Server extends Model
   }
 
   /**
+   * Get servers belonging to a certain group
+   * @method scopeOfGroup
+   *
+   * @return   void
+   */
+  public function scopeOfGroup($query, $group_id)
+  {
+      return $query->whereGroupId($group_id);
+  }
+
+  /**
    * Get only windows servers
    * @method scopeWindows
    * @param  [type]       $query [description]
@@ -160,6 +171,17 @@ class Server extends Model
   }
 
   /**
+   * Get production and test
+   * @method scopeBoth
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeBoth($query)
+  {
+    return $query->where('inactive_flag',0);
+  }
+
+  /**
    * Get only production servers
    * @method scopeProduction
    * @param  [type]          $query [description]
@@ -167,18 +189,29 @@ class Server extends Model
    */
   public function scopeProduction($query)
   {
-    return $query->where('production_flag',1);
+    return $query->where('production_flag',1)->active();
   }
 
   /**
    * Get only non-production servers
-   * @method scopeNonroduction
+   * @method scopeNonproduction
    * @param  [type]          $query [description]
    * @return [type]                 [description]
    */
   public function scopeNonproduction($query)
   {
-    return $query->where('production_flag',0);
+    return $query->where('production_flag',0)->active();
+  }
+
+  /**
+   * Get only non-production servers
+   * @method scopeTest
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeTest($query)
+  {
+    return $query->where('production_flag',0)->active();
   }
 
   /**

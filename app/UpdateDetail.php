@@ -42,6 +42,11 @@ class UpdateDetail extends Model
   protected $fillable = [
       'approved_flag'
   ];
+  
+  public function scopeUnapproved($query)
+  {
+    return $query->whereApprovedFlag(0);
+  }
 
   public function scopeProduction($query)
   {

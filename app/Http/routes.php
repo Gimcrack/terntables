@@ -59,6 +59,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth_admin'], function(){
  Route::group(["prefix" => 'oit', 'middleware' => 'auth'], function(){
    Route::get('servers/health',     'BI\ServerController@healthServers');
    Route::resource('servers',       'BI\ServerController', [ 'only' => [ 'index','show'] ] );
+   Route::resource('maintenanceWindows',       'BI\MaintenanceWindowController', [ 'only' => [ 'index','show'] ] );
    Route::resource('serverDisks',   'BI\ServerDiskController', [ 'only' => [ 'index','show'] ] );
    Route::resource('serverServices',   'BI\ServerServiceController', [ 'only' => [ 'index','show'] ] );
    Route::resource('sql-servers',   'BI\DatabaseInstanceController', [ 'only' => [ 'index','show'] ] );
