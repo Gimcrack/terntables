@@ -95,7 +95,7 @@ class DashboardMaintenance extends Command
     {
         $ids = $this->getServers($window)->pluck('id');
 
-        Log::debug('Approving updates for servers : ');
+        Log::debug('Approving updates for servers');
         
         UpdateDetail::whereIn('server_id', $ids )
             ->unapproved()
@@ -112,6 +112,7 @@ class DashboardMaintenance extends Command
      */
     private function install(MaintenanceWindow $window)
     {
+        Log::debug('Installing updates for servers');
         $this->getServers($window)
             ->whereStatus('Idle')
             ->update(['status' => 'Ready For Updates']);
@@ -125,6 +126,7 @@ class DashboardMaintenance extends Command
      */
     private function reboot(MaintenanceWindow $window)
     {
+        Log::debug('Rebooting servers');
         $this->getServers($window)
             ->whereStatus('Reboot Required')
             ->update(['status' => 'Ready For Reboot']);
