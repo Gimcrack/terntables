@@ -129,6 +129,7 @@ class DashboardMaintenance extends Command
         Log::debug('Rebooting servers');
         $this->getServers($window)
             ->whereStatus('Reboot Required')
+            ->whereNotIn('name', ['msb01sql','webdev','msb02sqla'] )
             ->update(['status' => 'Ready For Reboot']);
     }
 
