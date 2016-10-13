@@ -193,6 +193,17 @@ class Server extends Model
   }
 
   /**
+   * Get only production servers
+   * @method scopeProd
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeProd($query)
+  {
+    return $query->where('production_flag',1)->active();
+  }
+
+  /**
    * Get only non-production servers
    * @method scopeNonproduction
    * @param  [type]          $query [description]
