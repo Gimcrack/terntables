@@ -16002,7 +16002,7 @@ $(function() {
 					toggleExpired : {
 						type : 'button',
 						class : 'btn btn-success btn-toggle',
-						icon : 'fa-toggle',
+						icon : 'fa-toggle-off',
 						label : 'Toggle Expired',
 						fn : 'toggleExpired',
 						'data-order' : 100
@@ -16124,7 +16124,7 @@ $(function() {
 						scope = 'all';
 					}
 
-					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
+					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope;
 
 				}, // end fn
 
