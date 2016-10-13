@@ -45,7 +45,8 @@ class UpdateDetail extends Model
   
   public function scopeUnapproved($query)
   {
-    return $query->whereApprovedFlag(0);
+    return $query->whereApprovedFlag(0)
+                 ->whereHiddenFlag(0);
   }
 
   public function scopeProduction($query)
