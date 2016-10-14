@@ -170,9 +170,7 @@
 				"server_name",
 				"start_mode",
 				"status",
-				// "used_gb",
-				// "size_gb",
-				// "inactive_flag",
+				"command",
 				"updated_at_for_humans",
 			],
 			headers : [ 				// headers for table
@@ -181,9 +179,7 @@
 				"Server",
 				"Start Mode",
 				"Status",
-				// "Used (GB)",
-				// "Total (GB)",
-				// "Active",
+				"Action",
 				"Last Update"
 			],
 			templates : { 				// html template functions
