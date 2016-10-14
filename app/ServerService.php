@@ -35,6 +35,13 @@ class ServerService extends Model
         'ignored_flag' => 'int',
     ];
 
+    protected $searchableColumns = [
+        'service.name' => 80,
+        'server.name' => 80,
+        'status' => 30,
+        'start_mode' => 30,
+    ];
+
     /**
      * Gets the name attribute.
      */
