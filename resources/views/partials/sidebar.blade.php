@@ -66,6 +66,12 @@
 
           @if( Auth::user()->checkAccess('Server.read') )
           <li>
+            <a href="{{ url('oit/serverServices') }}"><i class="fa fa-gears fa-fw"></i> Server Services</a>
+          </li>
+          @endif
+
+          @if( Auth::user()->checkAccess('Server.read') )
+          <li>
             <a href="{{ url('oit/serverDisks') }}"><i class="fa fa-files-o fa-fw"></i> Server Disks</a>
           </li>
           @endif
