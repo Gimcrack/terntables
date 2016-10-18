@@ -56,9 +56,11 @@ class DatabaseInstanceController extends ApiController
         return $this->operationFailed("Oops, looks like you forgot to include the data.",406);
       }
 
+      $owner = ( !! $server = \App\Server::find($server_id) ) ? $server->owner->id : 6;
+
       $atts = [
         'server_id' => $server_id,
-        'group_id' => \App\Server::find($server_id)->owner->id,
+        'group_id' => $owner,
         'name' => $data['Instance'],
         'sql_product' => $data['Product'],
         'sql_edition' => $data['ProductEdition'],
