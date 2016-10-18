@@ -17604,6 +17604,19 @@ $(function() {
 				},
 				'data-order' : 100
 			},
+			updateSql : {
+				'data-multiple' : true,
+				'data-permission' : 'update_enabled',
+				class: 'btn btn-primary',
+				type : 'button',
+				icon : 'fa-gears',
+				label : 'Update Sql Server Info...',
+				fn : function(e) {
+					e.preventDefault();
+					jApp.activeGrid.fn.markServer({ 'status' : 'Refresh SQL Server'});
+				},
+				'data-order' : 100
+			},
 			runSelected : {
 				'data-multiple' : true,
 				'data-permission' : 'update_enabled',
