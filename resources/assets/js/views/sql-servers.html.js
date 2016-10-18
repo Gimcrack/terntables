@@ -135,7 +135,7 @@
 					if ( r.total_memory <= r.max_memory ) bg = '#d9534f';
 
 					// determine if ram has been added and memory usage has not been reconfigured
-					if ( ( r.total_memory - r.max_memory ) > os_max ) bg = '#e2f04e'
+					if ( ( r.total_memory - r.max_memory ) > os_max ) bg = '#e2f04e';
 					
 					return '<div style="padding: 0 6px; width:100%;height:100%;background:' + bg + '">' + 
 						r.min_memory + '-' + r.max_memory + '-' + rec + ' (' + os + '/' + r.total_memory + ')</div>';
