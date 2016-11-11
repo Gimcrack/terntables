@@ -18009,7 +18009,7 @@ $(function() {
 			refreshInterval : 17000,
 			columnFriendly : 'name',
 			filter : 'ignored_flag = 0',
-			scope : 'automatic',
+			scope : 'offline',
 			gridHeader : {
 				icon : 'fa-gears',
 				headerTitle : 'Server Services',
@@ -18024,8 +18024,8 @@ $(function() {
 				custom : {
 					toggleRunning : {
 						type : 'button',
-						class : 'btn btn-success btn-toggle active',
-						icon : 'fa-toggle-on',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
 						label : 'Toggle Running',
 						fn : 'toggleRunning',
 						'data-order' : 100
@@ -18065,6 +18065,18 @@ $(function() {
 					icon : 'fa-play',
 					class : 'btn btn-primary',
 				},
+				refreshService : {
+					'data-multiple' : true,
+					'data-permission' : 'update_enabled',
+					type : 'button',
+					fn : function(e) {
+						e.preventDefault();
+						jApp.activeGrid.fn.markService( { 'command' : 'refresh' } );
+					},
+					label : 'Refresh Selected...',
+					icon : 'fa-refresh',
+					class : 'btn btn-primary',
+				},
 				markSelected : [
 					{ label: 'Modify Selected Services', class: 'btn btn-primary', icon : 'fa-check-square-o' },
 					{
@@ -18098,7 +18110,7 @@ $(function() {
 				toggleRunning : function( ) {
 					var temp = jApp.activeGrid.temp;
 
-					temp.hideRunning = ( !!! temp.hideRunning );
+					temp.showRunning = ( !!! temp.showRunning );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
@@ -18150,7 +18162,7 @@ $(function() {
 						scope = 'active';
 					}
 
-					if ( !! temp.hideRunning ) {
+					if ( ! temp.showRunning ) {
 						scope = 'offline';
 					}
 
