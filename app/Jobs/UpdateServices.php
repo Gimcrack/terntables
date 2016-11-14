@@ -76,6 +76,11 @@ class UpdateServices extends Job implements ShouldQueue
     */
     private function getServiceByName( $name )
     {
-        return Service::firstOrCreate(['name' => $name]);
+        $s = Service::firstOrCreate(['name' => $name]);
+        
+        // update the timestamp, so we know the record is up to date.
+        $s->touch();
+        
+        return $s;
     }
 }
