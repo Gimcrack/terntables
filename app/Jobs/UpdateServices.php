@@ -20,6 +20,7 @@ class UpdateServices extends Job implements ShouldQueue
 
     /**
      * The services to process
+     * 
      */
     protected $services;
 
