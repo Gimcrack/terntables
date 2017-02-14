@@ -158,7 +158,6 @@ return [
         Laracasts\Flash\FlashServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Neomerx\CorsIlluminate\Providers\LaravelServiceProvider::class,
-        Adldap\Laravel\AdldapServiceProvider::class,
         Ingenious\Eloquence\ServiceProvider::class,
         SimpleSoftwareIO\SMS\SMSServiceProvider::class,
         Anchu\Ftp\FtpServiceProvider::class,
