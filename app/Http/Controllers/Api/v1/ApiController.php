@@ -11,6 +11,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\RecordLock;
 use Input;
+use Cache;
 use DB;
 
 
@@ -97,32 +98,49 @@ class ApiController extends Controller
    */
   public function index()
   {
-      $input = Input::all();
-      $model_class = $this->model_class;
+      $cache_key = $this->getCacheKey();
 
-      $filter = $this->parseSearchFilter();
+      $results = Cache::remember($cache_key, 60 * 10, function() {
+          $input = Input::all();
+          $model_class = $this->model_class;
 
-      $with = Input::get('with',$this->with) ?: [];
+          $filter = $this->parseSearchFilter();
 
-      $q = Input::get('q',null);
-      $scope = Input::get('scope','all');
-      $order = Input::get('order','oldest');
+          $with = Input::get('with',$this->with) ?: [];
 
-      $select = ( !empty( $this->select ) ) ? $this->select : null;
+          $q = Input::get('q',null);
+          $scope = Input::get('scope','all');
+          $order = Input::get('order','oldest');
 
-      $models = ( !! $q ) ? $model_class::search( $q )->with($with) : $model_class::with($with);
+          $select = ( !empty( $this->select ) ) ? $this->select : null;
 
-      $results = $models
-                  ->$scope()
-                  ->$order()
-                  ->whereRaw($filter);
+          $models = ( !! $q ) ? $model_class::search( $q )->with($with) : $model_class::with($with);
 
-      //$results = ( !! $select ) ? $models->get($select) : $results;
+          $results = $models
+                      ->$scope()
+                      ->$order()
+                      ->whereRaw($filter);
 
-      $results = $results->paginate( $this->limitPerPage );
+          //$results = ( !! $select ) ? $models->get($select) : $results;
+
+          return $results->paginate( $this->limitPerPage );
+      });
 
       return response()->json( $results );
   }
+
+  /**
+   * Get the cache key for the request
+   * @method getCacheKey
+   *
+   * @return   string
+   */
+  public function getCacheKey()
+  {
+      return json_encode([
+        'model' => $this->model_class
+      ] + request()->all() );
+  } 
 
   /**
    * Parse the search filter
