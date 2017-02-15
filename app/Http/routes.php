@@ -39,6 +39,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth_admin'], function(){
    Route::get('tickets/archive/{groupOrIndividual}/{id}/{period}', 'MetricsController@archiveTickets');
    Route::get('tickets/archive/{groupOrIndividual}/{id}',          'MetricsController@archiveTickets');
    Route::get('tickets/archive',                                   'MetricsController@archiveTickets');
+   Route::get('tickets/archive/json/{groupOrIndividual}/{id}',     'MetricsController@tickets_archive_json');
+   Route::get('tickets/archive/json',                              'MetricsController@tickets_archive_json');
+   Route::get('tickets/json/{groupOrIndividual}/{id}',             'MetricsController@tickets_json');
+   Route::get('tickets/json',                                      'MetricsController@tickets_json');
    Route::get('tickets/{groupOrIndividual}/{id}',                  'MetricsController@tickets');
    Route::get('tickets',                                           'MetricsController@tickets');
  });

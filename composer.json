@@ -42,7 +42,7 @@
         "ingenious/jstorage": "dev-master",
         "components/jqueryui": "dev-master",
         "neomerx/cors-illuminate": "dev-master",
-        "guzzlehttp/guzzle" : "~6.0",
+        "guzzlehttp/guzzle" : "^6.2",
         "aloha/twilio" : "dev-master",
         "rikless/laravel-ftp" : "dev-master",
         "graham-campbell/flysystem": "^3.0",
