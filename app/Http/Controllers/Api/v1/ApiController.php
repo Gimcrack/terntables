@@ -100,7 +100,7 @@ class ApiController extends Controller
   {
       $cache_key = $this->getCacheKey();
 
-      $results = Cache::remember($cache_key, 60 * 10, function() {
+      $results = Cache::section($this->model_class)->remember($cache_key, 60 * 10, function() {
           $input = Input::all();
           $model_class = $this->model_class;
 
@@ -137,10 +137,19 @@ class ApiController extends Controller
    */
   public function getCacheKey()
   {
-      return json_encode([
-        'model' => $this->model_class
-      ] + request()->all() );
+      return json_encode( request()->all() );
   } 
+
+  /**
+   * Forget the keys related to this model
+   * @method forgetCacheSection
+   *
+   * @return   void
+   */
+  public function forgetCacheSection()
+  {
+      Cache::section($this->model_class)->flush();
+  }
 
   /**
    * Parse the search filter
@@ -236,6 +245,8 @@ class ApiController extends Controller
       $model = $model_class::create($input)->updateTags();
       $this->handleRelations($model);
     }); // end transaction
+    
+    $this->forgetCacheSection();
 
     return $this->operationSuccessful(201);
   }
@@ -266,6 +277,8 @@ class ApiController extends Controller
     }); // end transaction
 
     //Event::fire( new Outage )
+    
+    $this->forgetCacheSection();
 
     return $this->operationSuccessful(200);
 
@@ -303,6 +316,7 @@ class ApiController extends Controller
     // delete the records
     $models->delete();
 
+    $this->forgetCacheSection();
 
     return $this->operationSuccessful(compact('message','count'), 200);
   }
@@ -359,6 +373,8 @@ class ApiController extends Controller
         ->update( $update );
     }
 
+    $this->forgetCacheSection();
+
   }
 
   /**
@@ -397,6 +413,8 @@ class ApiController extends Controller
 
     // sync the model with the relation
     return $model->$relation()->sync( $sync ?: [] );
+
+    $this->forgetCacheSection();
   }
 
   /**
@@ -463,6 +481,9 @@ class ApiController extends Controller
     }
 
     $models->update($changes);
+
+    $this->forgetCacheSection();
+    
     return $this->operationSuccessful();
   }
 
