@@ -160,7 +160,7 @@
 
     <script type="text/javascript">
 
-          $.getJSON('https://isupport.matsugov.us/Api/v14-5/Incident/Archive/{{$groupOrIndividual}}/{{$id}}', function(response){
+          $.getJSON('/metrics/tickets/archive/json/{{$groupOrIndividual}}/{{$id}}', function(response){
 
             $('.preloader').hide();
 
