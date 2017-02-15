@@ -35,7 +35,6 @@
         "ingenious/history.js": "dev-master",
         "Nathanmac/Parser": "3.*",
         "venturecraft/revisionable": "dev-master",
-        "illuminate/html": "^5.0@dev",
 
         "barryvdh/laravel-dompdf": "0.6.*",
         "ingenious/jquery-tokeninput": "dev-master",
@@ -48,7 +47,8 @@
         "rikless/laravel-ftp" : "dev-master",
         "graham-campbell/flysystem": "^3.0",
         "league/flysystem-sftp": "~1.0",
-        "pda/pheanstalk": "^3.1"
+        "pda/pheanstalk": "^3.1",
+        "predis/predis": "^1.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
