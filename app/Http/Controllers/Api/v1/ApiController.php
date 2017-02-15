@@ -100,7 +100,7 @@ class ApiController extends Controller
   {
       $cache_key = $this->getCacheKey();
 
-      $results = Cache::section($this->model_class)->remember($cache_key, 60 * 10, function() {
+      $results = Cache::tags([$this->model_class])->remember($cache_key, 60 * 10, function() {
           $input = Input::all();
           $model_class = $this->model_class;
 
@@ -148,7 +148,7 @@ class ApiController extends Controller
    */
   public function forgetCacheSection()
   {
-      Cache::section($this->model_class)->flush();
+      Cache::tags([$this->model_class])->flush();
   }
 
   /**
@@ -483,7 +483,7 @@ class ApiController extends Controller
     $models->update($changes);
 
     $this->forgetCacheSection();
-    
+
     return $this->operationSuccessful();
   }
 
