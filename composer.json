@@ -47,7 +47,8 @@
         "aloha/twilio" : "dev-master",
         "rikless/laravel-ftp" : "dev-master",
         "graham-campbell/flysystem": "^3.0",
-        "league/flysystem-sftp": "~1.0"
+        "league/flysystem-sftp": "~1.0",
+        "pda/pheanstalk": "^3.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
