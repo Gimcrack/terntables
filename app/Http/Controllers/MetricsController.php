@@ -29,16 +29,6 @@ class MetricsController extends Controller
      */
     protected $api_base = 'https://isupport.matsugov.us/Api/v14-5/Incident/';
 
-    /**
-     * Make a new Intrinio handler class
-     */
-    public function __construct()
-    {
-        $this->client = new Client([
-            'base_uri' => $this->api_base,
-        ]);
-    }
-
 
     /**
      * Perform a get request for the specific endpoint
@@ -46,6 +36,9 @@ class MetricsController extends Controller
      */
     public function get($endpoint, $params = [])
     {
+        $this->client = new Client([
+            'base_uri' => $this->api_base,
+        ]);
 
         try {
             return $this->client->request(
