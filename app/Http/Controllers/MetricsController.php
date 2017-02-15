@@ -85,22 +85,22 @@ class MetricsController extends Controller
                 'params' => $params,
             ];
 
-            $result = json_decode($this->get($endpoint, $params)->getBody(), true);
+            return json_decode($this->get($endpoint, $params)->getBody(), true);
 
-            if (! is_array($result)) {
-                return $this->respondWithError();
-            }
+            // if (! is_array($result)) {
+            //     return $this->respondWithError();
+            // }
             
-            if ( ! isset($result['data']) || ! is_array($result['data']) )
-            {
-                $data += ['data' => [$result] ];
-            }
-            else
-            {
-                $data += $result;
-            }
+            // if ( ! isset($result['data']) || ! is_array($result['data']) )
+            // {
+            //     $data += ['data' => [$result] ];
+            // }
+            // else
+            // {
+            //     $data += $result;
+            // }
 
-            return $data;
+            // return $data;
 
         });
     }
