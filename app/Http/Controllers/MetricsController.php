@@ -40,7 +40,7 @@ class MetricsController extends Controller
             'base_uri' => $this->api_base,
         ]);
 
-        return $this->client->request('GET', trim($endpoint, "/"); )
+        return $this->client->request('GET', trim($endpoint, "/") );
 
         // try {
             
