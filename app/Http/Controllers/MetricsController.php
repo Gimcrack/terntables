@@ -40,23 +40,19 @@ class MetricsController extends Controller
             'base_uri' => $this->api_base,
         ]);
 
-        try {
-            return $this->client->request(
-                'GET',
-                $endpoint,
-                [
-                    'query' => $params
-                ]
-            );
-        } catch (ClientException $e) {
+        return $this->client->request('GET',$endpoint);
+
+        // try {
             
-        } catch (ServerException $e) {
+        // } catch (ClientException $e) {
             
-        } catch (BadResponseException $e) {
+        // } catch (ServerException $e) {
             
-        } catch( ConnectException $e ) {
+        // } catch (BadResponseException $e) {
             
-        }
+        // } catch( ConnectException $e ) {
+            
+        // }
     }
 
     /**
@@ -70,7 +66,7 @@ class MetricsController extends Controller
     {
         $cache_key = collect( compact('endpoint','params') )->toJson();
 
-        return Cache::remember( $cache_key, 60 * 24, function() use ($endpoint, $params) {
+        return Cache::remember( $cache_key, 60 * 60 * 24, function() use ($endpoint, $params) {
 
             $data = [
                 'errors' => false,
@@ -78,7 +74,7 @@ class MetricsController extends Controller
                 'params' => $params,
             ];
 
-            return json_encode( json_decode($this->get($endpoint, $params)->getBody(), true) );
+            return json_decode($this->get($endpoint, $params)->getBody(), true);
 
             // if (! is_array($result)) {
             //     return $this->respondWithError();
