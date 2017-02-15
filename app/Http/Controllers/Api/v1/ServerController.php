@@ -58,6 +58,25 @@ class ServerController extends ApiController
   ];
 
   /**
+   * Return an index of the models
+   * @method index
+   *
+   * @return   Collection
+   */
+  public function index()
+  {
+      $this->with = [
+        'people',
+        'tags',
+        'owner',
+        'operating_system',
+        'agent'
+      ];
+
+      return parent::index();
+  }
+
+  /**
    * Parse the search filter
    * @method parseSearchFilter
    * @return [type]            [description]
