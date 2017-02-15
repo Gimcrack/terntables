@@ -113,11 +113,12 @@ class MetricsController extends Controller
      */
     public function tickets_json( $groupOrIndividual = null, $id = null, $archive = false)
     {
-        if ( $archive ) {
-          return $this->getJSON("Archive/{$groupOrIndividual}/{$id}");          
-        }
+        $data = ( $archive ) ?
+          $this->getJSON("Archive/{$groupOrIndividual}/{$id}") :
+          $this->getJSON("{$groupOrIndividual}/{$id}");
+        
 
-        return $this->getJSON("{$groupOrIndividual}/{$id}");
+        return response()->json($data);
     } 
 
     /**
