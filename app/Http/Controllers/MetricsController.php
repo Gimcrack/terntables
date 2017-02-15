@@ -85,7 +85,7 @@ class MetricsController extends Controller
                 'params' => $params,
             ];
 
-            return json_decode($this->get($endpoint, $params)->getBody(), true);
+            return json_encode( json_decode($this->get($endpoint, $params)->getBody(), true) );
 
             // if (! is_array($result)) {
             //     return $this->respondWithError();
