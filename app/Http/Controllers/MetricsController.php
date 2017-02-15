@@ -116,7 +116,7 @@ class MetricsController extends Controller
      *
      * @return   json response
      */
-    public function tickets_json_archive( $groupOrIndividual = null, $id = null)
+    public function tickets_archive_json( $groupOrIndividual = null, $id = null)
     {
       return $this->tickets_json($groupOrIndividual,$id,$archive = true);           
     }
