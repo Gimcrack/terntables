@@ -34,13 +34,13 @@ class MetricsController extends Controller
      * Perform a get request for the specific endpoint
      * @return \Response
      */
-    public function get($endpoint, $params = [])
+    public function get($endpoint = "", $params = [])
     {
         $this->client = new Client([
             'base_uri' => $this->api_base,
         ]);
 
-        return $this->client->request('GET',$endpoint);
+        return $this->client->request('GET', trim($endpoint, "/"); )
 
         // try {
             
