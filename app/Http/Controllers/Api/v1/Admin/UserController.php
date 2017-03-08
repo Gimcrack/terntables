@@ -1,6 +1,6 @@
 <?php
 
-namespace Admin;
+namespace App\Http\Controllers\Api\v1\Admin;
 
 use Input;
 use App\User;
