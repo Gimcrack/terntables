@@ -11,7 +11,6 @@ use App\Http\Controllers\Api\v1\ApiController;
 
 class UserController extends ApiController
 {
-
   /**
    * The class name of the associated model
    * @var string
