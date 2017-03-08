@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Api\v1\Admin;
 
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
-use App\Http\Controllers\Api\v1\ApiController;
 use Input;
+use App\User;
 use Faker\Factory;
+use App\Http\Requests;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Api\v1\ApiController;
 
 class UserController extends ApiController
 {
-
   /**
    * The class name of the associated model
    * @var string
