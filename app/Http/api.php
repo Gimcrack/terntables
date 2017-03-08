@@ -25,7 +25,7 @@ Route::group(['prefix' => 'api/v1', 'middleware' => 'api' ], function() {
 // admin routes
 Route::group( [ 'prefix' => 'api/v1', 'middleware' => 'api.admin' ], function() {
   
-  Route::patch('User/{id}/resetPassword/', 'Admin\UserController@resetPassword');
+  Route::patch('resetPassword/{id}', 'Admin\UserController@resetPassword');
   Route::delete('User',                    'Admin\UserController@destroy');
   Route::resource('User',                  'Admin\UserController');
 
