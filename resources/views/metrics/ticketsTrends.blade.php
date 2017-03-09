@@ -170,14 +170,15 @@
               }
             }
             
-            //Morris.Line()
-            Morris.Line({
+            var chartData = {
               element : 'closed-tickets-by-month',
               data : dataTicketsByMonthYear,
               xkey : 'x',
               ykeys : ykeys,
               labels : ykeys
-            });
+            }
+            console.log(chartData);
+            Morris.Line(chartData);
 
           })
 
