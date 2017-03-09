@@ -163,7 +163,7 @@
             // set placeholder values for months with no tickets.
             for( ii = 0; ii < dataTicketsByMonthYear.length; ii++ )
             {
-              for( jj=o; jj < ykeys.length; jj++)
+              for( jj=0; jj < ykeys.length; jj++)
               {
                 if ( ! dataTicketsByMonthYear[ii][ ykeys[jj] ]  )
                   dataTicketsByMonthYear[ii][ ykeys[jj] ] = 0;
