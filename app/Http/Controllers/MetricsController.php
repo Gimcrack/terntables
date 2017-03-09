@@ -118,6 +118,11 @@ class MetricsController extends Controller
      */
     public function tickets_trends_json( $groupOrIndividual = null, $id = null, $years = null)
     {
+      if ( is_numeric($groupOrIndividual) ) {
+        $years = $groupOrIndividual;
+        $groupOrIndividual = null;
+      }
+        
       $data = $this->getJSON("Trends/{$groupOrIndividual}/{$id}/{$years}");
 
       return response()->json($data);           
@@ -174,8 +179,11 @@ class MetricsController extends Controller
      */
     public function trendsTickets($groupOrIndividual = null, $id = null, $years = null)
     {
-        if ( is_numeric($groupOrIndividual) ) $years = $groupOrIndividual;
-        
+        if ( is_numeric($groupOrIndividual) ) {
+          $years = $groupOrIndividual;
+          $groupOrIndividual = null;
+        }
+
         return view('metrics.ticketsTrends', compact('groupOrIndividual', 'id', 'years') );
     } 
 }
