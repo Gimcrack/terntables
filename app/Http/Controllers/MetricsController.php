@@ -174,6 +174,8 @@ class MetricsController extends Controller
      */
     public function trendsTickets($groupOrIndividual = null, $id = null, $years = null)
     {
+        if ( is_numeric($groupOrIndividual) ) $years = $groupOrIndividual;
+        
         return view('metrics.ticketsTrends', compact('groupOrIndividual', 'id', 'years') );
     } 
 }
