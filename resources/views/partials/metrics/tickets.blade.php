@@ -59,10 +59,12 @@
           };
        
           $.extend({
-              parseJSON: function(data, convertDates = true) {
+              parseJSON: function(data, convertDates) {
                   /// <summary>Takes a well-formed JSON string and returns the resulting JavaScript object.</summary>
                   /// <param name="data" type="String">The JSON string to parse.</param>
                   /// <param name="convertDates" optional="true" type="Boolean">Set to true when you want ISO/Asp.net dates to be auto-converted to dates.</param>
+                   
+                  convertDates = convertDates === false ? false : true;
        
                   if (typeof data !== "string" || !data) {
                       return null;
