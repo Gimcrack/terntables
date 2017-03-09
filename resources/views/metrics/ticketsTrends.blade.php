@@ -160,13 +160,14 @@
 
             //console.log(dataTicketsByMonthYear);
             
-            Morris.Line({
+            //Morris.Line()
+            cosole.log({
               element : 'closed-tickets-by-month',
               data : dataTicketsByMonthYear,
               xkey : 'x',
               ykeys : _.uniq( ykeys ).sort()
 
-            })
+            });
 
           })
 
