@@ -164,7 +164,7 @@
               element : 'closed-tickets-by-month',
               data : dataTicketsByMonthYear,
               xkey : 'x',
-              ykeys : _.sort( _.uniq( ykeys ))
+              ykeys : _.uniq( ykeys ).sort()
 
             })
 
