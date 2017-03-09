@@ -143,8 +143,9 @@
             
               var d = o.CreatedDate,
                   m = d.getMonth(),
-                  y = d.getFullYear(),
-                  ykeys.push(y);
+                  y = d.getFullYear();
+              
+              ykeys.push(y);
 
               if ( ! dataTicketsByMonthYear[m][y] ) 
               {
