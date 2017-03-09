@@ -59,7 +59,7 @@
           };
        
           $.extend({
-              parseJSON: function(data, convertDates) {
+              parseJSON: function(data, convertDates = true) {
                   /// <summary>Takes a well-formed JSON string and returns the resulting JavaScript object.</summary>
                   /// <param name="data" type="String">The JSON string to parse.</param>
                   /// <param name="convertDates" optional="true" type="Boolean">Set to true when you want ISO/Asp.net dates to be auto-converted to dates.</param>
@@ -98,7 +98,7 @@
               }
           });
       })(jQuery);
-      
+
     </script>
 
     <style>
