@@ -181,7 +181,7 @@
 
             // divide the data in quarters
             _.each(response.data, function(o) {
-              var d = $.parseJSON(o.CreatedDate),
+              var d = o.CreatedDate,
                   m = d.getMonth(),
                   y = d.getFullYear();
 
