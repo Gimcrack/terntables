@@ -171,6 +171,7 @@
             }
             
             var chartData = {
+              parseTime : false,
               element : 'closed-tickets-by-month',
               data : dataTicketsByMonthYear,
               xkey : 'x',
