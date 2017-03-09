@@ -66,7 +66,7 @@ class MetricsController extends Controller
     {
         $cache_key = collect( compact('endpoint','params') )->toJson();
 
-        return Cache::remember( $cache_key, 60 * 60 * 24, function() use ($endpoint, $params) {
+        return Cache::remember( $cache_key, 60 * 24, function() use ($endpoint, $params) {
 
             $data = [
                 'errors' => false,
@@ -116,6 +116,19 @@ class MetricsController extends Controller
      *
      * @return   json response
      */
+    public function tickets_trends_json( $groupOrIndividual = null, $id = null, $years = null)
+    {
+      $data = $this->getJSON("Trends/{$groupOrIndividual}/{$id}/{$years}");
+
+      return response()->json($data);           
+    }
+
+    /**
+     * Get the tickets in json from the isupport api
+     * @method tickets_json
+     *
+     * @return   json response
+     */
     public function tickets_archive_json( $groupOrIndividual = null, $id = null)
     {
       return $this->tickets_json($groupOrIndividual,$id,$archive = true);           
@@ -152,4 +165,15 @@ class MetricsController extends Controller
       $periodName = $periods[$period];
       return view('metrics.ticketsArchive', compact('groupOrIndividual', 'id', 'period', 'periodName'));
     }
+
+    /**
+     * Get the tickets trends view
+     * @method trendsTickets
+     *
+     * @return   view
+     */
+    public function trendsTickets($groupOrIndividual = null, $id = null, $years = null)
+    {
+        return view('metrics.ticketsTrends', compact('groupOrIndividual', 'id', 'years') );
+    } 
 }
