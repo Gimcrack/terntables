@@ -159,7 +159,12 @@
 
 
     <script type="text/javascript">
-
+          $.ajaxSetup({
+            converters: {
+            'text json': $.parseJSON
+            }
+          });
+          
           $.getJSON('/metrics/tickets/trends/json/{{$groupOrIndividual}}/{{$id}}/{{$years}}', function(response){
 
             $('.preloader').hide();
