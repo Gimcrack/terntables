@@ -1,7 +1,7 @@
 @extends('partials.metrics.tickets')
 
 @section('body')
-      <div class="col-xs-12">
+      <!-- <div class="col-xs-12">
         <div class="panel panel-success">
           <div class="panel-heading">
             <strong class="visible-md visible-lg">Distribution of Time Allocation By Customer Over Last 12 Months : {{$id ?: "IT Department"}}</strong>
@@ -93,69 +93,23 @@
             <div id="bar-chart-incidents-by-rep"></div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div class="col-xs-12">
         <div class="panel panel-warning">
           <div class="panel-heading">
-            <strong class="visible-md visible-lg">Closed Tickets By Customer Over Last 12 Months : {{$id ?: "IT Department"}}</strong>
+            <strong class="visible-md visible-lg">Closed Tickets By Month - Last {{ $years ?: 5 }} Years : {{$id ?: "IT Department"}}</strong>
             <strong class="visible-sm">Closed Tickets By Customer : {{$id ?: "IT Department"}}</strong>
             <strong class="visible-xs">Closed Tickets : {{$id ?: "IT Department"}}</strong>
           </div>
           <div class="panel-body">
             @include('partials.preloader')
-            <div id="bar-chart-incidents-by-customer"></div>
+            <div id="closed-tickets-by-month"></div>
           </div>
         </div>
       </div>
 
-      <!-- <div class="col-xs-12 col-sm-6 col-lg-9">
-        <div class="panel panel-warning">
-          <div class="panel-heading">
-            Open Incidents By Month Created - {{$id ?: "IT Department"}}
-          </div>
-          <div class="panel-body">
-            <div id="bar-chart-incidents-by-month-created"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-xs-12">
-        <div class="panel panel-primary">
-          <div class="panel-heading">
-            Open Incidents By Rep & Status - {{$id ?: "IT Department"}}
-          </div>
-          <div class="panel-body">
-            <div id="bar-chart-incidents-by-rep-and-status-1"></div>
-            <hr/>
-            <div id="bar-chart-incidents-by-rep-and-status-2"></div>
-          </div>
-
-        </div>
-      </div>
-      <div class="col-xs-12">
-        <div class="panel panel-info">
-          <div class="panel-heading">
-            Open Incidents - {{$id ?: "IT Department"}}
-          </div>
-          <div class="panel-body">
-            <table id="tbl_tickets" class="display" width="100%">
-              <thead>
-                <tr>
-                  <th>Number</th>
-                  <th>Assignee</th>
-                  <th>Created Date</th>
-                  <th>Description</th>
-                  <th>Priority</th>
-                  <th>Status</th>
-                  <th>Customer</th>
-                  <th>Department</th>
-                </tr>
-              </thead>
-            </table>
-          </div>
-
-        </div>
-      </div> -->
+      
 
 
     <script type="text/javascript">
@@ -164,33 +118,33 @@
             'text json': $.parseJSON
             }
           });
-          
+
           $.getJSON('/metrics/tickets/trends/json/{{$groupOrIndividual}}/{{$id}}/{{$years}}', function(response){
 
             $('.preloader').hide();
 
             var dataTicketsByMonthYear = [
-                { y : 'Jan' },
-                { y : 'Feb' },
-                { y : 'Mar' },
-                { y : 'Apr' },
-                { y : 'May' },
-                { y : 'Jun' },
-                { y : 'Jul' },
-                { y : 'Aug' },
-                { y : 'Sep' },
-                { y : 'Oct' },
-                { y : 'Nov' },
-                { y : 'Dec' },
-            ];
+                { x : 'Jan' },
+                { x : 'Feb' },
+                { x : 'Mar' },
+                { x : 'Apr' },
+                { x : 'Max' },
+                { x : 'Jun' },
+                { x : 'Jul' },
+                { x : 'Aug' },
+                { x : 'Sep' },
+                { x : 'Oct' },
+                { x : 'Nov' },
+                { x : 'Dec' },
+            ], ykeys = [];
 
             // divide the data in quarters
             _.each(response.data, function(o) {
-              console.log(o);
-
+            
               var d = o.CreatedDate,
                   m = d.getMonth(),
-                  y = d.getFullYear();
+                  y = d.getFullYear(),
+                  ykeys.push(y);
 
               if ( ! dataTicketsByMonthYear[m][y] ) 
               {
@@ -203,7 +157,15 @@
 
             });
 
-            console.log(dataTicketsByMonthYear);
+            //console.log(dataTicketsByMonthYear);
+            
+            Morris.Line({
+              element : 'closed-tickets-by-month',
+              data : dataTicketsByMonthYear,
+              xkey : 'x',
+              ykeys : _.sort( _.uniq( ykeys ))
+
+            })
 
           })
 
