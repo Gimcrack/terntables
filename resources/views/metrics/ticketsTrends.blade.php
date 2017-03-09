@@ -171,7 +171,7 @@
             }
             
             //Morris.Line()
-            console.log({
+            Morris.Line({
               element : 'closed-tickets-by-month',
               data : dataTicketsByMonthYear,
               xkey : 'x',
