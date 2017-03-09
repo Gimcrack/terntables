@@ -175,7 +175,8 @@
               element : 'closed-tickets-by-month',
               data : dataTicketsByMonthYear,
               xkey : 'x',
-              ykeys : ykeys
+              ykeys : ykeys,
+              labels : ykeys
             });
 
           })
