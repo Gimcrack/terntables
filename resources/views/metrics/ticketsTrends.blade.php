@@ -59,13 +59,27 @@
     <div class="col-xs-12">
         <div class="panel panel-warning">
             <div class="panel-heading">
-                <strong class="visible-md visible-lg">Tickets By Category - Top 10 - Last {{ $years ?: 5 }} Years : {{$id ?: "IT Department"}}</strong>
+                <strong class="visible-md visible-lg">Number of Tickets By Category - Top 10 - Last {{ $years ?: 5 }} Years : {{$id ?: "IT Department"}}</strong>
                 <strong class="visible-sm">Tickets By Category : {{$id ?: "IT Department"}}</strong>
                 <strong class="visible-xs">Tickets By Category : {{$id ?: "IT Department"}}</strong>
             </div>
             <div class="panel-body">
                 @include('partials.preloader')
                 <div id="tickets-by-category"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-12">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <strong class="visible-md visible-lg">Hours Worked By Category - Top 10 - Last {{ $years ?: 5 }} Years : {{$id ?: "IT Department"}}</strong>
+                <strong class="visible-sm">Hours By Category : {{$id ?: "IT Department"}}</strong>
+                <strong class="visible-xs">Hours By Category : {{$id ?: "IT Department"}}</strong>
+            </div>
+            <div class="panel-body">
+                @include('partials.preloader')
+                <div id="hours-by-category"></div>
             </div>
         </div>
     </div>

@@ -24,6 +24,7 @@
 	    	chart3(data);
 	    	chart4(data);
 	    	chart5(data);
+	    	chart6(data);
 	    	$('.preloader').hide();
 	    }
 
@@ -190,6 +191,38 @@
 		        xkey : 'label',
 		        ykeys : ['tickets'],
 		        labels : 'Tickets',
+		        resize : true,
+		        stacked : true,
+		        //gridTextSize : 11,
+		        //xLabelAngle : 15
+
+	    	};
+	    	
+	    	Morris.Bar(chartSettings);
+	    }
+
+	    /**
+	     * Hours By Category
+	     *
+	     * @param      {<type>}  data    The data
+	     */
+	    let chart6 = function(data)
+	    {
+	    	let chartSettings = {
+	    		element : 'hours-by-category',
+		        data : _.orderBy(
+		        		_.map(
+		        		 _.groupBy(data, (o) => o.Category ),
+			        	(o, i) => { 
+			        		return { 
+			        			label : i, 
+			        			hours : Math.ceil( _.sum( _.map(o,'TotalTimeWorked') ) / 60 )
+			        		}; 
+			        	}
+    				), o => -o.hours).slice(0,10),
+		        xkey : 'label',
+		        ykeys : ['hours'],
+		        labels : 'Hours',
 		        resize : true,
 		        stacked : true,
 		        //gridTextSize : 11,

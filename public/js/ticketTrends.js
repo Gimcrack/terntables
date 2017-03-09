@@ -30,6 +30,7 @@
 			chart3(data);
 			chart4(data);
 			chart5(data);
+			chart6(data);
 			$('.preloader').hide();
 		};
 
@@ -171,6 +172,34 @@
 				xkey: 'label',
 				ykeys: ['tickets'],
 				labels: 'Tickets',
+				resize: true,
+				stacked: true
+			};
+
+			Morris.Bar(chartSettings);
+		};
+
+		/**
+   * Hours By Category
+   *
+   * @param      {<type>}  data    The data
+   */
+		var chart6 = function chart6(data) {
+			var chartSettings = {
+				element: 'hours-by-category',
+				data: _.orderBy(_.map(_.groupBy(data, function (o) {
+					return o.Category;
+				}), function (o, i) {
+					return {
+						label: i,
+						hours: Math.ceil(_.sum(_.map(o, 'TotalTimeWorked')) / 60)
+					};
+				}), function (o) {
+					return -o.hours;
+				}).slice(0, 10),
+				xkey: 'label',
+				ykeys: ['hours'],
+				labels: 'Hours',
 				resize: true,
 				stacked: true
 			};
