@@ -158,15 +158,24 @@
 
             });
 
-            //console.log(dataTicketsByMonthYear);
+            ykeys = _.uniq( ykeys ).sort();
+
+            // set placeholder values for months with no tickets.
+            for( ii = 0; ii < dataTicketsByMonthYear.length; ii++ )
+            {
+              for( jj=o; jj < ykeys.length; jj++)
+              {
+                if ( ! dataTicketsByMonthYear[ii][ ykeys[jj] ]  )
+                  dataTicketsByMonthYear[ii][ ykeys[jj] ] = 0;
+              }
+            }
             
             //Morris.Line()
             console.log({
               element : 'closed-tickets-by-month',
               data : dataTicketsByMonthYear,
               xkey : 'x',
-              ykeys : _.uniq( ykeys ).sort()
-
+              ykeys : ykeys
             });
 
           })
