@@ -29459,7 +29459,16 @@ var widgetsTooltip = $.ui.tooltip;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * ========================================================= */
-!function ($) {
+
+(function(factory){
+    if (typeof define === 'function' && define.amd)
+      define(['jquery'], factory);
+    else if (typeof exports === 'object')
+      factory(require('jquery'));
+    else
+      factory(jQuery);
+
+}(function($, undefined){
 
   // Add ECMA262-5 Array methods if not supported natively (IE8)
   if (!('indexOf' in Array.prototype)) {
@@ -29476,26 +29485,26 @@ var widgetsTooltip = $.ui.tooltip;
     }
   }
 
-  function elementOrParentIsFixed (element) {
-    var $element = $(element);
-    var $checkElements = $element.add($element.parents());
-    var isFixed = false;
-    $checkElements.each(function(){
-      if ($(this).css('position') === 'fixed') {
-        isFixed = true;
-        return false;
+  // Add timezone abbreviation support for ie6+, Chrome, Firefox
+  function timeZoneAbbreviation() {
+    var abbreviation, date, formattedStr, i, len, matchedStrings, ref, str;
+    date = (new Date()).toString();
+    formattedStr = ((ref = date.split('(')[1]) !== null ? ref.slice(0, -1) : 0) || date.split(' ');
+    if (formattedStr instanceof Array) {
+      matchedStrings = [];
+      for (var i = 0, len = formattedStr.length; i < len; i++) {
+        str = formattedStr[i];
+        if ((abbreviation = (ref = str.match(/\b[A-Z]+\b/)) !== null) ? ref[0] : 0) {
+          matchedStrings.push(abbreviation);
+        }
       }
-    });
-    return isFixed;
+      formattedStr = matchedStrings.pop();
+    }
+    return formattedStr;
   }
 
   function UTCDate() {
     return new Date(Date.UTC.apply(Date, arguments));
-  }
-
-  function UTCToday() {
-    var today = new Date();
-    return UTCDate(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), today.getUTCHours(), today.getUTCMinutes(), today.getUTCSeconds(), 0);
   }
 
   // Picker object
@@ -29521,8 +29530,8 @@ var widgetsTooltip = $.ui.tooltip;
 
     this.bootcssVer = options.bootcssVer || (this.isInput ? (this.element.is('.form-control') ? 3 : 2) : ( this.bootcssVer = this.element.is('.input-group') ? 3 : 2 ));
 
-    this.component = this.element.is('.date') ? ( this.bootcssVer == 3 ? this.element.find('.input-group-addon .glyphicon-th, .input-group-addon .glyphicon-time, .input-group-addon .glyphicon-calendar, .input-group-addon .glyphicon-calendar, .input-group-addon .fa-calendar, .input-group-addon .fa-clock-o').parent() : this.element.find('.add-on .icon-th, .add-on .icon-time, .add-on .icon-calendar, .add-on .fa-calendar, .add-on .fa-clock-o').parent()) : false;
-    this.componentReset = this.element.is('.date') ? ( this.bootcssVer == 3 ? this.element.find('.input-group-addon .glyphicon-remove, .input-group-addon .fa-times').parent():this.element.find('.add-on .icon-remove, .add-on .fa-times').parent()) : false;
+    this.component = this.element.is('.date') ? ( this.bootcssVer === 3 ? this.element.find('.input-group-addon .glyphicon-th, .input-group-addon .glyphicon-time, .input-group-addon .glyphicon-remove, .input-group-addon .glyphicon-calendar, .input-group-addon .fa-calendar, .input-group-addon .fa-clock-o').parent() : this.element.find('.add-on .icon-th, .add-on .icon-time, .add-on .icon-calendar, .add-on .fa-calendar, .add-on .fa-clock-o').parent()) : false;
+    this.componentReset = this.element.is('.date') ? ( this.bootcssVer === 3 ? this.element.find('.input-group-addon .glyphicon-remove, .input-group-addon .fa-times').parent():this.element.find('.add-on .icon-remove, .add-on .fa-times').parent()) : false;
     this.hasInput = this.component && this.element.find('input').length;
     if (this.component && this.component.length === 0) {
       this.component = false;
@@ -29535,6 +29544,7 @@ var widgetsTooltip = $.ui.tooltip;
     this.initialDate = options.initialDate || new Date();
     this.zIndex = options.zIndex || this.element.data('z-index') || undefined;
     this.title = typeof options.title === 'undefined' ? false : options.title;
+    this.timezone = options.timezone || timeZoneAbbreviation();
 
     this.icons = {
       leftArrow: this.fontAwesome ? 'fa-arrow-left' : (this.bootcssVer === 3 ? 'glyphicon-arrow-left' : 'icon-arrow-left'),
@@ -29655,7 +29665,7 @@ var widgetsTooltip = $.ui.tooltip;
       this.picker.find(selector).toggleClass(this.icons.leftArrow + ' ' + this.icons.rightArrow);
     }
 
-    $(document).on('mousedown', this.clickedOutside);
+    $(document).on('mousedown touchend', this.clickedOutside);
 
     this.autoclose = false;
     if ('autoclose' in options) {
@@ -29672,12 +29682,72 @@ var widgetsTooltip = $.ui.tooltip;
     }
 
     this.todayBtn = (options.todayBtn || this.element.data('date-today-btn') || false);
+    this.clearBtn = (options.clearBtn || this.element.data('date-clear-btn') || false);
     this.todayHighlight = (options.todayHighlight || this.element.data('date-today-highlight') || false);
 
-    this.weekStart = ((options.weekStart || this.element.data('date-weekstart') || dates[this.language].weekStart || 0) % 7);
+    this.weekStart = 0;
+    if (typeof options.weekStart !== 'undefined') {
+      this.weekStart = options.weekStart;
+    } else if (typeof this.element.data('date-weekstart') !== 'undefined') {
+      this.weekStart = this.element.data('date-weekstart');
+    } else if (typeof dates[this.language].weekStart !== 'undefined') {
+      this.weekStart = dates[this.language].weekStart;
+    }
+    this.weekStart = this.weekStart % 7;
     this.weekEnd = ((this.weekStart + 6) % 7);
-    this.startDate = -Infinity;
-    this.endDate = Infinity;
+    this.onRenderDay = function (date) {
+      var render = (options.onRenderDay || function () { return []; })(date);
+      if (typeof render === 'string') {
+        render = [render];
+      }
+      var res = ['day'];
+      return res.concat((render ? render : []));
+    };
+    this.onRenderHour = function (date) {
+      var render = (options.onRenderHour || function () { return []; })(date);
+      var res = ['hour'];
+      if (typeof render === 'string') {
+        render = [render];
+      }
+      return res.concat((render ? render : []));
+    };
+    this.onRenderMinute = function (date) {
+      var render = (options.onRenderMinute || function () { return []; })(date);
+      var res = ['minute'];
+      if (typeof render === 'string') {
+        render = [render];
+      }
+      if (date < this.startDate || date > this.endDate) {
+        res.push('disabled');
+      } else if (Math.floor(this.date.getUTCMinutes() / this.minuteStep) === Math.floor(date.getUTCMinutes() / this.minuteStep)) {
+        res.push('active');
+      }
+      return res.concat((render ? render : []));
+    };
+    this.onRenderYear = function (date) {
+      var render = (options.onRenderYear || function () { return []; })(date);
+      var res = ['year'];
+      if (typeof render === 'string') {
+        render = [render];
+      }
+      if (this.date.getUTCFullYear() === date.getUTCFullYear()) {
+        res.push('active');
+      }
+      if (date < this.startDate || date > this.endDate) {
+        res.push('disabled');
+      }
+      return res.concat((render ? render : []));
+    }
+    this.onRenderMonth = function (date) {
+      var render = (options.onRenderMonth || function () { return []; })(date);
+      var res = ['month'];
+      if (typeof render === 'string') {
+        render = [render];
+      }
+      return res.concat((render ? render : []));
+    }
+    this.startDate = new Date(-8639968443048000);
+    this.endDate = new Date(8639968443048000);
     this.datesDisabled = [];
     this.daysOfWeekDisabled = [];
     this.setStartDate(options.startDate || this.element.data('date-startdate'));
@@ -29775,7 +29845,7 @@ var widgetsTooltip = $.ui.tooltip;
       });
     },
 
-    hide: function (e) {
+    hide: function () {
       if (!this.isVisible) return;
       if (this.isInline) return;
       this.picker.hide();
@@ -29811,11 +29881,22 @@ var widgetsTooltip = $.ui.tooltip;
 
     getDate: function () {
       var d = this.getUTCDate();
+      if (d === null) {
+        return null;
+      }
       return new Date(d.getTime() + (d.getTimezoneOffset() * 60000));
     },
 
     getUTCDate: function () {
       return this.date;
+    },
+
+    getInitialDate: function () {
+      return this.initialDate
+    },
+
+    setInitialDate: function (initialDate) {
+      this.initialDate = initialDate;
     },
 
     setDate: function (d) {
@@ -29867,23 +29948,23 @@ var widgetsTooltip = $.ui.tooltip;
     },
 
     getFormattedDate: function (format) {
-      if (format == undefined) format = this.format;
-      return DPGlobal.formatDate(this.date, format, this.language, this.formatType);
+      format = format || this.format;
+      return DPGlobal.formatDate(this.date, format, this.language, this.formatType, this.timezone);
     },
 
     setStartDate: function (startDate) {
-      this.startDate = startDate || -Infinity;
-      if (this.startDate !== -Infinity) {
-        this.startDate = DPGlobal.parseDate(this.startDate, this.format, this.language, this.formatType);
+      this.startDate = startDate || this.startDate;
+      if (this.startDate.valueOf() !== 8639968443048000) {
+        this.startDate = DPGlobal.parseDate(this.startDate, this.format, this.language, this.formatType, this.timezone);
       }
       this.update();
       this.updateNavArrows();
     },
 
     setEndDate: function (endDate) {
-      this.endDate = endDate || Infinity;
-      if (this.endDate !== Infinity) {
-        this.endDate = DPGlobal.parseDate(this.endDate, this.format, this.language, this.formatType);
+      this.endDate = endDate || this.endDate;
+      if (this.endDate.valueOf() !== 8639968443048000) {
+        this.endDate = DPGlobal.parseDate(this.endDate, this.format, this.language, this.formatType, this.timezone);
       }
       this.update();
       this.updateNavArrows();
@@ -29894,8 +29975,9 @@ var widgetsTooltip = $.ui.tooltip;
       if (!$.isArray(this.datesDisabled)) {
         this.datesDisabled = this.datesDisabled.split(/,\s*/);
       }
+      var mThis = this;
       this.datesDisabled = $.map(this.datesDisabled, function (d) {
-        return DPGlobal.parseDate(d, this.format, this.language, this.formatType).toDateString();
+        return DPGlobal.parseDate(d, mThis.format, mThis.language, mThis.formatType, mThis.timezone).toDateString();
       });
       this.update();
       this.updateNavArrows();
@@ -29967,13 +30049,13 @@ var widgetsTooltip = $.ui.tooltip;
       if (this.component) {
         offset = this.component.offset();
         left = offset.left;
-        if (this.pickerPosition == 'bottom-left' || this.pickerPosition == 'top-left') {
+        if (this.pickerPosition === 'bottom-left' || this.pickerPosition === 'top-left') {
           left += this.component.outerWidth() - this.picker.outerWidth();
         }
       } else {
         offset = this.element.offset();
         left = offset.left;
-        if (this.pickerPosition == 'bottom-left' || this.pickerPosition == 'top-left') {
+        if (this.pickerPosition === 'bottom-left' || this.pickerPosition === 'top-left') {
           left += this.element.outerWidth() - this.picker.outerWidth();
         }
       }
@@ -29983,16 +30065,14 @@ var widgetsTooltip = $.ui.tooltip;
         left = bodyWidth - 220;
       }
 
-      if (this.component) {
-        top = top - containerOffset.top + 169;
-        left = left - containerOffset.left + 210;
+      if (this.pickerPosition === 'top-left' || this.pickerPosition === 'top-right') {
+        top = offset.top - this.picker.outerHeight();
       } else {
-        if (this.pickerPosition == 'top-left' || this.pickerPosition == 'top-right') {
-          top = offset.top - this.picker.outerHeight();
-        } else {
-          top = offset.top + this.height;
-        }
+        top = offset.top + this.height;
       }
+
+      top = top - containerOffset.top;
+      left = left - containerOffset.left;
 
       this.picker.css({
         top:    top,
@@ -30008,7 +30088,7 @@ var widgetsTooltip = $.ui.tooltip;
         fromArgs = true;
       } else {
         date = (this.isInput ? this.element.val() : this.element.find('input').val()) || this.element.data('date') || this.initialDate;
-        if (typeof date == 'string' || date instanceof String) {
+        if (typeof date === 'string') {
           date = date.replace(/^\s+|\s+$/g,'');
         }
       }
@@ -30018,7 +30098,7 @@ var widgetsTooltip = $.ui.tooltip;
         fromArgs = false;
       }
 
-      this.date = DPGlobal.parseDate(date, this.format, this.language, this.formatType);
+      this.date = DPGlobal.parseDate(date, this.format, this.language, this.formatType, this.timezone);
 
       if (fromArgs) this.setValue();
 
@@ -30043,16 +30123,18 @@ var widgetsTooltip = $.ui.tooltip;
     },
 
     fillMonths: function () {
-      var html = '',
-        i = 0;
-      while (i < 12) {
-        html += '<span class="month">' + dates[this.language].monthsShort[i++] + '</span>';
+      var html = '';
+      var d = new Date(this.viewDate);
+      for (var i = 0; i < 12; i++) {
+        d.setUTCMonth(i);
+        var classes = this.onRenderMonth(d);
+        html += '<span class="' + classes.join(' ') + '">' + dates[this.language].monthsShort[i] + '</span>';
       }
       this.picker.find('.datetimepicker-months td').html(html);
     },
 
     fill: function () {
-      if (this.date == null || this.viewDate == null) {
+      if (!this.date || !this.viewDate) {
         return;
       }
       var d = new Date(this.viewDate),
@@ -30060,15 +30142,14 @@ var widgetsTooltip = $.ui.tooltip;
         month = d.getUTCMonth(),
         dayMonth = d.getUTCDate(),
         hours = d.getUTCHours(),
-        minutes = d.getUTCMinutes(),
-        startYear = this.startDate !== -Infinity ? this.startDate.getUTCFullYear() : -Infinity,
-        startMonth = this.startDate !== -Infinity ? this.startDate.getUTCMonth() + 1 : -Infinity,
-        endYear = this.endDate !== Infinity ? this.endDate.getUTCFullYear() : Infinity,
-        endMonth = this.endDate !== Infinity ? this.endDate.getUTCMonth() + 1 : Infinity,
+        startYear = this.startDate.getUTCFullYear(),
+        startMonth = this.startDate.getUTCMonth(),
+        endYear = this.endDate.getUTCFullYear(),
+        endMonth = this.endDate.getUTCMonth() + 1,
         currentDate = (new UTCDate(this.date.getUTCFullYear(), this.date.getUTCMonth(), this.date.getUTCDate())).valueOf(),
         today = new Date();
       this.setTitle('.datetimepicker-days', dates[this.language].months[month] + ' ' + year)
-      if (this.formatViewType == 'time') {
+      if (this.formatViewType === 'time') {
         var formatted = this.getFormattedDate();
         this.setTitle('.datetimepicker-hours', formatted);
         this.setTitle('.datetimepicker-minutes', formatted);
@@ -30077,12 +30158,13 @@ var widgetsTooltip = $.ui.tooltip;
         this.setTitle('.datetimepicker-minutes', dayMonth + ' ' + dates[this.language].months[month] + ' ' + year);
       }
       this.picker.find('tfoot th.today')
-        .text(dates[this.language].today)
+        .text(dates[this.language].today || dates['en'].today)
         .toggle(this.todayBtn !== false);
+      this.picker.find('tfoot th.clear')
+        .text(dates[this.language].clear || dates['en'].clear)
+        .toggle(this.clearBtn !== false);
       this.updateNavArrows();
       this.fillMonths();
-      /*var prevMonth = UTCDate(year, month, 0,0,0,0,0);
-       prevMonth.setUTCDate(prevMonth.getDate() - (prevMonth.getUTCDay() - this.weekStart + 7)%7);*/
       var prevMonth = UTCDate(year, month - 1, 28, 0, 0, 0, 0),
         day = DPGlobal.getDaysInMonth(prevMonth.getUTCFullYear(), prevMonth.getUTCMonth());
       prevMonth.setUTCDate(day);
@@ -30091,34 +30173,34 @@ var widgetsTooltip = $.ui.tooltip;
       nextMonth.setUTCDate(nextMonth.getUTCDate() + 42);
       nextMonth = nextMonth.valueOf();
       var html = [];
-      var clsName;
+      var classes;
       while (prevMonth.valueOf() < nextMonth) {
-        if (prevMonth.getUTCDay() == this.weekStart) {
+        if (prevMonth.getUTCDay() === this.weekStart) {
           html.push('<tr>');
         }
-        clsName = '';
-        if (prevMonth.getUTCFullYear() < year || (prevMonth.getUTCFullYear() == year && prevMonth.getUTCMonth() < month)) {
-          clsName += ' old';
-        } else if (prevMonth.getUTCFullYear() > year || (prevMonth.getUTCFullYear() == year && prevMonth.getUTCMonth() > month)) {
-          clsName += ' new';
+        classes = this.onRenderDay(prevMonth);
+        if (prevMonth.getUTCFullYear() < year || (prevMonth.getUTCFullYear() === year && prevMonth.getUTCMonth() < month)) {
+          classes.push('old');
+        } else if (prevMonth.getUTCFullYear() > year || (prevMonth.getUTCFullYear() === year && prevMonth.getUTCMonth() > month)) {
+          classes.push('new');
         }
         // Compare internal UTC date with local today, not UTC today
         if (this.todayHighlight &&
-          prevMonth.getUTCFullYear() == today.getFullYear() &&
-          prevMonth.getUTCMonth() == today.getMonth() &&
-          prevMonth.getUTCDate() == today.getDate()) {
-          clsName += ' today';
+          prevMonth.getUTCFullYear() === today.getFullYear() &&
+          prevMonth.getUTCMonth() === today.getMonth() &&
+          prevMonth.getUTCDate() === today.getDate()) {
+          classes.push('today');
         }
-        if (prevMonth.valueOf() == currentDate) {
-          clsName += ' active';
+        if (prevMonth.valueOf() === currentDate) {
+          classes.push('active');
         }
         if ((prevMonth.valueOf() + 86400000) <= this.startDate || prevMonth.valueOf() > this.endDate ||
           $.inArray(prevMonth.getUTCDay(), this.daysOfWeekDisabled) !== -1 ||
-					$.inArray(prevMonth.toDateString(), this.datesDisabled) !== -1) {
-          clsName += ' disabled';
+          $.inArray(prevMonth.toDateString(), this.datesDisabled) !== -1) {
+          classes.push('disabled');
         }
-        html.push('<td class="day' + clsName + '">' + prevMonth.getUTCDate() + '</td>');
-        if (prevMonth.getUTCDay() == this.weekEnd) {
+        html.push('<td class="' + classes.join(' ') + '">' + prevMonth.getUTCDate() + '</td>');
+        if (prevMonth.getUTCDay() === this.weekEnd) {
           html.push('</tr>');
         }
         prevMonth.setUTCDate(prevMonth.getUTCDate() + 1);
@@ -30128,68 +30210,74 @@ var widgetsTooltip = $.ui.tooltip;
       html = [];
       var txt = '', meridian = '', meridianOld = '';
       var hoursDisabled = this.hoursDisabled || [];
+      d = new Date(this.viewDate)
       for (var i = 0; i < 24; i++) {
-        if (hoursDisabled.indexOf(i) !== -1) continue;
+        d.setUTCHours(i);
+        classes = this.onRenderHour(d);
+        if (hoursDisabled.indexOf(i) !== -1) {
+          classes.push('disabled');
+        }
         var actual = UTCDate(year, month, dayMonth, i);
-        clsName = '';
         // We want the previous hour for the startDate
         if ((actual.valueOf() + 3600000) <= this.startDate || actual.valueOf() > this.endDate) {
-          clsName += ' disabled';
-        } else if (hours == i) {
-          clsName += ' active';
+          classes.push('disabled');
+        } else if (hours === i) {
+          classes.push('active');
         }
-        if (this.showMeridian && dates[this.language].meridiem.length == 2) {
+        if (this.showMeridian && dates[this.language].meridiem.length === 2) {
           meridian = (i < 12 ? dates[this.language].meridiem[0] : dates[this.language].meridiem[1]);
-          if (meridian != meridianOld) {
-            if (meridianOld != '') {
+          if (meridian !== meridianOld) {
+            if (meridianOld !== '') {
               html.push('</fieldset>');
             }
             html.push('<fieldset class="hour"><legend>' + meridian.toUpperCase() + '</legend>');
           }
           meridianOld = meridian;
           txt = (i % 12 ? i % 12 : 12);
-          html.push('<span class="hour' + clsName + ' hour_' + (i < 12 ? 'am' : 'pm') + '">' + txt + '</span>');
-          if (i == 23) {
+          if (i < 12) {
+            classes.push('hour_am');
+          } else {
+            classes.push('hour_pm');
+          }
+          html.push('<span class="' + classes.join(' ') + '">' + txt + '</span>');
+          if (i === 23) {
             html.push('</fieldset>');
           }
         } else {
           txt = i + ':00';
-          html.push('<span class="hour' + clsName + '">' + txt + '</span>');
+          html.push('<span class="' + classes.join(' ') + '">' + txt + '</span>');
         }
       }
       this.picker.find('.datetimepicker-hours td').html(html.join(''));
 
       html = [];
-      txt = '', meridian = '', meridianOld = '';
+      txt = '';
+      meridian = '';
+      meridianOld = '';
       var minutesDisabled = this.minutesDisabled || [];
+      d = new Date(this.viewDate);
       for (var i = 0; i < 60; i += this.minuteStep) {
         if (minutesDisabled.indexOf(i) !== -1) continue;
-        var actual = UTCDate(year, month, dayMonth, hours, i, 0);
-        clsName = '';
-        if (actual.valueOf() < this.startDate || actual.valueOf() > this.endDate) {
-          clsName += ' disabled';
-        } else if (Math.floor(minutes / this.minuteStep) == Math.floor(i / this.minuteStep)) {
-          clsName += ' active';
-        }
-        if (this.showMeridian && dates[this.language].meridiem.length == 2) {
+        d.setUTCMinutes(i);
+        d.setUTCSeconds(0);
+        classes = this.onRenderMinute(d);
+        if (this.showMeridian && dates[this.language].meridiem.length === 2) {
           meridian = (hours < 12 ? dates[this.language].meridiem[0] : dates[this.language].meridiem[1]);
-          if (meridian != meridianOld) {
-            if (meridianOld != '') {
+          if (meridian !== meridianOld) {
+            if (meridianOld !== '') {
               html.push('</fieldset>');
             }
             html.push('<fieldset class="minute"><legend>' + meridian.toUpperCase() + '</legend>');
           }
           meridianOld = meridian;
           txt = (hours % 12 ? hours % 12 : 12);
-          //html.push('<span class="minute'+clsName+' minute_'+(hours<12?'am':'pm')+'">'+txt+'</span>');
-          html.push('<span class="minute' + clsName + '">' + txt + ':' + (i < 10 ? '0' + i : i) + '</span>');
-          if (i == 59) {
+          html.push('<span class="' + classes.join(' ') + '">' + txt + ':' + (i < 10 ? '0' + i : i) + '</span>');
+          if (i === 59) {
             html.push('</fieldset>');
           }
         } else {
           txt = i + ':00';
-          //html.push('<span class="hour'+clsName+'">'+txt+'</span>');
-          html.push('<span class="minute' + clsName + '">' + hours + ':' + (i < 10 ? '0' + i : i) + '</span>');
+          html.push('<span class="' + classes.join(' ') + '">' + hours + ':' + (i < 10 ? '0' + i : i) + '</span>');
         }
       }
       this.picker.find('.datetimepicker-minutes td').html(html.join(''));
@@ -30197,20 +30285,19 @@ var widgetsTooltip = $.ui.tooltip;
       var currentYear = this.date.getUTCFullYear();
       var months = this.setTitle('.datetimepicker-months', year)
         .end()
-        .find('span').removeClass('active');
-      if (currentYear == year) {
+        .find('.month').removeClass('active');
+      if (currentYear === year) {
         // getUTCMonths() returns 0 based, and we need to select the next one
-                // To cater bootstrap 2 we don't need to select the next one
-                var offset = months.length - 12;
-        months.eq(this.date.getUTCMonth() + offset).addClass('active');
+        // To cater bootstrap 2 we don't need to select the next one
+        months.eq(this.date.getUTCMonth()).addClass('active');
       }
       if (year < startYear || year > endYear) {
         months.addClass('disabled');
       }
-      if (year == startYear) {
-        months.slice(0, startMonth + 1).addClass('disabled');
+      if (year === startYear) {
+        months.slice(0, startMonth).addClass('disabled');
       }
-      if (year == endYear) {
+      if (year === endYear) {
         months.slice(endMonth).addClass('disabled');
       }
 
@@ -30220,8 +30307,14 @@ var widgetsTooltip = $.ui.tooltip;
         .end()
         .find('td');
       year -= 1;
+      d = new Date(this.viewDate);
       for (var i = -1; i < 11; i++) {
-        html += '<span class="year' + (i == -1 || i == 10 ? ' old' : '') + (currentYear == year ? ' active' : '') + (year < startYear || year > endYear ? ' disabled' : '') + '">' + year + '</span>';
+        d.setUTCFullYear(year);
+        classes = this.onRenderYear(d);
+        if (i === -1 || i === 10) {
+          classes.push(old);
+        }
+        html += '<span class="' + classes.join(' ') + '">' + year + '</span>';
         year += 1;
       }
       yearCont.html(html);
@@ -30236,7 +30329,7 @@ var widgetsTooltip = $.ui.tooltip;
         hour = d.getUTCHours();
       switch (this.viewMode) {
         case 0:
-          if (this.startDate !== -Infinity && year <= this.startDate.getUTCFullYear()
+          if (year <= this.startDate.getUTCFullYear()
             && month <= this.startDate.getUTCMonth()
             && day <= this.startDate.getUTCDate()
             && hour <= this.startDate.getUTCHours()) {
@@ -30244,7 +30337,7 @@ var widgetsTooltip = $.ui.tooltip;
           } else {
             this.picker.find('.prev').css({visibility: 'visible'});
           }
-          if (this.endDate !== Infinity && year >= this.endDate.getUTCFullYear()
+          if (year >= this.endDate.getUTCFullYear()
             && month >= this.endDate.getUTCMonth()
             && day >= this.endDate.getUTCDate()
             && hour >= this.endDate.getUTCHours()) {
@@ -30254,14 +30347,14 @@ var widgetsTooltip = $.ui.tooltip;
           }
           break;
         case 1:
-          if (this.startDate !== -Infinity && year <= this.startDate.getUTCFullYear()
+          if (year <= this.startDate.getUTCFullYear()
             && month <= this.startDate.getUTCMonth()
             && day <= this.startDate.getUTCDate()) {
             this.picker.find('.prev').css({visibility: 'hidden'});
           } else {
             this.picker.find('.prev').css({visibility: 'visible'});
           }
-          if (this.endDate !== Infinity && year >= this.endDate.getUTCFullYear()
+          if (year >= this.endDate.getUTCFullYear()
             && month >= this.endDate.getUTCMonth()
             && day >= this.endDate.getUTCDate()) {
             this.picker.find('.next').css({visibility: 'hidden'});
@@ -30270,13 +30363,13 @@ var widgetsTooltip = $.ui.tooltip;
           }
           break;
         case 2:
-          if (this.startDate !== -Infinity && year <= this.startDate.getUTCFullYear()
+          if (year <= this.startDate.getUTCFullYear()
             && month <= this.startDate.getUTCMonth()) {
             this.picker.find('.prev').css({visibility: 'hidden'});
           } else {
             this.picker.find('.prev').css({visibility: 'visible'});
           }
-          if (this.endDate !== Infinity && year >= this.endDate.getUTCFullYear()
+          if (year >= this.endDate.getUTCFullYear()
             && month >= this.endDate.getUTCMonth()) {
             this.picker.find('.next').css({visibility: 'hidden'});
           } else {
@@ -30285,12 +30378,12 @@ var widgetsTooltip = $.ui.tooltip;
           break;
         case 3:
         case 4:
-          if (this.startDate !== -Infinity && year <= this.startDate.getUTCFullYear()) {
+          if (year <= this.startDate.getUTCFullYear()) {
             this.picker.find('.prev').css({visibility: 'hidden'});
           } else {
             this.picker.find('.prev').css({visibility: 'visible'});
           }
-          if (this.endDate !== Infinity && year >= this.endDate.getUTCFullYear()) {
+          if (year >= this.endDate.getUTCFullYear()) {
             this.picker.find('.next').css({visibility: 'hidden'});
           } else {
             this.picker.find('.next').css({visibility: 'visible'});
@@ -30337,7 +30430,7 @@ var widgetsTooltip = $.ui.tooltip;
       if (target.is('.' + this.icontype)) {
         target = $(target).parent().closest('span, td, th, legend');
       }
-      if (target.length == 1) {
+      if (target.length === 1) {
         if (target.is('.disabled')) {
           this.element.trigger({
             type:      'outOfRange',
@@ -30355,7 +30448,7 @@ var widgetsTooltip = $.ui.tooltip;
                 break;
               case 'prev':
               case 'next':
-                var dir = DPGlobal.modes[this.viewMode].navStep * (target[0].className == 'prev' ? -1 : 1);
+                var dir = DPGlobal.modes[this.viewMode].navStep * (target[0].className === 'prev' ? -1 : 1);
                 switch (this.viewMode) {
                   case 0:
                     this.viewDate = this.moveHour(this.viewDate, dir);
@@ -30378,6 +30471,12 @@ var widgetsTooltip = $.ui.tooltip;
                   startDate: this.startDate,
                   endDate:   this.endDate
                 });
+                break;
+              case 'clear':
+                this.reset();
+                if (this.autoclose) {
+                  this.hide();
+                }
                 break;
               case 'today':
                 var date = new Date();
@@ -30432,9 +30531,9 @@ var widgetsTooltip = $.ui.tooltip;
               } else if (target.is('.hour')) {
                 hours = parseInt(target.text(), 10) || 0;
                 if (target.hasClass('hour_am') || target.hasClass('hour_pm')) {
-                  if (hours == 12 && target.hasClass('hour_am')) {
+                  if (hours === 12 && target.hasClass('hour_am')) {
                     hours = 0;
-                  } else if (hours != 12 && target.hasClass('hour_pm')) {
+                  } else if (hours !== 12 && target.hasClass('hour_pm')) {
                     hours += 12;
                   }
                 }
@@ -30457,11 +30556,11 @@ var widgetsTooltip = $.ui.tooltip;
                   this._setDate(UTCDate(year, month, day, hours, minutes, seconds, 0));
                 }
               }
-              if (this.viewMode != 0) {
+              if (this.viewMode !== 0) {
                 var oldViewMode = this.viewMode;
                 this.showMode(-1);
                 this.fill();
-                if (oldViewMode == this.viewMode && this.autoclose) {
+                if (oldViewMode === this.viewMode && this.autoclose) {
                   this.hide();
                 }
               } else {
@@ -30488,7 +30587,7 @@ var widgetsTooltip = $.ui.tooltip;
                   month -= 1;
                 }
               } else if (target.is('.new')) {
-                if (month == 11) {
+                if (month === 11) {
                   month = 0;
                   year += 1;
                 } else {
@@ -30508,7 +30607,7 @@ var widgetsTooltip = $.ui.tooltip;
             var oldViewMode = this.viewMode;
             this.showMode(-1);
             this.fill();
-            if (oldViewMode == this.viewMode && this.autoclose) {
+            if (oldViewMode === this.viewMode && this.autoclose) {
               this.hide();
             }
             break;
@@ -30517,9 +30616,9 @@ var widgetsTooltip = $.ui.tooltip;
     },
 
     _setDate: function (date, which) {
-      if (!which || which == 'date')
+      if (!which || which === 'date')
         this.date = date;
-      if (!which || which == 'view')
+      if (!which || which === 'view')
         this.viewDate = date;
       this.fill();
       this.setValue();
@@ -30531,15 +30630,12 @@ var widgetsTooltip = $.ui.tooltip;
       }
       if (element) {
         element.change();
-        if (this.autoclose && (!which || which == 'date')) {
-          //this.hide();
-        }
       }
       this.element.trigger({
         type: 'changeDate',
         date: this.getDate()
       });
-      if(date == null)
+      if(date === null)
         this.date = this.viewDate;
     },
 
@@ -30575,17 +30671,17 @@ var widgetsTooltip = $.ui.tooltip;
         mag = Math.abs(dir),
         new_month, test;
       dir = dir > 0 ? 1 : -1;
-      if (mag == 1) {
-        test = dir == -1
+      if (mag === 1) {
+        test = dir === -1
           // If going back one month, make sure month is not current month
-          // (eg, Mar 31 -> Feb 31 == Feb 28, not Mar 02)
+          // (eg, Mar 31 -> Feb 31 === Feb 28, not Mar 02)
           ? function () {
-          return new_date.getUTCMonth() == month;
+          return new_date.getUTCMonth() === month;
         }
           // If going forward one month, make sure month is as expected
-          // (eg, Jan 31 -> Feb 31 == Feb 28, not Mar 02)
+          // (eg, Jan 31 -> Feb 31 === Feb 28, not Mar 02)
           : function () {
-          return new_date.getUTCMonth() != new_month;
+          return new_date.getUTCMonth() !== new_month;
         };
         new_month = month + dir;
         new_date.setUTCMonth(new_month);
@@ -30601,7 +30697,7 @@ var widgetsTooltip = $.ui.tooltip;
         new_month = new_date.getUTCMonth();
         new_date.setUTCDate(day);
         test = function () {
-          return new_month != new_date.getUTCMonth();
+          return new_month !== new_date.getUTCMonth();
         };
       }
       // Common date-resetting loop -- if date is beyond end of month, make it
@@ -30623,13 +30719,12 @@ var widgetsTooltip = $.ui.tooltip;
 
     keydown: function (e) {
       if (this.picker.is(':not(:visible)')) {
-        if (e.keyCode == 27) // allow escape to hide and re-show picker
+        if (e.keyCode === 27) // allow escape to hide and re-show picker
           this.show();
         return;
       }
       var dateChanged = false,
-        dir, day, month,
-        newDate, newViewDate;
+        dir, newDate, newViewDate;
       switch (e.keyCode) {
         case 27: // escape
           this.hide();
@@ -30638,26 +30733,26 @@ var widgetsTooltip = $.ui.tooltip;
         case 37: // left
         case 39: // right
           if (!this.keyboardNavigation) break;
-          dir = e.keyCode == 37 ? -1 : 1;
-          viewMode = this.viewMode;
+          dir = e.keyCode === 37 ? -1 : 1;
+          var viewMode = this.viewMode;
           if (e.ctrlKey) {
             viewMode += 2;
           } else if (e.shiftKey) {
             viewMode += 1;
           }
-          if (viewMode == 4) {
+          if (viewMode === 4) {
             newDate = this.moveYear(this.date, dir);
             newViewDate = this.moveYear(this.viewDate, dir);
-          } else if (viewMode == 3) {
+          } else if (viewMode === 3) {
             newDate = this.moveMonth(this.date, dir);
             newViewDate = this.moveMonth(this.viewDate, dir);
-          } else if (viewMode == 2) {
+          } else if (viewMode === 2) {
             newDate = this.moveDate(this.date, dir);
             newViewDate = this.moveDate(this.viewDate, dir);
-          } else if (viewMode == 1) {
+          } else if (viewMode === 1) {
             newDate = this.moveHour(this.date, dir);
             newViewDate = this.moveHour(this.viewDate, dir);
-          } else if (viewMode == 0) {
+          } else if (viewMode === 0) {
             newDate = this.moveMinute(this.date, dir);
             newViewDate = this.moveMinute(this.viewDate, dir);
           }
@@ -30673,23 +30768,23 @@ var widgetsTooltip = $.ui.tooltip;
         case 38: // up
         case 40: // down
           if (!this.keyboardNavigation) break;
-          dir = e.keyCode == 38 ? -1 : 1;
+          dir = e.keyCode === 38 ? -1 : 1;
           viewMode = this.viewMode;
           if (e.ctrlKey) {
             viewMode += 2;
           } else if (e.shiftKey) {
             viewMode += 1;
           }
-          if (viewMode == 4) {
+          if (viewMode === 4) {
             newDate = this.moveYear(this.date, dir);
             newViewDate = this.moveYear(this.viewDate, dir);
-          } else if (viewMode == 3) {
+          } else if (viewMode === 3) {
             newDate = this.moveMonth(this.date, dir);
             newViewDate = this.moveMonth(this.viewDate, dir);
-          } else if (viewMode == 2) {
+          } else if (viewMode === 2) {
             newDate = this.moveDate(this.date, dir * 7);
             newViewDate = this.moveDate(this.viewDate, dir * 7);
-          } else if (viewMode == 1) {
+          } else if (viewMode === 1) {
             if (this.showMeridian) {
               newDate = this.moveHour(this.date, dir * 6);
               newViewDate = this.moveHour(this.viewDate, dir * 6);
@@ -30697,7 +30792,7 @@ var widgetsTooltip = $.ui.tooltip;
               newDate = this.moveHour(this.date, dir * 4);
               newViewDate = this.moveHour(this.viewDate, dir * 4);
             }
-          } else if (viewMode == 0) {
+          } else if (viewMode === 0) {
             newDate = this.moveMinute(this.date, dir * 4);
             newViewDate = this.moveMinute(this.viewDate, dir * 4);
           }
@@ -30711,11 +30806,11 @@ var widgetsTooltip = $.ui.tooltip;
           }
           break;
         case 13: // enter
-          if (this.viewMode != 0) {
+          if (this.viewMode !== 0) {
             var oldViewMode = this.viewMode;
             this.showMode(-1);
             this.fill();
-            if (oldViewMode == this.viewMode && this.autoclose) {
+            if (oldViewMode === this.viewMode && this.autoclose) {
               this.hide();
             }
           } else {
@@ -30775,7 +30870,7 @@ var widgetsTooltip = $.ui.tooltip;
       this.updateNavArrows();
     },
 
-    reset: function (e) {
+    reset: function () {
       this._setDate(null, 'date');
     },
 
@@ -30803,11 +30898,11 @@ var widgetsTooltip = $.ui.tooltip;
     this.each(function () {
       var $this = $(this),
         data = $this.data('datetimepicker'),
-        options = typeof option == 'object' && option;
+        options = typeof option === 'object' && option;
       if (!data) {
         $this.data('datetimepicker', (data = new Datetimepicker(this, $.extend({}, $.fn.datetimepicker.defaults, options))));
       }
-      if (typeof option == 'string' && typeof data[option] == 'function') {
+      if (typeof option === 'string' && typeof data[option] === 'function') {
         internal_return = data[option].apply(data, args);
         if (internal_return !== undefined) {
           return false;
@@ -30832,7 +30927,8 @@ var widgetsTooltip = $.ui.tooltip;
       monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       meridiem:    ['am', 'pm'],
       suffix:      ['st', 'nd', 'rd', 'th'],
-      today:       'Today'
+      today:       'Today',
+      clear:       'Clear'
     }
   };
 
@@ -30871,13 +30967,13 @@ var widgetsTooltip = $.ui.tooltip;
       return [31, (DPGlobal.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
     },
     getDefaultFormat: function (type, field) {
-      if (type == 'standard') {
-        if (field == 'input')
+      if (type === 'standard') {
+        if (field === 'input')
           return 'yyyy-mm-dd hh:ii';
         else
           return 'yyyy-mm-dd hh:ii:ss';
-      } else if (type == 'php') {
-        if (field == 'input')
+      } else if (type === 'php') {
+        if (field === 'input')
           return 'Y-m-d H:i';
         else
           return 'Y-m-d H:i:s';
@@ -30886,9 +30982,9 @@ var widgetsTooltip = $.ui.tooltip;
       }
     },
     validParts: function (type) {
-      if (type == 'standard') {
-        return /t|hh?|HH?|p|P|ii?|ss?|dd?|DD?|mm?|MM?|yy(?:yy)?/g;
-      } else if (type == 'php') {
+      if (type === 'standard') {
+        return /t|hh?|HH?|p|P|z|Z|ii?|ss?|dd?|DD?|mm?|MM?|yy(?:yy)?/g;
+      } else if (type === 'php') {
         return /[dDjlNwzFmMnStyYaABgGhHis]/g;
       } else {
         throw new Error('Invalid format type.');
@@ -30900,12 +30996,12 @@ var widgetsTooltip = $.ui.tooltip;
       // so it's a bad format delimiter, anyway
       var separators = format.replace(this.validParts(type), '\0').split('\0'),
         parts = format.match(this.validParts(type));
-      if (!separators || !separators.length || !parts || parts.length == 0) {
+      if (!separators || !separators.length || !parts || parts.length === 0) {
         throw new Error('Invalid date format.');
       }
       return {separators: separators, parts: parts};
     },
-    parseDate: function (date, format, language, type) {
+    parseDate: function (date, format, language, type, timezone) {
       if (date instanceof Date) {
         var dateUTC = new Date(date.valueOf() - date.getTimezoneOffset() * 60000);
         dateUTC.setMilliseconds(0);
@@ -30948,7 +31044,7 @@ var widgetsTooltip = $.ui.tooltip;
       var parts = date && date.toString().match(this.nonpunctuation) || [],
         date = new Date(0, 0, 0, 0, 0, 0, 0),
         parsed = {},
-        setters_order = ['hh', 'h', 'ii', 'i', 'ss', 's', 'yyyy', 'yy', 'M', 'MM', 'm', 'mm', 'D', 'DD', 'd', 'dd', 'H', 'HH', 'p', 'P'],
+        setters_order = ['hh', 'h', 'ii', 'i', 'ss', 's', 'yyyy', 'yy', 'M', 'MM', 'm', 'mm', 'D', 'DD', 'd', 'dd', 'H', 'HH', 'p', 'P', 'z', 'Z'],
         setters_map = {
           hh:   function (d, v) {
             return d.setUTCHours(v);
@@ -30957,10 +31053,10 @@ var widgetsTooltip = $.ui.tooltip;
             return d.setUTCHours(v);
           },
           HH:   function (d, v) {
-            return d.setUTCHours(v == 12 ? 0 : v);
+            return d.setUTCHours(v === 12 ? 0 : v);
           },
           H:    function (d, v) {
-            return d.setUTCHours(v == 12 ? 0 : v);
+            return d.setUTCHours(v === 12 ? 0 : v);
           },
           ii:   function (d, v) {
             return d.setUTCMinutes(v);
@@ -30985,7 +31081,7 @@ var widgetsTooltip = $.ui.tooltip;
             while (v < 0) v += 12;
             v %= 12;
             d.setUTCMonth(v);
-            while (d.getUTCMonth() != v)
+            while (d.getUTCMonth() !== v)
               if (isNaN(d.getUTCMonth()))
                 return d;
               else
@@ -30996,15 +31092,19 @@ var widgetsTooltip = $.ui.tooltip;
             return d.setUTCDate(v);
           },
           p:    function (d, v) {
-            return d.setUTCHours(v == 1 ? d.getUTCHours() + 12 : d.getUTCHours());
+            return d.setUTCHours(v === 1 ? d.getUTCHours() + 12 : d.getUTCHours());
+          },
+          z:    function () {
+            return timezone
           }
         },
         val, filtered, part;
       setters_map['M'] = setters_map['MM'] = setters_map['mm'] = setters_map['m'];
       setters_map['dd'] = setters_map['d'];
       setters_map['P'] = setters_map['p'];
+      setters_map['Z'] = setters_map['z'];
       date = UTCDate(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds());
-      if (parts.length == format.parts.length) {
+      if (parts.length === format.parts.length) {
         for (var i = 0, cnt = format.parts.length; i < cnt; i++) {
           val = parseInt(parts[i], 10);
           part = format.parts[i];
@@ -31014,7 +31114,7 @@ var widgetsTooltip = $.ui.tooltip;
                 filtered = $(dates[language].months).filter(function () {
                   var m = this.slice(0, parts[i].length),
                     p = parts[i].slice(0, m.length);
-                  return m == p;
+                  return m === p;
                 });
                 val = $.inArray(filtered[0], dates[language].months) + 1;
                 break;
@@ -31022,7 +31122,7 @@ var widgetsTooltip = $.ui.tooltip;
                 filtered = $(dates[language].monthsShort).filter(function () {
                   var m = this.slice(0, parts[i].length),
                     p = parts[i].slice(0, m.length);
-                  return m.toLowerCase() == p.toLowerCase();
+                  return m.toLowerCase() === p.toLowerCase();
                 });
                 val = $.inArray(filtered[0], dates[language].monthsShort) + 1;
                 break;
@@ -31030,6 +31130,11 @@ var widgetsTooltip = $.ui.tooltip;
               case 'P':
                 val = $.inArray(parts[i].toLowerCase(), dates[language].meridiem);
                 break;
+              case 'z':
+              case 'Z':
+                timezone;
+                break;
+
             }
           }
           parsed[part] = val;
@@ -31042,12 +31147,12 @@ var widgetsTooltip = $.ui.tooltip;
       }
       return date;
     },
-    formatDate:       function (date, format, language, type) {
-      if (date == null) {
+    formatDate:       function (date, format, language, type, timezone) {
+      if (date === null) {
         return '';
       }
       var val;
-      if (type == 'standard') {
+      if (type === 'standard') {
         val = {
           t:    date.getTime(),
           // year
@@ -31061,29 +31166,32 @@ var widgetsTooltip = $.ui.tooltip;
           d:    date.getUTCDate(),
           D:    dates[language].daysShort[date.getUTCDay()],
           DD:   dates[language].days[date.getUTCDay()],
-          p:    (dates[language].meridiem.length == 2 ? dates[language].meridiem[date.getUTCHours() < 12 ? 0 : 1] : ''),
+          p:    (dates[language].meridiem.length === 2 ? dates[language].meridiem[date.getUTCHours() < 12 ? 0 : 1] : ''),
           // hour
           h:    date.getUTCHours(),
           // minute
           i:    date.getUTCMinutes(),
           // second
-          s:    date.getUTCSeconds()
+          s:    date.getUTCSeconds(),
+          // timezone
+          z:    timezone
         };
 
-        if (dates[language].meridiem.length == 2) {
-          val.H = (val.h % 12 == 0 ? 12 : val.h % 12);
+        if (dates[language].meridiem.length === 2) {
+          val.H = (val.h % 12 === 0 ? 12 : val.h % 12);
         }
         else {
           val.H = val.h;
         }
         val.HH = (val.H < 10 ? '0' : '') + val.H;
         val.P = val.p.toUpperCase();
+        val.Z = val.z;
         val.hh = (val.h < 10 ? '0' : '') + val.h;
         val.ii = (val.i < 10 ? '0' : '') + val.i;
         val.ss = (val.s < 10 ? '0' : '') + val.s;
         val.dd = (val.d < 10 ? '0' : '') + val.d;
         val.mm = (val.m < 10 ? '0' : '') + val.m;
-      } else if (type == 'php') {
+      } else if (type === 'php') {
         // php format
         val = {
           // year
@@ -31099,11 +31207,11 @@ var widgetsTooltip = $.ui.tooltip;
           l: dates[language].days[date.getUTCDay()],
           D: dates[language].daysShort[date.getUTCDay()],
           w: date.getUTCDay(), // 0 -> 6
-          N: (date.getUTCDay() == 0 ? 7 : date.getUTCDay()),       // 1 -> 7
+          N: (date.getUTCDay() === 0 ? 7 : date.getUTCDay()),       // 1 -> 7
           S: (date.getUTCDate() % 10 <= dates[language].suffix.length ? dates[language].suffix[date.getUTCDate() % 10 - 1] : ''),
           // hour
-          a: (dates[language].meridiem.length == 2 ? dates[language].meridiem[date.getUTCHours() < 12 ? 0 : 1] : ''),
-          g: (date.getUTCHours() % 12 == 0 ? 12 : date.getUTCHours() % 12),
+          a: (dates[language].meridiem.length === 2 ? dates[language].meridiem[date.getUTCHours() < 12 ? 0 : 1] : ''),
+          g: (date.getUTCHours() % 12 === 0 ? 12 : date.getUTCHours() % 12),
           G: date.getUTCHours(),
           // minute
           i: date.getUTCMinutes(),
@@ -31174,7 +31282,10 @@ var widgetsTooltip = $.ui.tooltip;
                 '</tr>' +
       '</thead>',
     contTemplate: '<tbody><tr><td colspan="7"></td></tr></tbody>',
-    footTemplate: '<tfoot><tr><th colspan="7" class="today"></th></tr></tfoot>'
+    footTemplate: '<tfoot>' + 
+                    '<tr><th colspan="7" class="today"></th></tr>' +
+                    '<tr><th colspan="7" class="clear"></th></tr>' +
+                  '</tfoot>'
   };
   DPGlobal.template = '<div class="datetimepicker">' +
     '<div class="datetimepicker-minutes">' +
@@ -31278,901 +31389,6 @@ var widgetsTooltip = $.ui.tooltip;
     $('[data-provide="datetimepicker-inline"]').datetimepicker();
   });
 
-}(window.jQuery);
-
-/**
- * bootbox.js [master branch]
- *
- * http://bootboxjs.com/license.txt
- */
-
-// @see https://github.com/makeusabrew/bootbox/issues/180
-// @see https://github.com/makeusabrew/bootbox/issues/186
-(function (root, factory) {
-
-  "use strict";
-  if (typeof define === "function" && define.amd) {
-    // AMD. Register as an anonymous module.
-    define(["jquery"], factory);
-  } else if (typeof exports === "object") {
-    // Node. Does not work with strict CommonJS, but
-    // only CommonJS-like environments that support module.exports,
-    // like Node.
-    module.exports = factory(require("jquery"));
-  } else {
-    // Browser globals (root is window)
-    root.bootbox = factory(root.jQuery);
-  }
-
-}(this, function init($, undefined) {
-
-  "use strict";
-
-  // the base DOM structure needed to create a modal
-  var templates = {
-    dialog:
-      "<div class='bootbox modal' tabindex='-1' role='dialog'>" +
-        "<div class='modal-dialog'>" +
-          "<div class='modal-content'>" +
-            "<div class='modal-body'><div class='bootbox-body'></div></div>" +
-          "</div>" +
-        "</div>" +
-      "</div>",
-    header:
-      "<div class='modal-header'>" +
-        "<h4 class='modal-title'></h4>" +
-      "</div>",
-    footer:
-      "<div class='modal-footer'></div>",
-    closeButton:
-      "<button type='button' class='bootbox-close-button close' data-dismiss='modal' aria-hidden='true'>&times;</button>",
-    form:
-      "<form class='bootbox-form'></form>",
-    inputs: {
-      text:
-        "<input class='bootbox-input bootbox-input-text form-control' autocomplete=off type=text />",
-      textarea:
-        "<textarea class='bootbox-input bootbox-input-textarea form-control'></textarea>",
-      email:
-        "<input class='bootbox-input bootbox-input-email form-control' autocomplete='off' type='email' />",
-      select:
-        "<select class='bootbox-input bootbox-input-select form-control'></select>",
-      checkbox:
-        "<div class='checkbox'><label><input class='bootbox-input bootbox-input-checkbox' type='checkbox' /></label></div>",
-      date:
-        "<input class='bootbox-input bootbox-input-date form-control' autocomplete=off type='date' />",
-      time:
-        "<input class='bootbox-input bootbox-input-time form-control' autocomplete=off type='time' />",
-      number:
-        "<input class='bootbox-input bootbox-input-number form-control' autocomplete=off type='number' />",
-      password:
-        "<input class='bootbox-input bootbox-input-password form-control' autocomplete='off' type='password' />"
-    }
-  };
-
-  var defaults = {
-    // default language
-    locale: "en",
-    // show backdrop or not
-    backdrop: true,
-    // animate the modal in/out
-    animate: true,
-    // additional class string applied to the top level dialog
-    className: null,
-    // whether or not to include a close button
-    closeButton: true,
-    // show the dialog immediately by default
-    show: true,
-    // dialog container
-    container: "body"
-  };
-
-  // our public object; augmented after our private API
-  var exports = {};
-
-  /**
-   * @private
-   */
-  function _t(key) {
-    var locale = locales[defaults.locale];
-    return locale ? locale[key] : locales.en[key];
-  }
-
-  function processCallback(e, dialog, callback) {
-    e.stopPropagation();
-    e.preventDefault();
-
-    // by default we assume a callback will get rid of the dialog,
-    // although it is given the opportunity to override this
-
-    // so, if the callback can be invoked and it *explicitly returns false*
-    // then we'll set a flag to keep the dialog active...
-    var preserveDialog = $.isFunction(callback) && callback(e) === false;
-
-    // ... otherwise we'll bin it
-    if (!preserveDialog) {
-      dialog.modal("hide");
-    }
-  }
-
-  function getKeyLength(obj) {
-    // @TODO defer to Object.keys(x).length if available?
-    var k, t = 0;
-    for (k in obj) {
-      t ++;
-    }
-    return t;
-  }
-
-  function each(collection, iterator) {
-    var index = 0;
-    $.each(collection, function(key, value) {
-      iterator(key, value, index++);
-    });
-  }
-
-  function sanitize(options) {
-    var buttons;
-    var total;
-
-    if (typeof options !== "object") {
-      throw new Error("Please supply an object of options");
-    }
-
-    if (!options.message) {
-      throw new Error("Please specify a message");
-    }
-
-    // make sure any supplied options take precedence over defaults
-    options = $.extend({}, defaults, options);
-
-    if (!options.buttons) {
-      options.buttons = {};
-    }
-
-    // we only support Bootstrap's "static" and false backdrop args
-    // supporting true would mean you could dismiss the dialog without
-    // explicitly interacting with it
-    options.backdrop = options.backdrop ? "static" : false;
-
-    buttons = options.buttons;
-
-    total = getKeyLength(buttons);
-
-    each(buttons, function(key, button, index) {
-
-      if ($.isFunction(button)) {
-        // short form, assume value is our callback. Since button
-        // isn't an object it isn't a reference either so re-assign it
-        button = buttons[key] = {
-          callback: button
-        };
-      }
-
-      // before any further checks make sure by now button is the correct type
-      if ($.type(button) !== "object") {
-        throw new Error("button with key " + key + " must be an object");
-      }
-
-      if (!button.label) {
-        // the lack of an explicit label means we'll assume the key is good enough
-        button.label = key;
-      }
-
-      if (!button.className) {
-        if (total <= 2 && index === total-1) {
-          // always add a primary to the main option in a two-button dialog
-          button.className = "btn-primary";
-        } else {
-          button.className = "btn-default";
-        }
-      }
-    });
-
-    return options;
-  }
-
-  /**
-   * map a flexible set of arguments into a single returned object
-   * if args.length is already one just return it, otherwise
-   * use the properties argument to map the unnamed args to
-   * object properties
-   * so in the latter case:
-   * mapArguments(["foo", $.noop], ["message", "callback"])
-   * -> { message: "foo", callback: $.noop }
-   */
-  function mapArguments(args, properties) {
-    var argn = args.length;
-    var options = {};
-
-    if (argn < 1 || argn > 2) {
-      throw new Error("Invalid argument length");
-    }
-
-    if (argn === 2 || typeof args[0] === "string") {
-      options[properties[0]] = args[0];
-      options[properties[1]] = args[1];
-    } else {
-      options = args[0];
-    }
-
-    return options;
-  }
-
-  /**
-   * merge a set of default dialog options with user supplied arguments
-   */
-  function mergeArguments(defaults, args, properties) {
-    return $.extend(
-      // deep merge
-      true,
-      // ensure the target is an empty, unreferenced object
-      {},
-      // the base options object for this type of dialog (often just buttons)
-      defaults,
-      // args could be an object or array; if it's an array properties will
-      // map it to a proper options object
-      mapArguments(
-        args,
-        properties
-      )
-    );
-  }
-
-  /**
-   * this entry-level method makes heavy use of composition to take a simple
-   * range of inputs and return valid options suitable for passing to bootbox.dialog
-   */
-  function mergeDialogOptions(className, labels, properties, args) {
-    //  build up a base set of dialog properties
-    var baseOptions = {
-      className: "bootbox-" + className,
-      buttons: createLabels.apply(null, labels)
-    };
-
-    // ensure the buttons properties generated, *after* merging
-    // with user args are still valid against the supplied labels
-    return validateButtons(
-      // merge the generated base properties with user supplied arguments
-      mergeArguments(
-        baseOptions,
-        args,
-        // if args.length > 1, properties specify how each arg maps to an object key
-        properties
-      ),
-      labels
-    );
-  }
-
-  /**
-   * from a given list of arguments return a suitable object of button labels
-   * all this does is normalise the given labels and translate them where possible
-   * e.g. "ok", "confirm" -> { ok: "OK, cancel: "Annuleren" }
-   */
-  function createLabels() {
-    var buttons = {};
-
-    for (var i = 0, j = arguments.length; i < j; i++) {
-      var argument = arguments[i];
-      var key = argument.toLowerCase();
-      var value = argument.toUpperCase();
-
-      buttons[key] = {
-        label: _t(value)
-      };
-    }
-
-    return buttons;
-  }
-
-  function validateButtons(options, buttons) {
-    var allowedButtons = {};
-    each(buttons, function(key, value) {
-      allowedButtons[value] = true;
-    });
-
-    each(options.buttons, function(key) {
-      if (allowedButtons[key] === undefined) {
-        throw new Error("button key " + key + " is not allowed (options are " + buttons.join("\n") + ")");
-      }
-    });
-
-    return options;
-  }
-
-  exports.alert = function() {
-    var options;
-
-    options = mergeDialogOptions("alert", ["ok"], ["message", "callback"], arguments);
-
-    if (options.callback && !$.isFunction(options.callback)) {
-      throw new Error("alert requires callback property to be a function when provided");
-    }
-
-    /**
-     * overrides
-     */
-    options.buttons.ok.callback = options.onEscape = function() {
-      if ($.isFunction(options.callback)) {
-        return options.callback();
-      }
-      return true;
-    };
-
-    return exports.dialog(options);
-  };
-
-  exports.confirm = function() {
-    var options;
-
-    options = mergeDialogOptions("confirm", ["cancel", "confirm"], ["message", "callback"], arguments);
-
-    /**
-     * overrides; undo anything the user tried to set they shouldn't have
-     */
-    options.buttons.cancel.callback = options.onEscape = function() {
-      return options.callback(false);
-    };
-
-    options.buttons.confirm.callback = function() {
-      return options.callback(true);
-    };
-
-    // confirm specific validation
-    if (!$.isFunction(options.callback)) {
-      throw new Error("confirm requires a callback");
-    }
-
-    return exports.dialog(options);
-  };
-
-  exports.prompt = function() {
-    var options;
-    var defaults;
-    var dialog;
-    var form;
-    var input;
-    var shouldShow;
-    var inputOptions;
-
-    // we have to create our form first otherwise
-    // its value is undefined when gearing up our options
-    // @TODO this could be solved by allowing message to
-    // be a function instead...
-    form = $(templates.form);
-
-    // prompt defaults are more complex than others in that
-    // users can override more defaults
-    // @TODO I don't like that prompt has to do a lot of heavy
-    // lifting which mergeDialogOptions can *almost* support already
-    // just because of 'value' and 'inputType' - can we refactor?
-    defaults = {
-      className: "bootbox-prompt",
-      buttons: createLabels("cancel", "confirm"),
-      value: "",
-      inputType: "text"
-    };
-
-    options = validateButtons(
-      mergeArguments(defaults, arguments, ["title", "callback"]),
-      ["cancel", "confirm"]
-    );
-
-    // capture the user's show value; we always set this to false before
-    // spawning the dialog to give us a chance to attach some handlers to
-    // it, but we need to make sure we respect a preference not to show it
-    shouldShow = (options.show === undefined) ? true : options.show;
-
-    /**
-     * overrides; undo anything the user tried to set they shouldn't have
-     */
-    options.message = form;
-
-    options.buttons.cancel.callback = options.onEscape = function() {
-      return options.callback(null);
-    };
-
-    options.buttons.confirm.callback = function() {
-      var value;
-
-      switch (options.inputType) {
-        case "text":
-        case "textarea":
-        case "email":
-        case "select":
-        case "date":
-        case "time":
-        case "number":
-        case "password":
-          value = input.val();
-          break;
-
-        case "checkbox":
-          var checkedItems = input.find("input:checked");
-
-          // we assume that checkboxes are always multiple,
-          // hence we default to an empty array
-          value = [];
-
-          each(checkedItems, function(_, item) {
-            value.push($(item).val());
-          });
-          break;
-      }
-
-      return options.callback(value);
-    };
-
-    options.show = false;
-
-    // prompt specific validation
-    if (!options.title) {
-      throw new Error("prompt requires a title");
-    }
-
-    if (!$.isFunction(options.callback)) {
-      throw new Error("prompt requires a callback");
-    }
-
-    if (!templates.inputs[options.inputType]) {
-      throw new Error("invalid prompt type");
-    }
-
-    // create the input based on the supplied type
-    input = $(templates.inputs[options.inputType]);
-
-    switch (options.inputType) {
-      case "text":
-      case "textarea":
-      case "email":
-      case "date":
-      case "time":
-      case "number":
-      case "password":
-        input.val(options.value);
-        break;
-
-      case "select":
-        var groups = {};
-        inputOptions = options.inputOptions || [];
-
-        if (!inputOptions.length) {
-          throw new Error("prompt with select requires options");
-        }
-
-        each(inputOptions, function(_, option) {
-
-          // assume the element to attach to is the input...
-          var elem = input;
-
-          if (option.value === undefined || option.text === undefined) {
-            throw new Error("given options in wrong format");
-          }
-
-
-          // ... but override that element if this option sits in a group
-
-          if (option.group) {
-            // initialise group if necessary
-            if (!groups[option.group]) {
-              groups[option.group] = $("<optgroup/>").attr("label", option.group);
-            }
-
-            elem = groups[option.group];
-          }
-
-          elem.append("<option value='" + option.value + "'>" + option.text + "</option>");
-        });
-
-        each(groups, function(_, group) {
-          input.append(group);
-        });
-
-        // safe to set a select's value as per a normal input
-        input.val(options.value);
-        break;
-
-      case "checkbox":
-        var values   = $.isArray(options.value) ? options.value : [options.value];
-        inputOptions = options.inputOptions || [];
-
-        if (!inputOptions.length) {
-          throw new Error("prompt with checkbox requires options");
-        }
-
-        if (!inputOptions[0].value || !inputOptions[0].text) {
-          throw new Error("given options in wrong format");
-        }
-
-        // checkboxes have to nest within a containing element, so
-        // they break the rules a bit and we end up re-assigning
-        // our 'input' element to this container instead
-        input = $("<div/>");
-
-        each(inputOptions, function(_, option) {
-          var checkbox = $(templates.inputs[options.inputType]);
-
-          checkbox.find("input").attr("value", option.value);
-          checkbox.find("label").append(option.text);
-
-          // we've ensured values is an array so we can always iterate over it
-          each(values, function(_, value) {
-            if (value === option.value) {
-              checkbox.find("input").prop("checked", true);
-            }
-          });
-
-          input.append(checkbox);
-        });
-        break;
-    }
-
-    if (options.placeholder) {
-      input.attr("placeholder", options.placeholder);
-    }
-
-    if(options.pattern){
-      input.attr("pattern", options.pattern);
-    }
-
-    // now place it in our form
-    form.append(input);
-
-    form.on("submit", function(e) {
-      e.preventDefault();
-      // Fix for SammyJS (or similar JS routing library) hijacking the form post.
-      e.stopPropagation();
-      // @TODO can we actually click *the* button object instead?
-      // e.g. buttons.confirm.click() or similar
-      dialog.find(".btn-primary").click();
-    });
-
-    dialog = exports.dialog(options);
-
-    // clear the existing handler focusing the submit button...
-    dialog.off("shown.bs.modal");
-
-    // ...and replace it with one focusing our input, if possible
-    dialog.on("shown.bs.modal", function() {
-      input.focus();
-    });
-
-    if (shouldShow === true) {
-      dialog.modal("show");
-    }
-
-    return dialog;
-  };
-
-  exports.dialog = function(options) {
-    options = sanitize(options);
-
-    var dialog = $(templates.dialog);
-    var innerDialog = dialog.find(".modal-dialog");
-    var body = dialog.find(".modal-body");
-    var buttons = options.buttons;
-    var buttonStr = "";
-    var callbacks = {
-      onEscape: options.onEscape
-    };
-
-    each(buttons, function(key, button) {
-
-      // @TODO I don't like this string appending to itself; bit dirty. Needs reworking
-      // can we just build up button elements instead? slower but neater. Then button
-      // can just become a template too
-      buttonStr += "<button data-bb-handler='" + key + "' type='button' class='btn " + button.className + "'>" + button.label + "</button>";
-      callbacks[key] = button.callback;
-    });
-
-    body.find(".bootbox-body").html(options.message);
-
-    if (options.animate === true) {
-      dialog.addClass("fade");
-    }
-
-    if (options.className) {
-      dialog.addClass(options.className);
-    }
-
-    if (options.size === "large") {
-      innerDialog.addClass("modal-lg");
-    }
-
-    if (options.size === "small") {
-      innerDialog.addClass("modal-sm");
-    }
-
-    if (options.title) {
-      body.before(templates.header);
-    }
-
-    if (options.closeButton) {
-      var closeButton = $(templates.closeButton);
-
-      if (options.title) {
-        dialog.find(".modal-header").prepend(closeButton);
-      } else {
-        closeButton.css("margin-top", "-10px").prependTo(body);
-      }
-    }
-
-    if (options.title) {
-      dialog.find(".modal-title").html(options.title);
-    }
-
-    if (buttonStr.length) {
-      body.after(templates.footer);
-      dialog.find(".modal-footer").html(buttonStr);
-    }
-
-
-    /**
-     * Bootstrap event listeners; used handle extra
-     * setup & teardown required after the underlying
-     * modal has performed certain actions
-     */
-
-    dialog.on("hidden.bs.modal", function(e) {
-      // ensure we don't accidentally intercept hidden events triggered
-      // by children of the current dialog. We shouldn't anymore now BS
-      // namespaces its events; but still worth doing
-      if (e.target === this) {
-        dialog.remove();
-      }
-    });
-
-    /*
-    dialog.on("show.bs.modal", function() {
-      // sadly this doesn't work; show is called *just* before
-      // the backdrop is added so we'd need a setTimeout hack or
-      // otherwise... leaving in as would be nice
-      if (options.backdrop) {
-        dialog.next(".modal-backdrop").addClass("bootbox-backdrop");
-      }
-    });
-    */
-
-    dialog.on("shown.bs.modal", function() {
-      dialog.find(".btn-primary:first").focus();
-    });
-
-    /**
-     * Bootbox event listeners; experimental and may not last
-     * just an attempt to decouple some behaviours from their
-     * respective triggers
-     */
-
-    dialog.on("escape.close.bb", function(e) {
-      if (callbacks.onEscape) {
-        processCallback(e, dialog, callbacks.onEscape);
-      }
-    });
-
-    /**
-     * Standard jQuery event listeners; used to handle user
-     * interaction with our dialog
-     */
-
-    dialog.on("click", ".modal-footer button", function(e) {
-      var callbackKey = $(this).data("bb-handler");
-
-      processCallback(e, dialog, callbacks[callbackKey]);
-
-    });
-
-    dialog.on("click", ".bootbox-close-button", function(e) {
-      // onEscape might be falsy but that's fine; the fact is
-      // if the user has managed to click the close button we
-      // have to close the dialog, callback or not
-      processCallback(e, dialog, callbacks.onEscape);
-    });
-
-    dialog.on("keyup", function(e) {
-      if (e.which === 27) {
-        dialog.trigger("escape.close.bb");
-      }
-    });
-
-    // the remainder of this method simply deals with adding our
-    // dialogent to the DOM, augmenting it with Bootstrap's modal
-    // functionality and then giving the resulting object back
-    // to our caller
-
-    $(options.container).append(dialog);
-
-    dialog.modal({
-      backdrop: options.backdrop,
-      keyboard: false,
-      show: false
-    });
-
-    if (options.show) {
-      dialog.modal("show");
-    }
-
-    // @TODO should we return the raw element here or should
-    // we wrap it in an object on which we can expose some neater
-    // methods, e.g. var d = bootbox.alert(); d.hide(); instead
-    // of d.modal("hide");
-
-   /*
-    function BBDialog(elem) {
-      this.elem = elem;
-    }
-
-    BBDialog.prototype = {
-      hide: function() {
-        return this.elem.modal("hide");
-      },
-      show: function() {
-        return this.elem.modal("show");
-      }
-    };
-    */
-
-    return dialog;
-
-  };
-
-  exports.setDefaults = function() {
-    var values = {};
-
-    if (arguments.length === 2) {
-      // allow passing of single key/value...
-      values[arguments[0]] = arguments[1];
-    } else {
-      // ... and as an object too
-      values = arguments[0];
-    }
-
-    $.extend(defaults, values);
-  };
-
-  exports.hideAll = function() {
-    $(".bootbox").modal("hide");
-
-    return exports;
-  };
-
-
-  /**
-   * standard locales. Please add more according to ISO 639-1 standard. Multiple language variants are
-   * unlikely to be required. If this gets too large it can be split out into separate JS files.
-   */
-  var locales = {
-    br : {
-      OK      : "OK",
-      CANCEL  : "Cancelar",
-      CONFIRM : "Sim"
-    },
-    cs : {
-      OK      : "OK",
-      CANCEL  : "Zrušit",
-      CONFIRM : "Potvrdit"
-    },
-    da : {
-      OK      : "OK",
-      CANCEL  : "Annuller",
-      CONFIRM : "Accepter"
-    },
-    de : {
-      OK      : "OK",
-      CANCEL  : "Abbrechen",
-      CONFIRM : "Akzeptieren"
-    },
-    el : {
-      OK      : "Εντάξει",
-      CANCEL  : "Ακύρωση",
-      CONFIRM : "Επιβεβαίωση"
-    },
-    en : {
-      OK      : "OK",
-      CANCEL  : "Cancel",
-      CONFIRM : "OK"
-    },
-    es : {
-      OK      : "OK",
-      CANCEL  : "Cancelar",
-      CONFIRM : "Aceptar"
-    },
-    et : {
-      OK      : "OK",
-      CANCEL  : "Katkesta",
-      CONFIRM : "OK"
-    },
-    fi : {
-      OK      : "OK",
-      CANCEL  : "Peruuta",
-      CONFIRM : "OK"
-    },
-    fr : {
-      OK      : "OK",
-      CANCEL  : "Annuler",
-      CONFIRM : "D'accord"
-    },
-    he : {
-      OK      : "אישור",
-      CANCEL  : "ביטול",
-      CONFIRM : "אישור"
-    },
-    id : {
-      OK      : "OK",
-      CANCEL  : "Batal",
-      CONFIRM : "OK"
-    },
-    it : {
-      OK      : "OK",
-      CANCEL  : "Annulla",
-      CONFIRM : "Conferma"
-    },
-    ja : {
-      OK      : "OK",
-      CANCEL  : "キャンセル",
-      CONFIRM : "確認"
-    },
-    lt : {
-      OK      : "Gerai",
-      CANCEL  : "Atšaukti",
-      CONFIRM : "Patvirtinti"
-    },
-    lv : {
-      OK      : "Labi",
-      CANCEL  : "Atcelt",
-      CONFIRM : "Apstiprināt"
-    },
-    nl : {
-      OK      : "OK",
-      CANCEL  : "Annuleren",
-      CONFIRM : "Accepteren"
-    },
-    no : {
-      OK      : "OK",
-      CANCEL  : "Avbryt",
-      CONFIRM : "OK"
-    },
-    pl : {
-      OK      : "OK",
-      CANCEL  : "Anuluj",
-      CONFIRM : "Potwierdź"
-    },
-    pt : {
-      OK      : "OK",
-      CANCEL  : "Cancelar",
-      CONFIRM : "Confirmar"
-    },
-    ru : {
-      OK      : "OK",
-      CANCEL  : "Отмена",
-      CONFIRM : "Применить"
-    },
-    sv : {
-      OK      : "OK",
-      CANCEL  : "Avbryt",
-      CONFIRM : "OK"
-    },
-    tr : {
-      OK      : "Tamam",
-      CANCEL  : "İptal",
-      CONFIRM : "Onayla"
-    },
-    zh_CN : {
-      OK      : "OK",
-      CANCEL  : "取消",
-      CONFIRM : "确认"
-    },
-    zh_TW : {
-      OK      : "OK",
-      CANCEL  : "取消",
-      CONFIRM : "確認"
-    }
-  };
-
-  exports.init = function(_$) {
-    return init(_$ || $);
-  };
-
-  return exports;
 }));
 
 /*!
