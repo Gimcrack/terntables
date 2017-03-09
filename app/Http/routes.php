@@ -40,7 +40,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth_admin'], function(){
    Route::get('tickets/trends/json/{groupOrIndividual}/{id}',             'MetricsController@tickets_trends_json');
    Route::get('tickets/trends/json/{years}',                              'MetricsController@tickets_trends_json');
    Route::get('tickets/trends/json',                                      'MetricsController@tickets_trends_json');
-   Route::get('tickets/trends/all/{years}',                               'MetricsController@trendsTickets');
+   Route::get('tickets/trends/{years}',                                   'MetricsController@trendsTickets');
    Route::get('tickets/trends/{groupOrIndividual}/{id}/{years}',          'MetricsController@trendsTickets');
    Route::get('tickets/trends/{groupOrIndividual}/{id}',                  'MetricsController@trendsTickets');
    Route::get('tickets/trends',                                           'MetricsController@trendsTickets');
