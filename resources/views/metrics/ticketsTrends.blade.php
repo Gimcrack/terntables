@@ -119,7 +119,11 @@
             }
           });
 
-          $.getJSON('/metrics/tickets/trends/json/{{$groupOrIndividual}}/{{$id}}/{{$years}}', function(response){
+          var url = '/metrics/tickets/trends/json/{{$groupOrIndividual}}/{{$id}}/{{$years}}';
+
+          url = url.replace('///','/').replace('//','/');
+
+          $.getJSON( url, function(response){
 
             $('.preloader').hide();
 
