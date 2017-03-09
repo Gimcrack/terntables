@@ -181,6 +181,8 @@
 
             // divide the data in quarters
             _.each(response.data, function(o) {
+              console.log(o);
+
               var d = o.CreatedDate,
                   m = d.getMonth(),
                   y = d.getFullYear();
