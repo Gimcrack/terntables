@@ -43,7 +43,7 @@
 	                { x : 'Feb' },
 	                { x : 'Mar' },
 	                { x : 'Apr' },
-	                { x : 'Max' },
+	                { x : 'May' },
 	                { x : 'Jun' },
 	                { x : 'Jul' },
 	                { x : 'Aug' },
