@@ -43,7 +43,7 @@
 			var chartSettings = {
 				parseTime: false,
 				element: 'closed-tickets-by-month',
-				data: [{ x: 'Jan' }, { x: 'Feb' }, { x: 'Mar' }, { x: 'Apr' }, { x: 'Max' }, { x: 'Jun' }, { x: 'Jul' }, { x: 'Aug' }, { x: 'Sep' }, { x: 'Oct' }, { x: 'Nov' }, { x: 'Dec' }],
+				data: [{ x: 'Jan' }, { x: 'Feb' }, { x: 'Mar' }, { x: 'Apr' }, { x: 'May' }, { x: 'Jun' }, { x: 'Jul' }, { x: 'Aug' }, { x: 'Sep' }, { x: 'Oct' }, { x: 'Nov' }, { x: 'Dec' }],
 				xkey: 'x',
 				ykeys: [],
 				labels: []
