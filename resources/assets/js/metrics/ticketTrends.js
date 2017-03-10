@@ -84,7 +84,7 @@
 	        	for(let year in row)
 	        	{
 	        		if( year == 'x') continue;
-	        		if ( chartSettings.data.length > 800 && row[year] < 20 ) delete row[year]; 
+	        		if ( data.length > 800 && row[year] < 20 ) delete row[year]; 
 	        	}
 	        })
 
