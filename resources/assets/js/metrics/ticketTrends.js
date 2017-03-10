@@ -56,15 +56,19 @@
 	            ykeys : [],
 	            labels : []
 	        },
-	        ykeys = [];
+	        ykeys = [],
+	        today = new Date();
 
 
 		    // process the chart data
-	        _.each(data, function(o) {
+	        _.each(data, (o) => {
 	        
 	            let d = o.CreatedDate,
                     m = d.getMonth(),
                     y = d.getFullYear();
+
+                // don't add current month
+                //if (m == today.getMonth() && y == today.getFullYear()) {return false;}
 	            
 	            ykeys.push(y);
 
@@ -73,6 +77,16 @@
 
 	        // get the ykeys, unique and sorted
 	        ykeys = _.uniq( ykeys ).sort();
+
+	        // throw out outliers
+	        _.each( chartSettings.data, (row) => {
+	        	
+	        	for(let year in row)
+	        	{
+	        		if( year == 'x') continue;
+	        		if (row[year] < 20 ) delete row[year]; 
+	        	}
+	        })
 
 	        // set the labels
 	        chartSettings.ykeys = chartSettings.labels = ykeys;
