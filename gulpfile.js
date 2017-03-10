@@ -124,14 +124,15 @@ elixir(function(mix) {
     mix
       .scripts(jsScripts)
       .scripts(preReqs,'public/js/prereqs.js')
+      .browserify('./resources/assets/js/metrics/ticketTrends.js','public/js/ticketTrends.js')
       .copy('./vendor/ingenious/terntables.js/build/terntables.js','./public/js/terntables.js');
 
 
     //styles
-    mix.sass('app.scss',
-      'public/css/all.css', {
-        includePaths : cssPaths
-    });
+    // mix.sass('app.scss',
+    //   'public/css/all.css', {
+    //     includePaths : cssPaths
+    // });
 
     mix.livereload();
     
