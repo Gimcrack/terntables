@@ -74,7 +74,7 @@
 
 				for (var year in row) {
 					if (year == 'x') continue;
-					if (chartSettings.data.length > 2000 && row[year] < 20) delete row[year];
+					if (chartSettings.data.length > 800 && row[year] < 20) delete row[year];
 				}
 			});
 
