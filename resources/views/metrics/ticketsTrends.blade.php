@@ -14,6 +14,19 @@
             </div>
         </div>
     </div>
+    <div class="col-xs-12">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <strong class="visible-md visible-lg">Tickets By Month Opened - Last {{ $years ?: 5 }} Years : {{$id ?: "IT Department"}}</strong>
+                <strong class="visible-sm">Tickets By Month Opened : {{$id ?: "IT Department"}}</strong>
+                <strong class="visible-xs">Tickets By Month Opened : {{$id ?: "IT Department"}}</strong>
+            </div>
+            <div class="panel-body">
+                @include('partials.preloader')
+                <div id="closed-tickets-by-month-bar"></div>
+            </div>
+        </div>
+    </div>
     <div class="col-xs-4">
         <div class="panel panel-info">
             <div class="panel-heading">

@@ -70,11 +70,17 @@
 	            	.value(),				 
 	            xkey : 'x',
 	            ykeys : ykeys,
-	            labels : ykeys
+	            labels : ykeys,
+	            resize : true,
+		        //stacked : true,
 	        }; 
 
 	        // display the chart
 	        Morris.Line(chartSettings);
+
+	        chartSettings.element = 'closed-tickets-by-month-bar';
+
+	        Morris.Bar(chartSettings);
 	    }
 
 	    /**
