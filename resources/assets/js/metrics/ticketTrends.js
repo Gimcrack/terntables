@@ -1,4 +1,8 @@
 ;( function(window, $) {
+
+	var _ = require('lodash');
+	var moment = require('moment');
+
 	window.ticketTrends = function(params) {
 
 	    var base = '/metrics/tickets/trends/json/',
@@ -35,64 +39,48 @@
 	     */
 	    let chart1 = function(data) 
 	    {
-	        let chartSettings = {
+	    	let today = new Date(),
+
+        	ykeys = _(data).map( o => o.CreatedDate.getFullYear() ).uniq().value().sort(),
+
+	    	fn_counting = o => o.CreatedDate.getFullYear(),
+
+	    	chartSettings = {
 	            parseTime : false,
 	            element : 'closed-tickets-by-month',
-	            data : [
-	                { x : 'Jan' },
-	                { x : 'Feb' },
-	                { x : 'Mar' },
-	                { x : 'Apr' },
-	                { x : 'May' },
-	                { x : 'Jun' },
-	                { x : 'Jul' },
-	                { x : 'Aug' },
-	                { x : 'Sep' },
-	                { x : 'Oct' },
-	                { x : 'Nov' },
-	                { x : 'Dec' },
-	        	],
+	            data : _(data)
+	            	// reject tickets from this month
+	            	.reject( o => { 
+	            		return ( o.CreatedDate.getMonth() == today.getMonth() ) && 
+		            	( o.CreatedDate.getFullYear() == today.getFullYear() )
+	            	})
+	            	// group by month and year
+	            	.groupBy( o => o.CreatedDate.getMonth() + ' ' + o.CreatedDate.getFullYear() ) 
+	            	// reject months with low ticket numbers if we have a lot of data
+	            	.reject( o => o.length < 20 && data.length > 800 ) 	 
+	            	// ungroup from previous operation
+	            	.values()
+	            	// bring it back to one level array of objects				 
+	            	.flatten()		
+	            	// group by month		 
+	            	.groupBy( o => o.CreatedDate.getMonth() ) 
+	            	// count by year
+	            	.map( (o, i) => _(o).countBy(fn_counting).extend({ x : moment(new Date(2000,i,1)).format("MMM") }).value() )	
+	            	// get the data	 
+	            	.value(),				 
 	            xkey : 'x',
-	            ykeys : [],
-	            labels : []
-	        },
-	        ykeys = [],
-	        today = new Date();
+	            ykeys : ykeys,
+	            labels : ykeys,
+	            resize : true,
+		        //stacked : true,
+	        }; 
 
-
-		    // process the chart data
-	        _.each(data, (o) => {
-	        
-	            let d = o.CreatedDate,
-                    m = d.getMonth(),
-                    y = d.getFullYear();
-
-                // don't add current month
-                //if (m == today.getMonth() && y == today.getFullYear()) {return false;}
-	            
-	            ykeys.push(y);
-
-	            chartSettings.data[m][y] = ( chartSettings.data[m][y] + 1 ) || 1;
-	        });
-
-	        // get the ykeys, unique and sorted
-	        ykeys = _.uniq( ykeys ).sort();
-
-	        // throw out outliers
-	        _.each( chartSettings.data, (row) => {
-	        	
-	        	for(let year in row)
-	        	{
-	        		if( year == 'x') continue;
-	        		if ( data.length > 800 && row[year] < 20 ) delete row[year]; 
-	        	}
-	        })
-
-	        // set the labels
-	        chartSettings.ykeys = chartSettings.labels = ykeys;
-	        
 	        // display the chart
 	        Morris.Line(chartSettings);
+
+	        chartSettings.element = 'closed-tickets-by-month-bar';
+
+	        Morris.Bar(chartSettings);
 	    }
 
 	    /**
@@ -102,20 +90,27 @@
 	     */
 	    let chart2 = function(data)
 	    {
-	    	let chartSettings = {
+	    	let fn_grouping = (o) => { 
+	    	
+	    		return ( !! o.Customer_Department && o.Customer_Department != 'null' ) ? 
+	    			o.Customer_Department : 
+	    			'-No Department-'; 
+	    	
+	    	},	fn_mapping = (o, i) => { 
+	    	
+	    		return { 
+	    			label : i, 
+				    value : Math.ceil( _(o).sumBy('TotalTimeWorked') / 60 )
+				}; 
+			
+			},	chartSettings = {
 	    		element : 'hours-by-customer',
-		        data : _.orderBy(
-		        	 _.map(
-		        		 _.groupBy(data, (o) => { 
-		        		 	return ( !! o.Customer_Department && o.Customer_Department != 'null' ) ? o.Customer_Department : '-No Department-'; 
-		        		}),
-			        	(o, i) => { 
-			        		return { 
-			        			label : i, 
-			        			value : Math.ceil( _.sum( _.map(o, 'TotalTimeWorked') ) / 60 )
-			        		}; 
-			        	}
-        			), o => -o.value).slice(0,10),
+		        data : _(data)
+		        		.groupBy( fn_grouping )
+		        		.map( fn_mapping )
+	        			.orderBy(o => -o.value)
+	        			.value()
+	        			.slice(0,10),
 		        resize : true,
 	    	};
 	    	
@@ -129,20 +124,29 @@
 	     */
 	    let chart3 = function(data)
 	    {
-	    	let chartSettings = {
+	    	let fn_grouping = (o) => 
+	    	{
+	    		return ( !! o.Customer_Department && o.Customer_Department != 'null' ) ? 
+	    			o.Customer_Department : 
+	    			'-No Department-'; 
+	    	},
+	    		
+	    	fn_mapping = (o, i) => 
+	    	{ 
+        		return { 
+        			label : i, 
+        			value : o.length
+        		}; 
+	        },
+
+	    	chartSettings = {
 	    		element : 'tickets-by-customer',
-		        data : _.orderBy(
-		        	 _.map(
-		        		 _.groupBy(data, (o) => { 
-		        		 	return ( !! o.Customer_Department && o.Customer_Department != 'null' ) ? o.Customer_Department : '-No Department-'; 
-		        		}),
-			        	(o, i) => { 
-			        		return { 
-			        			label : i, 
-			        			value : o.length
-			        		}; 
-			        	}
-        			), o => -o.value).slice(0,10),
+		        data : _(data)
+		        		.groupBy( fn_grouping )
+		        		.map( fn_mapping )
+		        		.orderBy( o => -o.value )
+		        		.value()
+		        		.slice(0,10),
 		        resize : true,
 	    	};
 	    	
@@ -156,26 +160,33 @@
 	     */
 	    let chart4 = function(data)
 	    {
-	    	let chartSettings = {
+	    	let fn_counting = (o) => 
+	    	{
+	    		if ( o.DaysOpen <= 2 )  return ' 1-2 days'; 
+    		 	if ( o.DaysOpen <= 5 )  return ' 2-5 days'; 
+    		 	if ( o.DaysOpen <= 10 ) return ' 5-10 days'; 
+    		 	if ( o.DaysOpen <= 20 ) return '10-20 days'; 
+    		 	if ( o.DaysOpen <= 50 ) return '20-50 days';
+    		 	return '50+ days';
+	    	},
+
+	    	fn_mapping = (o, i) => 
+	    	{ 
+        		let percentage = Math.round( ( 100 * o ) / data.length, 2);
+        		
+        		return { 
+        			label : `${i} (${percentage}%)`, 
+        			value : o
+        		}; 
+        	},
+
+	    	chartSettings = {
 	    		element : 'tickets-by-days-open',
-		        data : _.orderBy(
-		        		_.map(
-		        		 _.countBy(data, (o) => { 
-		        		 	if ( o.DaysOpen <= 2 ) return ' 1-2 days'; 
-		        		 	if ( o.DaysOpen <= 5 ) return ' 2-5 days'; 
-		        		 	if ( o.DaysOpen <= 10 ) return ' 5-10 days'; 
-		        		 	if ( o.DaysOpen <= 20 ) return '10-20 days'; 
-		        		 	if ( o.DaysOpen <= 50 ) return '20-50 days';
-		        		 	return '50+ days';
-		        		}),
-			        	(o, i) => { 
-			        		let percentage = Math.round(100 * o/data.length, 2);
-			        		return { 
-			        			label : `${i} (${percentage}%)`, 
-			        			value : o
-			        		}; 
-			        	}
-    				), o => o.label),
+		        data : _(data)
+		        		.countBy( fn_counting )
+		        		.map( fn_mapping )
+		        		.orderBy( o => o.label )
+		        		.value(),
 		        resize : true,
 	    	};
 	    	
@@ -189,27 +200,31 @@
 	     */
 	    let chart5 = function(data)
 	    {
-	    	let chartSettings = {
+	    	let fn_counting = o => o.Category,
+
+	    	fn_mapping = (o, i) => 
+	    	{ 
+        		let percentage = Math.round( ( 100 * o ) / data.length, 2);
+        		
+        		return { 
+        			label : `${i} (${percentage}%)`, 
+        			tickets : o
+        		}; 
+        	},
+
+	    	chartSettings = {
 	    		element : 'tickets-by-category',
-		        data : _.orderBy(
-		        		_.map(
-		        		 _.countBy(data, (o) => o.Category ),
-			        	(o, i) => { 
-			        		let percentage = Math.round(100 * o/data.length, 2);
-			        		return { 
-			        			label : `${i} (${percentage}%)`, 
-			        			tickets : o
-			        		}; 
-			        	}
-    				), o => -o.tickets).slice(0,10),
+		        data : _(data)
+		        		.countBy( fn_counting )
+		        		.map( fn_mapping )
+		        		.orderBy( o => -o.tickets )
+		        		.value()
+		        		.slice(0,10),
 		        xkey : 'label',
 		        ykeys : ['tickets'],
 		        labels : 'Tickets',
 		        resize : true,
 		        stacked : true,
-		        //gridTextSize : 11,
-		        //xLabelAngle : 15
-
 	    	};
 	    	
 	    	Morris.Bar(chartSettings);
@@ -222,26 +237,30 @@
 	     */
 	    let chart6 = function(data)
 	    {
-	    	let chartSettings = {
+
+	    	let fn_grouping = o => o.Category,
+	    		
+	    	fn_mapping = (o, i) => 
+	    	{ 
+        		return { 
+        			label : i, 
+        			hours : Math.ceil( _(o).sumBy('TotalTimeWorked') / 60 )
+        		}; 
+	        },
+	    	
+	    	chartSettings = {
 	    		element : 'hours-by-category',
-		        data : _.orderBy(
-		        		_.map(
-		        		 _.groupBy(data, (o) => o.Category ),
-			        	(o, i) => { 
-			        		return { 
-			        			label : i, 
-			        			hours : Math.ceil( _.sum( _.map(o,'TotalTimeWorked') ) / 60 )
-			        		}; 
-			        	}
-    				), o => -o.hours).slice(0,10),
+		        data : _(data)
+		        		.groupBy( fn_grouping )
+		        		.map( fn_mapping )
+		        		.orderBy( o => -o.hours )
+		        		.value()
+		        		.slice(0,10),
 		        xkey : 'label',
 		        ykeys : ['hours'],
 		        labels : 'Hours',
 		        resize : true,
 		        stacked : true,
-		        //gridTextSize : 11,
-		        //xLabelAngle : 15
-
 	    	};
 	    	
 	    	Morris.Bar(chartSettings);
