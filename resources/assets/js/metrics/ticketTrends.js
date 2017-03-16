@@ -72,7 +72,7 @@
 	            ykeys : ykeys,
 	            labels : ykeys,
 	            resize : true,
-		        //stacked : true,
+		        stacked : true,
 	        }; 
 
 	        // display the chart
@@ -80,7 +80,7 @@
 
 	        chartSettings.element = 'closed-tickets-by-month-bar';
 
-	        Morris.Bar(chartSettings);
+	        Morris.Bar( chartSettings );
 	    }
 
 	    /**
