@@ -21475,7 +21475,8 @@ return hooks;
 				xkey: 'x',
 				ykeys: ykeys,
 				labels: ykeys,
-				resize: true
+				resize: true,
+				stacked: true
 			};
 
 			// display the chart
