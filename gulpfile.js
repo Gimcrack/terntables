@@ -13,8 +13,6 @@ require('laravel-elixir-livereload');
  |
  */
 
-
-
 elixir(function(mix) {
 
   var vendor_path = './vendor';
