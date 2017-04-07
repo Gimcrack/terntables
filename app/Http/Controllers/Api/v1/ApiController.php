@@ -109,7 +109,10 @@ class ApiController extends Controller
   {
       $cache_key = $this->getCacheKey();
 
-      $length = $this->shouldCache() ? 60 * 10 : 0;
+      if ( ! $this->shouldCache() )
+      {
+        $this->forgetCacheSection();
+      }
 
       $results = Cache::tags([$this->model_class])->remember($cache_key, 60 * 10, function() {
           $input = Input::all();
