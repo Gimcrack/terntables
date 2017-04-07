@@ -72,6 +72,15 @@ class ApiController extends Controller
   public $select = [];
 
   /**
+   * Don't cache views from these model types
+   *
+   * @var        array
+   */
+  public $dont_cache = [
+    'App\ServerAgent'
+  ];
+
+  /**
    * Create a new controller
    */
   public function __construct()
@@ -100,6 +109,8 @@ class ApiController extends Controller
   {
       $cache_key = $this->getCacheKey();
 
+      $length = $this->shouldCache() ? 60 * 10 : 0;
+
       $results = Cache::tags([$this->model_class])->remember($cache_key, 60 * 10, function() {
           $input = Input::all();
           $model_class = $this->model_class;
@@ -127,6 +138,17 @@ class ApiController extends Controller
       });
 
       return response()->json( $results );
+  }
+
+  /**
+   * Should the views be cached
+   * @method shouldCache
+   *
+   * @return   bool
+   */
+  private function shouldCache()
+  {
+      return ! in_array($this->model_class, $this->dont_cache);
   }
 
   /**
