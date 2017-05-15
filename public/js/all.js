@@ -15375,6 +15375,14 @@ $(function() {
 						fn : 'toggleApproved',
 						'data-order' : 100
 					},
+					toggleUnapproved : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
+						label : 'Toggle Unapproved',
+						fn : 'toggleUnapproved',
+						'data-order' : 100
+					},
 					toggleInstalled : {
 						type : 'button',
 						class : 'btn btn-success btn-toggle',
@@ -15539,6 +15547,10 @@ $(function() {
 						filter.push('approved_flag = 0');
 					}
 
+					if (typeof temp.hideUnapproved === 'undefined' || !!temp.hideUnapproved) {
+						filter.push('approved_flag = 1');
+					}
+
 					if (typeof temp.hideHidden === 'undefined' || !!temp.hideHidden) {
 						filter.push('hidden_flag = 0');
 					}
@@ -15596,6 +15608,14 @@ $(function() {
 				toggleApproved : function( ) {
 					jApp.activeGrid.temp.hideApproved = ( typeof jApp.activeGrid.temp.hideApproved === 'undefined')
 						? false : !jApp.activeGrid.temp.hideApproved;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+
+				toggleUnapproved : function( ) {
+					jApp.activeGrid.temp.hideUnapproved = ( typeof jApp.activeGrid.temp.hideUnapproved === 'undefined')
+						? false : !jApp.activeGrid.temp.hideUnapproved;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');

@@ -123,7 +123,6 @@ class UpdateDetail extends Model
   }
 
 
-
   /**
    * Get the owner name
    * @method getOwnerNameAttribute
@@ -131,6 +130,8 @@ class UpdateDetail extends Model
    */
   public function getOwnerNameAttribute()
   {
+    if ( ! $this->server || ! $this->server->owner ) return null;
+    
     return $this->server->owner->name;
   }
 
@@ -169,6 +170,11 @@ class UpdateDetail extends Model
     return $this->belongsTo('App\Server');
   }
 
+  /**
+   * An update details belongs to one update
+   *
+   * @return     <type>  ( description_of_the_return_value )
+   */
   public function header()
   {
     return $this->belongsTo('App\Update','update_id') ?? new Update;
