@@ -48,6 +48,13 @@ class UpdateDetail extends Model
     return $query->whereApprovedFlag(0)
                  ->whereHiddenFlag(0);
   }
+  
+  public function scopeApproved($query)
+  {
+    return $query->whereApprovedFlag(1)
+                 ->whereInstalledFlag(0)
+                 ->whereHiddenFlag(0);
+  }
 
   public function scopeProduction($query)
   {
@@ -61,6 +68,24 @@ class UpdateDetail extends Model
     return $query->whereHas('server', function($q) {
       return $q->where('production_flag',0);
     });
+  }
+
+  /**
+   * Use a custom compound scope
+   * @method scopeCompound
+   *
+   * @return   $query
+   */
+  public function scopeCompound($query, $scope)
+  {
+      $scopes = explode("_",$scope);
+
+      foreach( $scopes as $s )
+      {
+        $query->$s(); 
+      }
+
+      return $query;
   }
 
   /**

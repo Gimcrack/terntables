@@ -229,13 +229,13 @@
 				updateGridFilter : function() {
 					var filter = [], temp = jApp.activeGrid.temp, scope = [];
 
-					if (typeof temp.hideApproved === 'undefined' || !!temp.hideApproved) {
-						filter.push('approved_flag = 0');
-					}
+					// if (typeof temp.hideApproved === 'undefined' || !!temp.hideApproved) {
+					// 	filter.push('approved_flag = 0');
+					// }
 
-					if (typeof temp.hideUnapproved === 'undefined' || !!temp.hideUnapproved) {
-						filter.push('approved_flag = 1');
-					}
+					// if (typeof temp.hideUnapproved === 'undefined' || !!temp.hideUnapproved) {
+					// 	filter.push('approved_flag = 1');
+					// }
 
 					if (typeof temp.hideHidden === 'undefined' || !!temp.hideHidden) {
 						filter.push('hidden_flag = 0');
@@ -268,8 +268,27 @@
 						break;
 					}
 
+					switch( true ) {
+						case ( ! temp.hideApproved && ! temp.hideUnapproved ) :
+							scope.push('all');
+						break;
+
+						case ( ! temp.hideApproved && !! temp.hideUnapproved ) :
+							scope.push('approved');
+						break;
+
+						case ( !! temp.hideApproved && ! temp.hideUnapproved ) :
+							scope.push('unapproved');
+						break;
+
+						case ( !! temp.hideApproved && !! temp.hideUnapproved ) :
+							scope.push('none');
+						break;
+					}
+
 					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
-					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope.join('_');
+					jApp.activeGrid.dataGrid.requestOptions.data.scope = 'compound';
+					jApp.activeGrid.dataGrid.requestOptions.data.scope_argument = scope.join('_');
 
 				}, // end fn
 
