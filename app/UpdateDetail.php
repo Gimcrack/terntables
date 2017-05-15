@@ -171,7 +171,7 @@ class UpdateDetail extends Model
 
   public function header()
   {
-    return $this->belongsTo('App\Update','update_id');
+    return $this->belongsTo('App\Update','update_id') ?? new Update;
   }
 
 }
