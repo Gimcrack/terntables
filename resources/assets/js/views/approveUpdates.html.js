@@ -33,7 +33,7 @@
 						icon : 'fa-toggle-on',
 						label : 'Show Only My Groups\'',
 						fn : 'showOnlyMyGroups',
-						'data-order' : 98
+						'data-order' : 100
 					},
 					toggleProduction : {
 						type : 'button',
@@ -41,7 +41,7 @@
 						icon : 'fa-toggle-on',
 						label : 'Toggle Production',
 						fn : 'toggleProduction',
-						'data-order' : 100
+						'data-order' : 101
 					},
 					toggleNonProduction : {
 						type : 'button',
@@ -49,7 +49,7 @@
 						icon : 'fa-toggle-on',
 						label : 'Toggle Non-Production',
 						fn : 'toggleNonProduction',
-						'data-order' : 100
+						'data-order' : 102
 					},
 					toggleApproved : {
 						type : 'button',
@@ -57,7 +57,7 @@
 						icon : 'fa-toggle-off',
 						label : 'Toggle Approved',
 						fn : 'toggleApproved',
-						'data-order' : 100
+						'data-order' : 103
 					},
 					toggleUnapproved : {
 						type : 'button',
@@ -65,7 +65,7 @@
 						icon : 'fa-toggle-on',
 						label : 'Toggle Unapproved',
 						fn : 'toggleUnapproved',
-						'data-order' : 100
+						'data-order' : 104
 					},
 					toggleInstalled : {
 						type : 'button',
@@ -73,7 +73,7 @@
 						icon : 'fa-toggle-off',
 						label : 'Toggle Installed',
 						fn : 'toggleInstalled',
-						'data-order' : 101
+						'data-order' : 105
 					},
 					toggleHidden : {
 						type : 'button',
@@ -81,7 +81,7 @@
 						icon : 'fa-toggle-off',
 						label : 'Toggle Hidden',
 						fn : 'toggleHidden',
-						'data-order' : 101
+						'data-order' : 106
 					},
 					// toggleProduction : {
 					// 	type : 'button',
