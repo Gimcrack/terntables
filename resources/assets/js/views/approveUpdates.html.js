@@ -179,6 +179,8 @@
 				},
 
 				kb_article : function(val) {
+					if ( ! val || ! val.length ) return '';
+					
 					var url = 'https://support.microsoft.com/en-us/kb/' + val.replace('KB','');
 
 					return _.link( '<a target="_blank" href="' + url + '">' + val + '</a>', null, true );
