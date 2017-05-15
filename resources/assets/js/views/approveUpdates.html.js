@@ -61,8 +61,8 @@
 					},
 					toggleUnapproved : {
 						type : 'button',
-						class : 'btn btn-success btn-toggle',
-						icon : 'fa-toggle-off',
+						class : 'btn btn-success btn-toggle active',
+						icon : 'fa-toggle-on',
 						label : 'Toggle Unapproved',
 						fn : 'toggleUnapproved',
 						'data-order' : 100
@@ -180,7 +180,7 @@
 
 				kb_article : function(val) {
 					if ( ! val || ! val.length ) return '';
-					
+
 					var url = 'https://support.microsoft.com/en-us/kb/' + val.replace('KB','');
 
 					return _.link( '<a target="_blank" href="' + url + '">' + val + '</a>', null, true );
@@ -300,8 +300,9 @@
 				}, //end fn
 
 				toggleUnapproved : function( ) {
-					jApp.activeGrid.temp.hideUnapproved = ( typeof jApp.activeGrid.temp.hideUnapproved === 'undefined')
-						? false : !jApp.activeGrid.temp.hideUnapproved;
+					var temp = jApp.activeGrid.temp;
+
+					temp.hideProduction = ( !!! temp.hideProduction );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
