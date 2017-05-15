@@ -183,7 +183,7 @@
 				},
 
 				ip : function( val ) {
-					return _.map( val.split('.'), function(part) { return ('000' + part).slice(-3) }).join('.');
+					return _.map( val.split('.'), function(part) { return ('   ' + part).slice(-3) }).join('.');
 				},
 
 				agent_status : function() {
