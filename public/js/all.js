@@ -15566,6 +15566,8 @@ $(function() {
 						scope.push('myGroups');
 					}
 
+					if ( typeof temp.hideApproved === 'undefined' ) temp.hideApproved = true;
+
 					switch( true ) {
 						case ( ! temp.hideProduction && ! temp.hideNonProduction ) :
 							scope.push('all');
