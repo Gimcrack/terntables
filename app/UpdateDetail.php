@@ -137,11 +137,13 @@ class UpdateDetail extends Model
 
   public function identifiableName()
   {
+    if ( ! $this->header ) return null;
     return $this->header->title;
   }
 
   public function getKbArticleAttribute()
   {
+    if ( ! $this->header ) return null;
     return $this->header->kb_article;
   }
 
@@ -153,11 +155,13 @@ class UpdateDetail extends Model
 
   public function getTitleAttribute()
   {
+    if ( ! $this->header ) return null;
     return $this->header->title;
   }
 
   public function getDescriptionAttribute()
   {
+    if ( ! $this->header) return null;
     return $this->header->description;
   }
 
