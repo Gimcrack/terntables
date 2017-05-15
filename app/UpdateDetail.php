@@ -123,7 +123,6 @@ class UpdateDetail extends Model
   }
 
 
-
   /**
    * Get the owner name
    * @method getOwnerNameAttribute
@@ -131,31 +130,38 @@ class UpdateDetail extends Model
    */
   public function getOwnerNameAttribute()
   {
+    if ( ! $this->server || ! $this->server->owner ) return null;
+
     return $this->server->owner->name;
   }
 
   public function identifiableName()
   {
+    if ( ! $this->header ) return null;
     return $this->header->title;
   }
 
   public function getKbArticleAttribute()
   {
+    if ( ! $this->header ) return null;
     return $this->header->kb_article;
   }
 
   public function getHostnameAttribute()
   {
+    if ( ! $this->server ) return null; 
     return $this->server->name;
   }
 
   public function getTitleAttribute()
   {
+    if ( ! $this->header ) return null;
     return $this->header->title;
   }
 
   public function getDescriptionAttribute()
   {
+    if ( ! $this->header) return null;
     return $this->header->description;
   }
 
@@ -169,9 +175,14 @@ class UpdateDetail extends Model
     return $this->belongsTo('App\Server');
   }
 
+  /**
+   * An update details belongs to one update
+   *
+   * @return     <type>  ( description_of_the_return_value )
+   */
   public function header()
   {
-    return $this->belongsTo('App\Update','update_id');
+    return $this->belongsTo('App\Update','update_id') ?? new Update;
   }
 
 }
