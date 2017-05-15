@@ -321,7 +321,7 @@
 				toggleUnapproved : function( ) {
 					var temp = jApp.activeGrid.temp;
 
-					temp.hideProduction = ( !!! temp.hideProduction );
+					temp.hideUnapproved = ( !!! temp.hideUnapproved );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
