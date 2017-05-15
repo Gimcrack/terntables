@@ -131,7 +131,7 @@ class UpdateDetail extends Model
   public function getOwnerNameAttribute()
   {
     if ( ! $this->server || ! $this->server->owner ) return null;
-    
+
     return $this->server->owner->name;
   }
 
@@ -147,6 +147,7 @@ class UpdateDetail extends Model
 
   public function getHostnameAttribute()
   {
+    if ( ! $this->server ) return null; 
     return $this->server->name;
   }
 
