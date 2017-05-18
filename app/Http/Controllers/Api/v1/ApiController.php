@@ -78,7 +78,10 @@ class ApiController extends Controller
      */
     public $dont_cache = [
         'App\ServerAgent',
-        'App\WindowsUpdateServer'
+        'App\ServerService',
+        'App\WindowsUpdateServer',
+        'App\Update',
+        'App\UpdateDetail'
     ];
 
     /**
