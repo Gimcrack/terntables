@@ -104,7 +104,7 @@
       var barChartData1 = _(response.data)
             // reject for non-person assignees (assignees ending in a number)
             .reject( o => {
-                return !! o.Assignee_DisplayName.match(/(.*)\d/gi);
+                return !! o.assignee.match(/(.*)\d/gi);
             })
             .groupBy('assignee')
             .map( (o, i) => {
@@ -134,7 +134,7 @@
       var barChartData1 = _(response.data)
             // reject for person assignees (assignees ending in a number)
             .reject( o => {
-                return ! o.Assignee_DisplayName.match(/(.*)\d/gi);
+                return ! o.assignee.match(/(.*)\d/gi);
             })
             .groupBy('assignee')
             .map( (o, i) => {
