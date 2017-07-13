@@ -21450,6 +21450,10 @@ return hooks;
 				.reject(function (o) {
 					return o.CreatedDate.getMonth() == today.getMonth() && o.CreatedDate.getFullYear() == today.getFullYear();
 				})
+				// reject for non-person assignees (assignees ending in a number)
+				.reject(function (o) {
+					return !!o.Assignee_DisplayName.match(/(.*)\d/gi);
+				})
 				// group by month and year
 				.groupBy(function (o) {
 					return o.CreatedDate.getMonth() + ' ' + o.CreatedDate.getFullYear();
@@ -21506,7 +21510,11 @@ return hooks;
 			},
 			    chartSettings = {
 				element: 'hours-by-customer',
-				data: _(data).groupBy(fn_grouping).map(fn_mapping).orderBy(function (o) {
+				data: _(data)
+				// reject for non-person assignees (assignees ending in a number)
+				.reject(function (o) {
+					return !!o.Assignee_DisplayName.match(/(.*)\d/gi);
+				}).groupBy(fn_grouping).map(fn_mapping).orderBy(function (o) {
 					return -o.value;
 				}).value().slice(0, 10),
 				resize: true
@@ -21532,7 +21540,11 @@ return hooks;
 			},
 			    chartSettings = {
 				element: 'tickets-by-customer',
-				data: _(data).groupBy(fn_grouping).map(fn_mapping).orderBy(function (o) {
+				data: _(data)
+				// reject for non-person assignees (assignees ending in a number)
+				.reject(function (o) {
+					return !!o.Assignee_DisplayName.match(/(.*)\d/gi);
+				}).groupBy(fn_grouping).map(fn_mapping).orderBy(function (o) {
 					return -o.value;
 				}).value().slice(0, 10),
 				resize: true
@@ -21565,7 +21577,11 @@ return hooks;
 			},
 			    chartSettings = {
 				element: 'tickets-by-days-open',
-				data: _(data).countBy(fn_counting).map(fn_mapping).orderBy(function (o) {
+				data: _(data)
+				// reject for non-person assignees (assignees ending in a number)
+				.reject(function (o) {
+					return !!o.Assignee_DisplayName.match(/(.*)\d/gi);
+				}).countBy(fn_counting).map(fn_mapping).orderBy(function (o) {
 					return o.label;
 				}).value(),
 				resize: true
@@ -21593,7 +21609,11 @@ return hooks;
 			},
 			    chartSettings = {
 				element: 'tickets-by-category',
-				data: _(data).countBy(fn_counting).map(fn_mapping).orderBy(function (o) {
+				data: _(data)
+				// reject for non-person assignees (assignees ending in a number)
+				.reject(function (o) {
+					return !!o.Assignee_DisplayName.match(/(.*)\d/gi);
+				}).countBy(fn_counting).map(fn_mapping).orderBy(function (o) {
 					return -o.tickets;
 				}).value().slice(0, 10),
 				xkey: 'label',
@@ -21624,7 +21644,11 @@ return hooks;
 			},
 			    chartSettings = {
 				element: 'hours-by-category',
-				data: _(data).groupBy(fn_grouping).map(fn_mapping).orderBy(function (o) {
+				data: _(data)
+				// reject for non-person assignees (assignees ending in a number)
+				.reject(function (o) {
+					return !!o.Assignee_DisplayName.match(/(.*)\d/gi);
+				}).groupBy(fn_grouping).map(fn_mapping).orderBy(function (o) {
 					return -o.hours;
 				}).value().slice(0, 10),
 				xkey: 'label',

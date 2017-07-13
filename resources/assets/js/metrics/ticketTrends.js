@@ -54,6 +54,10 @@
 	            		return ( o.CreatedDate.getMonth() == today.getMonth() ) && 
 		            	( o.CreatedDate.getFullYear() == today.getFullYear() )
 	            	})
+	            	// reject for non-person assignees (assignees ending in a number)
+	            	.reject( o => {
+	            		return !! o.Assignee_DisplayName.match(/(.*)\d/gi);
+	            	})
 	            	// group by month and year
 	            	.groupBy( o => o.CreatedDate.getMonth() + ' ' + o.CreatedDate.getFullYear() ) 
 	            	// reject months with low ticket numbers if we have a lot of data
@@ -106,6 +110,10 @@
 			},	chartSettings = {
 	    		element : 'hours-by-customer',
 		        data : _(data)
+		        		// reject for non-person assignees (assignees ending in a number)
+		            	.reject( o => {
+		            		return !! o.Assignee_DisplayName.match(/(.*)\d/gi);
+		            	})
 		        		.groupBy( fn_grouping )
 		        		.map( fn_mapping )
 	        			.orderBy(o => -o.value)
@@ -142,6 +150,10 @@
 	    	chartSettings = {
 	    		element : 'tickets-by-customer',
 		        data : _(data)
+		        		// reject for non-person assignees (assignees ending in a number)
+		            	.reject( o => {
+		            		return !! o.Assignee_DisplayName.match(/(.*)\d/gi);
+		            	})
 		        		.groupBy( fn_grouping )
 		        		.map( fn_mapping )
 		        		.orderBy( o => -o.value )
@@ -183,6 +195,10 @@
 	    	chartSettings = {
 	    		element : 'tickets-by-days-open',
 		        data : _(data)
+		        		// reject for non-person assignees (assignees ending in a number)
+		            	.reject( o => {
+		            		return !! o.Assignee_DisplayName.match(/(.*)\d/gi);
+		            	})
 		        		.countBy( fn_counting )
 		        		.map( fn_mapping )
 		        		.orderBy( o => o.label )
@@ -215,6 +231,10 @@
 	    	chartSettings = {
 	    		element : 'tickets-by-category',
 		        data : _(data)
+		        		// reject for non-person assignees (assignees ending in a number)
+		            	.reject( o => {
+		            		return !! o.Assignee_DisplayName.match(/(.*)\d/gi);
+		            	})
 		        		.countBy( fn_counting )
 		        		.map( fn_mapping )
 		        		.orderBy( o => -o.tickets )
@@ -251,6 +271,10 @@
 	    	chartSettings = {
 	    		element : 'hours-by-category',
 		        data : _(data)
+		        		// reject for non-person assignees (assignees ending in a number)
+		            	.reject( o => {
+		            		return !! o.Assignee_DisplayName.match(/(.*)\d/gi);
+		            	})
 		        		.groupBy( fn_grouping )
 		        		.map( fn_mapping )
 		        		.orderBy( o => -o.hours )
