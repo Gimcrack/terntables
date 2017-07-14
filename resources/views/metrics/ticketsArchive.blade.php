@@ -159,10 +159,21 @@
 
 
     <script type="text/javascript">
+        var url = '/metrics/tickets/archive/json/{{$groupOrIndividual}}/{{$id}}',
+        oit = false;
 
-          $.getJSON('/metrics/tickets/archive/json/{{$groupOrIndividual}}/{{$id}}', function(response){
+        if ( '{{$id}}' == 'OIT' ) {
+            url = '/metrics/tickets/archive/json';
+            oit = true;
+        }
+          $.getJSON(url, function(response){
 
             $('.preloader').hide();
+
+            if (oit)
+            {
+                response.data = _(response.data).reject( o => o.group.match(/GIS Team/gi) ).value();
+            }
 
             // get the department list
             var departmentList = _.uniq( _.map( response.data, function(o, i) { return o.department || '-No Department-' } ) ).sort();

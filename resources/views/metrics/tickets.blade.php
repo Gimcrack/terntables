@@ -77,8 +77,15 @@
 
 
 <script type="text/javascript">
+    var url = '/metrics/tickets/json/{{$groupOrIndividual}}/{{$id}}',
+        oit = false;
 
-    $.getJSON('/metrics/tickets/json/{{$groupOrIndividual}}/{{$id}}', function(response){
+    if ( '{{$id}}' == 'OIT' ) {
+        url = '/metrics/tickets/json';
+        oit = true;
+    }
+
+    $.getJSON(url, function(response){
       $('.preloader').hide();
 
       $('#tbl_tickets').DataTable(
@@ -105,6 +112,9 @@
             // reject for non-person assignees (assignees ending in a number)
             .reject( o => {
                 return !! o.assignee.match(/(.*)\d/gi) || o.assignee.split(' ').length > 2;
+            })
+            .filter( o => {
+                return (! oit) || (! o.group.match(/GIS Team/gi) )
             })
             .groupBy('assignee')
             .map( (o, i) => {
@@ -135,6 +145,9 @@
             // reject for person assignees (assignees ending in a number)
             .reject( o => {
                 return ( ! o.assignee.match(/(.*)\d/gi) ) && o.assignee.split(' ').length < 3;
+            })
+            .filter( o => {
+                return (! oit) || (! o.group.match(/GIS Team/gi) )
             })
             .groupBy('assignee')
             .map( (o, i) => {
