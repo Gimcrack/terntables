@@ -113,8 +113,11 @@
             .reject( o => {
                 return !! o.assignee.match(/(.*)\d/gi) || o.assignee.split(' ').length > 2;
             })
-            .filter( o => {
-                return (! oit) || (! o.group.match(/GIS Team/gi) )
+            .reject( o => {
+                return oit && o.group.match(/GIS Team/gi);
+            })
+            .reject( o => {
+                return o.group.match(/TRIM/gi);
             })
             .groupBy('assignee')
             .map( (o, i) => {
