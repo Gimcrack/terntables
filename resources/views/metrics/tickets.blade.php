@@ -88,6 +88,11 @@
     $.getJSON(url, function(response){
       $('.preloader').hide();
 
+      if (oit)
+        {
+            response.data = _(response.data).reject( o => o.group.match(/TRIM|Records Support Team|GIS Team/gi) ).value();
+        }
+
       $('#tbl_tickets').DataTable(
         {
           processing : true,
@@ -112,12 +117,6 @@
             // reject for non-person assignees (assignees ending in a number)
             .reject( o => {
                 return !! o.assignee.match(/(.*)\d/gi) || o.assignee.split(' ').length > 2;
-            })
-            .reject( o => {
-                return oit && o.group.match(/GIS Team/gi);
-            })
-            .reject( o => {
-                return o.group.match(/TRIM|Records Support Team/gi);
             })
             .groupBy('assignee')
             .map( (o, i) => {
@@ -148,9 +147,6 @@
             // reject for person assignees (assignees ending in a number)
             .reject( o => {
                 return ( ! o.assignee.match(/(.*)\d/gi) ) && o.assignee.split(' ').length < 3;
-            })
-            .filter( o => {
-                return (! oit) || (! o.group.match(/GIS Team/gi) )
             })
             .groupBy('assignee')
             .map( (o, i) => {
