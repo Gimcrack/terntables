@@ -117,7 +117,7 @@
                 return oit && o.group.match(/GIS Team/gi);
             })
             .reject( o => {
-                return o.group.match(/TRIM/gi);
+                return o.group.match(/TRIM|Records Support Team/gi);
             })
             .groupBy('assignee')
             .map( (o, i) => {

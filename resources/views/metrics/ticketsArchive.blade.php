@@ -172,7 +172,7 @@
 
             if (oit)
             {
-                response.data = _(response.data).reject( o => o.group.match(/TRIM|GIS Team/gi) ).value();
+                response.data = _(response.data).reject( o => o.group.match(/TRIM|Records Support Team|GIS Team/gi) ).value();
             }
 
             // get the department list
