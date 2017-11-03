@@ -35,8 +35,8 @@
 	      var paramValue = typeof(a[1])==='undefined' ? true : decodeURI(a[1]);
 
 	      // (optional) keep case consistent
-	      paramName = paramName.toLowerCase();
-	      paramValue = paramValue.toLowerCase();
+	      //paramName = paramName.toLowerCase();
+	      //paramValue = paramValue.toLowerCase();
 
 	      // if parameter name already exists
 	      if (obj[paramName]) {
@@ -93,6 +93,22 @@
 	    			if( ! o.Category ) return false;
 	    			return _get.ignore.split('|').some( cat => cat.toLowerCase() == o.Category.toLowerCase() );
 	    		}).value();
+
+	    		let catList = _get.ignore.split('|').join('</li><li>')
+
+	    		let div = $('<div/>', { class : "col-xs-12" }).html(`
+		    		<div class="panel panel-warning">
+						<div class="panel-heading">
+							<strong>Tickets in these categories will be ignored</strong>
+						</div>
+						<div class="panel-body">
+							<ul>
+								<li>${catList}</li>
+							</ul>
+						</div>
+					</div>`);
+
+	    		$('body').prepend(div);
 
 	    		console.dir(data);
 	    	}

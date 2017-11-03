@@ -21642,8 +21642,8 @@ return hooks;
 				var paramValue = typeof a[1] === 'undefined' ? true : decodeURI(a[1]);
 
 				// (optional) keep case consistent
-				paramName = paramName.toLowerCase();
-				paramValue = paramValue.toLowerCase();
+				//paramName = paramName.toLowerCase();
+				//paramValue = paramValue.toLowerCase();
 
 				// if parameter name already exists
 				if (obj[paramName]) {
@@ -21705,6 +21705,12 @@ return hooks;
 						return cat.toLowerCase() == o.Category.toLowerCase();
 					});
 				}).value();
+
+				var catList = _get.ignore.split('|').join('</li><li>');
+
+				var div = $('<div/>', { class: "col-xs-12" }).html('\n\t\t    \t\t<div class="panel panel-warning">\n\t\t\t\t\t\t<div class="panel-heading">\n\t\t\t\t\t\t\t<strong>Tickets in these categories will be ignored</strong>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class="panel-body">\n\t\t\t\t\t\t\t<ul>\n\t\t\t\t\t\t\t\t<li>' + catList + '</li>\n\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>');
+
+				$('body').prepend(div);
 
 				console.dir(data);
 			}
