@@ -82,7 +82,8 @@ class ApiController extends Controller
         'App\ServerService',
         'App\WindowsUpdateServer',
         'App\Update',
-        'App\UpdateDetail'
+        'App\UpdateDetail',
+        'App\LogEntry',
     ];
 
     /**
@@ -169,7 +170,7 @@ class ApiController extends Controller
     public function getCacheKey()
     {
     	return json_encode( request()->all() );
-    } 
+    }
 
     /**
      * Forget the keys related to this model
