@@ -41,6 +41,14 @@ class User extends Model implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
 
+    protected $searchableColumns = [
+      'username' => 80,
+      'email' => 80,
+      'person.name' => 30,
+      'groups.name' => 20,
+      'groups.roles.name' => 20,
+    ];
+
     /**
      * The column that identifies the model
      * @return [type] [description]

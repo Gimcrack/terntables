@@ -96,3 +96,39 @@ label a { color:white; }
 	width:82px;
 
 }
+
+
+.serverGrid {
+	margin-left:20px;
+
+	.server {
+		float:left;
+		margin:1px;
+		height:50px;
+		width:79px;
+		font-size:10px;
+		background:$success;
+		padding:3px;
+		color:white;
+		text-align: center;
+
+		&.alert {
+			background: $danger;
+			color:white;
+		}
+
+		&.warning {
+			background: $warning;
+			color:white;
+		}
+	}
+}
+
+.server-alerts {
+	font-size: 12px;
+
+	li.active {
+		background:lighten($yellow,20%);
+		color:#333;
+	}
+}

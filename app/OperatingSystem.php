@@ -22,6 +22,11 @@ class OperatingSystem extends Model
     'name',
   ];
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'servers.name' => 10,
+  ];
+
   /**
    * An Operating System may belong to many servers
    * @method servers

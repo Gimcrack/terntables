@@ -106,12 +106,12 @@
 			]
 		},
 		{
-			name : 'servers',
+			name : 'applications',
 			type : 'array',
 			_label : 'Server Applications',
 			fields : [
 				{
-					name : 'applicattions',
+					name : 'applications',
 					type : 'select',
 					_label : 'Select Applications',
 					_labelssource : 'Application.name',
@@ -197,7 +197,7 @@
 			model : 'Server',
 			columnFriendly : 'name',
 			gridHeader : {
-				icon : 'fa-server',
+				icon : 'fa-building-o',
 				headerTitle : 'Manage Servers',
 				helpText : "<strong>Note:</strong> Manage Servers Here"
 			},
@@ -271,20 +271,24 @@
 				"serverName",
 				"owner_name",
 				"os",
+				"ip",
 				"people",
 				"applications",
 				"databases",
 				'tags',
+				"software_version"
 			],
 			headers : [ 				// headers for table
 				"ID",
 				"Name",
 				"Owner",
 				"OS",
+				"IP",
 				"Contacts",
-				"Applications",
+				"Apps",
 				"Databases",
-				"Tags"
+				"Tags",
+				"Agent"
 			],
 			templates : { 				// html template functions
 
@@ -304,6 +308,10 @@
 				os : function(val) {
 					var r = jApp.activeGrid.currentRow;
 					return _.get('name', r.operating_system, 'fa-windows','OperatingSystem');
+				},
+
+				ip : function( val ) {
+					return _.map( val.split('.'), function(part) { return ('000' + part).slice(-3) }).join('.');
 				}
 
 			},

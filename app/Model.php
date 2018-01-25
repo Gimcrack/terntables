@@ -6,14 +6,22 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 use Input;
 use App\Tag;
 use App\Exceptions\OperationRequiresCheckoutException;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use \Venturecraft\Revisionable\RevisionableTrait as RevisionableTrait;
+use Carbon\Carbon;
+use Sofa\Eloquence\Eloquence;
 
 abstract class Model extends BaseModel
 {
   /**
    * Make the model track revision changes
    */
-  use RevisionableTrait;
+  use RevisionableTrait, Eloquence;
+
+  protected $dates = [
+    'updated_at',
+    'created_at'
+  ];
 
   protected $appends = [
     'identifiable_name',
@@ -27,6 +35,26 @@ abstract class Model extends BaseModel
   public static function boot()
   {
       parent::boot();
+  }
+
+  /**
+   * Scope All
+   * @method scopeAll
+   * @return [type]   [description]
+   */
+  public function scopeAll($query)
+  {
+    return $query->whereRaw('1=1');
+  }
+
+  /**
+   * Scope None
+   * @method scopeAll
+   * @return [type]   [description]
+   */
+  public function scopeNone($query)
+  {
+    return $query->whereRaw('1=0');
   }
 
   /**
@@ -55,12 +83,21 @@ abstract class Model extends BaseModel
   public function getUpdatedAtForHumansAttribute()
   {
     try {
-      return $this->updated_at->diffForHumans();
+      if (is_object($this->updated_at)) {
+        return $this->updated_at->diffForHumans();
+      } elseif ( !empty($this->updated_at) ) {
+        return Carbon::createFromFormat('Y-m-d G:i:s.000', $this->updated_at )->diffForHumans();
+
+      }
+
+      return null;
+
     }
 
     catch(Exception $e) {
       return null;
     }
+
 
   }
 
@@ -101,6 +138,23 @@ abstract class Model extends BaseModel
     }
 
     return $this->recordLock->isSameUser();
+  }
+
+
+  /**
+   * [getColumns description]
+   * @method getColumns
+   * @return [type]     [description]
+   */
+  public static function getColumns()
+  {
+    $model = static::first();
+    $ret = [];
+    $table = $model->getTable();
+    foreach ( array_keys($model->getAttributes()) as $key ) {
+      $ret[] = $table . "." .$key;
+    }
+    return $ret;
   }
 
   /**

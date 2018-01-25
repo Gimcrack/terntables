@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
+use App\Server;
 use Input;
 
 class ServerController extends ApiController
@@ -23,6 +24,9 @@ class ServerController extends ApiController
    */
   public $model_short = 'Server';
 
+
+  public $limitPerPage = 200;
+
   /**
    * What relationships to grab with the model
    * @var [type]
@@ -33,7 +37,8 @@ class ServerController extends ApiController
     'people',
     'tags',
     'owner',
-    'operating_system'
+    'operating_system',
+    'update_batches'
   ];
 
   /**
@@ -47,11 +52,44 @@ class ServerController extends ApiController
   ];
 
   /**
+   * Parse the search filter
+   * @method parseSearchFilter
+   * @return [type]            [description]
+   */
+  public function parseSearchFilter()
+  {
+    $filter = Input::get('filter',null);
+
+    if (empty($filter))
+    {
+      return '1=1';
+    }
+
+    $search = [':show__only__my__groups:'];
+    $replace = [$this->showOnlyMyGroupsCriteria()];
+
+    $filter = str_replace($search,$replace,$filter);
+
+    return $filter;
+  }
+
+  /**
+   * Get the criteria for my groups tasks
+   * @method showOnlyAvailableCriteria
+   * @return [type]                    [description]
+   */
+  private function showOnlyMyGroupsCriteria()
+  {
+    $my_groups = implode(",",\Auth::user()->groups()->lists('id')->toArray() );
+    return "group_id in ({$my_groups})";
+  }
+
+  /**
    * Spawn a new instance of the controller
    */
   public function __construct()
   {
-    $this->middleware('auth');
+    $this->middleware('auth', [ 'except' => 'healthServers']);
     $this->checkAccessMiddleware();
   }
 
@@ -62,7 +100,58 @@ class ServerController extends ApiController
    */
   public function markServers()
   {
-    $fillable = ['production_flag', 'inactive_flag'];
+    $fillable = ['production_flag', 'inactive_flag', 'status'];
     return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
+  }
+
+  /**
+   * Get all the servers for a health check
+   * @method healthServers
+   * @return [type]        [description]
+   */
+  public function healthServers()
+  {
+    $data = Server::with(['alerts' => function($query) {
+      $query->unacknowledged();
+    }])
+      ->active()
+      ->windows()
+      ->get();
+    return response()->json($data);
+  }
+
+  public function windowsUpdateServerIndex()
+  {
+
+    $input = Input::all();
+    $model_class = $this->model_class;
+
+    $filter = $this->parseSearchFilter();
+
+    $with = ['owner','operating_system'];
+
+    $q = Input::get('q',null);
+    $scope = Input::get('scope','all');
+
+    if ( !! $q ) {
+      $results = $model_class::search( $q )
+                  ->with($with)
+                  ->windows()
+                  ->updatable( )
+                  ->hasUpdates( Input::get('showUnupdatable',false) )
+                  ->$scope()
+                  ->whereRaw($filter)
+                  ->paginate( $this->limitPerPage );
+    } else {
+      $results = $model_class::with($with)
+                  ->windows()
+                  ->updatable()
+                  ->hasUpdates( Input::get('showUnupdatable',false) )
+                  ->$scope()
+                  ->whereRaw($filter)
+                  ->paginate( $this->limitPerPage );
+    }
+
+    return response()->json( $results );
   }
 }

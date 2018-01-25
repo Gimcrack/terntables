@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'url' => 'http://itdashboard-dev',
+    'url' => 'http://itdashboard',
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Anchorage',
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +78,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY', 'SomeRandomString'),
+    'key' => env('APP_KEY', 'xlhF31NeOlibJcoOW9tvZg7TkHcAZI3a'),
 
     'cipher' => 'AES-256-CBC',
 
@@ -95,7 +95,7 @@ return [
     |
     */
 
-    'log' => 'single',
+    'log' => 'daily',
 
     /*
     |--------------------------------------------------------------------------
@@ -154,7 +154,23 @@ return [
 
         Neomerx\CorsIlluminate\Providers\LaravelServiceProvider::class,
 
-        Adldap\Laravel\AdldapServiceProvider::class
+        Adldap\Laravel\AdldapServiceProvider::class,
+
+        Sofa\Eloquence\ServiceProvider::class,
+
+        Aloha\Twilio\Support\Laravel\ServiceProvider::class,
+
+        /**
+         * Laravel-FTP
+         */
+        Anchu\Ftp\FtpServiceProvider::class,
+
+        /**
+         * Flysystem
+         */
+         GrahamCampbell\Flysystem\FlysystemServiceProvider::class,
+
+
 
     ],
 
@@ -209,7 +225,12 @@ return [
         'Parser'    => Nathanmac\Utilities\Parser\Facades\Parser::class,
         'Flash'     => Laracasts\Flash\Flash::class,
         'PDF'       => Barryvdh\DomPDF\Facade::class,
-        'Adldap'    => Adldap\Laravel\Facades\Adldap::class
+        'Adldap'    => Adldap\Laravel\Facades\Adldap::class,
+        'Twilio'    => Aloha\Twilio\Support\Laravel\Facade::class,
+        'FTP'       => Anchu\Ftp\Facades\Ftp::class,
+        'SSH'       => Collective\Remote\RemoteFacade::class,
+        'Flysystem' => GrahamCampbell\Flysystem\Facades\Flysystem::class,
+        'SFTP'      => League\Flysystem\Sftp\SftpAdapter::class,
     ],
 
 ];

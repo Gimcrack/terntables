@@ -68,9 +68,9 @@
 
 <script type="text/javascript">
 
-    $.getJSON('http://isupport/Api/v14-5/Incident/{{$groupOrIndividual}}/{{$id}}', function(response){
+    $.getJSON('https://isupport.msb.matsugov.lan/Api/v14-5/Incident/{{$groupOrIndividual}}/{{$id}}', function(response){
       $('.preloader').hide();
-      
+
       $('#tbl_tickets').DataTable(
         {
           processing : true,

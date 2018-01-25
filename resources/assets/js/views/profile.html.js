@@ -70,6 +70,12 @@
 			groups : function(arr) {
         return _.get('name', arr, 'fa-users');
       },
+
+			person_name : function() {
+				var r = jApp.activeGrid.currentRow;
+
+				return _.get('name', r.person || '','fa-male','Person');
+			},
 		},
 		formDefs : {
 			resetPassword : {

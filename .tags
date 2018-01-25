@@ -4556,7 +4556,7 @@ fn.datetimepicker.dates.days	B:\_webroot_\dashboard-dev\components\bootstrap-dat
 .fa-facebook-official:before	B:\_webroot_\dashboard-dev\components\font-awesome\font-awesome-built.css	/^.fa-facebook-official:before {$/;"	function	line:1786
 .fa-pinterest-p:before	B:\_webroot_\dashboard-dev\components\font-awesome\font-awesome-built.css	/^.fa-pinterest-p:before {$/;"	function	line:1789
 .fa-whatsapp:before	B:\_webroot_\dashboard-dev\components\font-awesome\font-awesome-built.css	/^.fa-whatsapp:before {$/;"	function	line:1792
-.fa-server:before	B:\_webroot_\dashboard-dev\components\font-awesome\font-awesome-built.css	/^.fa-server:before {$/;"	function	line:1795
+.fa-building-o:before	B:\_webroot_\dashboard-dev\components\font-awesome\font-awesome-built.css	/^.fa-building-o:before {$/;"	function	line:1795
 .fa-user-plus:before	B:\_webroot_\dashboard-dev\components\font-awesome\font-awesome-built.css	/^.fa-user-plus:before {$/;"	function	line:1798
 .fa-user-times:before	B:\_webroot_\dashboard-dev\components\font-awesome\font-awesome-built.css	/^.fa-user-times:before {$/;"	function	line:1801
 .fa-hotel:before	B:\_webroot_\dashboard-dev\components\font-awesome\font-awesome-built.css	/^.fa-hotel:before,$/;"	function	line:1804

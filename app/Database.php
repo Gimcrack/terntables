@@ -11,6 +11,16 @@ class Database extends Model
    */
   protected $table = 'databases';
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'description' => 20,
+    'owner.name' => 20,
+    'tags.name' => 10,
+    'people.name' => 10,
+    'servers.name' => 10,
+    'applications.name' => 10
+  ];
+
   /**
    * The mass assignable fields
    *
@@ -73,6 +83,16 @@ class Database extends Model
   }
 
   /**
+   * A database is managaed by one group
+   * @method owner
+   * @return [type] [description]
+   */
+  public function owner()
+  {
+    return $this->belongsTo('App\Group','group_id');
+  }
+
+  /**
    * Polymorphic relationship. Second parameter to morphOne/morphMany
    * should be the same as the prefix for the *_id/*_type fields.
    */
@@ -129,5 +149,15 @@ class Database extends Model
   public function getHostnameAttribute()
   {
     return $this->host->name;
+  }
+
+  /**
+   * Get the alerts for the server
+   * @method alerts
+   * @return [type] [description]
+   */
+  public function alerts()
+  {
+    return $this->morphMany('App\Alert','alertable');
   }
 }

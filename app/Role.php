@@ -27,6 +27,14 @@ class Role extends Model
     , 'delete_enabled'
   ];
 
+  protected $searchableColumns = [
+    'name' => 80,
+    'description' => 30,
+    'model' => 40,
+    'groups.name' => 30,
+    'groups.users.username' => 25
+  ];
+
   /**
    * A role can be assigned to many groups
    * @method groups

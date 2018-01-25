@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Inspire::class,
+        \App\Console\Commands\DashboardServerHealth::class
     ];
 
     /**
@@ -27,8 +28,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('inspire')
                  ->hourly();
 
-        $schedule->command('migrate:refresh --seed')
-          ->everyTenMinutes()
-          ->sendOutputTo( storage_path('logs' . DIRECTORY_SEPARATOR . 'schedule.log') );
+        $schedule->command('dashboard:serverHealth')
+                 ->everyFiveMinutes();
+
     }
 }

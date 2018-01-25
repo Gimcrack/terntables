@@ -38,6 +38,13 @@ class Document extends Model
      */
     protected $table = 'documents';
 
+    protected $searchableColumns = [
+      'name' => 80,
+      'description' => 20,
+      'owner.name' => 20,
+      'tags.name' => 10,
+    ];
+
     /**
      * The mass assignable fields
      *

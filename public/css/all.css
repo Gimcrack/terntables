@@ -16245,8 +16245,10 @@ i.i-yellow {
 .navbar-top-links .dropdown-tasks,
 .navbar-top-links .dropdown-alerts,
 .navbar-top-links .dropdown-notifications {
-  width: 310px;
+  width: 550px;
   min-width: 0;
+  height: 400px;
+  overflow: auto;
 }
 
 .navbar-top-links .dropdown-notifications div {
@@ -16529,6 +16531,84 @@ table {
   border: none !important;
 }
 
+#page-wrapper .table-menu-row input#search,
+#page-wrapper .table-rowMenu-row input#search {
+  border: 1px solid #80c780;
+  background: #c7e6c7;
+  color: #5cb85c;
+  padding-left: 6px;
+  width: 100px;
+  height: 40px;
+  margin-right: 6px;
+}
+
+#page-wrapper .table-menu-row ::-webkit-input-placeholder,
+#page-wrapper .table-rowMenu-row ::-webkit-input-placeholder {
+  /* WebKit, Blink, Edge */
+  color: #449d44 !important;
+}
+
+#page-wrapper .table-menu-row ::-webkit-input-placeholder::before,
+#page-wrapper .table-rowMenu-row ::-webkit-input-placeholder::before {
+  content: '\f002  ';
+  color: #357935;
+  font-family: fontAwesome;
+}
+
+#page-wrapper .table-menu-row :-moz-placeholder,
+#page-wrapper .table-rowMenu-row :-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: #449d44 !important;
+  opacity: 1;
+}
+
+#page-wrapper .table-menu-row :-moz-placeholder::before,
+#page-wrapper .table-rowMenu-row :-moz-placeholder::before {
+  content: '\f002  ';
+  color: #357935;
+  font-family: fontAwesome;
+}
+
+#page-wrapper .table-menu-row ::-moz-placeholder,
+#page-wrapper .table-rowMenu-row ::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: #449d44 !important;
+  opacity: 1;
+}
+
+#page-wrapper .table-menu-row ::-moz-placeholder::before,
+#page-wrapper .table-rowMenu-row ::-moz-placeholder::before {
+  content: '\f002  ';
+  color: #357935;
+  font-family: fontAwesome;
+}
+
+#page-wrapper .table-menu-row :-ms-input-placeholder,
+#page-wrapper .table-rowMenu-row :-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #449d44 !important;
+}
+
+#page-wrapper .table-menu-row :-ms-input-placeholder::before,
+#page-wrapper .table-rowMenu-row :-ms-input-placeholder::before {
+  content: '\f002  ';
+  color: #357935;
+  font-family: fontAwesome;
+}
+
+#page-wrapper .table-menu-row :placeholder-shown,
+#page-wrapper .table-rowMenu-row :placeholder-shown {
+  /* Standard (https://drafts.csswg.org/selectors-4/#placeholder) */
+  color: #449d44 !important;
+}
+
+#page-wrapper .table-menu-row :placeholder-shown::before,
+#page-wrapper .table-rowMenu-row :placeholder-shown::before {
+  content: '\f002  ';
+  color: #357935;
+  font-family: fontAwesome;
+}
+
 #page-wrapper .table-menu-row .table-header,
 #page-wrapper .table-rowMenu-row .table-header {
   padding: 0px !important;
@@ -16542,6 +16622,11 @@ table {
 #page-wrapper .table-menu-row .table-header .btn-group .btn,
 #page-wrapper .table-rowMenu-row .table-header .btn-group .btn {
   padding: 10px !important;
+}
+
+#page-wrapper .table-menu-row .table-header .btn-group .btn-clear-search,
+#page-wrapper .table-rowMenu-row .table-header .btn-group .btn-clear-search {
+  padding: 0 !important;
 }
 
 #page-wrapper .table-menu-row .table-header .btn-group .btn-rowMenu,
@@ -18730,4 +18815,39 @@ label a {
   background: url("../../images/ajax-activity-preloader.gif") repeat-y;
   height: 36px;
   width: 82px;
+}
+
+.serverGrid {
+  margin-left: 20px;
+}
+
+.serverGrid .server {
+  float: left;
+  margin: 1px;
+  height: 50px;
+  width: 79px;
+  font-size: 10px;
+  background: #5cb85c;
+  padding: 3px;
+  color: white;
+  text-align: center;
+}
+
+.serverGrid .server.alert {
+  background: #d9534f;
+  color: white;
+}
+
+.serverGrid .server.warning {
+  background: #f0ad4e;
+  color: white;
+}
+
+.server-alerts {
+  font-size: 12px;
+}
+
+.server-alerts li.active {
+  background: #f8d9ac;
+  color: #333;
 }

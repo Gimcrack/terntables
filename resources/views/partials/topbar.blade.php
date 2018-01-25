@@ -40,6 +40,15 @@
     		</ul>
       </li>
     @else
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="true">
+            <span id="messages-badge" class="badge badge-red"></span> <i class="fa fa-bell-o fa-fw"></i>  <i class="fa fa-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-messages">
+
+        </ul>
+        <!-- /.dropdown-messages -->
+    </li>
   	<li class="dropdown">
       <a class="dropdown-toggle usermenu" data-toggle="dropdown" href="#">
   			<i class="fa fa-user fa-fw"></i> {{ Auth::user()->username }} <i class="fa fa-caret-down"></i>
@@ -60,11 +69,17 @@
     			<li>
     				<a href="{{ url('admin/roles')}}" ><i class="fa fa-lock fa-fw"></i> Manage Roles</a>
     			</li>
+          <li>
+    				<a href="{{ url('admin/notifications')}}" ><i class="fa fa-bell-o fa-fw"></i> Manage Notifications</a>
+    			</li>
+          <li>
+    				<a href="{{ url('admin/notificationExemptions')}}" ><i class="fa fa-bell-slash-o fa-fw"></i> Notifications Exceptions</a>
+    			</li>
     			<li>
     				<a href="{{ url('admin/operatingSystems')}}" ><i class="fa fa-windows fa-fw"></i> Manage Operating Systems</a>
     			</li>
     			<li>
-    				<a href="{{ url('oit/outageTasks/_generate')}}" ><i class="fa fa-tasks fa-fw"></i> Auto-Generate Outage Tasks</a>
+    				<a href="{{ url('oit/outageTasks/_generate')}}" ><i class="fa fa-check-square-o fa-fw"></i> Auto-Generate Outage Tasks</a>
     			</li>
   			@endif
 

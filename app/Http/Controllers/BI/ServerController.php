@@ -36,7 +36,8 @@ class ServerController extends Controller
     'people',
     'tags',
     'owner',
-    'operating_system'
+    'operating_system',
+    'update_batches'
   ];
 
   /**
@@ -45,7 +46,17 @@ class ServerController extends Controller
   public function __construct()
   {
     $this->views = (object) $this->views;
-    $this->middleware('auth');
+    $this->middleware('auth', [ 'except' => 'healthServers']);
+  }
+
+  /**
+   * Server health check view
+   * @method healthServers
+   * @return [type]        [description]
+   */
+  public function healthServers()
+  {
+    return view('bi.servers.health');
   }
 
 }

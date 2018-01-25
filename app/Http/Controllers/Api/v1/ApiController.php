@@ -61,6 +61,12 @@ class ApiController extends Controller
   public $limitPerPage = 100;
 
   /**
+   * The columns to select in the query;
+   * @var [type]
+   */
+  public $select = [];
+
+  /**
    * Load the checkaccess middleware for the controller
    * @return [type] [description]
    */
@@ -82,11 +88,23 @@ class ApiController extends Controller
       $input = Input::all();
       $model_class = $this->model_class;
 
-      $input['filter'] = $this->parseSearchFilter();
+      $filter = $this->parseSearchFilter();
 
-      $results = ( !empty($input['filter']) ) ?
-        $model_class::with($this->with)->whereRaw($input['filter'])->paginate( $this->limitPerPage ) :
-        $model_class::with($this->with)->paginate( $this->limitPerPage );
+      $with = Input::get('with',$this->with) ?: [];
+
+      $q = Input::get('q',null);
+      $scope = Input::get('scope','all');
+      $select = ( !empty( $this->select ) ) ? $this->select : null;
+
+      $models = ( !! $q ) ? $model_class::search( $q )->with($with) : $model_class::with($with);
+
+      $results = $models
+                  ->$scope()
+                  ->whereRaw($filter);
+
+      //$results = ( !! $select ) ? $models->get($select) : $results;
+
+      $results = $results->paginate( $this->limitPerPage );
 
       return response()->json( $results );
   }
@@ -100,8 +118,14 @@ class ApiController extends Controller
   {
     $filter = Input::get('filter',null);
 
+    if (empty($filter)) {
+      return '1=1';
+    }
+
+    $id = ( is_object(\Auth::user()->person) ) ? \Auth::user()->person->id : null;
+
     $search = [':user__person__id:'];
-    $replace = [\Auth::user()->person->id];
+    $replace = [$id];
 
     $filter = str_replace($search,$replace,$filter);
 
@@ -116,8 +140,10 @@ class ApiController extends Controller
    */
   public function show($id)
   {
+      $with = Input::get('with',$this->with);
+
       $model_class = $this->model_class;
-      $model = $model_class::with( $this->with, 'RevisionHistory' )->findOrFail($id);
+      $model = $model_class::with( $with ?: [], 'RevisionHistory' )->findOrFail($id);
 
       $return = $model->toArray();
       $return['readable_history'] = $this->getHistory($model);
@@ -141,12 +167,16 @@ class ApiController extends Controller
         'Group'   => 'Admin\GroupController',
         'Role'    => 'Admin\RoleController',
         'Server'  => 'BI\ServerController',
+        'WindowsUpdateServer' => 'BI\ServerController',
         'Application' => 'BI\ApplicationController',
         'Database'    => 'BI\DatabaseController',
         'Outage'      => 'BI\OutageController',
         'OutageTask'  => 'BI\OutageTaskController',
         'OutageTaskDetail' => 'BI\OutageTaskDetailController',
         'Document'    => 'GIS\DocumentController',
+        'Notification' => 'Admin\NotificationController',
+        'NotificationExemption' => 'Admin\NotificationExemptionController',
+
       ];
 
       $class = 'App\Http\Controllers' . "\\" . $classControllers[$model];

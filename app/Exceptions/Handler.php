@@ -6,6 +6,7 @@ use Exception;
 use App\Exceptions\OperationRequiresCheckoutException;
 use App\Exceptions\ModelCheckedOutToSomeoneElseException;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -96,6 +97,11 @@ class Handler extends ExceptionHandler
           $response['message'] = $e->getMessage();
           $response['explanation'] = $e->getExplanation();
           $status = $e->getCode();
+        break;
+
+        case ($e instanceof QueryException) :
+          $response['message'] = str_replace("SQLSTATE[23000]: [Microsoft][SQL Server Native Client 10.0][SQL Server]","",$e->getMessage());
+          $status = 406;
         break;
       }
 

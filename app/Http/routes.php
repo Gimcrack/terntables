@@ -40,7 +40,21 @@ Route::group(['prefix' => 'api/v1'], function() {
   // oit routes
   Route::delete('Server',           'Api\v1\ServerController@destroy');
   Route::patch('Server/_massUpdate', 'Api\v1\ServerController@markServers');
+  Route::get('Server/_health',      'Api\v1\ServerController@healthServers');
   Route::resource('Server',         'Api\v1\ServerController');
+
+  Route::get('Alert/_acknowledge',      'Api\v1\AlertController@acknowledge_all');
+  Route::get('Alert/{id}/_acknowledge', 'Api\v1\AlertController@acknowledge');
+  Route::get('Alert/_server',          'Api\v1\AlertController@serverAlerts');
+  Route::resource('Alert',              'Api\v1\AlertController', [ 'except' => 'delete']);
+
+
+  Route::patch('WindowsUpdateServer/_massUpdate', 'Api\v1\ServerController@markServers');
+  Route::get('WindowsUpdateServer',               'Api\v1\ServerController@windowsUpdateServerIndex');
+
+  Route::patch('UpdateDetail/_massUpdate',  'Api\v1\UpdateDetailController@markUpdates');
+  Route::get('UpdateDetail',                'Api\v1\UpdateDetailController@index');
+
 
   Route::delete('Database',           'Api\v1\DatabaseController@destroy');
   Route::patch('Database/_massUpdate', 'Api\v1\DatabaseController@markDatabases');
@@ -60,6 +74,7 @@ Route::group(['prefix' => 'api/v1'], function() {
 
   Route::delete('OutageTaskDetail',             'Api\v1\OutageTaskDetailController@destroy');
   Route::patch('OutageTaskDetail/_massUpdate',  'Api\v1\OutageTaskDetailController@markOutageTasks');
+  Route::patch('OutageTaskDetail/_massUpdateServers',  'Api\v1\OutageTaskDetailController@markServers');
   Route::resource('OutageTaskDetail',           'Api\v1\OutageTaskDetailController');
 
   // gis routes
@@ -73,6 +88,13 @@ Route::group(['prefix' => 'api/v1'], function() {
 
   Route::delete('Group',                  'Api\v1\GroupController@destroy');
   Route::resource('Group',                'Api\v1\GroupController');
+
+  Route::delete('Notification',                  'Api\v1\NotificationController@destroy');
+  Route::patch('Notification/_massUpdate',       'Api\v1\NotificationController@markNotifications');
+  Route::resource('Notification',                'Api\v1\NotificationController');
+
+  Route::delete('NotificationExemption',                  'Api\v1\NotificationExemptionController@destroy');
+  Route::resource('NotificationExemption',                'Api\v1\NotificationExemptionController');
 
   Route::patch('Person/_massUpdate',      'Api\v1\PersonController@massUpdate');
   Route::delete('Person',                 'Api\v1\PersonController@destroy');
@@ -93,6 +115,8 @@ Route::group(['prefix' => 'admin'], function(){
   Route::resource('users',  'Admin\UserController', [ 'only' => [ 'index','show'] ]);
   Route::resource('groups', 'Admin\GroupController', [ 'only' => [ 'index','show'] ]);
   Route::resource('roles',   'Admin\RoleController', [ 'only' => [ 'index','show'] ]);
+  Route::resource('notifications',   'Admin\NotificationController', [ 'only' => [ 'index','show'] ]);
+  Route::resource('notificationExemptions',   'Admin\NotificationExemptionController', [ 'only' => [ 'index','show'] ]);
   Route::resource('operatingSystems',   'Admin\OperatingSystemController', [ 'only' => [ 'index','show'] ]);
 });
 
@@ -125,6 +149,7 @@ Route::group(['prefix' => 'admin'], function(){
   * oit Routes
   */
  Route::group(["prefix" => 'oit'], function(){
+   Route::get('servers/health',     'BI\ServerController@healthServers', [ 'only' => [ 'index','show'] ] );
    Route::resource('servers',       'BI\ServerController', [ 'only' => [ 'index','show'] ] );
    Route::resource('applications',  'BI\ApplicationController', [ 'only' => [ 'index', 'show'] ] );
    Route::resource('databases',     'BI\DatabaseController', [ 'only' => [ 'index', 'show'] ] );
@@ -132,7 +157,10 @@ Route::group(['prefix' => 'admin'], function(){
    Route::resource('taskTemplates', 'BI\OutageTaskController', [ 'only' => [ 'index', 'show'] ] );
    Route::get('outageTasks/_generate',   'BI\OutageTaskDetailController@generateTaskDetails');
    Route::resource('outageTasks',   'BI\OutageTaskDetailController', [ 'only' => [ 'index', 'show'] ] );
+   Route::resource('updates',       'BI\UpdateController', [ 'only' => [ 'index', 'show'] ] );
+   Route::resource('approveUpdates','BI\UpdateDetailController', [ 'only' => [ 'index', 'show'] ] );
 
+   Route::get('sharepoint', 'PagesController@sharepoint');
  });
 
 //misc
