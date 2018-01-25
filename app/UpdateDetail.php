@@ -42,6 +42,19 @@ class UpdateDetail extends Model
   protected $fillable = [
       'approved_flag'
   ];
+  
+  public function scopeUnapproved($query)
+  {
+    return $query->whereApprovedFlag(0)
+                 ->whereHiddenFlag(0);
+  }
+  
+  public function scopeApproved($query)
+  {
+    return $query->whereApprovedFlag(1)
+                 ->whereInstalledFlag(0)
+                 ->whereHiddenFlag(0);
+  }
 
   public function scopeProduction($query)
   {
@@ -58,6 +71,24 @@ class UpdateDetail extends Model
   }
 
   /**
+   * Use a custom compound scope
+   * @method scopeCompound
+   *
+   * @return   $query
+   */
+  public function scopeCompound($query, $scope)
+  {
+      $scopes = explode("_",$scope);
+
+      foreach( $scopes as $s )
+      {
+        $query->$s(); 
+      }
+
+      return $query;
+  }
+
+  /**
    * My groups
    * @method scopeMyGroups
    * @param  [type]        $query [description]
@@ -65,7 +96,7 @@ class UpdateDetail extends Model
    */
   public function scopeMyGroups($query)
   {
-    $my_groups = \Auth::user()->groups()->lists('id')->toArray();
+    $my_groups = \Auth::guard('api')->user()->groups()->lists('id')->toArray();
 
     return $query->whereHas('server', function($q) use ($my_groups) {
       return $q->whereIn('group_id', $my_groups);
@@ -117,7 +148,6 @@ class UpdateDetail extends Model
   }
 
 
-
   /**
    * Get the owner name
    * @method getOwnerNameAttribute
@@ -125,31 +155,38 @@ class UpdateDetail extends Model
    */
   public function getOwnerNameAttribute()
   {
+    if ( ! $this->server || ! $this->server->owner ) return null;
+
     return $this->server->owner->name;
   }
 
   public function identifiableName()
   {
+    if ( ! $this->header ) return null;
     return $this->header->title;
   }
 
   public function getKbArticleAttribute()
   {
+    if ( ! $this->header ) return null;
     return $this->header->kb_article;
   }
 
   public function getHostnameAttribute()
   {
+    if ( ! $this->server ) return null; 
     return $this->server->name;
   }
 
   public function getTitleAttribute()
   {
+    if ( ! $this->header ) return null;
     return $this->header->title;
   }
 
   public function getDescriptionAttribute()
   {
+    if ( ! $this->header) return null;
     return $this->header->description;
   }
 
@@ -163,9 +200,14 @@ class UpdateDetail extends Model
     return $this->belongsTo('App\Server');
   }
 
+  /**
+   * An update details belongs to one update
+   *
+   * @return     <type>  ( description_of_the_return_value )
+   */
   public function header()
   {
-    return $this->belongsTo('App\Update','update_id');
+    return $this->belongsTo('App\Update','update_id') ?? new Update;
   }
 
 }

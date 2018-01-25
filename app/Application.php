@@ -33,6 +33,11 @@ class Application extends Model
     'databases.name' => 10
   ];
 
+  protected $casts = [
+    'group_id' => 'int',
+    'inactive_flag' => 'int'
+  ];
+
   /**
    * Get only active applications
    * @method scopeActive

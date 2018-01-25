@@ -45,15 +45,6 @@ class ApplicationController extends ApiController
   ];
 
   /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-    $this->checkAccessMiddleware();
-  }
-
-  /**
    * Mark applications as inactive/not inactive
    * @method markApplications
    * @return [type]      [description]

@@ -45,15 +45,6 @@ class DatabaseController extends ApiController
   ];
 
   /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth');
-  }
-
-  /**
    * Mark databases as prod/not prod/inactive/not inactive
    * @method markServers
    * @return [type]      [description]

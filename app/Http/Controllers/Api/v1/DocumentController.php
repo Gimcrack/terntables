@@ -43,15 +43,6 @@ class DocumentController extends ApiController
   public $relations = [];
 
   /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-    $this->checkAccessMiddleware();
-  }
-
-  /**
    * Store the uploaded file.
    * @method storeFile
    * @param  Request   $request [description]

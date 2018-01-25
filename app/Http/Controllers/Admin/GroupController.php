@@ -16,9 +16,9 @@ class GroupController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
-    'index' => 'admin.groups.index'
-  );
+  public $views = [
+      'index' => 'admin.groups.index'
+    ];
 
   /**
    * The class of the model
@@ -35,15 +35,4 @@ class GroupController extends Controller
     'roles',
     'servers'
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth.admin');
-    //$this->checkAccessMiddleware();
-  }
-
 }

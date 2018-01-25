@@ -37,7 +37,16 @@ class Database extends Model
       'dr_strategy',
       'ha_strategy',
       'upgrade_readiness',
-      'server_id'
+      'server_id',
+      'group_id'
+  ];
+
+  protected $casts = [
+    'group_id' => 'int',
+    'ignore_flag' => 'int',
+    'production_flag' => 'int',
+    'inactive_flag' => 'int',
+    'server_id' => 'int'
   ];
 
   /**
@@ -62,6 +71,7 @@ class Database extends Model
     return $query->where('production_flag',1)->where('ignore_flag',0);
   }
 
+
   /**
    * Get only non-production databases
    * @method scopeNonroduction
@@ -71,15 +81,6 @@ class Database extends Model
   public function scopeNonproduction($query)
   {
     return $query->where('production_flag',0)->where('ignore_flag',0);
-  }
-
-  /**
-   * Polymorphic relationship. Second parameter to morphOne/morphMany
-   * should be the same as the prefix for the *_id/*_type fields.
-   */
-  public function recordLock()
-  {
-      return $this->morphOne('App\RecordLock', 'lockable');
   }
 
   /**
@@ -149,5 +150,15 @@ class Database extends Model
   public function getHostnameAttribute()
   {
     return $this->host->name;
+  }
+
+  /**
+   * Get the alerts for the server
+   * @method alerts
+   * @return [type] [description]
+   */
+  public function alerts()
+  {
+    return $this->morphMany('App\Alert','alertable');
   }
 }

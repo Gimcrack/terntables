@@ -16,6 +16,7 @@ require('laravel-elixir-livereload');
 elixir(function(mix) {
 
   var vendor_path = './vendor';
+  var node_modules = './node_modules';
 
   var paths = {
     jquery : vendor_path + '/components/jquery',
@@ -24,7 +25,7 @@ elixir(function(mix) {
     bootstrap : vendor_path + '/twbs/bootstrap-sass/assets',
     fontAwesome : vendor_path + '/components/font-awesome',
     bootstrapDatetimepicker : vendor_path + '/components/bootstrap-datetimepicker',
-    bootbox : vendor_path + '/components/bootbox',
+    bootbox : node_modules + '/bootbox/',
     modernizr : vendor_path + '/components/modernizr',
     underscore : vendor_path + '/ingenious/underscore',
     asyncGrid : vendor_path + '/ingenious/async-grid',
@@ -120,15 +121,22 @@ elixir(function(mix) {
 
     //scripts
     mix
-      //.babel(babelScripts, 'resources/assets/js/async-grid.js')
       .scripts(jsScripts)
-      .scripts(preReqs,'public/js/prereqs.js');
+      .scripts(preReqs,'public/js/prereqs.js')
+      .browserify('./resources/assets/js/metrics/ticketTrends.js','public/js/ticketTrends.js')
+      .copy('./vendor/ingenious/terntables.js/build/terntables.js','./public/js/terntables.js');
+
 
     //styles
-    mix.sass('app.scss',
-      'public/css/all.css', {
-        includePaths : cssPaths
-    }).livereload().phpUnit();
+    // mix.sass('app.scss',
+    //   'public/css/all.css', {
+    //     includePaths : cssPaths
+    // });
+
+    mix.livereload();
+    
+    //mix.phpUnit();
 
     //mix.phpUnit();
-});
+})
+

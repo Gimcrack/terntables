@@ -33,7 +33,7 @@
 						icon : 'fa-toggle-on',
 						label : 'Show Only My Groups\'',
 						fn : 'showOnlyMyGroups',
-						'data-order' : 98
+						'data-order' : 100
 					},
 					toggleProduction : {
 						type : 'button',
@@ -41,7 +41,7 @@
 						icon : 'fa-toggle-on',
 						label : 'Toggle Production',
 						fn : 'toggleProduction',
-						'data-order' : 100
+						'data-order' : 101
 					},
 					toggleNonProduction : {
 						type : 'button',
@@ -49,7 +49,7 @@
 						icon : 'fa-toggle-on',
 						label : 'Toggle Non-Production',
 						fn : 'toggleNonProduction',
-						'data-order' : 100
+						'data-order' : 102
 					},
 					toggleApproved : {
 						type : 'button',
@@ -57,7 +57,15 @@
 						icon : 'fa-toggle-off',
 						label : 'Toggle Approved',
 						fn : 'toggleApproved',
-						'data-order' : 100
+						'data-order' : 103
+					},
+					toggleUnapproved : {
+						type : 'button',
+						class : 'btn btn-success btn-toggle active',
+						icon : 'fa-toggle-on',
+						label : 'Toggle Unapproved',
+						fn : 'toggleUnapproved',
+						'data-order' : 104
 					},
 					toggleInstalled : {
 						type : 'button',
@@ -65,7 +73,7 @@
 						icon : 'fa-toggle-off',
 						label : 'Toggle Installed',
 						fn : 'toggleInstalled',
-						'data-order' : 101
+						'data-order' : 105
 					},
 					toggleHidden : {
 						type : 'button',
@@ -73,7 +81,7 @@
 						icon : 'fa-toggle-off',
 						label : 'Toggle Hidden',
 						fn : 'toggleHidden',
-						'data-order' : 101
+						'data-order' : 106
 					},
 					// toggleProduction : {
 					// 	type : 'button',
@@ -171,6 +179,8 @@
 				},
 
 				kb_article : function(val) {
+					if ( ! val || ! val.length ) return '';
+
 					var url = 'https://support.microsoft.com/en-us/kb/' + val.replace('KB','');
 
 					return _.link( '<a target="_blank" href="' + url + '">' + val + '</a>', null, true );
@@ -219,9 +229,13 @@
 				updateGridFilter : function() {
 					var filter = [], temp = jApp.activeGrid.temp, scope = [];
 
-					if (typeof temp.hideApproved === 'undefined' || !!temp.hideApproved) {
-						filter.push('approved_flag = 0');
-					}
+					// if (typeof temp.hideApproved === 'undefined' || !!temp.hideApproved) {
+					// 	filter.push('approved_flag = 0');
+					// }
+
+					// if (typeof temp.hideUnapproved === 'undefined' || !!temp.hideUnapproved) {
+					// 	filter.push('approved_flag = 1');
+					// }
 
 					if (typeof temp.hideHidden === 'undefined' || !!temp.hideHidden) {
 						filter.push('hidden_flag = 0');
@@ -235,6 +249,8 @@
 					{
 						scope.push('myGroups');
 					}
+
+					if ( typeof temp.hideApproved === 'undefined' ) temp.hideApproved = true;
 
 					switch( true ) {
 						case ( ! temp.hideProduction && ! temp.hideNonProduction ) :
@@ -254,8 +270,27 @@
 						break;
 					}
 
+					switch( true ) {
+						case ( ! temp.hideApproved && ! temp.hideUnapproved ) :
+							scope.push('all');
+						break;
+
+						case ( ! temp.hideApproved && !! temp.hideUnapproved ) :
+							scope.push('approved');
+						break;
+
+						case ( !! temp.hideApproved && ! temp.hideUnapproved ) :
+							scope.push('unapproved');
+						break;
+
+						case ( !! temp.hideApproved && !! temp.hideUnapproved ) :
+							scope.push('none');
+						break;
+					}
+
 					jApp.activeGrid.dataGrid.requestOptions.data.filter = filter.join(' AND ');
-					jApp.activeGrid.dataGrid.requestOptions.data.scope = scope.join('_');
+					jApp.activeGrid.dataGrid.requestOptions.data.scope = 'compound';
+					jApp.activeGrid.dataGrid.requestOptions.data.scope_argument = scope.join('_');
 
 				}, // end fn
 
@@ -280,6 +315,15 @@
 				toggleApproved : function( ) {
 					jApp.activeGrid.temp.hideApproved = ( typeof jApp.activeGrid.temp.hideApproved === 'undefined')
 						? false : !jApp.activeGrid.temp.hideApproved;
+					jApp.activeGrid.fn.updateGridFilter();
+					jUtility.executeGridDataRequest();
+					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');
+				}, //end fn
+
+				toggleUnapproved : function( ) {
+					var temp = jApp.activeGrid.temp;
+
+					temp.hideUnapproved = ( !!! temp.hideUnapproved );
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');

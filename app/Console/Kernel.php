@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Notifier;
 
 class Kernel extends ConsoleKernel
 {
@@ -14,7 +15,13 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Inspire::class,
-        \App\Console\Commands\DashboardServerHealth::class
+        \App\Console\Commands\DashboardServerHealth::class,
+        \App\Console\Commands\DashboardServerAgentHealth::class,
+        \App\Console\Commands\DashboardServerDiskHealth::class,
+        \App\Console\Commands\DashboardServerCheckDisks::class,
+        \App\Console\Commands\DashboardServerServices::class,
+        \App\Console\Commands\DashboardNotifications::class,
+        \App\Console\Commands\DashboardMaintenance::class
     ];
 
     /**
@@ -25,11 +32,49 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('inspire')
-                 ->hourly();
+        if ( app()->isLocal() ) return false;
+        if ( ! config('app.run_commands') ) return false;
+
+        $schedule->command('dashboard:maintenance')
+                 ->everyFiveMinutes();
 
         $schedule->command('dashboard:serverHealth')
                  ->everyFiveMinutes();
 
+        $schedule->command('dashboard:serverAgentHealth')
+                 ->everyFiveMinutes();
+
+        $schedule->command('dashboard:serverServices')
+                 ->everyFiveMinutes();
+
+        $schedule->command('dashboard:serverDisks critical')
+                 ->everyFiveMinutes();
+
+        $schedule->command('dashboard:serverDiskHealth')
+                 ->everyFiveMinutes();
+
+        $schedule->command('dashboard:serverDisks hourly')
+                 ->weekdays()
+                 ->hourly();
+
+        $schedule->command('dashboard:serverDisks daily')
+                 ->weekdays()
+                 ->dailyAt('08:00');
+
+        $schedule->command('dashboard:notifications fifteen')
+                 ->weekdays()
+                 ->everyTenMinutes()
+                 ->skip( function() {
+                    return Notifier::isQuietHours();
+                 });
+
+        $schedule->command('dashboard:notifications daily')
+                 ->weekdays()
+                 ->dailyAt('08:00');
+
+        $schedule->command('dashboard:notifications weekly')
+                 ->weekly()
+                 ->mondays()
+                 ->at('08:00');
     }
 }

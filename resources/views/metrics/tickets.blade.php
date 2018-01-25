@@ -28,13 +28,23 @@
 <div class="col-xs-12">
   <div class="panel panel-primary">
     <div class="panel-heading">
-      Open Incidents By Rep & Status - {{$id ?: "IT Department"}}
+      Open Incidents By Rep &amp; Status - Reps - {{$id ?: "IT Department"}}
     </div>
     <div class="panel-body">
       @include('partials.preloader')
       <div id="bar-chart-incidents-by-rep-and-status-1"></div>
-      <hr/>
-      <div id="bar-chart-incidents-by-rep-and-status-2"></div>
+    </div>
+
+  </div>
+</div>
+<div class="col-xs-12">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      Open Incidents By Rep &amp; Status - Queues - {{$id ?: "IT Department"}}
+    </div>
+    <div class="panel-body">
+      @include('partials.preloader')
+      <div id="bar-chart-incidents-by-rep-and-status-queues-1"></div>
     </div>
 
   </div>
@@ -67,9 +77,21 @@
 
 
 <script type="text/javascript">
+    var url = '/metrics/tickets/json/{{$groupOrIndividual}}/{{$id}}',
+        oit = false;
 
-    $.getJSON('https://isupport.msb.matsugov.lan/Api/v14-5/Incident/{{$groupOrIndividual}}/{{$id}}', function(response){
+    if ( '{{$id}}' == 'OIT' ) {
+        url = '/metrics/tickets/json';
+        oit = true;
+    }
+
+    $.getJSON(url, function(response){
       $('.preloader').hide();
+
+      if (oit)
+        {
+            response.data = _(response.data).reject( o => o.group.match(/TRIM|Records Support Team|GIS Team/gi) ).value();
+        }
 
       $('#tbl_tickets').DataTable(
         {
@@ -89,14 +111,51 @@
 
       // prepare the data
 
-      var barChartData1 = _.map(
-        _.groupBy(response.data, 'assignee'),
-        function(o, i) {
-          return _.extend( _.countBy( o, 'status' ), { label : i } );
-        });
+
+      // Bar char incidents by rep and status - reps
+      var barChartData1 = _(response.data)
+            // reject for non-person assignees (assignees ending in a number)
+            .reject( o => {
+                return !! o.assignee.match(/(.*)\d/gi) || o.assignee.split(' ').length > 2;
+            })
+            .groupBy('assignee')
+            .map( (o, i) => {
+                return _.extend( _.countBy( o, 'status' ), { label : i } );
+            })
+            .value();
+
 
       Morris.Bar({
        element : 'bar-chart-incidents-by-rep-and-status-1',
+       data : barChartData1,
+       xkey : 'label',
+       ykeys : ['Open','Pending','Reopened','Waiting for Reply','Waiting for Vendor','In Progress'],
+       labels : ['Open','Pending','Reopened','Waiting for Reply','Waiting for Vendor','In Progress'],
+       stacked : true,
+       //resize : true,
+       //gridTextSize : 12,
+       xLabelAngle : 25,
+       padding : 80,
+      //  xLabelFormat : function(l) {
+      //    return l.label.split(' ').join('\n');
+      //  },
+       fillOpacity: 0.3
+     });
+
+      // Bar char incidents by rep and status - queues
+      var barChartData1 = _(response.data)
+            // reject for person assignees (assignees ending in a number)
+            .reject( o => {
+                return ( ! o.assignee.match(/(.*)\d/gi) ) && o.assignee.split(' ').length < 3;
+            })
+            .groupBy('assignee')
+            .map( (o, i) => {
+                return _.extend( _.countBy( o, 'status' ), { label : i } );
+            })
+            .value();
+
+      Morris.Bar({
+       element : 'bar-chart-incidents-by-rep-and-status-queues-1',
        data : barChartData1,
        xkey : 'label',
        ykeys : ['Open','Pending','Reopened','Waiting for Reply','Waiting for Vendor','In Progress'],

@@ -9,15 +9,13 @@ use Input;
 
 class OperatingSystemController extends Controller
 {
-
-
   /**
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'admin.operatingSystems.index'
-  );
+  ];
 
   /**
    * The class of the model
@@ -32,15 +30,4 @@ class OperatingSystemController extends Controller
   public $with = [
     'servers'
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth.admin');
-    //$this->checkAccessMiddleware();
-  }
-
 }

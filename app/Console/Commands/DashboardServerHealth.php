@@ -4,9 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Server;
-use App\Notification;
-use App\Dashboard\Notifier;
-use Illuminate\Database\Eloquent\Collection;
+use Carbon\Carbon;
+use Logger;
 
 class DashboardServerHealth extends Command
 {
@@ -22,7 +21,7 @@ class DashboardServerHealth extends Command
      *
      * @var string
      */
-    protected $description = 'Queries the servers table and sends notifications of any alerts.';
+    protected $description = 'Logs any servers that are late checking in - could be an indication that the server or the agent is offline.';
 
     /**
      * Create a new command instance.
@@ -41,50 +40,59 @@ class DashboardServerHealth extends Command
      */
     public function handle()
     {
-        $late_servers = Server::lateCheckingIn()->get();
+      Server::lateCheckingIn()
+        ->get()
+        ->reject( function( Server $server ) {
+            $server->fresh(); // get a fresh copy from the db
+            $diff = Carbon::now()->diffInMinutes( Carbon::parse($server->last_checkin) );
+            return ($diff < 15);
+        })
+        ->each( function(Server $server) {
+            $this->log($server);
+        });
+    }
 
-        if ( $late_servers->count() )
-        {
-          $this->sendNotifications($late_servers);
+    /**
+     * Log the error
+     *
+     * @param      \App\Server  $server  The server
+     */
+    private function log(Server $server)
+    {
+        $level = $this->getLevel( $server->last_checkin );
+
+        Logger::$level( $this->getMessage($server) , 'App\Server', $server->id);
+    }
+
+    /**
+     * Gets the message.
+     *
+     * @param      \App\Server  $server  The server
+     */
+    private function getMessage(Server $server)
+    {
+        return sprintf("Last checkin at [%s on %s]. Server may be offline.", 
+            Carbon::parse($server->last_checkin)->format('g:i A'),
+            Carbon::parse($server->last_checkin)->format('Y-m-d')
+        );
+    }
+
+    /**
+     * Get the severity of the issue
+     * @method getLevel
+     *
+     * @return   string
+     */
+    private function getLevel($last_checkin)
+    {
+        $diff = Carbon::now()->diffInMinutes( Carbon::parse($last_checkin) );
+
+        switch($diff) {
+            case $diff < 20 : return 'error';
+            case $diff >= 20 && $diff < 40 : return 'critical';
+            case $diff >= 40 && $diff < 60 : return 'alert';
+            case $diff >= 60 : return 'emergency';
         }
-
-    }
-
-    /**
-     * Send the notifications for the late servers
-     * @method sendNotifications
-     * @param  Collection        $servers [description]
-     * @return [type]                     [description]
-     */
-    public function sendNotifications(Collection $servers)
-    {
-      $body = $this->getLateServerNotification($servers);
-
-      // send a text message to the system admin
-      Notifier::text( env('ADMIN_PHONE'), $body );
-
-      // send an email message to the system admin
-      Notifier::mail( 'emails.lateServerNotification', compact('servers') );
-    }
-
-
-
-    /**
-     * get the notification message for a late server
-     * @method getLateServerNotification
-     * @param  [type]                    $server_names [description]
-     * @return [type]                                  [description]
-     */
-    public function getLateServerNotification(Collection $servers)
-    {
-      $server_names = [];
-
-      foreach($servers as $server)
-      {
-        $server_names[] = $server->name . " (" . $server->updated_at_for_humans . ")";
-      }
-
-      return "\nMSB Dashboard Warning:\nServer(s) late checking in:\n -- " . implode("\n -- ",$server_names) . "\n-Reported at " . date("Y-m-d H:i:s");
     }
 
 }

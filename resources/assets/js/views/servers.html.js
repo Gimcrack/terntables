@@ -28,7 +28,7 @@
 		{
 			name : 'ip',
 			_label : 'IP Address',
-			required : true,
+			//required : true,
 			'data-validType' : 'IPV4'
 		},
 
@@ -196,6 +196,7 @@
 		{ // grid definition
 			model : 'Server',
 			columnFriendly : 'name',
+			filter : 'inactive_flag = 0',
 			gridHeader : {
 				icon : 'fa-building-o',
 				headerTitle : 'Manage Servers',
@@ -205,8 +206,8 @@
 				custom : {
 					toggleInactive : {
 						type : 'button',
-						class : 'btn btn-success active btn-toggle',
-						icon : 'fa-toggle-on',
+						class : 'btn btn-success btn-toggle',
+						icon : 'fa-toggle-off',
 						label : 'Toggle Inactive',
 						fn : 'toggleInactive',
 						'data-order' : 100
@@ -222,8 +223,58 @@
 				},
 			},
 			rowBtns : {
+				tagSelected : [
+					{ label: 'Tag Selected Servers', class: 'btn btn-primary', icon : 'fa-tag' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							bootbox.prompt('What tag should be added to the selected servers?', function( val ) {
+								jApp.activeGrid.fn.addTag({ 'tag' : val });
+							});
+							
+						},
+						label : 'Add Tag...'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							bootbox.prompt('What tag should be removed from the selected servers?', function( val ) {
+								jApp.activeGrid.fn.removeTag({ 'tag' : val });
+							});
+							
+						},
+						label : 'Remove Tag...'
+					},
+				],
+
 				markSelected : [
-					{ label: 'Flag Selected Servers', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{ label: 'Modify Selected Servers', class: 'btn btn-primary', icon : 'fa-check-square-o' },
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Update Software'})
+						},
+						label : 'Update Agent Software',
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Start Agent'})
+						},
+						label : 'Start Agent Service'
+					},
 					{
 						'data-multiple' : true,
 						'data-permission' : 'update_enabled',
@@ -232,7 +283,7 @@
 								e.preventDefault();
 								jApp.activeGrid.fn.markServer( { 'inactive_flag' : 1} );
 						},
-						label : 'As Inactive'
+						label : 'Flag As Inactive'
 					},
 					{
 						'data-multiple' : true,
@@ -242,7 +293,7 @@
 							e.preventDefault();
 							jApp.activeGrid.fn.markServer({ 'inactive_flag' : 0})
 						},
-						label : 'As Not Inactive'
+						label : 'Flag As Active'
 					},
 					{
 						'data-multiple' : true,
@@ -252,7 +303,7 @@
 							e.preventDefault();
 							jApp.activeGrid.fn.markServer({ 'production_flag' : 1})
 						},
-						label : 'As Production'
+						label : 'Flag As Production'
 					},
 					{
 						'data-multiple' : true,
@@ -262,7 +313,7 @@
 							e.preventDefault();
 							jApp.activeGrid.fn.markServer({ 'production_flag' : 0})
 						},
-						label : 'As Not Production'
+						label : 'Flag As Not Production'
 					}
 				]
 			},
@@ -273,10 +324,12 @@
 				"os",
 				"ip",
 				"people",
-				"applications",
-				"databases",
+				//"applications",
+				//"databases",
 				'tags',
-				"software_version"
+				'status',
+				"agent_version",
+				"agent_status",
 			],
 			headers : [ 				// headers for table
 				"ID",
@@ -285,10 +338,12 @@
 				"OS",
 				"IP",
 				"Contacts",
-				"Apps",
-				"Databases",
+				//"Apps",
+				//"Databases",
 				"Tags",
-				"Agent"
+				"Status",
+				"Agent Version",
+				"Agent Status",
 			],
 			templates : { 				// html template functions
 
@@ -311,8 +366,34 @@
 				},
 
 				ip : function( val ) {
-					return _.map( val.split('.'), function(part) { return ('000' + part).slice(-3) }).join('.');
-				}
+					
+					if ( val == null || ! val.length )
+					{
+						return '';
+					}
+
+					var ip = _.map( val.split('.'), function(part) { return ('   ' + part).slice(-3) }).join('.');
+					
+					return  `<div class="pull-right">${ip}</div>`;
+				},
+
+				agent_status : function() {
+					var r = jApp.activeGrid.currentRow
+						agent = r.agent;
+					if ( agent == null ) return "";
+
+					status = ( agent.status == 'Running' ) ? 1 : 0;
+
+					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' ) + ' <em>' + agent.updated_at_for_humans + '</em>';;
+				},
+
+				agent_version : function() {
+					var r = jApp.activeGrid.currentRow
+						agent = r.agent;
+					if ( agent == null ) return "";
+
+					return agent.version;
+				},
 
 			},
 			fn : {
@@ -331,6 +412,38 @@
 						});
 					});
 				}, // end fn
+				
+				/**
+				 * Tag selected server
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				addTag			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction() + '/_addTag',
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
+				
+				/**
+				 * Remove Tag from selected server
+				 * @method function
+				 * @return {[type]} [description]
+				 */
+				removeTag			: function( atts ) {
+					jApp.aG().action = 'withSelectedUpdate';
+					jUtility.withSelected('custom', function(ids) {
+						jUtility.postJSON( {
+							url : jUtility.getCurrentFormAction() + '/_removeTag',
+							success : jUtility.callback.submitCurrentForm,
+							data : _.extend( { '_method' : 'patch', 'ids[]' : ids }, atts )
+						});
+					});
+				}, // end fn
 
 				/**
 				 * Update the grid filter with the current values
@@ -340,7 +453,7 @@
 				updateGridFilter : function() {
 					var filter = [], temp = jApp.activeGrid.temp;
 
-					if (typeof temp.hideInactive !== 'undefined' && !!temp.hideInactive) {
+					if (typeof temp.hideInactive === 'undefined' || !!temp.hideInactive) {
 						filter.push('inactive_flag = 0');
 					}
 
@@ -359,7 +472,7 @@
 				 */
 				toggleInactive : function( ) {
 					jApp.activeGrid.temp.hideInactive = ( typeof jApp.activeGrid.temp.hideInactive === 'undefined')
-						? true : !jApp.activeGrid.temp.hideInactive;
+						? false : !jApp.activeGrid.temp.hideInactive;
 					jApp.activeGrid.fn.updateGridFilter();
 					jUtility.executeGridDataRequest();
 					$(this).toggleClass('active').find('i').toggleClass('fa-toggle-on fa-toggle-off');

@@ -20,6 +20,10 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\OutageWasModified' => [
           'App\Listeners\SyncOutageTasks'
         ],
+
+        'App\Events\ImportantEventLogged' => [
+          'App\Listeners\SendNotification'
+        ],
     ];
 
     /**

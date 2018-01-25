@@ -17,6 +17,14 @@ abstract class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     /**
+    * Spawn a new instance of the controller
+    */
+    public function __construct()
+    {
+        $this->views = (object) $this->views;
+    }
+
+    /**
      * The associated views
      * @var [type]
      */
@@ -86,5 +94,7 @@ abstract class Controller extends BaseController
       return $readable_history;
 
     }
+
+
 
 }

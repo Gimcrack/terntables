@@ -2,14 +2,15 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model as BaseModel;
 use Input;
 use App\Tag;
+use Carbon\Carbon;
+use Ingenious\Eloquence\Eloquence;
+use Ingenious\Eloquence\Builder;
+use Illuminate\Database\Eloquent\Model as BaseModel;
 use App\Exceptions\OperationRequiresCheckoutException;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use \Venturecraft\Revisionable\RevisionableTrait as RevisionableTrait;
-use Carbon\Carbon;
-use Sofa\Eloquence\Eloquence;
 
 abstract class Model extends BaseModel
 {
@@ -17,11 +18,6 @@ abstract class Model extends BaseModel
    * Make the model track revision changes
    */
   use RevisionableTrait, Eloquence;
-
-  protected $dates = [
-    'updated_at',
-    'created_at'
-  ];
 
   protected $appends = [
     'identifiable_name',
@@ -42,7 +38,7 @@ abstract class Model extends BaseModel
    * @method scopeAll
    * @return [type]   [description]
    */
-  public function scopeAll($query)
+  public function scopeAll( Builder $query )
   {
     return $query->whereRaw('1=1');
   }
@@ -52,7 +48,7 @@ abstract class Model extends BaseModel
    * @method scopeAll
    * @return [type]   [description]
    */
-  public function scopeNone($query)
+  public function scopeNone( Builder $query )
   {
     return $query->whereRaw('1=0');
   }
@@ -64,6 +60,14 @@ abstract class Model extends BaseModel
   public function identifiableName()
   {
       return $this->name;
+  }
+
+  /**
+   * Return the original attributes
+   */
+  public function getBaseAtts()
+  {
+    return array_intersect_key($this->toArray(), array_flip($this->fillable));  
   }
 
   /**
@@ -416,9 +420,9 @@ abstract class Model extends BaseModel
    * @method checkoutToMe
    * @return [type]       [description]
    */
-  public function checkoutToMe()
+  public function checkoutToMe( $guard = 'api' )
   {
-    return $this->checkoutToId( \Auth::id() );
+    return $this->checkoutToId( \Auth::guard($guard)->user()->id );
   }
 
   /**

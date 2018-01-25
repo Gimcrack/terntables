@@ -32,14 +32,14 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['username', 'email', 'password', 'people_id', 'comment', 'primary_flag'];
+    protected $fillable = ['username', 'email', 'password', 'people_id', 'comment', 'primary_flag', 'api_token'];
 
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'api_token'];
 
     protected $searchableColumns = [
       'username' => 80,
@@ -110,6 +110,16 @@ class User extends Model implements AuthenticatableContract,
       return (Boolean) ( $this->groups()->where('name','Super Administrators')->count() );
     }
 
+    /**
+     * Does the user have a particular group
+     * @method hasGroup
+     * @param  [type]   $group [description]
+     * @return boolean         [description]
+     */
+    public function hasGroup($group)
+    {
+      return (Boolean) ( $this->groups()->where('name',$group)->count() || $this->isAdmin() );
+    }
 
     /**
      * Is user an AD user

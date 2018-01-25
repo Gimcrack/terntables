@@ -20,6 +20,13 @@ var $intervals = {};
 var ajaxRequests = {};
 var urlParams;
 
+$.ajaxSetup({
+  headers: {
+      'X-XSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+      'x-api-token' : $('meta[name="api_token"]').attr('content')
+  }
+});
+
 
 String.prototype.ucfirst = function() {
     return this.toString().charAt(0).toUpperCase() + this.slice(1);

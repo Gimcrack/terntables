@@ -1,4 +1,8 @@
 <?php
+
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
     /**
@@ -7,6 +11,22 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
      * @var string
      */
     protected $baseUrl = 'http://localhost';
+
+    /**
+     * The database connection to transact
+     */
+    public $connectionsToTransact = ['test'];
+
+    /**
+     * Sets Up.
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        //$this->runDatabaseMigrations();
+        //$this->beginDatabaseTransaction();
+    }
 
     /**
      * Creates the application.
@@ -18,13 +38,6 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
         $app = require __DIR__.'/../bootstrap/app.php';
 
         $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-
-        if ( ! \App\User::where('username','jeremy')->count() )
-        {
-          // \App\Group::create([ 'name' => 'Super Administrators']);
-
-          \App\User::create([ 'username' => 'jeremy', 'email' => 'jeremy.bloomstrom@matsugov.us', 'password' => bcrypt('Matanuska1') ])->groups()->attach([1]);
-        }
 
         return $app;
     }

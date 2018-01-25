@@ -16,9 +16,9 @@ class ApplicationController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'bi.applications.index'
-  );
+  ];
 
   /**
    * What relationships to grab with the model
@@ -37,14 +37,5 @@ class ApplicationController extends Controller
    * @var string
    */
   public $model_class = 'App\Application';
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth');
-  }
 
 }

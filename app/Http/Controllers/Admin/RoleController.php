@@ -16,23 +16,13 @@ class RoleController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'admin.roles.index'
-  );
+  ];
 
   /**
    * The class of the model
    * @var string
    */
   public $model_class = 'App\Role';
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth.admin');
-  }
-
 }

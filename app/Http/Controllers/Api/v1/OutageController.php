@@ -31,14 +31,6 @@ class OutageController extends ApiController
   ];
 
   /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-  }
-
-  /**
    * Update the selected outages
    * @method updateOutages
    * @return [type]        [description]
