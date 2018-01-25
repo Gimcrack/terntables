@@ -3,59 +3,62 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Support\Facades\Auth;
 use Laracasts\Flash\Flash;
 
 class SuperAdministrator
 {
-    /**
-     * The Guard implementation.
-     *
-     * @var Guard
-     */
-    protected $auth;
-
-    /**
-     * Create a new filter instance.
-     *
-     * @param  Guard  $auth
-     * @return void
-     */
-    public function __construct(Guard $auth)
+  /**
+   * Handle an incoming request.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @param  \Closure  $next
+   * @return mixed
+   */
+  public function handle($request, Closure $next, $guard = null)
+  {
+    // determine first if user is logged in
+    if ( Auth::guard($guard)->guest() ) 
     {
-        $this->auth = $auth;
-    }
-
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle($request, Closure $next)
-    {
-      // determine first if user is logged in
-      if ($this->auth->guest()) {
-        if ($request->wantsJson()) {
+        if ($request->ajax() || $request->wantsJson() || $this->isApiCall($request) ) 
+        {
           return response()->json([
             'errors' => true,
             'message' => "You must be logged on as a super administrator to do that."
           ], 403);
-        }
-        if (!$request->ajax()) {
-          return redirect()->guest('auth/login');
-        }
-      }
+        } 
+        
+        return redirect()->guest('auth/login');
+    }
 
+    // now determine if logged in user is an admin
+    if ( ! Auth::guard($guard)->user()->isSuperAdmin() ) 
+    {
+      if ($request->ajax() || $request->wantsJson() || $this->isApiCall($request)) 
+      {
+        return response()->json([
+          'errors' => true,
+          'message' => "You must be logged on as a super administrator to do that."
+        ], 403);
+      } 
 
-      // now determine if logged in user is a super admin
-      if ( $this->auth->user()->isSuperAdmin() ) {
-        return $next($request);
-      } else {
-        Flash::error('You must be logged on as a super administrator to do that.');
-        return redirect('/');
-      }
+      Flash::error('You must be logged on as a super administrator to do that.');
+      return redirect()->guest('auth/login');
+    } 
 
+    return $next($request);
+  }
+
+  /**
+     * Determines if request is an api call.
+     *
+     * If the request URI contains '/api/v'.
+     *
+     * @param Request $request
+     * @return bool
+     */
+    protected function isApiCall($request)
+    {
+      return strpos($request->getUri(), 'api/v') !== false;
     }
 }

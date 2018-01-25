@@ -15,23 +15,14 @@ class NotificationExemptionController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
-    'index' => 'admin.notifications.exemptions'
-  );
+  public $views = [
+      'index' => 'admin.notifications.exemptions'
+    ];
 
   /**
    * The class of the model
    * @var string
    */
   public $model_class = 'App\NotificationExemption';
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth.admin');
-  }
 
 }

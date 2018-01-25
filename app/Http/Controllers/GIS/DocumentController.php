@@ -23,19 +23,12 @@ class DocumentController extends Controller
      * @var [type]
      */
     public $views = [
-      'index' => 'gis.documents.index'
+        'index' => 'gis.documents.index'
     ];
 
-    public $with = ['owner'];
-
-    /**
-     * Spawn a new instance of the controller
-     */
-    public function __construct()
-    {
-      $this->views = (object) $this->views;
-      $this->middleware('auth');
-    }
+    public $with = [
+        'owner'
+    ];
 
     /**
      * Display the specified resource.

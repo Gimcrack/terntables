@@ -3,28 +3,10 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Support\Facades\Auth;
 
 class Authenticate
 {
-    /**
-     * The Guard implementation.
-     *
-     * @var Guard
-     */
-    protected $auth;
-
-    /**
-     * Create a new filter instance.
-     *
-     * @param  Guard  $auth
-     * @return void
-     */
-    public function __construct(Guard $auth)
-    {
-        $this->auth = $auth;
-    }
-
     /**
      * Handle an incoming request.
      *
@@ -32,18 +14,17 @@ class Authenticate
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $guard = null)
     {
-        if ($this->auth->guest()) {
-            if ($request->wantsJson()) {
+        if ( Auth::guard($guard)->guest() ) {
+            if ($request->ajax() || $request->wantsJson() || $this->isApiCall($request)) {
               return response()->json([
                 'errors' => true,
                 'message' => "You must be logged on as a user to do that."
               ], 403);
-            }
-            if (!$request->ajax()) {
-                return redirect()->guest('auth/login');
-            }
+            } 
+            
+            return redirect()->guest('auth/login');
         }
 
         return $next($request);
@@ -59,4 +40,19 @@ class Authenticate
         // set to true instead of false
         return true;
     }
+
+    /**
+     * Determines if request is an api call.
+     *
+     * If the request URI contains '/api/v'.
+     *
+     * @param Request $request
+     * @return bool
+     */
+    protected function isApiCall($request)
+    {
+      return strpos($request->getUri(), 'api/v') !== false;
+    }
+
+
 }

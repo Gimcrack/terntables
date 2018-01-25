@@ -79,6 +79,16 @@
 						type : 'button',
 						fn : function(e) {
 							e.preventDefault();
+							jApp.activeGrid.fn.markServer({ 'status' : 'Start Agent'})
+						},
+						label : 'Start Agent Service'
+					},
+					{
+						'data-multiple' : true,
+						'data-permission' : 'update_enabled',
+						type : 'button',
+						fn : function(e) {
+							e.preventDefault();
 							jApp.activeGrid.fn.markServer({ 'status' : 'Look For Updates'})
 						},
 						label : 'As Look For Updates'
@@ -143,9 +153,9 @@
 				"status",
 				"approved_updates",
 				"new_updates",
-				"software_version",
+				"agent_version",
+				"agent_status",
 				"updated_at_for_humans"
-				//'tags',
 			],
 			headers : [ 				// headers for table
 				"ID",
@@ -157,6 +167,7 @@
 				"Approved Updates",
 				"New Updates",
 				"Agent Version",
+				"Agent Status",
 				"Updated"
 			],
 			templates : { 				// html template functions
@@ -172,8 +183,26 @@
 				},
 
 				ip : function( val ) {
-					return _.map( val.split('.'), function(part) { return ('000' + part).slice(-3) }).join('.');
-				}
+					return _.map( val.split('.'), function(part) { return ('   ' + part).slice(-3) }).join('.');
+				},
+
+				agent_status : function() {
+					var r = jApp.activeGrid.currentRow
+						agent = r.agent;
+					if ( agent == null ) return "";
+
+					status = ( agent.status == 'Running' ) ? 1 : 0;
+
+					return _.getFlag(status, 'Running', 'Stopped', 'success', 'danger' );
+				},
+
+				agent_version : function() {
+					var r = jApp.activeGrid.currentRow
+						agent = r.agent;
+					if ( agent == null ) return "";
+
+					return agent.version;
+				},
 
 			},
 			fn : {

@@ -15,9 +15,9 @@ class DatabaseController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'bi.databases.index'
-  );
+  ];
 
   /**
    * The class of the model
@@ -36,15 +36,4 @@ class DatabaseController extends Controller
     'tags',
     'host'
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth');
-  }
-
-
 }

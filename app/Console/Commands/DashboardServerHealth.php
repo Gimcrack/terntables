@@ -4,12 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Server;
-use App\Alert;
-use App\Notification;
-use App\ServerDisk;
-use App\Dashboard\Notifier;
-use Illuminate\Database\Eloquent\Collection;
-use Log;
+use Carbon\Carbon;
+use Logger;
 
 class DashboardServerHealth extends Command
 {
@@ -25,7 +21,7 @@ class DashboardServerHealth extends Command
      *
      * @var string
      */
-    protected $description = 'Queries the servers table and sends notifications of any alerts.';
+    protected $description = 'Logs any servers that are late checking in - could be an indication that the server or the agent is offline.';
 
     /**
      * Create a new command instance.
@@ -44,190 +40,59 @@ class DashboardServerHealth extends Command
      */
     public function handle()
     {
-      $this->checkDiskSpace();
-
-      $this->checkServerAlerts();
-
-      $this->checkLateServers();
+      Server::lateCheckingIn()
+        ->get()
+        ->reject( function( Server $server ) {
+            $server->fresh(); // get a fresh copy from the db
+            $diff = Carbon::now()->diffInMinutes( Carbon::parse($server->last_checkin) );
+            return ($diff < 15);
+        })
+        ->each( function(Server $server) {
+            $this->log($server);
+        });
     }
 
+    /**
+     * Log the error
+     *
+     * @param      \App\Server  $server  The server
+     */
+    private function log(Server $server)
+    {
+        $level = $this->getLevel( $server->last_checkin );
+
+        Logger::$level( $this->getMessage($server) , 'App\Server', $server->id);
+    }
 
     /**
-     * Check free disk space
-     * @method checkDiskSpace
-     * @return [type]         [description]
+     * Gets the message.
+     *
+     * @param      \App\Server  $server  The server
      */
-    public function checkDiskSpace()
+    private function getMessage(Server $server)
     {
-      $disks = ServerDisk::with(['server'])->almostFull()->get();
+        return sprintf("Last checkin at [%s on %s]. Server may be offline.", 
+            Carbon::parse($server->last_checkin)->format('g:i A'),
+            Carbon::parse($server->last_checkin)->format('Y-m-d')
+        );
+    }
 
-      foreach($disks as $disk)
-      {
-        if ( ! $disk->server->inactive_flag )
-        {
-          Alert::create([
-            'message' => "[{$disk->server->name}] Less than 10% free space on {$disk->name}",
-            'alertable_type' => 'App\Server',
-            'alertable_id' => $disk->server->id
-          ]);
+    /**
+     * Get the severity of the issue
+     * @method getLevel
+     *
+     * @return   string
+     */
+    private function getLevel($last_checkin)
+    {
+        $diff = Carbon::now()->diffInMinutes( Carbon::parse($last_checkin) );
+
+        switch($diff) {
+            case $diff < 20 : return 'error';
+            case $diff >= 20 && $diff < 40 : return 'critical';
+            case $diff >= 40 && $diff < 60 : return 'alert';
+            case $diff >= 60 : return 'emergency';
         }
-      }
-    }
-
-    /**
-     * Check servers that are late checking in.
-     * @method checkLateServers
-     * @return [type]           [description]
-     */
-    public function checkLateServers()
-    {
-      $late_servers = Server::lateCheckingIn()->get();
-
-      if ( $late_servers->count() )
-      {
-        $this->sendLateServerNotifications($late_servers);
-      }
-
-    }
-
-    /**
-     * Check if there are any unreported server alerts and process
-     * @method checkServerAlerts
-     * @return [type]            [description]
-     */
-    public function checkServerAlerts()
-    {
-      $alerts = Alert::with(['alertable'])->serverAlerts()->unnotified()->get();
-
-
-      foreach($alerts as $alert)
-      {
-        $server = $alert->alertable;
-        $notifications = $server->notifications();
-        $body = str_replace( "\n", "<br/>", $alert->message );
-
-        if ( $this->shouldSendAlert($alert) )
-        {
-          foreach( $notifications as $notification )
-          {
-            if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Email' )
-            {
-              Log::info("Sending Email Notification to {$notification->email}");
-              Notifier::mail('emails.offlineServiceNotification'
-                , compact('body')
-                , $notification->email
-                , "Service Error on {$server->name}"
-              );
-            }
-
-            if ( $notification->notifications_enabled == 'Both' || $notifications->notifications_enabled == 'Text' )
-            {
-              Log::info("Sending Text Notification to {$notification->phone_number}");
-              Notifier::text($notification->phone_number, $alert->message);
-            }
-          } // end foreach
-        }
-
-        Log::warning($alert->message);
-
-        $alert->notification_sent_flag = 1;
-        $alert->save();
-
-      } // end foreach
-    }
-
-    /**
-     * Should the alert be sent?
-     * @method shouldSendAlert
-     * @return [type]          [description]
-     */
-    public function shouldSendAlert(Alert $alert)
-    {
-      $server = $alert->alertable;
-      $quiet = Notifier::isQuietHours( $server->production_flag );
-      $outage = Notifier::isOutage();
-
-      if ( !! $server->inactive_flag )
-      {
-        Log::info("Alert suppressed for inactive server");
-        return false;
-      }
-
-      if ( !! $outage ) {
-        Log::info("Alert suppressed due to: outage window");
-        return false;
-      }
-
-      if ( ! $quiet ) return true;
-
-      // quiet hours, don't send alerts for nonprod servers
-      if ( ! $server->production_flag ) {
-        Log::info("Alert suppressed for test server due to: quiet hours enforced");
-        return false;
-      }
-
-      // quiet hours, production server - send if there have been more than the threshold in the past hour
-      if ( $server->alerts()->recent()->count() >= config('alerts.production_alert_threshold') )
-      {
-        Log::info("Alert allowed for production server due to: threshold reached during quiet hours");
-        return true;
-      }
-
-      Log::info("Alert suppressed for production server due to: quiet hours enforced");
-      return false;
-
-    }
-
-    /**
-     * Send the notifications for the late servers
-     * @method sendNotifications
-     * @param  Collection        $servers [description]
-     * @return [type]                     [description]
-     */
-    public function sendLateServerNotifications(Collection $servers)
-    {
-      $body = $this->getLateServerNotification($servers);
-
-      // make sure it's not quiet hours
-      if ( ! Notifier::isQuietHours() )
-      {
-        // send a text message to the system admin
-        Notifier::text( env('ADMIN_PHONE'), $body );
-
-        // send an email message to the system admin
-        Notifier::mail( 'emails.lateServerNotification', compact('servers') );
-      } else {
-        // just log a warning instead
-        Log::warning($body);
-      }
-    }
-
-
-
-    /**
-     * get the notification message for a late server
-     * @method getLateServerNotification
-     * @param  [type]                    $server_names [description]
-     * @return [type]                                  [description]
-     */
-    public function getLateServerNotification(Collection $servers)
-    {
-      $server_names = [];
-
-      foreach($servers as $server)
-      {
-        // create the alert
-        Alert::create([
-          'message' => "Server {$server->name} last checked in: {$server->updated_at_for_humans}.",
-          'alertable_id' => $server->id,
-          'alertable_type' => 'App\Server',
-          'notification_sent_flag' => 1
-        ]);
-
-        $server_names[] = $server->name . " (" . $server->updated_at_for_humans . ")";
-      }
-
-      return "\nMSB Dashboard Warning:\nServer(s) late checking in:\n -- " . implode("\n -- ",$server_names) . "\n-Reported at " . date("Y-m-d H:i:s");
     }
 
 }

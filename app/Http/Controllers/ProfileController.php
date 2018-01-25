@@ -14,9 +14,9 @@ class ProfileController extends Controller
      * The associated views
      * @var [type]
      */
-    public $views = array(
+    public $views = [
       'index' => 'pages.profile.index'
-    );
+    ];
 
     /**
      * The class of the model
@@ -32,15 +32,6 @@ class ProfileController extends Controller
       'groups.roles',
       'person'
     ];
-
-    /**
-     * Construct a new PagesController
-     * @method __construct
-     */
-    public function __construct()
-    {
-      $this->middleware('auth');
-    }
 
     /**
      * Show the user's profile view

@@ -17,9 +17,9 @@ class CheckAccess
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next, $role)
+    public function handle($request, Closure $next, $role, $guard='api')
     {
-        if (Auth::check() && Auth::user()->checkAccess($role) ) {
+        if (Auth::guard($guard)->check() && Auth::guard($guard)->user()->checkAccess($role) ) {
           return $next($request);
         }
 

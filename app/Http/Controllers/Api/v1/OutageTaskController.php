@@ -49,11 +49,4 @@ class OutageTaskController extends ApiController
     'scope_to_databases'
   ];
 
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth');
-  }
 }

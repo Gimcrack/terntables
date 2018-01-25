@@ -1,5 +1,5 @@
 <h1>
- MSB IT Dashboard Warning
+ MSB IT Dashboard Notice
 </h1>
 
 <p>

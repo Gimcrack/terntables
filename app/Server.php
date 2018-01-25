@@ -2,15 +2,10 @@
 
 namespace App;
 
+use Carbon;
+
 class Server extends Model
 {
-  /**
-   * The database table that the model references
-   *
-   * @var string
-   */
-  protected $table = 'servers';
-
   /**
    * The mass assignable fields
    *
@@ -28,6 +23,14 @@ class Server extends Model
       'group_id',
       'operating_system_id',
       'status'
+  ];
+
+  protected $casts = [
+    'group_id' => 'int',
+    'inactive_flag' => 'int',
+    'production_flag' => 'int',
+    'windows_updatable_flag' => 'int',
+    'operating_system_id' => 'int' 
   ];
 
   protected $searchableColumns = [
@@ -84,7 +87,7 @@ class Server extends Model
    * @param  [type]          $query [description]
    * @return [type]                 [description]
    */
-  public function scopeHasUpdates($query, $filter)
+  public function scopeHasUpdates($query, $filter = false)
   {
     if ( ! $filter )
     {
@@ -104,7 +107,32 @@ class Server extends Model
    */
   public function scopeLateCheckingIn($query)
   {
-    return $query->active()->whereNotNull('software_version')->where('updated_at','<', date('Y-m-d H:i:s', strtotime("15 minutes ago") ) );
+    return $query
+      ->active()
+      ->hasAgent()
+      ->where('last_checkin','<', Carbon::now()->subMinutes(15) );
+  }
+
+  /**
+   * Get servers which have the agent installed
+   *
+   * @param      <type>  $query  The query
+   * @return     <type>  ( description_of_the_return_value )
+   */
+  public function scopeHasAgent($query)
+  {
+    return $query->has('agent');
+  }
+
+  /**
+   * Get servers belonging to a certain group
+   * @method scopeOfGroup
+   *
+   * @return   void
+   */
+  public function scopeOfGroup($query, $group_id)
+  {
+      return $query->whereGroupId($group_id);
   }
 
   /**
@@ -143,6 +171,17 @@ class Server extends Model
   }
 
   /**
+   * Get production and test
+   * @method scopeBoth
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeBoth($query)
+  {
+    return $query->where('inactive_flag',0);
+  }
+
+  /**
    * Get only production servers
    * @method scopeProduction
    * @param  [type]          $query [description]
@@ -150,18 +189,52 @@ class Server extends Model
    */
   public function scopeProduction($query)
   {
-    return $query->where('production_flag',1);
+    return $query->where('production_flag',1)->active();
+  }
+
+  /**
+   * Get only production servers
+   * @method scopeProd
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeProd($query)
+  {
+    return $query->where('production_flag',1)->active();
   }
 
   /**
    * Get only non-production servers
-   * @method scopeNonroduction
+   * @method scopeNonproduction
    * @param  [type]          $query [description]
    * @return [type]                 [description]
    */
   public function scopeNonproduction($query)
   {
-    return $query->where('production_flag',0);
+    return $query->where('production_flag',0)->active();
+  }
+
+  /**
+   * Get only non-production servers
+   * @method scopeTest
+   * @param  [type]          $query [description]
+   * @return [type]                 [description]
+   */
+  public function scopeTest($query)
+  {
+    return $query->where('production_flag',0)->active();
+  }
+
+  /**
+   * A Server can have many services
+   *
+   * @return     <type>  ( description_of_the_return_value )
+   */
+  public function services()
+  {
+    return $this->belongsToMany(Service::class)
+      ->withTimestamps()
+      ->withPivot(['status', 'start_mode', 'level']);
   }
 
   /**
@@ -171,7 +244,7 @@ class Server extends Model
    */
   public function disks()
   {
-    return $this->hasMany('App\ServerDisk');
+    return $this->hasMany(ServerDisk::class);
   }
 
   /**
@@ -181,7 +254,7 @@ class Server extends Model
    */
   public function alerts()
   {
-    return $this->morphMany('App\Alert','alertable');
+    return $this->morphMany(Alert::class,'alertable');
   }
 
   /**
@@ -190,7 +263,7 @@ class Server extends Model
    */
   public function tags()
   {
-      return $this->morphToMany('App\Tag', 'taggable');
+      return $this->morphToMany(Tag::class, 'taggable');
   }
 
   /**
@@ -200,7 +273,9 @@ class Server extends Model
    */
   public function people()
   {
-    return $this->belongsToMany('App\Person')->withTimestamps()->withPivot(['comment','contact_type']);
+    return $this->belongsToMany(Person::class)
+      ->withTimestamps()
+      ->withPivot(['comment','contact_type']);
   }
 
   /**
@@ -210,7 +285,9 @@ class Server extends Model
    */
   public function applications()
   {
-    return $this->belongsToMany('App\Application')->withTimestamps()->withPivot(['comment','server_type']);
+    return $this->belongsToMany(Application::class)
+      ->withTimestamps()
+      ->withPivot(['comment','server_type']);
   }
 
   /**
@@ -220,7 +297,9 @@ class Server extends Model
    */
   public function databases()
   {
-    return $this->belongsToMany('App\Database')->withTimestamps()->withPivot(['comment','server_type']);
+    return $this->belongsToMany(Database::class)
+      ->withTimestamps()
+      ->withPivot(['comment','server_type']);
   }
 
   /**
@@ -230,7 +309,7 @@ class Server extends Model
    */
   public function owner()
   {
-    return $this->belongsTo('App\Group','group_id');
+    return $this->belongsTo(Group::class,'group_id');
   }
 
   /**
@@ -240,7 +319,7 @@ class Server extends Model
    */
   public function operating_system()
   {
-    return $this->belongsTo('App\OperatingSystem','operating_system_id');
+    return $this->belongsTo(OperatingSystem::class,'operating_system_id');
   }
 
   /**
@@ -250,7 +329,18 @@ class Server extends Model
    */
   public function updates()
   {
-    return $this->hasMany('App\UpdateDetail','server_id');
+    return $this->hasMany(UpdateDetail::class,'server_id');
+  }
+
+  /**
+   * A server can have one agent
+   * @method agent
+   *
+   * @return   
+   */
+  public function agent()
+  {
+      return $this->hasOne(ServerAgent::class);
   }
 
   /**
@@ -260,7 +350,7 @@ class Server extends Model
    */
   public function update_batches()
   {
-    return $this->hasMany('App\UpdateBatch','server_id');
+    return $this->hasMany(UpdateBatch::class,'server_id');
   }
 
   /**
@@ -270,6 +360,8 @@ class Server extends Model
    */
   public function notifications()
   {
+    if ( ! $this->owner )  return collect([]);
+    
     return Notification::where('group_id', $this->owner->id )
       ->where('notifications_enabled','<>','None')
       ->get();

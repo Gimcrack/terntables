@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Api\v1;
 
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
+use App\Jobs\UpdateServices;
 use App\Http\Requests;
 use App\Http\Controllers\Api\v1\ApiController;
 use App\Server;
+use App\Service;
+
 use Input;
 
 class ServerController extends ApiController
 {
+  use DispatchesJobs;
 
   /**
    * The class name of the associated model
@@ -32,13 +37,14 @@ class ServerController extends ApiController
    * @var [type]
    */
   public $with = [
-    'applications',
-    'databases',
+    //'applications',
+    //'databases',
     'people',
     'tags',
     'owner',
     'operating_system',
-    'update_batches'
+    'update_batches',
+    'agent'
   ];
 
   /**
@@ -50,6 +56,25 @@ class ServerController extends ApiController
     'applications',
     'databases'
   ];
+
+  /**
+   * Return an index of the models
+   * @method index
+   *
+   * @return   Collection
+   */
+  public function index()
+  {
+      $this->with = [
+        'people',
+        'tags',
+        'owner',
+        'operating_system',
+        'agent'
+      ];
+
+      return parent::index();
+  }
 
   /**
    * Parse the search filter
@@ -80,17 +105,8 @@ class ServerController extends ApiController
    */
   private function showOnlyMyGroupsCriteria()
   {
-    $my_groups = implode(",",\Auth::user()->groups()->lists('id')->toArray() );
+    $my_groups = implode(",",$this->user->groups()->lists('id')->toArray() );
     return "group_id in ({$my_groups})";
-  }
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->middleware('auth', [ 'except' => 'healthServers']);
-    $this->checkAccessMiddleware();
   }
 
   /**
@@ -102,6 +118,44 @@ class ServerController extends ApiController
   {
     $fillable = ['production_flag', 'inactive_flag', 'status'];
     return $this->massUpdate( $this->getInputIds(), array_intersect_key( Input::all() , array_flip( $fillable ) ) );
+  }
+
+  /**
+   * Add tag to the selected servers
+   * @method addTag
+   *
+   * @return   void
+   */
+  public function addTag(Request $request)
+  {
+      $tag = \App\Tag::firstOrCreate(['name' => $request->get('tag')]);
+
+      Server::whereIn('id', $this->getInputIds()) 
+        ->each( function(Server $server) use ($tag) {
+          $tags = $server->tags()->lists('tag_id')->push($tag->id)->unique()->all();
+          $server->tags()->detach();
+          $server->tags()->sync($tags);
+        });
+
+      return $this->operationSuccessful();
+  }
+
+  /**
+   * Remove tag from the selected servers
+   * @method removeTag
+   *
+   * @return   void
+   */
+  public function removeTag(Request $request)
+  {
+      $tag = \App\Tag::where(['name' => $request->get('tag')])->firstOrFail();
+
+      Server::whereIn('id', $this->getInputIds()) 
+        ->each( function(Server $server) use ($tag) {
+          $server->tags()->detach($tag->id);
+        });
+
+      return $this->operationSuccessful();
   }
 
   /**
@@ -120,25 +174,25 @@ class ServerController extends ApiController
     return response()->json($data);
   }
 
-  public function windowsUpdateServerIndex()
+  public function windowsUpdateServerIndex(Request $request)
   {
 
-    $input = Input::all();
+    $input = $request->all();
     $model_class = $this->model_class;
 
     $filter = $this->parseSearchFilter();
 
     $with = ['owner','operating_system'];
 
-    $q = Input::get('q',null);
-    $scope = Input::get('scope','all');
+    $q = $request->input('q',null);
+    $scope = $request->input('scope','all');
 
     if ( !! $q ) {
       $results = $model_class::search( $q )
                   ->with($with)
                   ->windows()
                   ->updatable( )
-                  ->hasUpdates( Input::get('showUnupdatable',false) )
+                  ->hasUpdates( $request->input('showUnupdatable',false) )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
@@ -146,7 +200,7 @@ class ServerController extends ApiController
       $results = $model_class::with($with)
                   ->windows()
                   ->updatable()
-                  ->hasUpdates( Input::get('showUnupdatable',false) )
+                  ->hasUpdates( $request->input('showUnupdatable',false) )
                   ->$scope()
                   ->whereRaw($filter)
                   ->paginate( $this->limitPerPage );
@@ -154,4 +208,40 @@ class ServerController extends ApiController
 
     return response()->json( $results );
   }
+
+  /**
+   * Update the services for the selected server
+   */
+  public function updateServices($server_id, Request $request)
+  {
+    $this->dispatch( new UpdateServices( $server_id, $request ) );
+      
+    return $this->operationSuccessful();
+  }
+
+  /**
+   * Update the services for the selected server
+   *  does not detach services that are not included 
+   *  in the data
+   */
+  public function updateIndividualServices($server_id, Request $request)
+  {
+    $this->dispatch( new UpdateServices( $server_id, $request, false ) );
+      
+    return $this->operationSuccessful();
+  }
+
+  /**
+   * Update the status of the agent for the selected server
+   * @method updateAgent
+   *
+   * @return   void
+   */
+  public function updateAgentStatus($server_id, Request $request)
+  {
+      $this->dispatch( new UpdateAgent( $server_id, $request ) );
+
+      return $this->operationSuccessful();
+  }
+
 }

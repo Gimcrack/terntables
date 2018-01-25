@@ -16,9 +16,9 @@ class UpdateDetailController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'bi.updates.approve'
-  );
+  ];
 
   /**
    * The class of the model
@@ -34,14 +34,5 @@ class UpdateDetailController extends Controller
     'server',
     'header'
   ];
-
-  /**
-   * Spawn a new instance of the controller
-   */
-  public function __construct()
-  {
-    $this->views = (object) $this->views;
-    $this->middleware('auth');
-  }
 
 }

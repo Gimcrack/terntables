@@ -112,8 +112,8 @@ class RecordLock extends BaseModel
       }
     }
 
-    public function isSameUser()
+    public function isSameUser($guard='api')
     {
-      return (Boolean) ($this->user_id === \Auth::id() );
+      return (Boolean) ($this->user_id == \Auth::guard($guard)->user()->id );
     }
 }

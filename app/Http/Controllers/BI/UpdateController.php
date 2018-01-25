@@ -16,9 +16,9 @@ class UpdateController extends Controller
    * The associated views
    * @var [type]
    */
-  public $views = array(
+  public $views = [
     'index' => 'bi.updates.index'
-  );
+  ];
 
   /**
    * The class of the model

@@ -1,0 +1,1 @@
+php artisan queue:listen --tries=3 --timeout=60 --sleep=5

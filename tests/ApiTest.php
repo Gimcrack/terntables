@@ -3,10 +3,12 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Group;
+use App\User;
 
 abstract class ApiTest extends TestCase
 {
-    use DatabaseTransactions;
+    use DatabaseMigrations;
     //use WithoutMiddleware;
 
     /**
@@ -21,7 +23,6 @@ abstract class ApiTest extends TestCase
      * @var [type]
      */
     public $headers;
-
 
     /**
      * The class of the model to test: e.g. App\Person.
@@ -52,6 +53,7 @@ abstract class ApiTest extends TestCase
     {
       $this->headers = [
         'accept' => 'application/json',
+        'x-api-token' => '012345678901234567890123456789012345678901234567890123456789',
       ];
 
       $this->error_messages = [
@@ -68,13 +70,36 @@ abstract class ApiTest extends TestCase
     public function setUp() {
       parent::setUp();
 
-
-      Auth::loginUsingId(1);
+      $this->login();
 
       $this->test_dummy = factory($this->model_class)->make();
-      $this->test_dummy_attributes = $this->test_dummy->toArray();
+      $this->test_dummy_attributes = $this->test_dummy->getBaseAtts();
+
       unset($this->test_dummy_attributes['updated_at_for_humans']);
       unset($this->test_dummy_attributes['identifiable_name']);
+    }
+
+    /**
+     * Login
+     */
+    public function login()
+    {
+      if ( ! \App\User::where('username','jeremy')->count() )
+      {
+        \App\Group::create([ 'name' => 'Super Administrators']);
+
+        \App\User::create(
+          [ 
+              'username' => 'jeremy', 
+              'email' => 'jeremy.bloomstrom@matsugov.us', 
+              'password' => bcrypt('Matanuska1'),
+              'api_token' => 'JRq1WSlKwtlLGb5iM1CugmS0qGIGAIddHvcPPxVz2fQBV2XO6e0XSDeN3YVw'
+          ]                
+        )->groups()->attach([1]);
+      }
+      
+      \Auth::loginUsingId(1);
+      \Auth::guard('api')->loginUsingToken('JRq1WSlKwtlLGb5iM1CugmS0qGIGAIddHvcPPxVz2fQBV2XO6e0XSDeN3YVw');
     }
 
 
@@ -162,7 +187,7 @@ abstract class ApiTest extends TestCase
     public function testCreateModelWhileNotLoggedIn()
     {
       // logout first
-      Auth::logout();
+      Auth::guard('api')->logout();
 
       $attributes = $this->test_dummy_attributes;
 
@@ -231,7 +256,7 @@ abstract class ApiTest extends TestCase
      */
     public function testUpdateModelWhileNotLoggedIn() {
       // logout first
-      Auth::logout();
+      Auth::guard('api')->logout();
 
       // create a model
       $model = $this->test_dummy->save();
@@ -301,6 +326,9 @@ abstract class ApiTest extends TestCase
      */
     public function testDeleteModel()
     {
+      // login
+      $this->login();
+
       // create a model
       $this->test_dummy->save();
       $id = $this->test_dummy->id;
@@ -310,6 +338,9 @@ abstract class ApiTest extends TestCase
            ->seeJsonContainsTestDummyAttributes()
            ->seeTestDummyInDatabase()
            ->seeStatusCode(200);
+
+      // checkout the model
+      $this->test_dummy->checkoutToMe();
 
       // delete
       $this->delete("/{$this->model_short}/{$id}", [], $this->headers)
@@ -369,7 +400,7 @@ abstract class ApiTest extends TestCase
       $this->test_dummy->save();
       $id = $this->test_dummy->id;
 
-      Auth::logout();
+      Auth::guard('api')->logout();
 
       // verify the model
       $this->delete("/{$this->model_short}/{$id}", [], $this->headers)
@@ -464,7 +495,7 @@ abstract class ApiTest extends TestCase
      */
     public function testCheckoutAModelWhileNotLoggedIn()
     {
-      Auth::logout();
+      Auth::guard('api')->logout();
 
       // create a model
       $this->test_dummy->save();
@@ -571,7 +602,6 @@ abstract class ApiTest extends TestCase
     public function testCheckinMultipleModelsAtOnce()
     {
       $class = $this->model_class;
-
       // create models
       factory($this->model_class, 3)->create();
 
@@ -740,7 +770,8 @@ abstract class ApiTest extends TestCase
      * @return [type]                 [description]
      */
     public function seeTestDummyInDatabase()
-    {
+    { 
+      $class = $this->model_class;
       return $this->seeInDatabase( $this->db_table, $this->test_dummy_attributes );
     }
 
@@ -771,7 +802,7 @@ abstract class ApiTest extends TestCase
      */
     public function createUser()
     {
-      return App\User::create(['username' => 'JohnDoe', 'email' => 'jdoe@email.com', 'password' => 'password']);
+      return User::create(['username' => 'JohnDoe', 'email' => 'jdoe@email.com', 'password' => 'password', 'api_token' => '000000000000000000000000000000000000000000000000000000000000']);
     }
 
     /**
@@ -781,7 +812,7 @@ abstract class ApiTest extends TestCase
      */
     public function createGroup()
     {
-      return App\Group::create(['name' => 'Test Group', 'description' => 'Test Group']);
+      return Group::create(['name' => 'Test Group', 'description' => 'Test Group']);
     }
 
     /**
